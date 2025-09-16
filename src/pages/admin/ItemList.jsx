@@ -183,9 +183,13 @@ const ItemList = () => {
 
   // Save or Update Item
   const handleSave = async () => {
+    // console.log("Item ", itemCategory);
+    
     const formData = new FormData();
 
     formData.append("itemType", itemCategory);
+    
+    
     formData.append("itemName", itemName);
     formData.append("details", details);
     formData.append("manufacturer", manufacture);
@@ -203,7 +207,7 @@ const ItemList = () => {
     if (image) {
       formData.append("itemImage", image); // ✅ append actual file, not preview
     }
-
+   
     console.log("Form Data", [...formData.entries()]);
 
     try {
