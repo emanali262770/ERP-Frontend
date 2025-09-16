@@ -185,7 +185,7 @@ const ItemList = () => {
   const handleSave = async () => {
     const formData = new FormData();
 
-    formData.append("itemCategory", itemCategory);
+    formData.append("itemType", itemCategory);
     formData.append("itemName", itemName);
     formData.append("details", details);
     formData.append("manufacturer", manufacture);
