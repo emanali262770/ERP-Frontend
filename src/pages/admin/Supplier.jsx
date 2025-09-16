@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import axios from "axios";
@@ -38,82 +38,27 @@ const SupplierList = () => {
     }
   }, [isSliderOpen]);
 
-  // Static Data for Suppliers
-  const suppliers = [
-    {
-      _id: "1",
-      supplierName: "ABC Traders",
-      contactPerson: "John Doe",
-      email: "john@abctraders.com",
-      address: "123 Commerce St, New York, USA",
-      phoneNumber: "+1-212-555-1234",
-      designation: "Sales Manager",
-      ntn: "NTN123456789",
-      gst: "27ABCDE1234F1Z5",
-      paymentTerms: "Cash",
-      status: true,
-    },
-    {
-      _id: "2",
-      supplierName: "HomeDeco",
-      contactPerson: "Emma Smith",
-      email: "emma@homedeco.com",
-      address: "456 Decor Ave, London, UK",
-      phoneNumber: "+44-20-5555-6789",
-      designation: "Regional Director",
-      ntn: "NTN987654321",
-      gst: "29FGHIJ5678K2M9",
-      paymentTerms: "CreditCard",
-      creditLimit: "4000000",
-      status: true,
-    },
-    {
-      _id: "3",
-      supplierName: "KitchenPro",
-      contactPerson: "Li Wei",
-      email: "wei@kitchenpro.com",
-      address: "789 Kitchen Rd, Shanghai, China",
-      phoneNumber: "+86-21-5555-9876",
-      designation: "Operations Head",
-      ntn: "NTN456789123",
-      gst: "30NOPQR9012S3T4",
-      paymentTerms: "Cash",
-      status: false,
-    },
-    {
-      _id: "4",
-      supplierName: "Fashion Hub",
-      contactPerson: "Sarah Johnson",
-      email: "sarah@fashionhub.com",
-      address: "101 Style Blvd, Paris, France",
-      phoneNumber: "+33-1-5555-4567",
-      designation: "Marketing Lead",
-      ntn: "NTN789123456",
-      gst: "06UVWXY3456Z7A8",
-      paymentTerms: "CreditCard",
-      creditLimit: "4500000",
-      status: true,
-    },
-    {
-      _id: "5",
-      supplierName: "PaperHouse",
-      contactPerson: "Michael Brown",
-      email: "michael@paperhouse.com",
-      address: "202 Stationery Ln, Sydney, Australia",
-      phoneNumber: "+61-2-5555-2345",
-      designation: "Procurement Manager",
-      ntn: "NTN321654987",
-      gst: "09BCDEF6789G1H2",
-      paymentTerms: "Cash",
-      status: false,
-    },
-  ];
 
-  // Initialize supplier list with static data
-  useEffect(() => {
-    setSupplierList(suppliers);
-    setTimeout(() => setLoading(false), 1000);
+
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/suppliers`;
+
+  const fetchSuppliersList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setSupplierList(res.data); // store actual categories array
+      console.log("Suppliers  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
   }, []);
+  useEffect(() => {
+    fetchSuppliersList();
+  }, [fetchSuppliersList]);
+
+  
 
   // Handlers
   const handleAddSupplier = () => {
@@ -134,12 +79,25 @@ const SupplierList = () => {
     setStatus(true);
   };
 
+  const validateEmail = (email) => {
+    console.log("Emmm", email);
+    
+    const re = /^\S+@\S+\.\S+$/;
+    return re.test(email);
+  };
+
+
   // Save or Update Supplier
   const handleSave = async () => {
     if (paymentTerms === "CreditCard" && status && (!creditLimit || creditLimit > 5000000)) {
       toast.error("❌ Credit limit is required and must not exceed 50 lac");
       return;
     }
+    
+  if (!validateEmail(email)) {
+    toast.error("Please enter a valid email address");
+    return;
+  }
 
     const formData = {
       supplierName,
@@ -155,29 +113,36 @@ const SupplierList = () => {
       status,
     };
 
+    console.log("From Data ", formData);
+    
+
     try {
       const { token } = userInfo || {};
       const headers = {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       };
-
+      let res;
       if (isEdit && editId) {
-        setSupplierList(
-          supplierList.map((s) =>
-            s._id === editId ? { ...s, ...formData } : s
-          )
+        res = await axios.put(
+          `${API_URL}/${editId}`,
+          formData,
+          { headers }
         );
+
+       
         toast.success("✅ Supplier updated successfully");
       } else {
-        const newSupplier = {
-          ...formData,
-          _id: String(supplierList.length + 1),
-        };
-        setSupplierList([...supplierList, newSupplier]);
+        res = await axios.post(
+          `${API_URL}`,
+          formData,
+          { headers }
+        );
+       
+        setSupplierList([...supplierList, res.data]);
         toast.success("✅ Supplier added successfully");
       }
-
+      fetchSuppliersList()
       setSupplierName("");
       setContactPerson("");
       setEmail("");
@@ -243,6 +208,12 @@ const SupplierList = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
+            await axios.delete(`${API_URL}/${id}`, {
+              headers: {
+                Authorization: `Bearer ${userInfo?.token}`,
+              },
+            });
+
             setSupplierList(supplierList.filter((s) => s._id !== id));
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -298,7 +269,7 @@ const SupplierList = () => {
         <div className="table-container max-w-full">
           <div className="w-full">
             {/* Table Headers */}
-            <div className="hidden lg:grid grid-cols-[1fr_2fr_1.5fr_2fr_3fr_2fr_2fr_1fr_0.5fr] gap-2 bg-gray-50 py-3 px-4 text-xs font-medium text-gray-500 uppercase rounded-t-lg sticky top-0 z-10">
+            <div className="grid grid-cols-[1fr_2fr_1.5fr_2fr_3fr_2fr_2fr_1fr_0.5fr] gap-2 bg-gray-50 py-3 px-4 text-xs font-medium text-gray-500 uppercase rounded-t-lg sticky top-0 z-10">
               <div>Supplier ID</div>
               <div>Supplier Name</div>
               <div>Contact Person</div>
@@ -317,7 +288,8 @@ const SupplierList = () => {
                   key={supplier._id}
                   className="grid grid-cols-[1fr_2fr_1.5fr_2fr_3fr_2fr_2fr_1fr_0.5fr] items-center gap-2 bg-white p-4 rounded-lg border-b border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <div className="text-sm font-medium text-gray-900 truncate">{supplier._id}</div>
+                  <div className="text-sm font-medium text-gray-900 truncate">{supplier._id?.slice(0, 5) || "N/A"}
+                </div>
                   <div className="text-sm text-gray-500 truncate">{supplier.supplierName}</div>
                   <div className="text-sm text-gray-500 truncate">{supplier.contactPerson}</div>
                   <div className="text-sm text-gray-500 truncate">{supplier.email}</div>

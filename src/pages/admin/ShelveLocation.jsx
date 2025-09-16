@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const ShelveLocation = () => {
   const [shelveLocationList, setShelveLocationList] = useState([]);
@@ -17,6 +18,7 @@ const ShelveLocation = () => {
   const [loading, setLoading] = useState(true);
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/shelves`;
 
   // Slider animation
   useEffect(() => {
@@ -29,50 +31,26 @@ const ShelveLocation = () => {
     }
   }, [isSliderOpen]);
 
-  // Static Data for Shelve Locations
-  const shelveLocations = [
-    {
-      _id: "LOC001",
-      shelfName: "SH-A1",
-      // section: "Electronics",
-      // currentStockCount: 75,
-      description: "Main electronics storage for small gadgets",
-    },
-    {
-      _id: "LOC002",
-      shelfName: "SH-B2",
-      // section: "Books",
-      // currentStockCount: 120,
-      description: "Bookshelf for fiction and non-fiction",
-    },
-    {
-      _id: "LOC003",
-      shelfName: "SH-C3",
-      // section: "Clothing",
-      // currentStockCount: 90,
-      description: "Storage for seasonal clothing items",
-    },
-    {
-      _id: "LOC004",
-      shelfName: "SH-D4",
-      // section: "Groceries",
-      // currentStockCount: 200,
-      description: "Shelf for non-perishable food items",
-    },
-    {
-      _id: "LOC005",
-      shelfName: "SH-E5",
-      // section: "Home Goods",
-      // currentStockCount: 180,
-      description: "Storage for household essentials",
-    },
-  ];
 
-  // Initialize shelve location list with static data
-  useEffect(() => {
-    setShelveLocationList(shelveLocations);
-    setTimeout(() => setLoading(false), 1000);
+
+  const fetchLocation = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setShelveLocationList(res.data); // store actual categories array
+      console.log("Location  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
   }, []);
+  useEffect(() => {
+    fetchLocation();
+  }, [fetchLocation]);
+
+
+
 
   // Handlers
   const handleAddShelveLocation = () => {
@@ -88,12 +66,11 @@ const ShelveLocation = () => {
   // Save or Update Shelve Location
   const handleSave = async () => {
     const formData = {
-      shelfName,
-      // section,
-      // currentStockCount: parseInt(currentStockCount),
+      shelfNameCode: shelfName,
       description,
     };
-
+    console.log("Form data", formData);
+    
     try {
       const { token } = userInfo || {};
       const headers = {
@@ -103,22 +80,25 @@ const ShelveLocation = () => {
 
       if (isEdit && editId) {
         // Simulate API update
-        setShelveLocationList(
-          shelveLocationList.map((s) =>
-            s._id === editId ? { ...s, ...formData } : s
-          )
+        const res = await axios.put(
+          `${API_URL}/${editId}`,
+          formData,
+          { headers }
         );
+     
         toast.success("✅ Shelve Location updated successfully");
       } else {
-        // Simulate API create
-        const newShelveLocation = {
-          ...formData,
-          _id: `LOC${String(1000 + shelveLocationList.length + 1).padStart(3, "0")}`,
-        };
-        setShelveLocationList([...shelveLocationList, newShelveLocation]);
+        const res = await axios.post(
+          API_URL,
+          formData,
+          {
+            headers
+          }
+        );
+        
         toast.success("✅ Shelve Location added successfully");
       }
-
+      fetchLocation()
       // Reset form
       setShelfName("");
       // setSection("");
@@ -244,7 +224,7 @@ const ShelveLocation = () => {
                 >
                   {/* Shelf Name / Code */}
                   <div className="text-sm text-gray-500">
-                    {shelveLocation.shelfName}
+                    {shelveLocation.shelfNameCode}
                   </div>
 
                   {/* Section

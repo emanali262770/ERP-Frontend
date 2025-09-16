@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import axios from "axios";
 import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import { toast } from "react-toastify";
@@ -24,7 +25,7 @@ const Manufacture = () => {
   const [loading, setLoading] = useState(true);
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/manufacturers`;
   useEffect(() => {
     if (isSliderOpen && sliderRef.current) {
       gsap.fromTo(
@@ -35,78 +36,22 @@ const Manufacture = () => {
     }
   }, [isSliderOpen]);
 
-  const manufacturers = [
-    {
-      _id: "10001",
-      name: "Samsung",
-      address: "123 Tech Street, Seoul, South Korea",
-      phoneNumber: "+82-2-1234-5678",
-      personName: "John Kim",
-      mobileNumber: "+82-10-9876-5432",
-      designation: "Sales Manager",
-      ntn: "NTN123456789",
-      gstNumber: "27ABCDE1234F1Z5",
-      email: "contact@samsung.com",
-      status: true,
-    },
-    {
-      _id: "10002",
-      name: "Ikea",
-      address: "456 Furniture Ave, Stockholm, Sweden",
-      phoneNumber: "+46-8-2345-6789",
-      personName: "Anna Svensson",
-      mobileNumber: "+46-70-1234-5678",
-      designation: "Regional Director",
-      ntn: "NTN987654321",
-      gstNumber: "29FGHIJ5678K2M9",
-      email: "support@ikea.com",
-      status: true,
-    },
-    {
-      _id: "10003",
-      name: "Haier",
-      address: "789 Appliance Road, Qingdao, China",
-      phoneNumber: "+86-532-1234-5678",
-      personName: "Li Wei",
-      mobileNumber: "+86-138-1234-5678",
-      designation: "Operations Head",
-      ntn: "NTN456789123",
-      gstNumber: "30NOPQR9012S3T4",
-      email: "info@haier.com",
-      status: false,
-    },
-    {
-      _id: "10004",
-      name: "Levis",
-      address: "101 Fashion Blvd, San Francisco, USA",
-      phoneNumber: "+1-415-123-4567",
-      personName: "Sarah Johnson",
-      mobileNumber: "+1-510-987-6543",
-      designation: "Marketing Lead",
-      ntn: "NTN789123456",
-      gstNumber: "06UVWXY3456Z7A8",
-      email: "sales@levis.com",
-      status: true,
-    },
-    {
-      _id: "10005",
-      name: "Oxford",
-      address: "202 Stationery Lane, London, UK",
-      phoneNumber: "+44-20-1234-5678",
-      personName: "James Brown",
-      mobileNumber: "+44-7700-123456",
-      designation: "Procurement Manager",
-      ntn: "NTN321654987",
-      gstNumber: "09BCDEF6789G1H2",
-      email: "contact@oxford.com",
-      status: false,
-    },
-  ];
-
-  useEffect(() => {
-    setManufacturerList(manufacturers);
-    setTimeout(() => setLoading(false), 1000);
+  const fetchManufacturersList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/manufacturers`);
+      setManufacturerList(res.data); // store actual categories array
+      console.log("Manufacturers  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
   }, []);
+  useEffect(() => {
+    fetchManufacturersList();
+  }, [fetchManufacturersList]);
+
 
   const handleAddManufacturer = () => {
     setIsSliderOpen(true);
@@ -127,8 +72,8 @@ const Manufacture = () => {
 
   const handleSave = async () => {
     const formData = {
-      _id: manufacturerId,
-      name: manufacturerName,
+      manufacturerId,
+      manufacturerName,
       address,
       phoneNumber,
       personName,
@@ -139,6 +84,7 @@ const Manufacture = () => {
       email,
       status,
     };
+    console.log("Form Data ", formData);
 
     try {
       const { token } = userInfo || {};
@@ -148,18 +94,22 @@ const Manufacture = () => {
       };
 
       if (isEdit && editId) {
-        setManufacturerList(
-          manufacturerList.map((m) =>
-            m._id === editId ? { ...m, ...formData } : m
-          )
-        );
+       // 🔄 Update existing category
+       const res = await axios.put(
+        `${API_URL}/${editId}`,
+        formData,
+        { headers }
+      );
+
         toast.success("✅ Manufacturer updated successfully");
       } else {
-        const newManufacturer = {
-          ...formData,
-          _id: String(10000 + manufacturerList.length + 1),
-        };
-        setManufacturerList([...manufacturerList, newManufacturer]);
+         const res = await axios.post(
+          API_URL,
+          formData,
+          {
+            headers
+          }
+        );
         toast.success("✅ Manufacturer added successfully");
       }
 
@@ -177,6 +127,7 @@ const Manufacture = () => {
       setIsSliderOpen(false);
       setIsEdit(false);
       setEditId(null);
+      fetchManufacturersList();
     } catch (error) {
       console.error(error);
       toast.error(`❌ ${isEdit ? "Update" : "Add"} manufacturer failed`);
@@ -225,6 +176,13 @@ const Manufacture = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
+            await axios.delete(`${API_URL}/${id}`, {
+              headers: {
+                Authorization: `Bearer ${userInfo?.token}`,
+              },
+            });
+
+
             setManufacturerList(manufacturerList.filter((m) => m._id !== id));
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -282,7 +240,7 @@ const Manufacture = () => {
           <div className="min-w-[1000px] max-w-[100%]">
             {/* Table Headers */}
             <div className="hidden lg:grid grid-cols-[90px_90px_180px_110px_110px_110px_110px_110px_110px_70px_70px] gap-2 bg-gray-50 py-2 px-3 text-xs font-medium text-gray-500 uppercase rounded-t-lg">
-              <div>Manufacturer ID</div>
+              <div>Manufact ID</div>
               <div>Name</div>
               <div>Address</div>
               <div>Phone Number</div>
@@ -303,10 +261,10 @@ const Manufacture = () => {
                   className="grid grid-cols-[90px_90px_180px_110px_110px_110px_110px_110px_110px_70px_70px] items-center gap-2 bg-white p-2 rounded-lg border-b border-gray-100 hover:bg-gray-50 transition"
                 >
                   <div className="text-sm font-medium text-gray-900 truncate">
-                    {manufacturer._id}
+                    {manufacturer.manufacturerId}
                   </div>
                   <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.name}
+                    {manufacturer.manufacturerName}
                   </div>
                   <div className="text-sm text-gray-500 truncate">
                     {manufacturer.address}

@@ -72,7 +72,7 @@ const ItemList = () => {
   const fetchCategoryList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/list`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type/list`);
       setCategoryList(res.data); // store actual categories array
       console.log("Categories ", res.data);
     } catch (error) {
@@ -438,7 +438,7 @@ const ItemList = () => {
                 className="w-7 h-7 object-cover rounded-full"
               />
               <span className="text-sm font-medium text-gray-900">
-                {capitalizeFirstLetter(item.itemCategory.categoryName)}
+                {capitalizeFirstLetter(item?.itemType?.itemTypeName)}
               </span>
             </div>
 
@@ -538,7 +538,7 @@ const ItemList = () => {
                   <option value="">Select Category</option>
                   {categoryList.map((category) => (
                     <option key={category._id} value={category._id}>
-                      {category.categoryName}
+                      {category.itemTypeName}
                     </option>
                   ))}
                 </select>

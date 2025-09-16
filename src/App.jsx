@@ -22,12 +22,13 @@ import ItemUnit from './pages/admin/ItemUnit';
 import Company from "./pages/admin/Company";
 import Users from "./pages/admin/Users";
 import GroupManagement from "./pages/admin/GroupManagement";
-import AccessRights from "./pages/admin/AccessControl";
+// import AccessRights from "./pages/admin/AccessControl";
 import Modules from "./pages/admin/Modules";
-import ModulesFunctionalities from "./pages/admin/ModulesFunctionalities.jsx";
+import AccessControll from "./pages/admin/AccessControll.jsx";
 import ExpenseHead from "./pages/admin/ExpenseHead.jsx";
 import ExpenseVoucher from "./pages/admin/ExpenseVoucher.jsx";
 import DayBook from "./pages/admin/DayBook.jsx";
+import ItemType from "./pages/admin/ItemType.jsx";
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -63,12 +64,14 @@ function AppContent() {
             <Route path="company" element={<Company />} />
             <Route path="users" element={<Users />} />
             <Route path="groups" element={<GroupManagement />} />
-            <Route path="access-rights" element={<AccessRights />} />
+            <Route path="access-rights" element={<AccessControll />} />
             <Route path="modules" element={<Modules />} />
-            <Route path="modules-functionalities" element={<ModulesFunctionalities />} />
+            {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
             <Route path="day-book" element={<DayBook />} />
+
+            <Route path='item-type' element={<ItemType/>}/>
           </Route>
         </Routes>
       </main>
