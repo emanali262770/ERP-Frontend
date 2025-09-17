@@ -33,6 +33,7 @@ const links = [
   { to: "/admin/customers", label: "Customers", icon: <FaUsers />, key: "isCustomer" },
   { to: "/admin/customers-booking", label: "Booking Customer", icon: <FaUsers />, key: "isBookingCustomer" },
   { to: "/admin/item-barcode", label: "Item Barcode", icon: <FaBarcode />, key: "isInventory" }, // map barcode under inventory
+  { to: "/admin/open-balance", label: "Opening Balance", icon: <FaBarcode />,},
   { to: "/admin/expiry-tags", label: "Expiry Tags", icon: <FaTags />, key: "isSettings" },       // or add new field if backend supports
   { to: "/admin/report", label: "Report", icon: <FaChartBar />, key: "isReports" },
 
@@ -47,6 +48,7 @@ const links = [
       { to: "/admin/shelve-location", label: "Shelve Location", icon: <FaWarehouse />, key: "isItemLocation" },
       { to: "/admin/item-unit", label: "Item Unit", icon: <FaBalanceScale />, key: "isItemUnit" },
       { to: "/admin/promotion", label: "Promotion", icon: <FaBalanceScale /> },
+      { to: "/admin/promotion-item", label: "Promotion Item", icon: <FaBalanceScale /> },
     ],
   },
   {

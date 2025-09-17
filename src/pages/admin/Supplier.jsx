@@ -500,7 +500,7 @@ const SupplierList = () => {
               {paymentTerms === "CreditCard" && status && (
                 <div>
                   <label className="block text-gray-700 font-medium">
-                    Credit Limit (Max 50 Lac) <span className="text-newPrimary">*</span>
+                    Credit Limit  <span className="text-newPrimary">*</span>
                   </label>
                   <input
                     type="number"
@@ -509,7 +509,23 @@ const SupplierList = () => {
                     onChange={(e) => setCreditLimit(e.target.value)}
                     className="w-full p-2 border rounded"
                     placeholder="Enter credit limit (e.g. 4000000)"
-                    max="5000000"
+                      
+                  />
+                </div>
+              )}
+              {paymentTerms === "Cash" && status && (
+                <div>
+                  <label className="block text-gray-700 font-medium">
+                    Cash Limit  <span className="text-newPrimary">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={creditLimit}
+                    required
+                    onChange={(e) => setCreditLimit(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="Enter credit limit (e.g. 4000000)"
+                   
                   />
                 </div>
               )}
