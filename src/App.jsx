@@ -31,6 +31,7 @@ import DayBook from "./pages/admin/DayBook.jsx";
 import ItemType from "./pages/admin/ItemType.jsx";
 import Promotion from "./pages/admin/PromotionDetail.jsx";
 import PromotionItem from "./pages/admin/PromotionItem.jsx";
+import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -73,7 +74,8 @@ function AppContent() {
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
             <Route path="day-book" element={<DayBook />} />
-
+            <Route path="open-balance" element={<OpeningBalance />} />
+            
             <Route path="promotion-item" element={<PromotionItem />}/>
             <Route path='item-type' element={<ItemType/>}/>
           </Route>
