@@ -251,7 +251,7 @@ const Category = () => {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      <div className="max-w-7xl mx-auto">
+      <div className="px-6 mx-auto">
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-2xl font-bold text-newPrimary">All Categories</h1>

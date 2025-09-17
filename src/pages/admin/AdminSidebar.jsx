@@ -46,6 +46,7 @@ const links = [
       { to: "/admin/supplier", label: "Supplier", icon: <FaTruck />, key: "isItemSupplier" },
       { to: "/admin/shelve-location", label: "Shelve Location", icon: <FaWarehouse />, key: "isItemLocation" },
       { to: "/admin/item-unit", label: "Item Unit", icon: <FaBalanceScale />, key: "isItemUnit" },
+      { to: "/admin/promotion", label: "Promotion", icon: <FaBalanceScale /> },
     ],
   },
   {

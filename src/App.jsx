@@ -29,6 +29,7 @@ import ExpenseHead from "./pages/admin/ExpenseHead.jsx";
 import ExpenseVoucher from "./pages/admin/ExpenseVoucher.jsx";
 import DayBook from "./pages/admin/DayBook.jsx";
 import ItemType from "./pages/admin/ItemType.jsx";
+import Promotion from "./pages/admin/PromotionDetail.jsx";
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -60,6 +61,7 @@ function AppContent() {
             <Route path="item-purchase" element={<ItemPurchase />} />
             <Route path="expiry-tags" element={<ExpiryTags />} />
              <Route path="item-unit" element={<ItemUnit />} />
+             <Route path="promotion" element={<Promotion />} />
             <Route path="customers-booking" element={<BookingOrder />} />
             <Route path="company" element={<Company />} />
             <Route path="users" element={<Users />} />
