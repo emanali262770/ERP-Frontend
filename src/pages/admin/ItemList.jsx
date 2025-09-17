@@ -4,6 +4,7 @@ import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axios from "axios";
+import Barcode from "react-barcode";
 
 const ItemList = () => {
   const [categoryList, setCategoryList] = useState([]);
@@ -11,10 +12,13 @@ const ItemList = () => {
   const [manufacturerList, setManufacturerList] = useState([]);
   const [supplierList, setSupplierList] = useState([]);
   const [shelvesList, setShelvesList] = useState([]);
+  const [expiryOption, setExpiryOption] = useState("NoExpiry");
+  const [expiryDay, setExpiryDay] = useState("");
 
   const [itemList, setItemList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [itemCategory, setItemCategory] = useState("");
+  const [itemType, setItemType] = useState("");
   const [itemName, setItemName] = useState("");
   const [details, setDetails] = useState("");
   const [manufacture, setManufacture] = useState("");
@@ -49,13 +53,13 @@ const ItemList = () => {
     }
   }, [isSliderOpen]);
 
-
-
-  // Item Detals Fetch 
+  // Item Detals Fetch
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-details`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-details`
+      );
       setItemList(res.data); // store actual categories array
       console.log("Item Details ", res.data);
     } catch (error) {
@@ -68,11 +72,13 @@ const ItemList = () => {
     fetchData();
   }, [fetchData]);
 
-  // CategoryList Fetch 
+  // CategoryList Fetch
   const fetchCategoryList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type/list`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-type/list`
+      );
       setCategoryList(res.data); // store actual categories array
       console.log("Categories ", res.data);
     } catch (error) {
@@ -85,11 +91,13 @@ const ItemList = () => {
     fetchCategoryList();
   }, [fetchCategoryList]);
 
-  // Item Unit List Fetch 
+  // Item Unit List Fetch
   const fetchItemUnitList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-unit`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-unit`
+      );
       setItemUnitList(res.data); // store actual categories array
       console.log("Item Unit ", res.data);
     } catch (error) {
@@ -102,11 +110,13 @@ const ItemList = () => {
     fetchItemUnitList();
   }, [fetchItemUnitList]);
 
-  // Manufacturer List Fetch 
+  // Manufacturer List Fetch
   const fetchManufacturerList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/manufacturers/list`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/manufacturers/list`
+      );
       setManufacturerList(res.data); // store actual categories array
       console.log("Manufacturer ", res.data);
     } catch (error) {
@@ -119,11 +129,13 @@ const ItemList = () => {
     fetchManufacturerList();
   }, [fetchManufacturerList]);
 
-  // Supplier List Fetch 
+  // Supplier List Fetch
   const fetchSupplierList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/suppliers/list`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers/list`
+      );
       setSupplierList(res.data); // store actual categories array
       console.log("Supplier ", res.data);
     } catch (error) {
@@ -136,11 +148,13 @@ const ItemList = () => {
     fetchSupplierList();
   }, [fetchSupplierList]);
 
-  // Shelves List Fetch 
+  // Shelves List Fetch
   const fetchShelvesList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/shelves`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/shelves`
+      );
       setShelvesList(res.data); // store actual categories array
       console.log("Shelves ", res.data);
     } catch (error) {
@@ -153,16 +167,13 @@ const ItemList = () => {
     fetchShelvesList();
   }, [fetchShelvesList]);
 
-
-
-
-
   // Handlers
   const handleAddItem = () => {
     setIsSliderOpen(true);
     setIsEdit(false);
     setEditId(null);
     setItemCategory("");
+    setItemType("");
     setItemName("");
     setDetails("");
     setManufacture("");
@@ -184,12 +195,11 @@ const ItemList = () => {
   // Save or Update Item
   const handleSave = async () => {
     // console.log("Item ", itemCategory);
-    
+
     const formData = new FormData();
 
     formData.append("itemType", itemCategory);
-    
-    
+
     formData.append("itemName", itemName);
     formData.append("details", details);
     formData.append("manufacturer", manufacture);
@@ -207,7 +217,7 @@ const ItemList = () => {
     if (image) {
       formData.append("itemImage", image); // ✅ append actual file, not preview
     }
-   
+
     console.log("Form Data", [...formData.entries()]);
 
     try {
@@ -240,14 +250,14 @@ const ItemList = () => {
     }
   };
 
-
   // Set All States Null
   const reState = () => {
     setIsSliderOpen(false);
     setIsEdit(false);
     setEditId(null);
-    setItemCategory('')
-    setManufacture('');
+    setItemCategory("");
+    setItemType("");
+    setManufacture("");
     setItemName("");
     setDetails("");
     setSupplier("");
@@ -263,41 +273,41 @@ const ItemList = () => {
     setEnabled(false);
     setImagePreview("");
     setImage(null);
-  }
+  };
   // Edit Item
- const handleEdit = (item) => {
-  console.log("Item", item);
+  const handleEdit = (item) => {
+    console.log("Item", item);
 
-  setIsEdit(true);
-  setEditId(item._id);
+    setIsEdit(true);
+    setEditId(item._id);
 
-  // Dropdowns ke liye _id set karo
-  setItemCategory(item?.itemCategory?._id || "");
-  setManufacture(item?.manufacturer?._id || "");
-  setSupplier(item?.supplier?._id || "");
-  setShelveLocation(item?.shelveLocation?._id || "");
-  setItemUnit(item?.itemUnit?._id || "");
+    // Dropdowns ke liye _id set karo
+    setItemCategory(item?.itemCategory?._id || "");
+    setManufacture(item?.manufacturer?._id || "");
+    setSupplier(item?.supplier?._id || "");
+    setShelveLocation(item?.shelveLocation?._id || "");
+    setItemUnit(item?.itemUnit?._id || "");
 
-  // Normal fields
-  setItemName(item.itemName || "");
-  setDetails(item.details || "");
-  setPerUnit(item.perUnit ? item.perUnit.toString() : "");
-  setPurchase(item.purchase ? item.purchase.toString() : "");
-  setSales(item.sales ? item.sales.toString() : "");
-  setStock(item.stock ? item.stock.toString() : "");
-  setPrice(item.price ? item.price.toString() : "");
-  setBarcode(item.labelBarcode || "");
-  setReorder(item.reorder ? item.reorder.toString() : "");
+    // Normal fields
+    setItemName(item.itemName || "");
+    setDetails(item.details || "");
+    setPerUnit(item.perUnit ? item.perUnit.toString() : "");
+    setPurchase(item.purchase ? item.purchase.toString() : "");
+    setSales(item.sales ? item.sales.toString() : "");
+    setStock(item.stock ? item.stock.toString() : "");
+    setPrice(item.price ? item.price.toString() : "");
+    setBarcode(item.labelBarcode || "");
+    setReorder(item.reorder ? item.reorder.toString() : "");
 
-  // Enable/Disable
-  setEnabled(item.isEnable !== undefined ? item.isEnable : true);
+    // Enable/Disable
+    setEnabled(item.isEnable !== undefined ? item.isEnable : true);
 
-  // Image
-  setImagePreview(item?.itemImage?.url || "");
-  setImage(null);
+    // Image
+    setImagePreview(item?.itemImage?.url || "");
+    setImage(null);
 
-  setIsSliderOpen(true);
-};
+    setIsSliderOpen(true);
+  };
 
   // Delete Item
   const handleDelete = async (id) => {
@@ -325,13 +335,12 @@ const ItemList = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-
             await axios.delete(
               `${import.meta.env.VITE_API_BASE_URL}/item-details/${id}`,
               {
                 headers: {
-                  Authorization: `Bearer ${userInfo.token}` // if you’re using auth
-                }
+                  Authorization: `Bearer ${userInfo.token}`, // if you’re using auth
+                },
               }
             );
             setItemList(itemList.filter((item) => item._id !== id));
@@ -349,11 +358,7 @@ const ItemList = () => {
             );
           }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithTailwindButtons.fire(
-            "Cancelled",
-            "Item is safe 🙂",
-            "error"
-          );
+          swalWithTailwindButtons.fire("Cancelled", "Item is safe 🙂", "error");
         }
       });
   };
@@ -384,7 +389,6 @@ const ItemList = () => {
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-
   // Show loading spinner
   if (loading) {
     return (
@@ -412,91 +416,107 @@ const ItemList = () => {
       </div>
 
       {/* Item Table */}
-<div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
-  <div className="overflow-x-auto scrollbar-hide">
-    {/* Table wrapper with minimum width */}
-    <div className="min-w-[1000px]">
-      {/* Table Headers */}
-      <div className="grid grid-cols-7 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-        <div className="min-w-[120px]">Item Category</div>
-        <div className="min-w-[150px]">Item Name</div>
-        <div className="min-w-[80px]">Purchase</div>
-        <div className="min-w-[80px]">Sales</div>
-        <div className="min-w-[80px]">Stock</div>
-        <div className="min-w-[100px]">Barcode</div>
-        {userInfo?.isAdmin && <div className="min-w-[80px] text-right">Actions</div>}
-      </div>
-
-      {/* Items in Table */}
-      <div className="mt-4 flex flex-col gap-[6px] mb-14">
-        {itemList.map((item) => (
-          <div
-            key={item._id}
-            className="grid grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
-          >
-            {/* Item Category */}
-            <div className="min-w-[120px] flex items-center gap-3">
-              <img
-                src={item.itemImage?.url}
-                alt="Product Icon"
-                className="w-7 h-7 object-cover rounded-full"
-              />
-              <span className="text-sm font-medium text-gray-900">
-                {capitalizeFirstLetter(item?.itemType?.itemTypeName)}
-              </span>
+      <div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
+        <div className="overflow-x-auto scrollbar-hide">
+          {/* Table wrapper with minimum width */}
+          <div className="min-w-[1000px]">
+            {/* Table Headers */}
+            <div className="grid grid-cols-7 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
+              <div className="min-w-[120px]">Item Category</div>
+              <div className="min-w-[150px]">Item Name</div>
+              <div className="min-w-[80px]">Purchase</div>
+              <div className="min-w-[80px]">Sales</div>
+              <div className="min-w-[80px]">Stock</div>
+              <div className="min-w-[100px]">Barcode</div>
+              {userInfo?.isAdmin && (
+                <div className="min-w-[80px] text-right">Actions</div>
+              )}
             </div>
 
-            {/* Item Name */}
-            <div className="min-w-[150px] text-sm text-gray-500">{item.itemName}</div>
+            {/* Items in Table */}
+            <div className="mt-4 flex flex-col gap-[6px] mb-14">
+              {itemList.map((item) => (
+                <div
+                  key={item._id}
+                  className="grid grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
+                >
+                  {/* Item Category */}
+                  <div className="min-w-[120px] flex items-center gap-3">
+                    <img
+                      src={item.itemImage?.url}
+                      alt="Product Icon"
+                      className="w-7 h-7 object-cover rounded-full"
+                    />
+                    <span className="text-sm font-medium text-gray-900">
+                      {capitalizeFirstLetter(item?.itemType?.itemTypeName)}
+                    </span>
+                  </div>
 
-            {/* Purchase */}
-            <div className="min-w-[80px] text-sm font-semibold text-gray-500">{item.purchase}</div>
+                  {/* Item Name */}
+                  <div className="min-w-[150px] text-sm text-gray-500">
+                    {item.itemName}
+                  </div>
 
-            {/* Sales */}
-            <div className="min-w-[80px] text-sm font-semibold text-gray-500">{item.price}</div>
+                  {/* Purchase */}
+                  <div className="min-w-[80px] text-sm font-semibold text-gray-500">
+                    {item.purchase}
+                  </div>
 
-            {/* Stock */}
-            <div className="min-w-[80px] text-sm font-semibold text-gray-500">{item.stock}</div>
+                  {/* Sales */}
+                  <div className="min-w-[80px] text-sm font-semibold text-gray-500">
+                    {item.price}
+                  </div>
 
-            {/* Barcode */}
-            <div className="min-w-[100px] text-sm font-semibold text-gray-500">
-              {item.labelBarcode.slice(0, 12)}
+                  {/* Stock */}
+                  <div className="min-w-[80px] text-sm font-semibold text-gray-500">
+                    {item.stock}
+                  </div>
 
-            </div>
+                  {/* Barcode */}
+                  <div className="min-w-[100px] text-sm font-semibold text-gray-500">
+                    {item.labelBarcode.slice(0, 12)}
+                  </div>
 
-            {/* Actions */}
-            {userInfo?.isAdmin && (
-              <div className="min-w-[80px] text-right relative group">
-                <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                <div className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col justify-between">
-                  <button
-                    onClick={() => handleEdit(item)}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-newPrimary/10 text-newPrimary flex items-center gap-2"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                  >
-                    Delete
-                  </button>
+                  {/* Actions */}
+                  {userInfo?.isAdmin && (
+                    <div className="min-w-[80px] text-right relative group">
+                      <button className="text-gray-400 hover:text-gray-600 text-xl">
+                        ⋯
+                      </button>
+                      <div className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col justify-between">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-newPrimary/10 text-newPrimary flex items-center gap-2"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            )}
+              ))}
+            </div>
           </div>
-        ))}
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* Slider */}
       {isSliderOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
-          <div ref={sliderRef} className="w-1/3 bg-white p-6 h-full overflow-y-auto shadow-lg">
+          <div
+            ref={sliderRef}
+            className="w-1/3 bg-white p-6 h-full overflow-y-auto shadow-lg"
+          >
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-newPrimary">{isEdit ? "Update Item" : "Add a New Item"}</h2>
+              <h2 className="text-xl font-bold text-newPrimary">
+                {isEdit ? "Update Item" : "Add a New Item"}
+              </h2>
               <button
                 className="text-gray-500 hover:text-gray-800 text-2xl"
                 onClick={() => {
@@ -527,7 +547,6 @@ const ItemList = () => {
             </div>
 
             <div className="p-6 bg-white rounded-xl shadow-md space-y-4">
-
               {/* Item Category */}
               <div>
                 <label className="block text-gray-700 font-medium">
@@ -547,19 +566,26 @@ const ItemList = () => {
                   ))}
                 </select>
               </div>
-
-              {/* Item Name */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Item Name <span className="text-newPrimary">*</span>
+                  Item Type <span className="text-newPrimary">*</span>
                 </label>
-                <input
-                  type="text"
-                  value={itemName}
+                <select
+                  value={itemType}
                   required
-                  onChange={(e) => setItemName(e.target.value)}
+                  onChange={(e) => setItemType(e.target.value)}
                   className="w-full p-2 border rounded"
-                />
+                >
+                  <option value="">Select Item Type</option>
+                  {/* {categoryList.map((category) => (
+                    <option key={category._id} value={category._id}>
+                      {category.itemTypeName}
+                    </option>
+                  ))} */}
+                  <option value="">tyep1</option>
+                  <option value="">tyep2</option>
+                  <option value="">tyep3</option>
+                </select>
               </div>
 
               {/* Manufacture */}
@@ -600,6 +626,73 @@ const ItemList = () => {
                     </option>
                   ))}
                 </select>
+              </div>
+
+              {/* Shelve Location */}
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Shelve Location <span className="text-newPrimary">*</span>
+                </label>
+                <select
+                  value={shelveLocation}
+                  required
+                  onChange={(e) => setShelveLocation(e.target.value)}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Location</option>
+                  {shelvesList.map((shelves) => (
+                    <option key={shelves._id} value={shelves._id}>
+                      {shelves.shelfNameCode}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Item Name */}
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Item Name <span className="text-newPrimary">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={itemName}
+                  required
+                  onChange={(e) => setItemName(e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+
+              {/* Item Unit */}
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Item Unit <span className="text-newPrimary">*</span>
+                </label>
+                <select
+                  value={itemUnit}
+                  required
+                  onChange={(e) => setItemUnit(e.target.value)}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Unit</option>
+                  {itemUnitList.map((item) => (
+                    <option key={item._id} value={item._id}>
+                      {item.unitName}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Per Unit */}
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Per Unit
+                </label>
+                <input
+                  type="number"
+                  value={perUnit}
+                  onChange={(e) => setPerUnit(e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
               </div>
 
               {/* Purchase */}
@@ -644,86 +737,11 @@ const ItemList = () => {
                 />
               </div>
 
-              
-              {/* Barcode */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Barcode <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={barcode}
-                  required
-                  onChange={(e) => setBarcode(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. BAR1234567890"
-                />
-              </div>
-
-              {/* Details */}
-              <div>
-                <label className="block text-gray-700 font-medium">Details</label>
-                <textarea
-                  value={details}
-                  onChange={(e) => setDetails(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Shelve Location */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Shelve Location <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={shelveLocation}
-                  required
-                  onChange={(e) => setShelveLocation(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Location</option>
-                  {shelvesList.map((shelves) => (
-                    <option key={shelves._id} value={shelves._id}>
-                      {shelves.shelfNameCode}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Item Unit */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Item Unit <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={itemUnit}
-                  required
-                  onChange={(e) => setItemUnit(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Unit</option>
-                  {itemUnitList.map((item) => (
-                    <option key={item._id} value={item._id}>
-                      {item.unitName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Per Unit */}
-              <div>
-                <label className="block text-gray-700 font-medium">Per Unit</label>
-                <input
-                  type="number"
-                  value={perUnit}
-                  onChange={(e) => setPerUnit(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
               {/* Reorder */}
               <div>
-                <label className="block text-gray-700 font-medium">Reorder</label>
+                <label className="block text-gray-700 font-medium">
+                  Reorder
+                </label>
                 <input
                   type="number"
                   value={reorder}
@@ -731,6 +749,74 @@ const ItemList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
+
+              {/* Secandory Barcode */}
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Secondary Barcode
+                </label>
+                <input
+                  type="text"
+                  value={barcode}
+                  required
+                  onChange={(e) => setBarcode(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  placeholder="e.g. BAR1234567890" 
+                   minLength={5}
+  maxLength={20}  
+                  onBlur={(e) => setBarcode(e.target.value)} // update on blur
+                />
+
+                {/* Show barcode only if input is not empty */}
+                {barcode && (
+                  <div className="mt-3">
+                      <Barcode value={barcode} height={60} />  
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Expiry Day 
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="NoExpiry"
+                      checked={expiryOption === "NoExpiry"}
+                      onChange={(e) => setExpiryOption(e.target.value)}
+                      className="form-radio"
+                    />
+                    No Expiry days
+                  </label>
+                  <label className="flex items-center gap-2">
+                    <input
+                      type="radio"
+                      value="HasExpiry"
+                      checked={expiryOption === "HasExpiry"}
+                      onChange={(e) => setExpiryOption(e.target.value)}
+                      className="form-radio"
+                    />
+                    Has Expiry days
+                  </label>
+                </div>
+              </div>
+
+              {/* Conditionally show expiry date field */}
+              {expiryOption === "HasExpiry" && (
+                <div className="mt-3">
+              
+                  <input
+                    type="number"
+                    value={expiryDay}
+                    required
+                    onChange={(e) => setExpiryDay(e.target.value)}
+                    placeholder="Enter Expiry Days"
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              )}
 
               {/* Image Upload */}
               <div>
@@ -769,14 +855,18 @@ const ItemList = () => {
                       </label>
                       <p className="pl-1">or drag and drop</p>
                     </div>
-                    <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+                    <p className="text-xs text-gray-500">
+                      PNG, JPG, GIF up to 10MB
+                    </p>
                   </div>
                 </div>
 
                 {/* Image Preview */}
                 {imagePreview && (
                   <div className="mt-4">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Uploaded Image</h3>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">
+                      Uploaded Image
+                    </h3>
                     <div className="relative group w-48 h-32">
                       <img
                         src={imagePreview}
@@ -796,16 +886,20 @@ const ItemList = () => {
 
               {/* Enable / Disable */}
               <div className="flex items-center gap-3">
-                <label className="text-gray-700 font-medium">Enable / Disable</label>
+                <label className="text-gray-700 font-medium">
+                  Enable / Disable
+                </label>
                 <button
                   type="button"
                   onClick={() => setEnabled(!enabled)}
-                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${enabled ? "bg-green-500" : "bg-gray-300"
-                    }`}
+                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${
+                    enabled ? "bg-green-500" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enabled ? "translate-x-7" : "translate-x-0"
-                      }`}
+                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                      enabled ? "translate-x-7" : "translate-x-0"
+                    }`}
                   />
                 </button>
               </div>
@@ -818,7 +912,6 @@ const ItemList = () => {
                 Save Item
               </button>
             </div>
-
           </div>
         </div>
       )}
