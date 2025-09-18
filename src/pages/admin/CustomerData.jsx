@@ -4,9 +4,57 @@ import { toast } from "react-toastify";
 import axios from 'axios';
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
+import { SquarePen, Trash2 } from "lucide-react";
 
 const CustomerData = () => {
-  const [customerList, setCustomerData] = useState([]);
+  const [customerList, setCustomerList] = useState([
+  {
+    _id: "c1",
+    customerName: "John Doe",
+    address: "123 Main Street, Cityville",
+    mobileNumber: "03001234567",
+    previousBalance: "5000",
+    nearby: "Near City Mall",
+    paymentMethod: "Cash",
+  },
+  {
+    _id: "c2",
+    customerName: "Sarah Smith",
+    address: "456 Market Road, Townsville",
+    mobileNumber: "03007654321",
+    previousBalance: "2500",
+    nearby: "Near Central Park",
+    paymentMethod: "Credit Card",
+  },
+  {
+    _id: "c3",
+    customerName: "Ali Khan",
+    address: "789 Gulshan Block, Karachi",
+    mobileNumber: "03211234567",
+    previousBalance: "0",
+    nearby: "Opposite City Tower",
+    paymentMethod: "Bank Transfer",
+  },
+  {
+    _id: "c4",
+    customerName: "Maria Garcia",
+    address: "12 Green Avenue, Lahore",
+    mobileNumber: "03331239876",
+    previousBalance: "700",
+    nearby: "Close to Metro Station",
+    paymentMethod: "Cash",
+  },
+  {
+    _id: "c5",
+    customerName: "David Johnson",
+    address: "45 Sunset Blvd, Islamabad",
+    mobileNumber: "03459876543",
+    previousBalance: "1500",
+    nearby: "Next to Airport",
+    paymentMethod: "Debit Card",
+  },
+]);
+
   const [staffMembers, setStaffMember] = useState([]);
   const [productList, setProductList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -238,76 +286,77 @@ console.log("Payload", payload);
       </div>
 
       {/* Customer Table */}
-      <div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="w-full">
-            {/* Table Headers */}
-            <div className="hidden lg:grid grid-cols-7 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div>Name</div>
-              <div>Address</div>
-              <div>Mobile No./WhatsApp</div>
-              <div>Previous Balance</div>
-              <div>Nearby</div>
-              <div>Payment Method</div>
-              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-            </div>
-
-            {/* Customer Table */}
-            <div className="mt-4 flex flex-col gap-[14px] pb-14">
-              {customerList.map((client, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
-                >
-                  {/* Name */}
-                  <div className="text-sm font-medium text-gray-900">
-                    {client.customerName
-                    }
-                  </div>
-
-                  {/* Address */}
-                  <div className="text-sm font-semibold text-green-600">{client.address}</div>
-
-                  {/* Mobile No./WhatsApp */}
-                  <div className="text-sm text-gray-500">{client.mobileNumber}</div>
-
-                  {/* Previous Balance */}
-                  <div className="text-sm text-gray-500">{client.previousBalance}</div>
-
-                  {/* Nearby */}
-                  <div className="text-sm text-gray-500">{client.nearby}</div>
-
-                  {/* Payment Method */}
-                  <div className="text-sm text-gray-500">{client.paymentMethod}</div>
-
-                  {/* Actions */}
-                  {userInfo?.isAdmin && (
-                    <div className="text-right relative group">
-                      <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                      <div className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg 
-                        opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto 
-                        transition-opacity duration-300 z-50 flex flex-col justify-between">
-                        <button
-                          onClick={() => handleEdit(client)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100 text-blue-600 flex items-center gap-2"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(client._id)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-red-100 text-red-500 flex items-center gap-2"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-[1000px]">
+      
+      {/* ✅ Table Header (sticky) */}
+      <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+        <div>Name</div>
+        <div>Address</div>
+        <div>Mobile No./WhatsApp</div>
+        <div>Previous Balance</div>
+        <div>Nearby</div>
+        <div>Payment Method</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
       </div>
+
+      {/* ✅ Scrollable Table Body */}
+      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
+        {customerList.map((client, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+          >
+            {/* Name */}
+            <div className="font-medium text-gray-900">
+              {client.customerName}
+            </div>
+
+            {/* Address */}
+            <div className="font-semibold text-green-600">
+              {client.address}
+            </div>
+
+            {/* Mobile No./WhatsApp */}
+            <div className="text-gray-500">{client.mobileNumber}</div>
+
+            {/* Previous Balance */}
+            <div className="text-gray-500">{client.previousBalance}</div>
+
+            {/* Nearby */}
+            <div className="text-gray-500">{client.nearby}</div>
+
+            {/* Payment Method */}
+            <div className="text-gray-500">{client.paymentMethod}</div>
+
+            {/* Actions */}
+            {userInfo?.isAdmin && (
+              <div className=" ">
+                
+                <div className="flex justify-end">
+                  <button
+                    onClick={() => handleEdit(client)}
+                    className=" text-left px-2 py-2 text-sm hover:bg-blue-50 text-blue-600 "
+                  >
+                    <SquarePen size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(client._id)}
+                    className=" text-left px-2 py-2 text-sm hover:bg-red-50 text-red-500 "
+                  >
+                   <Trash2 size={18} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Right-Side Slider */}
       {isSliderOpen && (

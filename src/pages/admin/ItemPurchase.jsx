@@ -4,10 +4,52 @@ import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { SquarePen, Trash2 } from "lucide-react";
 
 export default function PurchaseManager() {
     const [view, setView] = useState("list"); // list | form
-    const [purchases, setPurchases] = useState([]);
+    
+    const [purchases, setPurchases] = useState( [
+  {
+    _id: "1",
+    grnNo: "GRN-1001",
+    grnDate: "2025-01-15",
+    invoiceNo: "INV-5001",
+    supplier: { supplierName: "ABC Traders" },
+    items: [
+      { name: "Coca Cola 1L", qty: 50, total: 2500 },
+      { name: "Lays Chips", qty: 100, total: 4000 },
+    ],
+    discountAmount: 500,
+    payable: 6000,
+  },
+  {
+    _id: "2",
+    grnNo: "GRN-1002",
+    grnDate: "2025-02-05",
+    invoiceNo: "INV-5002",
+    supplier: { supplierName: "XYZ Distributors" },
+    items: [
+      { name: "Milk 1L", qty: 30, total: 3000 },
+      { name: "Butter", qty: 20, total: 2000 },
+    ],
+    discountAmount: 200,
+    payable: 4800,
+  },
+  {
+    _id: "3",
+    grnNo: "GRN-1003",
+    grnDate: "2025-02-10",
+    invoiceNo: "INV-5003",
+    supplier: { supplierName: "Fast Supplies Ltd." },
+    items: [
+      { name: "Shampoo", qty: 40, total: 8000 },
+      { name: "Soap", qty: 60, total: 3000 },
+    ],
+    discountAmount: 1000,
+    payable: 10000,
+  },
+]);
     const [isSliderOpen, setIsSliderOpen] = useState(false);
     const [purchaseDrawerOpen, setPurchaseDrawerOpen] = useState(false);
     const sliderRef = useRef(null);
@@ -294,13 +336,13 @@ export default function PurchaseManager() {
 
     return (
         <div className="p-4 bg-gray-50 min-h-screen">
-            <div className="max-w-7xl mx-auto">
+            <div className="px-6">
                 {view === "list" && (
                     <div>
                         <div className="flex justify-between items-center mb-4">
                             <div>
                                 <h1 className="text-2xl font-bold text-newPrimary">Purchase Items</h1>
-                                <p className="text-gray-500 text-sm">Manage your purchase items details</p>
+                               
                             </div>
                             <button
                                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
@@ -320,79 +362,73 @@ export default function PurchaseManager() {
                                 + Add New Purchase
                             </button>
                         </div>
-                        <div className="rounded-xl shadow border border-gray-100 overflow-hidden">
-                            <div className="table-container max-w-full">
-                                <div className="w-full">
-                                    <div className="hidden lg:grid grid-cols-[60px_100px_120px_100px_150px_200px_120px_100px_100px_100px_60px] gap-6 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-                                        <div>Sr.#</div>
-                                        <div>GRN No</div>
-                                        <div>GRN Date</div>
-                                        <div>Invoice No</div>
-                                        <div>Supplier</div>
-                                        <div>Items</div>
-                                        <div>Total Purchase</div>
-                                        <div>Total Qty</div>
-                                        <div>Discount</div>
-                                        <div>Payable</div>
-                                        <div>Actions</div>
-                                    </div>
-                                    <div className="flex flex-col divide-y gap-2 mx-2 mb-4 divide-gray-100">
-                                        {purchases.length === 0 ? (
-                                            <div className="text-center py-4 text-gray-500">
-                                                No purchases found.
-                                            </div>
-                                        ) : (
-                                            purchases.map((p, idx) => {
-                                                // Calculate total purchase and total qty
-                                                const totalPurchase = p.items.reduce((sum, it) => sum + it.total, 0);
-                                                const totalQty = p.items.reduce((sum, it) => sum + it.qty, 0);
+            <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="max-h-[400px] overflow-y-auto">
+      <table className="min-w-[1000px] w-full text-sm text-left border-collapse">
+        {/* Table Header */}
+        <thead className="sticky top-0 bg-gray-100 z-10 text-xs font-semibold text-gray-600 uppercase">
+          <tr>
+            <th className="px-6 py-3">Sr.#</th>
+            <th className="px-6 py-3">GRN No</th>
+            <th className="px-6 py-3">GRN Date</th>
+            <th className="px-6 py-3">Invoice No</th>
+            <th className="px-6 py-3">Supplier</th>
+            <th className="px-6 py-3">Items</th>
+            <th className="px-6 py-3">Total Purchase</th>
+            <th className="px-6 py-3">Total Qty</th>
+            <th className="px-6 py-3">Discount</th>
+            <th className="px-6 py-3">Payable</th>
+            <th className="px-6 py-3 text-right">Actions</th>
+          </tr>
+        </thead>
 
-                                                return (
-                                                    <div
-                                                        key={p._id}
-                                                        className="grid grid-cols-[60px_100px_120px_100px_150px_200px_120px_100px_100px_100px_60px] items-center gap-6 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
-                                                    >
-                                                        <div className="text-sm font-medium text-gray-500">{idx + 1}</div>
-                                                        <div className="text-sm text-gray-500">{p.grnNo}</div>
-                                                        <div className="text-sm text-gray-500">
-                                                            {new Date(p.grnDate).toLocaleDateString()}
-                                                        </div>
-                                                        <div className="text-sm text-gray-500">{p.invoiceNo}</div>
-                                                        <div className="text-sm text-gray-500">{p.supplier?.supplierName}</div>
-                                                        <div className="text-sm text-gray-500 truncate">
-                                                            {p.items.map((it) => it.name).join(", ")}
-                                                        </div>
-                                                        <div className="text-sm text-gray-500">{totalPurchase}</div>
-                                                        <div className="text-sm text-gray-500">{totalQty}</div>
-                                                        <div className="text-sm text-gray-500">{p.discountAmount}</div>
-                                                        <div className="text-sm text-gray-500">{p.payable}</div>
-                                                        
-                                                        <div className="relative group">
-                                                            <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                                                            <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-                                                                <button
-                                                                    onClick={() => handleEditClick(p)}
-                                                                    className="w-full text-left px-4 py-4 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleDelete(p._id)}
-                                                                    className="w-full text-left px-4 py-4 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })
-                                        )}
-                                    </div>
+        {/* Table Body */}
+        <tbody>
+          {purchases.length === 0 ? (
+            <tr>
+              <td colSpan={11} className="text-center py-4 text-gray-500">
+                No purchases found.
+              </td>
+            </tr>
+          ) : (
+            purchases.map((p, idx) => {
+              const totalPurchase = p.items.reduce((sum, it) => sum + it.total, 0);
+              const totalQty = p.items.reduce((sum, it) => sum + it.qty, 0);
 
-                                </div>
-                            </div>
-                        </div>
+              return (
+                <tr
+                  key={p._id}
+                  className="border-b border-gray-200 hover:bg-gray-100"
+                >
+                  <td className="px-6 py-3">{idx + 1}</td>
+                  <td className="px-6 py-3">{p.grnNo}</td>
+                  <td className="px-6 py-3">{new Date(p.grnDate).toLocaleDateString()}</td>
+                  <td className="px-6 py-3">{p.invoiceNo}</td>
+                  <td className="px-6 py-3">{p.supplier?.supplierName}</td>
+                  <td className="px-6 py-3 truncate">{p.items.map(it => it.name).join(", ")}</td>
+                  <td className="px-6 py-3">{totalPurchase}</td>
+                  <td className="px-6 py-3">{totalQty}</td>
+                  <td className="px-6 py-3">{p.discountAmount}</td>
+                  <td className="px-6 py-3">{p.payable}</td>
+                  <td className="px-6 py-3 text-right">
+                     <button className="text-blue-500 hover:underline mr-3">
+                                  <SquarePen size={18} />
+                                </button>
+                                <button className="text-red-500 hover:underline">
+                                  <Trash2 size={18} />
+                                </button>
+                  </td>
+                </tr>
+              );
+            })
+          )}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
                     </div>
                 )}
 

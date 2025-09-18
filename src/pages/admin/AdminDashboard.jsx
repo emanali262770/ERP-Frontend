@@ -21,8 +21,10 @@ import {
   Tooltip,
   ResponsiveContainer,
   Line,
-  Legend
+  Legend,
+  LineChart
 } from "recharts";
+
 import {
   Users,
   Package,
@@ -55,11 +57,95 @@ const AdminDashboard = () => {
   const [open, setOpen] = useState(false);
   const [currentTime, setCurrentTime] = useState(new Date());
   const dropdownRef = useRef(null);
-
+ const [search, setSearch] = useState("");
+const dummyBookings = [
+  {
+    id: 1,
+    customerName: "John Doe",
+    mobileNo: "123-456-7890",
+    address: "123 Main St, New York",
+    items: ["Pizza", "Burger"],
+    total: 1200,
+    paymentMethod: "Credit Card",
+    status: "Approved",
+  },
+  {
+    id: 2,
+    customerName: "Alexander Pierce",
+    mobileNo: "555-111-2222",
+    address: "456 Elm St, Los Angeles",
+    items: ["Pasta", "Salad"],
+    total: 800,
+    paymentMethod: "Cash",
+    status: "Pending",
+  },
+  {
+    id: 3,
+    customerName: "Bob Doe",
+    mobileNo: "987-654-3210",
+    address: "789 Oak St, Chicago",
+    items: ["Sushi", "Noodles"],
+    total: 1500,
+    paymentMethod: "PayPal",
+    status: "Approved",
+  },
+  {
+    id: 4,
+    customerName: "Mike Doe",
+    mobileNo: "444-222-3333",
+    address: "321 Pine St, Houston",
+    items: ["Sandwich", "Juice"],
+    total: 600,
+    paymentMethod: "Debit Card",
+    status: "Denied",
+  },
+  {
+    id: 5,
+    customerName: "Mike Doe",
+    mobileNo: "444-222-3333",
+    address: "321 Pine St, Houston",
+    items: ["Sandwich", "Juice"],
+    total: 600,
+    paymentMethod: "Debit Card",
+    status: "Denied",
+  },
+  {
+    id: 6,
+    customerName: "Mike Doe",
+    mobileNo: "444-222-3333",
+    address: "321 Pine St, Houston",
+    items: ["Sandwich", "Juice"],
+    total: 600,
+    paymentMethod: "Debit Card",
+    status: "Denied",
+  },
+  {
+    id: 7,
+    customerName: "Mike Doe",
+    mobileNo: "444-222-3333",
+    address: "321 Pine St, Houston",
+    items: ["Sandwich", "Juice"],
+    total: 600,
+    paymentMethod: "Debit Card",
+    status: "Denied",
+  },
+];
+  const filteredData = dummyBookings.filter(
+    (booking) =>
+      booking.customerName.toLowerCase().includes(search.toLowerCase()) ||
+      booking.mobileNo.toLowerCase().includes(search.toLowerCase())
+  );
   const abortRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const base = import.meta.env.VITE_API_BASE_URL;
+const statusColor = {
+  Approved: "bg-green-100 text-green-800",
+  Pending: "bg-amber-100 text-amber-800",
+  Denied: "bg-rose-100 text-rose-800",
+};
+
+
 
   // Update time every minute
   useEffect(() => {
@@ -304,6 +390,15 @@ const AdminDashboard = () => {
     if (hour < 17) return <Cloud className="text-blue-400" size={24} />;
     return <Moon className="text-indigo-500" size={24} />;
   };
+  const data = [
+  { day: "22th", thisWeek: 100, lastWeek: 60 },
+  { day: "23th", thisWeek: 120, lastWeek: 80 },
+  { day: "24th", thisWeek: 160, lastWeek: 70 },
+  { day: "25th", thisWeek: 155, lastWeek: 65 },
+  { day: "26th", thisWeek: 170, lastWeek: 75 },
+  { day: "27th", thisWeek: 177, lastWeek: 77 },
+  { day: "28th", thisWeek: 150, lastWeek: 90 },
+];
 
   const summaryData = [
     {
@@ -357,21 +452,41 @@ const AdminDashboard = () => {
   ];
 
   const pieData = [
-    { name: "Completed", value: bookingCompleted, color: "#58C5A0" },
-    { name: "Pending", value: bookingPending, color: "#FF8901" },
-    { name: "Rejected", value: bookingRejected, color: "#E63946" },
+     { month: "JUN", thisYear: 1000, lastYear: 600 },
+  { month: "JUL", thisYear: 2000, lastYear: 1800 },
+  { month: "AUG", thisYear: 3000, lastYear: 2800 },
+  { month: "SEP", thisYear: 2500, lastYear: 2000 },
+  { month: "OCT", thisYear: 2700, lastYear: 1900 },
+  { month: "NOV", thisYear: 2600, lastYear: 1500 },
+  { month: "DEC", thisYear: 3000, lastYear: 2000 },
   ];
   const statusColors = {
     "Completed": "bg-green-100 text-green-800",
     "Pending": "bg-amber-100 text-amber-800",
     "Refunded": "bg-rose-100 text-rose-800"
   };
+  const CustomTooltip = ({ active, payload, label }) => {
+  if (active && payload && payload.length) {
+    return (
+      <div className="bg-white p-3 shadow rounded text-sm">
+        <p className="font-semibold">{label}</p>
+        <p style={{ color: "#2563eb" }}>
+          High - 2023: {payload[0]?.value}
+        </p>
+        <p style={{ color: "#6b7280" }}>
+          Low - 2023: {payload[1]?.value}
+        </p>
+      </div>
+    );
+  }
+  return null;
+};
 
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center h-[80vh]">
         <HashLoader  color="#84CF16" />
-        <span className="ml-4 text-gray-500 mt-4">Loading dashboard data...</span>
+        <span className="ml-4 text-gray-500 mt-4">Loading ERP...</span>
       </div>
     );
   }
@@ -522,24 +637,32 @@ const AdminDashboard = () => {
             </div>
           </div>
           <div className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData.length > 0 ? chartData : [{ name: "No data", sales: 0, revenue: 0 }]}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" />
-                <YAxis yAxisId="left" />
-                <YAxis yAxisId="right" orientation="right" />
-                <Tooltip
-                  contentStyle={{
-                    borderRadius: '8px',
-                    border: '1px solid #e5e7eb',
-                    boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
-                  }}
-                />
-                <Legend />
-                <Bar yAxisId="left" dataKey="sales" name="Number of Sales" fill="#84CF16" radius={[4, 4, 0, 0]} />
-                <Line yAxisId="right" type="monotone" dataKey="revenue" name="Revenue ($)" stroke="#58C5A0" strokeWidth={2} dot={{ r: 4 }} />
-              </BarChart>
-            </ResponsiveContainer>
+             <ResponsiveContainer width="100%" height="100%">
+        <LineChart data={data} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <CartesianGrid strokeDasharray="3 3" vertical={false} />
+          <XAxis dataKey="day" />
+          <YAxis domain={[30, 210]} />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Line
+            type="monotone"
+            dataKey="thisWeek"
+            stroke="#84cf16"
+            strokeWidth={3}
+            dot={{ r: 4 }}
+            activeDot={{ r: 6 }}
+            name="This Week"
+          />
+          <Line
+            type="monotone"
+            dataKey="lastWeek"
+            stroke="#6b7280"
+            strokeWidth={2}
+            dot={{ r: 3 }}
+            name="Last Week"
+          />
+        </LineChart>
+      </ResponsiveContainer>
           </div>
         </div>
 
@@ -550,26 +673,25 @@ const AdminDashboard = () => {
         >
           <h2 className="text-lg font-semibold text-gray-800 mb-6">Order Status</h2>
           <div className="flex justify-center items-center h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
-                  data={pieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                  labelLine={false}
-                >
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+           <ResponsiveContainer width="100%" height="100%">
+          <BarChart
+            data={pieData}
+            margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis dataKey="month" />
+            <YAxis
+              tickFormatter={(value) => `$${value / 1000}k`}
+              domain={[0, 3000]}
+            />
+            <Tooltip
+              formatter={(value) => [`$${value}`, "Orders"]}
+              cursor={{ fill: "rgba(0,0,0,0.05)" }}
+            />
+            <Bar dataKey="thisYear" fill="#84cf16" barSize={40} />
+            <Bar dataKey="lastYear" fill="#d1d5db" barSize={40} />
+          </BarChart>
+        </ResponsiveContainer>
           </div>
           <div className="flex flex-wrap justify-center gap-4 mt-4">
             {pieData.map((entry, index) => (
@@ -583,58 +705,103 @@ const AdminDashboard = () => {
       </div>
 
       {/* Recent Transactions */}
-      <div
-        className="bg-white rounded-xl shadow-sm p-6 border border-gray-100 mb-8"
-        style={{ animation: "fadeIn 0.5s ease-out" }}
-      >
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-          <h2 className="text-lg font-semibold text-gray-800">Recent Booking Customers</h2>
-
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 mb-8">
+      {/* Header with Search */}
+      <div className="flex justify-between items-center px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-xl">
+        <h2 className="text-md font-semibold text-gray-700">
+          Recent Booking Customers
+        </h2>
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-8 pr-3 py-1.5 border border-gray-300 rounded-md text-sm focus:ring-1 focus:ring-blue-400 focus:border-blue-400"
+          />
+          <svg
+            className="w-4 h-4 text-gray-400 absolute left-2 top-2.5"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21 21l-4.35-4.35M17 10a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
-        <div className="overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[120px]">Customer Name</TableHead>
-                <TableHead className="w-[120px]">Mobile No.</TableHead>
-                <TableHead className="w-[250px]">Address</TableHead>
-                <TableHead className="w-[300px]">Items</TableHead>
-                <TableHead className="w-[100px]">Total</TableHead>
-                <TableHead className="w-[140px]">Payment Method</TableHead>
-                <TableHead className="w-[100px]">Status</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {recentCustomer.map((transaction, index) => (
-                <TableRow
-                  key={transaction.id}
-                  style={{ animation: `fadeIn 0.5s ease-out ${index * 0.1}s both` }}
-                >
-                  <TableCell className="font-medium">{transaction.customerName}</TableCell>
-                  <TableCell>{transaction.mobileNo}</TableCell>
-                  <TableCell className="whitespace-normal break-words">{transaction.address}</TableCell>
-                  <TableCell className="whitespace-normal break-words">
-                    {transaction.items.map((item) => item.itemName).join(", ")}
-                  </TableCell>
-                  <TableCell>Rs.{transaction.total}</TableCell>
-                  <TableCell>{transaction.paymentMethod}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 text-xs rounded-full ${statusColors[transaction.status]}`}>
-                      {transaction.status}
-                    </span>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
-
-        {recentCustomer.length === 0 && (
-          <div className="text-center py-8 text-gray-500">
-            No recent transactions found.
-          </div>
-        )}
       </div>
+
+      {/* Scrollable Table with Fixed Header */}
+      <div className="overflow-y-auto max-h-72">
+        <Table className="min-w-full text-sm text-left border-collapse">
+          <TableHeader className="sticky top-0 bg-gray-100 z-10">
+            <TableRow className="border-b border-gray-200">
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Customer Name
+              </TableHead>
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Mobile No.
+              </TableHead>
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Address
+              </TableHead>
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Items
+              </TableHead>
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Total
+              </TableHead>
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Payment Method
+              </TableHead>
+              <TableHead className="px-4 py-2 font-semibold text-gray-600">
+                Status
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {filteredData.map((booking, index) => (
+              <TableRow
+                key={booking.id}
+                className={`border-b border-gray-100 hover:bg-gray-50 ${
+                  index % 2 === 0 ? "bg-white" : "bg-gray-50"
+                }`}
+              >
+                <TableCell className="px-4 py-2">{booking.customerName}</TableCell>
+                <TableCell className="px-4 py-2">{booking.mobileNo}</TableCell>
+                <TableCell className="px-4 py-2">{booking.address}</TableCell>
+                <TableCell className="px-4 py-2">
+                  {booking.items.join(", ")}
+                </TableCell>
+                <TableCell className="px-4 py-2">Rs.{booking.total}</TableCell>
+                <TableCell className="px-4 py-2">{booking.paymentMethod}</TableCell>
+                <TableCell className="px-4 py-2">
+                  <span
+                    className={`px-2 py-1 text-xs rounded-full ${
+                      statusColor[booking.status]
+                    }`}
+                  >
+                    {booking.status}
+                  </span>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* No Data State */}
+      {filteredData.length === 0 && (
+        <div className="text-center py-6 text-gray-500">
+          No recent transactions found.
+        </div>
+      )}
+    </div>
+
 
       {/* CSS Animations */}
       <style jsx>{`
