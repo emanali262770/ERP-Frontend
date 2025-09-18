@@ -1,22 +1,33 @@
+import { SaveIcon, Search } from "lucide-react";
 import React, { useState } from "react";
+import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../components/CommanHeader";
 
 const OpeningBalance = () => {
   const categories = ["Clothing", "Electronics", "Grocery"];
-
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+const [loading, setLoading] = useState(true);
   const itemTypes = [
-    { type: "Type 1", items: ["Item A", "Item B", "Item C"] }, 
-    { type: "Type 2", items: Array.from({ length: 25 }, (_, i) => `Item ${i + 1}`) }, 
-    { type: "Type 3", items: Array.from({ length: 10 }, (_, i) => `Product ${i + 1}`) }, 
-    { type: "Type 4", items: Array.from({ length: 30 }, (_, i) => `Material ${i + 1}`) }, 
+    { type: "Type 1", items: ["Item A", "Item B", "Item C"] },
+    {
+      type: "Type 2",
+      items: Array.from({ length: 25 }, (_, i) => `Item ${i + 1}`),
+    },
+    {
+      type: "Type 3",
+      items: Array.from({ length: 10 }, (_, i) => `Product ${i + 1}`),
+    },
+    {
+      type: "Type 4",
+      items: Array.from({ length: 30 }, (_, i) => `Material ${i + 1}`),
+    },
   ];
 
   const [form, setForm] = useState({
     category: "",
     itemType: "",
-    itemName: "",
+    itemSearch: "",
   });
-
-  const selectedType = itemTypes.find((t) => t.type === form.itemType);
 
   // Static 25 Records
   const [records, setRecords] = useState(
@@ -48,168 +59,208 @@ const OpeningBalance = () => {
     setEditing((prev) => ({ ...prev, [`${index}-${field}`]: true }));
   };
 
+  // ✅ Filtered records according to search text
+  const filteredRecords = records.filter((rec) =>
+    rec.item.toLowerCase().includes(form.itemSearch.toLowerCase())
+  );
+setTimeout(() => {
+  setLoading(false)
+}, 2000);
   return (
     <div className="p-6 space-y-6">
       {/* Heading */}
-      <h1 className="text-2xl font-bold text-gray-800">Opening Balance</h1>
+      {/* Common Header */}
+      <CommanHeader/>
+      <h1 className="text-2xl font-bold text-newPrimary">Opening Balance</h1>
 
       {/* Form */}
-    <div className="border rounded-lg shadow bg-white p-6 w-full">
-  <div className="grid grid-cols-3 gap-6 w-full">
-    {/* Category */}
-    <div className="w-full">
-      <label className="block text-gray-700 font-medium mb-1">Category</label>
-      <select
-        value={form.category}
-        onChange={(e) => setForm({ ...form, category: e.target.value })}
-        className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
-      >
-        <option value="">Select Category</option>
-        {categories.map((cat, idx) => (
-          <option key={idx} value={cat}>
-            {cat}
-          </option>
-        ))}
-      </select>
-    </div>
+      <div className="border rounded-lg shadow bg-white p-6 w-full">
+        <div className="grid grid-cols-3 gap-6 items-end w-full">
+          {/* Category */}
+          <div className="w-full">
+            <label className="block text-gray-700 font-medium mb-1">
+              Category
+            </label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
+            >
+              <option value="">Select Category</option>
+              {categories.map((cat, idx) => (
+                <option key={idx} value={cat}>
+                  {cat}
+                </option>
+              ))}
+            </select>
+          </div>
 
-    {/* Item Type */}
-    <div className="w-full">
-      <label className="block text-gray-700 font-medium mb-1">Item Type</label>
-      <select
-        value={form.itemType}
-        onChange={(e) => setForm({ ...form, itemType: e.target.value, itemName: "" })}
-        className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
-      >
-        <option value="">Select Item Type</option>
-        {itemTypes.map((type, idx) => (
-          <option key={idx} value={type.type}>
-            {type.type}
-          </option>
-        ))}
-      </select>
-    </div>
+          {/* Item Type */}
+          <div className="w-full">
+            <label className="block text-gray-700 font-medium mb-1">
+              Item Type
+            </label>
+            <select
+              value={form.itemType}
+              onChange={(e) => setForm({ ...form, itemType: e.target.value })}
+              className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
+            >
+              <option value="">Select Item Type</option>
+              {itemTypes.map((type, idx) => (
+                <option key={idx} value={type.type}>
+                  {type.type}
+                </option>
+              ))}
+            </select>
+          </div>
 
-    {/* Item Name (only if items > 20) */}
-    {selectedType && selectedType.items.length > 20 ? (
-      <div className="w-full">
-        <label className="block text-gray-700 font-medium mb-1">Item Name</label>
-        <select
-          value={form.itemName}
-          onChange={(e) => setForm({ ...form, itemName: e.target.value })}
-          className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
-        >
-          <option value="">Select Item Name</option>
-          {selectedType.items.map((name, idx) => (
-            <option key={idx} value={name}>
-              {name}
-            </option>
-          ))}
-        </select>
+          {/* Search bar with icon (no label) */}
+
+          <div className="w-full">
+            <div className="relative">
+              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search size={18} className="text-gray-400" />
+              </span>
+              <input
+                type="text"
+                value={form.itemSearch}
+                onChange={(e) =>
+                  setForm({ ...form, itemSearch: e.target.value })
+                }
+                placeholder="Search Item..."
+                aria-label="Search Item"
+                className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+                 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
+                 placeholder:text-gray-400"
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    ) : (
-      <div className="w-full" /> // empty column placeholder
-    )}
+
+      {/* Table */}
+   <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-[1000px]">
+      
+      {/* ✅ Table Header (sticky like your previous tables) */}
+      <div className="grid grid-cols-8 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+        <div>Sr</div>
+        <div>Code</div>
+        <div>Type</div>
+        <div>Item</div>
+        <div>Purchase</div>
+        <div>Sales</div>
+        <div>Stock</div>
+        <div className="text-right">Action</div>
+      </div>
+
+      {/* ✅ Scrollable Table Body */}
+      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
+        {loading ? (
+          <TableSkeleton
+            rows={filteredRecords.length || 5}
+            cols={userInfo?.isAdmin ? 8 : 7}
+          />
+        ) : filteredRecords.map((rec, index) => (
+          <div
+            key={rec.code}
+            className="grid grid-cols-8 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+          >
+            <div className="text-gray-700">{rec.sr}</div>
+            <div className="text-gray-600">{rec.code}</div>
+            <div className="text-gray-600">{rec.type}</div>
+            <div className="font-medium text-gray-900">{rec.item}</div>
+
+            {/* Purchase */}
+            <div className="text-gray-600">
+              {editing[`${index}-purchase`] ? (
+                <input
+                  type="number"
+                  value={rec.purchase}
+                  onChange={(e) =>
+                    handleChange(index, "purchase", e.target.value)
+                  }
+                  onBlur={() => handleBlur(index, "purchase")}
+                  autoFocus
+                  className="w-20 border rounded p-1"
+                />
+              ) : (
+                <span
+                  onClick={() => handleFocus(index, "purchase")}
+                  className="cursor-pointer"
+                >
+                  {rec.purchase}
+                </span>
+              )}
+            </div>
+
+            {/* Sales */}
+            <div className="text-gray-600">
+              {editing[`${index}-sales`] ? (
+                <input
+                  type="number"
+                  value={rec.sales}
+                  onChange={(e) =>
+                    handleChange(index, "sales", e.target.value)
+                  }
+                  onBlur={() => handleBlur(index, "sales")}
+                  autoFocus
+                  className="w-20 border rounded p-1"
+                />
+              ) : (
+                <span
+                  onClick={() => handleFocus(index, "sales")}
+                  className="cursor-pointer"
+                >
+                  {rec.sales}
+                </span>
+              )}
+            </div>
+
+            {/* Stock */}
+            <div className="text-gray-600">
+              {editing[`${index}-stock`] ? (
+                <input
+                  type="number"
+                  value={rec.stock}
+                  onChange={(e) =>
+                    handleChange(index, "stock", e.target.value)
+                  }
+                  onBlur={() => handleBlur(index, "stock")}
+                  autoFocus
+                  className="w-20 border rounded p-1"
+                />
+              ) : (
+                <span
+                  onClick={() => handleFocus(index, "stock")}
+                  className="cursor-pointer"
+                >
+                  {rec.stock}
+                </span>
+              )}
+            </div>
+
+            {/* Action */}
+            <div className="flex justify-end">
+              <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
+                <SaveIcon size={18} />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {/* Show message if nothing found */}
+        {!loading && filteredRecords.length === 0 && (
+          <div className="px-6 py-4 text-center text-gray-500">
+            No items found.
+          </div>
+        )}
+      </div>
+    </div>
   </div>
 </div>
 
-
-      {/* Table */}
-      <div className="overflow-x-auto border rounded-lg shadow bg-white">
-        <table className="w-full text-sm text-left border-collapse">
-          <thead className="bg-gray-100 text-gray-700">
-            <tr>
-              <th className="px-4 py-2 border">Sr</th>
-              <th className="px-4 py-2 border">Code</th>
-              <th className="px-4 py-2 border">Type</th>
-              <th className="px-4 py-2 border">Item</th>
-              <th className="px-4 py-2 border">Purchase</th>
-              <th className="px-4 py-2 border">Sales</th>
-              <th className="px-4 py-2 border">Stock</th>
-              <th className="px-4 py-2 border">Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {records.map((rec, index) => (
-              <tr key={rec.code} className="hover:bg-gray-50">
-                <td className="px-4 py-2 border">{rec.sr}</td>
-                <td className="px-4 py-2 border">{rec.code}</td>
-                <td className="px-4 py-2 border">{rec.type}</td>
-                <td className="px-4 py-2 border">{rec.item}</td>
-
-                {/* Purchase */}
-                <td className="px-4 py-2 border">
-                  {editing[`${index}-purchase`] ? (
-                    <input
-                      type="number"
-                      value={rec.purchase}
-                      onChange={(e) => handleChange(index, "purchase", e.target.value)}
-                      onBlur={() => handleBlur(index, "purchase")}
-                      autoFocus
-                      className="w-20 border rounded p-1"
-                    />
-                  ) : (
-                    <span
-                      onClick={() => handleFocus(index, "purchase")}
-                      className="cursor-pointer"
-                    >
-                      {rec.purchase}
-                    </span>
-                  )}
-                </td>
-
-                {/* Sales */}
-                <td className="px-4 py-2 border">
-                  {editing[`${index}-sales`] ? (
-                    <input
-                      type="number"
-                      value={rec.sales}
-                      onChange={(e) => handleChange(index, "sales", e.target.value)}
-                      onBlur={() => handleBlur(index, "sales")}
-                      autoFocus
-                      className="w-20 border rounded p-1"
-                    />
-                  ) : (
-                    <span
-                      onClick={() => handleFocus(index, "sales")}
-                      className="cursor-pointer"
-                    >
-                      {rec.sales}
-                    </span>
-                  )}
-                </td>
-
-                {/* Stock */}
-                <td className="px-4 py-2 border">
-                  {editing[`${index}-stock`] ? (
-                    <input
-                      type="number"
-                      value={rec.stock}
-                      onChange={(e) => handleChange(index, "stock", e.target.value)}
-                      onBlur={() => handleBlur(index, "stock")}
-                      autoFocus
-                      className="w-20 border rounded p-1"
-                    />
-                  ) : (
-                    <span
-                      onClick={() => handleFocus(index, "stock")}
-                      className="cursor-pointer"
-                    >
-                      {rec.stock}
-                    </span>
-                  )}
-                </td>
-
-                <td className="px-4 py-2 border">
-                  <button className="px-3 py-1 bg-newPrimary text-white rounded">
-                    Save
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
     </div>
   );
 };

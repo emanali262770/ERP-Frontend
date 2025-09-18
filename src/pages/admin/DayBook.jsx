@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { HashLoader } from "react-spinners";
 import { format } from "date-fns";
+import CommanHeader from "../../components/CommanHeader";
 
 // Static data for day book entries
 
@@ -67,6 +68,8 @@ const DayBook = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Coomon header */}
+      <CommanHeader/>
       <div>
         <h1 className="text-2xl font-bold text-newPrimary">Day Book List</h1>
         <p className="text-gray-500 text-sm">Day Book Management Dashboard</p>

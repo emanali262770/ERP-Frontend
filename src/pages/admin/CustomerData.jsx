@@ -5,6 +5,8 @@ import axios from 'axios';
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { SquarePen, Trash2 } from "lucide-react";
+import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../components/CommanHeader";
 
 const CustomerData = () => {
   const [customerList, setCustomerList] = useState([
@@ -255,23 +257,25 @@ console.log("Payload", payload);
   };
 
   // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader
-            height="150"
-            width="150"
-            radius={1}
-            color="#84CF16"
-          />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader
+  //           height="150"
+  //           width="150"
+  //           radius={1}
+  //           color="#84CF16"
+  //         />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Common Header */}
+      <CommanHeader/>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Customer List</h1>
@@ -303,7 +307,10 @@ console.log("Payload", payload);
 
       {/* ✅ Scrollable Table Body */}
       <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
-        {customerList.map((client, index) => (
+        {loading?(<TableSkeleton
+                    rows={customerList.length || 5}
+                    cols={userInfo?.isAdmin ? 7 : 6}
+                  />):customerList.map((client, index) => (
           <div
             key={index}
             className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"

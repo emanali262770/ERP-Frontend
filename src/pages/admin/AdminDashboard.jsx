@@ -39,6 +39,7 @@ import {
   Moon,
   Cloud
 } from "lucide-react";
+import CommanHeader from "../../components/CommanHeader";
 
 const AdminDashboard = () => {
   const [customers, setCustomers] = useState(0);
@@ -494,90 +495,7 @@ const statusColor = {
   return (
     <div className="p-6 w-full bg-gray-50 min-h-screen">
       {/* Updated Header - Replaced Search Bar */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-        <div className="mb-4 md:mb-0">
-          <div className="flex items-center gap-2 mb-2">
-            {getGreetingIcon()}
-            <h1 className="text-2xl font-bold text-newPrimary">{getGreeting()}, {userInfo?.name || 'Admin'}!</h1>
-          </div>
-          <p className="text-gray-600">{formatDate(currentTime)} • {formatTime(currentTime)}</p>
-        </div>
-        
-        {/* Quick Stats Overview */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center bg-gradient-to-r from-newPrimary/10 to-green-100/30 p-4 rounded-xl border border-newPrimary/20">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-newPrimary">{sales}</div>
-            <div className="text-xs text-gray-600">Today's Sales</div>
-          </div>
-          <div className="h-8 w-px bg-newPrimary/30 hidden sm:block"></div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-newPrimary">${revenue.toLocaleString()}</div>
-            <div className="text-xs text-gray-600">Revenue</div>
-          </div>
-          <div className="h-8 w-px bg-newPrimary/30 hidden sm:block"></div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-newPrimary">{bookingPending}</div>
-            <div className="text-xs text-gray-600">  Orders</div>
-          </div>
-          
-          {/* Notification Bell */}
-          <div className="h-8 w-px bg-newPrimary/30 hidden sm:block"></div>
-          <div className="relative" ref={dropdownRef}>
-            <button
-              className="relative p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              onClick={() => setOpen(!open)}
-            >
-              <Bell size={20} className="text-gray-600" />
-              {notifications.length > 0 && (
-                <span className="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full px-1">
-                  {notifications.length}
-                </span>
-              )}
-            </button>
-
-            {/* Dropdown */}
-            {open && (
-              <div className="absolute right-0 mt-2 w-80 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
-                <div className="flex justify-between items-center p-2 border-b">
-                  <h3 className="font-semibold text-sm">Notifications</h3>
-                  {notifications.length > 0 && (
-                    <button
-                      onClick={clearAll}
-                      className="text-xs text-blue-500 hover:underline"
-                    >
-                      Clear All
-                    </button>
-                  )}
-                </div>
-
-                <div className="max-h-64 overflow-y-auto">
-                  {notifications.length === 0 ? (
-                    <p className="p-4 text-sm text-gray-500">No new notifications</p>
-                  ) : (
-                    notifications.map((notif) => (
-                      <div
-                        key={notif._id}
-                        className="flex justify-between items-start p-3 border-b hover:bg-gray-50"
-                      >
-                        <div>
-                          <p className="font-medium text-sm">{notif.title}</p>
-                          <p className="text-xs text-gray-600">{notif.message}</p>
-                        </div>
-                        <button
-                          onClick={() => clearNotification(notif._id)}
-                          className="ml-2 text-gray-400 hover:text-red-500"
-                        >
-                          <X size={14} />
-                        </button>
-                      </div>
-                    ))
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
+     <CommanHeader/>
 
       {/* Summary Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">

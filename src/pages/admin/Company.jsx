@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { toast } from "react-toastify";
-import axios from 'axios';
+import axios from "axios";
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
+import CommanHeader from "../../components/CommanHeader";
 
 const Company = () => {
   const [companyList, setCompanyList] = useState([]);
@@ -49,7 +50,9 @@ const Company = () => {
   const fetchCompanyData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/companies`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/companies`
+      );
       const result = await response.json();
       console.log("Companies ", result);
       setCompanyList(result);
@@ -68,7 +71,9 @@ const Company = () => {
   const fetchUserData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/users`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/users`
+      );
       const result = await response.json();
       console.log("Users ", result);
       setUserList(result.data || []);
@@ -211,12 +216,7 @@ const Company = () => {
     return (
       <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <HashLoader
-            height="150"
-            width="150"
-            radius={1}
-            color="#84CF16"
-          />
+          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
         </div>
       </div>
     );
@@ -224,6 +224,8 @@ const Company = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Coomon header */}
+      <CommanHeader />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Company List</h1>
@@ -266,10 +268,14 @@ const Company = () => {
                   {/* Actions */}
                   {userInfo?.isAdmin && (
                     <div className="text-right relative group">
-                      <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                      <div className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg 
+                      <button className="text-gray-400 hover:text-gray-600 text-xl">
+                        ⋯
+                      </button>
+                      <div
+                        className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg 
                         opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto 
-                        transition-opacity duration-300 z-50 flex flex-col justify-between">
+                        transition-opacity duration-300 z-50 flex flex-col justify-between"
+                      >
                         <button
                           onClick={() => handleEdit(company)}
                           className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100 text-blue-600 flex items-center gap-2"
@@ -301,7 +307,9 @@ const Company = () => {
             style={{ display: "block" }}
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-newPrimary">{isEdit ? "Edit Company" : "Add Company"}</h2>
+              <h2 className="text-xl font-bold text-newPrimary">
+                {isEdit ? "Edit Company" : "Add Company"}
+              </h2>
               <button
                 className="w-6 h-6 text-white rounded-full flex justify-center items-center hover:text-gray-400 text-xl bg-newPrimary"
                 onClick={() => setIsSliderOpen(false)}
@@ -314,7 +322,9 @@ const Company = () => {
               <div className="border rounded-lg p-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-gray-700 mb-1">Company Name</label>
+                    <label className="block text-gray-700 mb-1">
+                      Company Name
+                    </label>
                     <input
                       type="text"
                       value={companyName}

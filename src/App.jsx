@@ -32,12 +32,15 @@ import ItemType from "./pages/admin/ItemType.jsx";
 import Promotion from "./pages/admin/PromotionDetail.jsx";
 import PromotionItem from "./pages/admin/PromotionItem.jsx";
 import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
+import ScrollToTop from "./helper/ScrollToTop.jsx";
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
       <main className="flex-1">
+         <ScrollToTop />
         <Routes>
           {/* Public Routes */}
+          
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
