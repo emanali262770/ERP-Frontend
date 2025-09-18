@@ -239,14 +239,14 @@ const Manufacture = () => {
         <div className="table-container max-w-full overflow-x-auto">
           <div className="min-w-[1000px] max-w-[100%]">
             {/* Table Headers */}
-            <div className="hidden lg:grid grid-cols-[90px_90px_180px_110px_110px_110px_110px_110px_110px_70px_70px] gap-2 bg-gray-50 py-2 px-3 text-xs font-medium text-gray-500 uppercase rounded-t-lg">
-              <div>Manufact ID</div>
+            <div className="grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] gap-2 bg-gray-50 py-2 px-3 text-xs font-medium text-gray-500 uppercase rounded-t-lg">
+              
               <div>Name</div>
               <div>Address</div>
               <div>Phone Number</div>
-              <div>Person Name</div>
+              <div>Email</div>
+              <div>Contact Person</div>
               <div>Mobile Number</div>
-              <div>Designation</div>
               <div>NTN</div>
               <div>GST</div>
               <div className="text-center">Status</div>
@@ -254,15 +254,13 @@ const Manufacture = () => {
             </div>
 
             {/* Manufacturers in Table */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2 mb-16">
               {manufacturerList.map((manufacturer) => (
                 <div
                   key={manufacturer._id}
-                  className="grid grid-cols-[90px_90px_180px_110px_110px_110px_110px_110px_110px_70px_70px] items-center gap-2 bg-white p-2 rounded-lg border-b border-gray-100 hover:bg-gray-50 transition"
+                  className="grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] items-center gap-2 bg-white p-2 rounded-lg border-b border-gray-100 hover:bg-gray-50 transition"
                 >
-                  <div className="text-sm font-medium text-gray-900 truncate">
-                    {manufacturer.manufacturerId}
-                  </div>
+                  
                   <div className="text-sm text-gray-500 truncate">
                     {manufacturer.manufacturerName}
                   </div>
@@ -272,15 +270,16 @@ const Manufacture = () => {
                   <div className="text-sm text-gray-500 truncate">
                     {manufacturer.phoneNumber}
                   </div>
+                   <div className="text-sm text-gray-500 truncate">
+                    {manufacturer?.email || "-"}
+                  </div>
                   <div className="text-sm text-gray-500 truncate">
                     {manufacturer.personName}
                   </div>
                   <div className="text-sm text-gray-500 truncate">
                     {manufacturer.mobileNumber}
                   </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.designation}
-                  </div>
+                 
                   <div className="text-sm text-gray-500 truncate">
                     {manufacturer.ntn}
                   </div>
@@ -359,20 +358,7 @@ const Manufacture = () => {
             </div>
 
             <div className="space-y-4">
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Manufacturer ID <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={manufacturerId}
-                  required
-                  onChange={(e) => setManufacturerId(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  disabled={isEdit}
-                  placeholder="e.g. 10001"
-                />
-              </div>
+               
               <div>
                 <label className="block text-gray-700 font-medium">
                   Manufacturer Name <span className="text-newPrimary">*</span>
@@ -397,19 +383,7 @@ const Manufacture = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Email Address <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  required
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
+               <div>
                 <label className="block text-gray-700 font-medium">
                   Phone Number <span className="text-newPrimary">*</span>
                 </label>
@@ -424,7 +398,20 @@ const Manufacture = () => {
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Person Name <span className="text-newPrimary">*</span>
+                  Email Address <span className="text-newPrimary">*</span>
+                </label>
+                <input
+                  type="email"
+                  value={email}
+                  required
+                  onChange={(e) => setEmail(e.target.value)}
+                  className="w-full p-2 border rounded"
+                />
+              </div>
+             
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Contact Person<span className="text-newPrimary">*</span>
                 </label>
                 <input
                   type="text"
@@ -447,18 +434,7 @@ const Manufacture = () => {
                   placeholder="e.g. +82-10-9876-5432"
                 />
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Designation <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={designation}
-                  required
-                  onChange={(e) => setDesignation(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
+            
               <div>
                 <label className="block text-gray-700 font-medium">
                   NTN <span className="text-newPrimary">*</span>
