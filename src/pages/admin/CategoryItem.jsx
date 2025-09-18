@@ -4,6 +4,7 @@ import gsap from "gsap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import CommanHeader from "../../components/CommanHeader";
 
 const Category = () => {
   const [categories, setCategories] = useState([]);
@@ -252,6 +253,8 @@ const Category = () => {
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <div className="px-6 mx-auto">
+        {/* Common Header */}
+      <CommanHeader/>
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-2xl font-bold text-newPrimary">All Categories</h1>

@@ -4,6 +4,7 @@ import gsap from "gsap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
+import CommanHeader from "../../components/CommanHeader";
 
 const Promotion = () => {
     const [categories, setCategories] = useState([]);
@@ -155,6 +156,8 @@ const Promotion = () => {
 
     return (
         <div className="p-4 bg-gray-50 min-h-screen">
+            {/* Coomon header */}
+      <CommanHeader/>
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-4">
                     <div>

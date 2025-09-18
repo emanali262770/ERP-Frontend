@@ -4,6 +4,7 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { HashLoader } from "react-spinners";
+import CommanHeader from "../../components/CommanHeader";
 
 const ExpiryTags = () => {
   const [expiryTagList, setExpiryTagList] = useState([]);
@@ -276,7 +277,9 @@ const ExpiryTags = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
+     
+      {/* Common Header */}
+      <CommanHeader/>
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Expiry Tags List</h1>

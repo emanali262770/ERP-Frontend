@@ -5,7 +5,7 @@ const TableSkeleton = ({ rows = 5, cols = 6 }) => {
         <tr
           key={rowIdx}
           className={`${
-            rowIdx % 2 === 0 ? "bg-white" : "bg-gray-50"
+            rowIdx % 2 === 0 ? "" : "bg-gray-50"
           } border-b border-gray-200`}
         >
           {Array.from({ length: cols }).map((_, colIdx) => (

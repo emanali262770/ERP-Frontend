@@ -6,6 +6,7 @@ import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { FiSearch, FiPlus, FiEdit, FiTrash2, FiUsers, FiX } from "react-icons/fi";
 import { FaTimes } from "react-icons/fa";
+import CommanHeader from "../../components/CommanHeader";
 
 
 const GroupManagement = () => {
@@ -268,6 +269,8 @@ const GroupManagement = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+      {/* Coomon header */}
+      <CommanHeader/>
       {error && (
         <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
           Error: {error}. Data is using fallback values.

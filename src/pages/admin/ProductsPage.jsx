@@ -5,6 +5,7 @@ import axios from 'axios'
 import { FiEdit, FiTrash } from "react-icons/fi";
 import Swal from "sweetalert2";
 import { PuffLoader } from "react-spinners";
+import CommanHeader from "../../components/CommanHeader";
 
 
 const ProductsPage = () => {
@@ -359,6 +360,8 @@ const handleDelete = async (id) => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Coomon header */}
+      <CommanHeader/>
       {/* Page Header with Add Product Button */}
       <div className="flex justify-between items-center mb-6">
         <div>

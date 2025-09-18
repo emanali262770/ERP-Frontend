@@ -4,10 +4,11 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { HashLoader } from "react-spinners";
-import { FaEdit, FaTrash, FaPrint, } from "react-icons/fa"
+import { FaEdit, FaTrash, FaPrint } from "react-icons/fa";
 import { TbTruckReturn } from "react-icons/tb";
 import { Printer, SquarePen, Trash2, Truck } from "lucide-react";
-
+import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../components/CommanHeader";
 
 const SalesInvoice = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -22,51 +23,50 @@ const SalesInvoice = () => {
 
   // Static invoice data
   // Inside SalesInvoice component, instead of fetching at first
-const [invoices, setInvoices] = useState([
-  {
-    _id: "1",
-    receiptNo: "INV-1001",
-    customerName: "Ali Khan",
-    mobile: "03001234567",
-    items: [
-      { itemName: "Coca Cola 1L", price: 50, qty: 2, total: 100 },
-      { itemName: "Lays Chips", price: 30, qty: 3, total: 90 },
-    ],
-    discount: 20,
-    payable: 170,
-    givenAmount: 200,
-    returnAmount: 30,
-  },
-  {
-    _id: "2",
-    receiptNo: "INV-1002",
-    customerName: "Sara Ahmed",
-    mobile: "03007654321",
-    items: [
-      { itemName: "Milk 1L", price: 120, qty: 1, total: 120 },
-      { itemName: "Bread", price: 50, qty: 2, total: 100 },
-    ],
-    discount: 10,
-    payable: 210,
-    givenAmount: 210,
-    returnAmount: 0,
-  },
-  {
-    _id: "3",
-    receiptNo: "INV-1003",
-    customerName: "Usman Ali",
-    mobile: "03211234567",
-    items: [
-      { itemName: "Shampoo", price: 300, qty: 1, total: 300 },
-      { itemName: "Soap", price: 80, qty: 4, total: 320 },
-    ],
-    discount: 50,
-    payable: 570,
-    givenAmount: 600,
-    returnAmount: 30,
-  },
-]);
-
+  const [invoices, setInvoices] = useState([
+    {
+      _id: "1",
+      receiptNo: "INV-1001",
+      customerName: "Ali Khan",
+      mobile: "03001234567",
+      items: [
+        { itemName: "Coca Cola 1L", price: 50, qty: 2, total: 100 },
+        { itemName: "Lays Chips", price: 30, qty: 3, total: 90 },
+      ],
+      discount: 20,
+      payable: 170,
+      givenAmount: 200,
+      returnAmount: 30,
+    },
+    {
+      _id: "2",
+      receiptNo: "INV-1002",
+      customerName: "Sara Ahmed",
+      mobile: "03007654321",
+      items: [
+        { itemName: "Milk 1L", price: 120, qty: 1, total: 120 },
+        { itemName: "Bread", price: 50, qty: 2, total: 100 },
+      ],
+      discount: 10,
+      payable: 210,
+      givenAmount: 210,
+      returnAmount: 0,
+    },
+    {
+      _id: "3",
+      receiptNo: "INV-1003",
+      customerName: "Usman Ali",
+      mobile: "03211234567",
+      items: [
+        { itemName: "Shampoo", price: 300, qty: 1, total: 300 },
+        { itemName: "Soap", price: 80, qty: 4, total: 320 },
+      ],
+      discount: 50,
+      payable: 570,
+      givenAmount: 600,
+      returnAmount: 30,
+    },
+  ]);
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   // console.log("userInfo", userInfo);
@@ -74,20 +74,20 @@ const [invoices, setInvoices] = useState([
   // Form states
   const [customerName, setCustomerName] = useState("");
   const [mobileNo, setMobile] = useState("");
-  const [items, setItems] = useState([{ itemName: "", price: 0, qty: 1, total: 0 }]);
+  const [items, setItems] = useState([
+    { itemName: "", price: 0, qty: 1, total: 0 },
+  ]);
   const [discount, setDiscount] = useState("");
   const [givenAmount, setGivenAmount] = useState("");
 
   const [payable, setPayable] = useState(0);
   const [returnAmount, setReturnAmount] = useState(0);
-  const [balanceAmt, setBalanceAmt] = useState(0);     // ✅ was missing
+  const [balanceAmt, setBalanceAmt] = useState(0); // ✅ was missing
 
-  
   const [editId, setEditId] = useState(null);
   const [itemCategory, setItemCategory] = useState("");
-  const [categoryList, setCategoryList] = useState([]); 
+  const [categoryList, setCategoryList] = useState([]);
   const [suggestionsNo, setSuggestionsNo] = useState([]);
-
 
   // Animate slider
   useEffect(() => {
@@ -100,12 +100,13 @@ const [invoices, setInvoices] = useState([
     }
   }, [isSliderOpen]);
 
-
   // Fetch Sales Invoice Data
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/saleInvoices`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/saleInvoices`
+      );
       setInvoices(res.data); // store actual categories array
       console.log("Sales Invoices", res.data);
     } catch (error) {
@@ -117,7 +118,6 @@ const [invoices, setInvoices] = useState([
 
   // Initialize shelve location list with static data
   useEffect(() => {
-
     fetchData();
   }, [fetchData]);
 
@@ -132,12 +132,14 @@ const [invoices, setInvoices] = useState([
     const delay = setTimeout(async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/customers/search/mobile/?q=${mobileNumber}`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/customers/search/mobile/?q=${mobileNumber}`
         );
 
         if (res.data) {
           setSuggestionsNo(Array.isArray(res.data) ? res.data : [res.data]);
-          console.log("suggestion", suggestionsNo)
+          console.log("suggestion", suggestionsNo);
         } else {
           setSuggestionsNo([]);
         }
@@ -150,7 +152,7 @@ const [invoices, setInvoices] = useState([
     return () => clearTimeout(delay);
   }, [mobileNo]);
 
-  // search suggestion with debouncing 
+  // search suggestion with debouncing
   useEffect(() => {
     // ✅ Run only if searchValue is not empty and has more than 1 character
     if (!searchValue || searchValue.length <= 1) {
@@ -162,7 +164,9 @@ const [invoices, setInvoices] = useState([
       const fetchData = async () => {
         try {
           const res = await axios.get(
-            `${import.meta.env.VITE_API_BASE_URL}/item-details/search?q=${searchValue}`
+            `${
+              import.meta.env.VITE_API_BASE_URL
+            }/item-details/search?q=${searchValue}`
           );
           setSuggestions(res.data);
           console.log("Suggestion Item", res.data);
@@ -177,12 +181,13 @@ const [invoices, setInvoices] = useState([
     return () => clearTimeout(delay);
   }, [searchValue]);
 
-
-  // CategoryList Fetch 
+  // CategoryList Fetch
   const fetchCategoryList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/list`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/categories/list`
+      );
       setCategoryList(res.data); // store actual categories array
       console.log("Categories ", res.data);
     } catch (error) {
@@ -198,9 +203,11 @@ const [invoices, setInvoices] = useState([
   // ✅ Fetch items by category
   const fetchItemsByCategory = async (categoryName) => {
     try {
-      setItemCategory(categoryName)
+      setItemCategory(categoryName);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/item-details/category/${categoryName}`
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/item-details/category/${categoryName}`
       );
       setSuggestions(res.data); // store items of this category as suggestions
       console.log("Suggestion", suggestions);
@@ -211,16 +218,12 @@ const [invoices, setInvoices] = useState([
     }
   };
 
-
-
-
   const handleSearch = (selectedItem, index) => {
     handleItemChange(index, "itemName", selectedItem.itemName);
     handleItemChange(index, "price", selectedItem.price); // auto-fill price
     setSearchValue(""); // clear searchValue after selection
     setSuggestions([]); // close dropdown
   };
-
 
   // Handle item changes
   const handleItemChange = (index, field, value) => {
@@ -240,10 +243,12 @@ const [invoices, setInvoices] = useState([
     calculateTotals(updatedItems, discount, givenAmount);
   };
 
-
   // 👉 Calculate totals
   const calculateTotals = (itemsList, disc, given) => {
-    const totalBill = itemsList.reduce((sum, item) => sum + Number(item.total || 0), 0);
+    const totalBill = itemsList.reduce(
+      (sum, item) => sum + Number(item.total || 0),
+      0
+    );
     const payableAmt = totalBill - (parseFloat(disc) || 0);
 
     const paidValue = parseFloat(given) || 0;
@@ -273,7 +278,7 @@ const [invoices, setInvoices] = useState([
       returnDescription,
       payable,
       returnAmount,
-      itemCategory
+      itemCategory,
     };
     console.log("Form data ", formData);
 
@@ -302,7 +307,7 @@ const [invoices, setInvoices] = useState([
       }
 
       // reset form
-      resetForm()
+      resetForm();
       setIsSliderOpen(false);
       setIsEdit(false);
       setEditId(null);
@@ -315,14 +320,12 @@ const [invoices, setInvoices] = useState([
     }
   };
 
-
   // ✅ Handle suggestion click
   const handleCustomerSelect = (customer) => {
     setCustomerName(customer.customerName);
     setMobile(customer.mobileNumber); // use mobileNumber to match your API
     setSuggestionsNo([]);
   };
-
 
   // Reset form
   const resetForm = () => {
@@ -365,8 +368,8 @@ const [invoices, setInvoices] = useState([
               `${import.meta.env.VITE_API_BASE_URL}/saleInvoices/${id}`,
               {
                 headers: {
-                  Authorization: `Bearer ${userInfo.token}` // if you’re using auth
-                }
+                  Authorization: `Bearer ${userInfo.token}`, // if you’re using auth
+                },
               }
             );
             setInvoices(invoices.filter((s) => s._id !== id));
@@ -375,7 +378,7 @@ const [invoices, setInvoices] = useState([
               "Sales Invoice deleted successfully.",
               "success"
             );
-            fetchData()
+            fetchData();
           } catch (error) {
             console.error("Delete error:", error);
             swalWithTailwindButtons.fire(
@@ -402,8 +405,8 @@ const [invoices, setInvoices] = useState([
     // ✅ now itemCategory is a string, not object
     setItemCategory(invoice.itemCategory || "");
 
-    setCustomerName(invoice.customerName || '');
-    setMobile(invoice.mobile || '');
+    setCustomerName(invoice.customerName || "");
+    setMobile(invoice.mobile || "");
     setItems(invoice.items || []);
     setDiscount(invoice.discount || 0);
     setGivenAmount(invoice.givenAmount || 0);
@@ -412,18 +415,17 @@ const [invoices, setInvoices] = useState([
     setIsSliderOpen(true);
   };
 
-
   // Retrun invoice
   const handleReturn = (invoice) => {
     console.log(invoice);
 
     setIsEdit(true);
-    setIsReturn(true)
+    setIsReturn(true);
     setEditId(invoice._id);
     console.log("Eidit ", editId);
 
-    setCustomerName(invoice.customerName || '');
-    setMobile(invoice.mobile || '');
+    setCustomerName(invoice.customerName || "");
+    setMobile(invoice.mobile || "");
     setItems(invoice.items || []); // default to empty array
     setDiscount(invoice.discount || 0);
     setGivenAmount(invoice.givenAmount || 0);
@@ -441,11 +443,19 @@ const [invoices, setInvoices] = useState([
       .map(
         (i, idx) => `
       <tr>
-        <td style="border:1px solid #000;padding:4px;text-align:center;">${idx + 1}</td>
+        <td style="border:1px solid #000;padding:4px;text-align:center;">${
+          idx + 1
+        }</td>
         <td style="border:1px solid #000;padding:4px;">${i.itemName}</td>
-        <td style="border:1px solid #000;padding:4px;text-align:right;">${i.price}</td>
-        <td style="border:1px solid #000;padding:4px;text-align:center;">${i.qty}</td>
-        <td style="border:1px solid #000;padding:4px;text-align:right;">${i.total}</td>
+        <td style="border:1px solid #000;padding:4px;text-align:right;">${
+          i.price
+        }</td>
+        <td style="border:1px solid #000;padding:4px;text-align:center;">${
+          i.qty
+        }</td>
+        <td style="border:1px solid #000;padding:4px;text-align:right;">${
+          i.total
+        }</td>
       </tr>
     `
       )
@@ -505,18 +515,20 @@ const [invoices, setInvoices] = useState([
   };
 
   // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Common Header */}
+      <CommanHeader/>
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-newPrimary">
           Sales Invoice List
@@ -532,138 +544,149 @@ const [invoices, setInvoices] = useState([
         </button>
       </div>
 
-
       {/* Responsive Table Container */}
       <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-  {/* Mobile Cards (show on small screens) */}
-  <div className="lg:hidden space-y-4 p-4">
-    {invoices.map((inv, index) => (
-      <div
-        key={index}
-        className="bg-gray-100 p-4 rounded-xl shadow-sm border border-gray-200"
-      >
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-sm font-medium text-gray-500">Receipt No.</div>
-          <div className="text-sm text-gray-900">{inv.receiptNo}</div>
+        {/* Mobile Cards (show on small screens) */}
+        <div className="lg:hidden space-y-4 p-4">
+          {invoices.map((inv, index) => (
+            <div
+              key={index}
+              className="bg-gray-100 p-4 rounded-xl shadow-sm border border-gray-200"
+            >
+              <div className="grid grid-cols-2 gap-4">
+                <div className="text-sm font-medium text-gray-500">
+                  Receipt No.
+                </div>
+                <div className="text-sm text-gray-900">{inv.receiptNo}</div>
 
-          <div className="text-sm font-medium text-gray-500">Customer Name</div>
-          <div className="text-sm text-gray-900">{inv.customerName}</div>
+                <div className="text-sm font-medium text-gray-500">
+                  Customer Name
+                </div>
+                <div className="text-sm text-gray-900">{inv.customerName}</div>
 
-          <div className="text-sm font-medium text-gray-500">Mobile #</div>
-          <div className="text-sm text-gray-900">{inv.mobile}</div>
+                <div className="text-sm font-medium text-gray-500">
+                  Mobile #
+                </div>
+                <div className="text-sm text-gray-900">{inv.mobile}</div>
 
-          <div className="text-sm font-medium text-gray-500">Payable</div>
-          <div className="text-sm text-gray-900">{inv.payable}</div>
+                <div className="text-sm font-medium text-gray-500">Payable</div>
+                <div className="text-sm text-gray-900">{inv.payable}</div>
 
-          <div className="text-sm font-medium text-gray-500">Given</div>
-          <div className="text-sm text-gray-900">{inv.givenAmount}</div>
+                <div className="text-sm font-medium text-gray-500">Given</div>
+                <div className="text-sm text-gray-900">{inv.givenAmount}</div>
 
-          <div className="text-sm font-medium text-gray-500">Return</div>
-          <div className="text-sm text-gray-900">{inv.returnAmount}</div>
+                <div className="text-sm font-medium text-gray-500">Return</div>
+                <div className="text-sm text-gray-900">{inv.returnAmount}</div>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-4 flex justify-end">
+                <div className="relative group">
+                  <button className="text-gray-400 hover:text-gray-600 text-xl">
+                    ⋯
+                  </button>
+                  <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
+                    <button
+                      onClick={() => handleEdit(inv)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
+                    >
+                      <SquarePen size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(inv._id)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handlePrint(inv)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-blue-700 flex items-center gap-2"
+                    >
+                      <Printer size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleReturn(inv)}
+                      className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+                    >
+                      <Truck size={18} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
-        {/* Actions */}
-        <div className="mt-4 flex justify-end">
-          <div className="relative group">
-            <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-            <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-              <button
-                onClick={() => handleEdit(inv)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
-              >
-                <SquarePen size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(inv._id)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-              >
-               <Trash2 size={18} />
-              </button>
-              <button
-                onClick={() => handlePrint(inv)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-blue-700 flex items-center gap-2"
-              >
-                 <Printer size={18} />
-              </button>
-              <button
-                onClick={() => handleReturn(inv)}
-                className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
-              >
-                 <Truck size={18}/>
-              </button>
+        {/* Desktop Table (show on large screens) */}
+        <div className="hidden lg:block overflow-x-auto">
+          <div className="min-w-[1000px]">
+            {/* Table Header */}
+            <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200">
+              <div className="text-left">Receipt No.</div>
+              <div className="text-left">Customer Name</div>
+              <div className="text-left">Mobile #</div>
+              <div className="text-left">Payable</div>
+              <div className="text-left">Given</div>
+              <div className="text-left">Return</div>
+              <div className="text-right">Actions</div>
+            </div>
+
+            {/* Table Body */}
+            <div className="divide-y divide-gray-200">
+              {loading?(<TableSkeleton
+                    rows={invoices.length || 5}
+                    cols={userInfo?.isAdmin ? 8 : 6}
+                  />):invoices.map((inv, index) => (
+                <div
+                  key={index}
+                  className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                >
+                  <div className="font-medium text-gray-700">
+                    {inv.receiptNo}
+                  </div>
+                  <div className="text-gray-600">{inv.customerName}</div>
+                  <div className="text-gray-600">{inv.mobile}</div>
+                  <div className="text-gray-600">{inv.payable}</div>
+                  <div className="text-gray-600">{inv.givenAmount}</div>
+                  <div className="text-gray-600">{inv.returnAmount}</div>
+
+                  {/* Actions */}
+                  <div className="flex justify-end items-center gap-3">
+                    <button
+                      onClick={() => handleEdit(inv)}
+                      className="text-blue-500 hover:text-blue-700 "
+                      title="Edit"
+                    >
+                      <SquarePen size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(inv._id)}
+                      className="text-red-500 hover:text-red-700 "
+                      title="Delete"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                    <button
+                      onClick={() => handlePrint(inv)}
+                      className="text-blue-600 hover:text-blue-800 "
+                      title="Print"
+                    >
+                      <Printer size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleReturn(inv)}
+                      className="text-green-600 hover:text-green-800 "
+                      title="Return Sales"
+                    >
+                      <Truck size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
       </div>
-    ))}
-  </div>
-
-  {/* Desktop Table (show on large screens) */}
-  <div className="hidden lg:block overflow-x-auto">
-    <div className="min-w-[1000px]">
-      {/* Table Header */}
-      <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200">
-        <div className="text-left">Receipt No.</div>
-        <div className="text-left">Customer Name</div>
-        <div className="text-left">Mobile #</div>
-        <div className="text-left">Payable</div>
-        <div className="text-left">Given</div>
-        <div className="text-left">Return</div>
-        <div className="text-right">Actions</div>
-      </div>
-
-      {/* Table Body */}
-      <div className="divide-y divide-gray-200">
-        {invoices.map((inv, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-          >
-            <div className="font-medium text-gray-700">{inv.receiptNo}</div>
-            <div className="text-gray-600">{inv.customerName}</div>
-            <div className="text-gray-600">{inv.mobile}</div>
-            <div className="text-gray-600">{inv.payable}</div>
-            <div className="text-gray-600">{inv.givenAmount}</div>
-            <div className="text-gray-600">{inv.returnAmount}</div>
-
-            {/* Actions */}
-            <div className="flex justify-end items-center gap-3">
-              <button
-                onClick={() => handleEdit(inv)}
-                className="text-blue-500 hover:text-blue-700 "
-                title="Edit"
-              >
-                  <SquarePen size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(inv._id)}
-                className="text-red-500 hover:text-red-700 "
-                title="Delete"
-              >
-                <Trash2 size={18} />
-              </button>
-              <button
-                onClick={() => handlePrint(inv)}
-                className="text-blue-600 hover:text-blue-800 "
-                title="Print"
-              >
-                <Printer size={18} />
-              </button>
-              <button
-                onClick={() => handleReturn(inv)}
-                className="text-green-600 hover:text-green-800 "
-                title="Return Sales"
-              >
-                <Truck size={18}/>
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
-
 
       {/* Slider Form */}
       {isSliderOpen && (
@@ -697,19 +720,20 @@ const [invoices, setInvoices] = useState([
               readOnly={isReturn} // ✅ make it readonly
             />
 
-            {!isReturn && suggestionsNo.length > 0 && ( // ❌ hide suggestions if return
-              <ul className="absolute bg-white border w-full mt-1 z-10 rounded shadow">
-                {suggestionsNo.map((s) => (
-                  <li
-                    key={s._id}
-                    className="p-2 hover:bg-gray-200 cursor-pointer"
-                    onClick={() => handleCustomerSelect(s)}
-                  >
-                    📱 {s.mobileNumber} — {s.customerName}
-                  </li>
-                ))}
-              </ul>
-            )}
+            {!isReturn &&
+              suggestionsNo.length > 0 && ( // ❌ hide suggestions if return
+                <ul className="absolute bg-white border w-full mt-1 z-10 rounded shadow">
+                  {suggestionsNo.map((s) => (
+                    <li
+                      key={s._id}
+                      className="p-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={() => handleCustomerSelect(s)}
+                    >
+                      📱 {s.mobileNumber} — {s.customerName}
+                    </li>
+                  ))}
+                </ul>
+              )}
 
             {/* Customer name */}
             <label htmlFor="">Customer Name</label>
@@ -731,7 +755,8 @@ const [invoices, setInvoices] = useState([
                 value={itemCategory}
                 required
                 onChange={(e) => {
-                  if (!isReturn) { // ❌ block changes if return
+                  if (!isReturn) {
+                    // ❌ block changes if return
                     const categoryName = e.target.value;
                     setItemCategory(categoryName);
                     if (categoryName) fetchItemsByCategory(categoryName);
@@ -748,7 +773,6 @@ const [invoices, setInvoices] = useState([
                 ))}
               </select>
             </div>
-
 
             {/* Items */}
             <div className="mt-2">Items</div>
@@ -771,7 +795,9 @@ const [invoices, setInvoices] = useState([
                     if (e.target.value.length > 0) {
                       // filter category items by typed value
                       const filtered = suggestions.filter((s) =>
-                        s.itemName.toLowerCase().includes(e.target.value.toLowerCase())
+                        s.itemName
+                          .toLowerCase()
+                          .includes(e.target.value.toLowerCase())
                       );
                       setSuggestions(filtered);
                     } else {
@@ -793,7 +819,9 @@ const [invoices, setInvoices] = useState([
                   value={item.qty}
                   onChange={(e) => handleItemChange(i, "qty", e.target.value)}
                 />
-                <div className="p-2 w-full sm:w-20 text-right">{item.amount}</div>
+                <div className="p-2 w-full sm:w-20 text-right">
+                  {item.amount}
+                </div>
                 <button
                   onClick={() => removeItemRow(i)}
                   className="text-red-500 hover:underline"
@@ -808,7 +836,9 @@ const [invoices, setInvoices] = useState([
                       <li
                         key={s._id}
                         className={`px-4 py-2 text-sm text-gray-700 cursor-pointer transition-colors duration-200 
-            ${index !== suggestions.length - 1 ? "border-b border-gray-100" : ""} 
+            ${
+              index !== suggestions.length - 1 ? "border-b border-gray-100" : ""
+            } 
           hover:bg-indigo-50 hover:text-indigo-600`}
                         onClick={() => handleSearch(s, i)}
                       >
@@ -817,15 +847,16 @@ const [invoices, setInvoices] = useState([
                     ))}
                   </ul>
                 )}
-
               </div>
             ))}
-
 
             {/* Return Des */}
             {isReturn && (
               <div className="mb-4">
-                <label htmlFor="returnReason" className="block font-medium mb-1">
+                <label
+                  htmlFor="returnReason"
+                  className="block font-medium mb-1"
+                >
                   Why are we returning the product?
                 </label>
                 <input
@@ -840,17 +871,18 @@ const [invoices, setInvoices] = useState([
               </div>
             )}
 
-
             {/* Totals */}
             <div className="mt-6 p-4 border rounded-lg bg-gray-50 shadow-sm">
-              <h3 className="font-bold text-lg mb-4 text-gray-700">Order Summary</h3>
+              <h3 className="font-bold text-lg mb-4 text-gray-700">
+                Order Summary
+              </h3>
 
               <div className="flex gap-4">
-
-
                 {/* Given Amount */}
                 <div className="flex flex-col w-1/2">
-                  <label className="text-sm font-medium text-gray-600">Given Amount</label>
+                  <label className="text-sm font-medium text-gray-600">
+                    Given Amount
+                  </label>
                   <input
                     type="number"
                     placeholder="Given Amount"
@@ -859,14 +891,20 @@ const [invoices, setInvoices] = useState([
                     onChange={(e) => {
                       const val = e.target.value;
                       setGivenAmount(val);
-                      calculateTotals(items, discount ? parseFloat(discount) : 0, parseFloat(val) || 0);
+                      calculateTotals(
+                        items,
+                        discount ? parseFloat(discount) : 0,
+                        parseFloat(val) || 0
+                      );
                     }}
                   />
                 </div>
 
                 {/* Discount */}
                 <div className="flex flex-col w-1/2">
-                  <label className="text-sm font-medium text-gray-600">Discount</label>
+                  <label className="text-sm font-medium text-gray-600">
+                    Discount
+                  </label>
                   <input
                     type="number"
                     placeholder="Discount"
@@ -875,12 +913,14 @@ const [invoices, setInvoices] = useState([
                     onChange={(e) => {
                       const val = e.target.value;
                       setDiscount(val);
-                      calculateTotals(items, parseFloat(val) || 0, givenAmount ? parseFloat(givenAmount) : 0);
+                      calculateTotals(
+                        items,
+                        parseFloat(val) || 0,
+                        givenAmount ? parseFloat(givenAmount) : 0
+                      );
                     }}
                   />
                 </div>
-
-
               </div>
             </div>
             {/* Payable */}
@@ -891,10 +931,9 @@ const [invoices, setInvoices] = useState([
               {balanceAmt > 0
                 ? `Balance Due: ${balanceAmt}`
                 : returnAmount > 0
-                  ? `Return Amount: ${returnAmount}`
-                  : 'All Paid'}
+                ? `Return Amount: ${returnAmount}`
+                : "All Paid"}
             </div>
-
 
             {/* Save */}
             <button
@@ -906,7 +945,6 @@ const [invoices, setInvoices] = useState([
           </div>
         </div>
       )}
-
     </div>
   );
 };

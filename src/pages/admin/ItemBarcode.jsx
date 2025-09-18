@@ -4,9 +4,58 @@ import Barcode from "react-barcode";
 import { toast } from "react-toastify";
 import gsap from "gsap";
 import { HashLoader } from "react-spinners";
+import { BarcodeIcon } from "lucide-react";
+import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../components/CommanHeader";
 
 const ItemBarcode = () => {
-  const [itemBarcodeList, setItemBarcodeList] = useState([]);
+  const [itemBarcodeList, setItemBarcodeList] = useState([
+    {
+      code: "PRD001",
+      itemDetail: { itemName: "Coca Cola 1L" },
+      category: { categoryName: "Beverages" },
+      itemType: "Drink",
+      price: 120,
+      stock: 80,
+      barcode: "BAR123456789",
+    },
+    {
+      code: "PRD002",
+      itemDetail: { itemName: "Lays Chips" },
+      category: { categoryName: "Snacks" },
+      itemType: "Food",
+      price: 50,
+      stock: 200,
+      barcode: "BAR987654321",
+    },
+    {
+      code: "PRD003",
+      itemDetail: { itemName: "Nestle Water 500ml" },
+      category: { categoryName: "Beverages" },
+      itemType: "Drink",
+      price: 40,
+      stock: 300,
+      barcode: "BAR112233445",
+    },
+    {
+      code: "PRD004",
+      itemDetail: { itemName: "Oreo Biscuits" },
+      category: { categoryName: "Snacks" },
+      itemType: "Food",
+      price: 75,
+      stock: 150,
+      barcode: "BAR998877665",
+    },
+    {
+      code: "PRD005",
+      itemDetail: { itemName: "Red Bull 250ml" },
+      category: { categoryName: "Energy Drinks" },
+      itemType: "Drink",
+      price: 180,
+      stock: 90,
+      barcode: "BAR556677889",
+    },
+  ]);
   const [categoryList, setCategoryList] = useState([]);
   const [manufacturerList, setManufacturerList] = useState([]);
   const [supplierList, setSupplierList] = useState([]);
@@ -26,7 +75,8 @@ const ItemBarcode = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const sliderRef = useRef(null);
-
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
 
   // Safe userInfo parsing
   const getUserInfo = () => {
@@ -68,7 +118,9 @@ const ItemBarcode = () => {
   const fetchCategories = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/categories`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/categories`
+      );
       if (!res.ok) throw new Error("Failed to fetch categories");
       const result = await res.json();
       setCategoryList(result);
@@ -84,7 +136,9 @@ const ItemBarcode = () => {
   const fetchManufacturers = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/manufacturers`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/manufacturers`
+      );
       if (!res.ok) throw new Error("Failed to fetch manufacturers");
       const result = await res.json();
       setManufacturerList(result);
@@ -116,7 +170,9 @@ const ItemBarcode = () => {
   const fetchItemDetails = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-details`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-details`
+      );
       setItemDetailList(res.data);
     } catch (error) {
       console.error("Failed to fetch item details:", error);
@@ -146,7 +202,9 @@ const ItemBarcode = () => {
   const fetchBarcodes = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_BASE_URL}/itemBarcode`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/itemBarcode`
+      );
       if (!res.ok) throw new Error("Failed to fetch barcodes");
       const result = await res.json();
       console.log("Result", result);
@@ -166,15 +224,30 @@ const ItemBarcode = () => {
     fetchSuppliers();
     fetchItemDetails();
     fetchUnits();
-    fetchBarcodes();
-  }, [fetchCategories, fetchManufacturers, fetchSuppliers, fetchItemDetails, fetchUnits, fetchBarcodes]);
+    // fetchBarcodes();
+  }, [
+    fetchCategories,
+    fetchManufacturers,
+    fetchSuppliers,
+    fetchItemDetails,
+    fetchUnits,
+    fetchBarcodes,
+  ]);
 
   const handleAddItem = () => {
     setIsSliderOpen(true);
   };
 
   const handleSave = async () => {
-    if (!code || !categoryId || !manufacturerId || !itemDetailId || !stock || !reorderLevel || !salePrice) {
+    if (
+      !code ||
+      !categoryId ||
+      !manufacturerId ||
+      !itemDetailId ||
+      !stock ||
+      !reorderLevel ||
+      !salePrice
+    ) {
       alert("Please fill in all required fields!");
       return;
     }
@@ -240,17 +313,18 @@ const ItemBarcode = () => {
       setStock("");
       setReorderLevel("");
       setSalePrice("");
-      fetchBarcodes()
+      fetchBarcodes();
     } catch (error) {
       console.error("❌ Error saving item:", error);
       toast.error("Failed to save item!");
     }
   };
 
-
   // Print individual barcode
   const handlePrint = (item) => {
-    const itemDetail = itemDetailList.find((d) => d._id === item.itemDetail)?.itemName || "Unknown";
+    const itemDetail =
+      itemDetailList.find((d) => d._id === item.itemDetail)?.itemName ||
+      "Unknown";
     const printWindow = window.open("", "_blank");
     printWindow.document.write(`
       <html>
@@ -275,24 +349,27 @@ const ItemBarcode = () => {
     printWindow.document.close();
   };
 
-
-  // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // // Show loading spinner
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
+      {/* Common Header */}
+      <CommanHeader/>
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Item Barcode</h1>
-          <p className="text-gray-500 text-sm">Item Barcode Management Dashboard</p>
+          <p className="text-gray-500 text-sm">
+            Item Barcode Management Dashboard
+          </p>
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-primaryDark transition-colors duration-200"
@@ -303,259 +380,148 @@ const ItemBarcode = () => {
       </div>
 
       {/* TABLE/CARDS */}
-      <div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="w-full">
-            {/* Table Headers */}
-            <div className="hidden lg:grid grid-cols-9 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div>Code</div>
-              <div>Item Name</div>
-              <div>Category</div>
-              <div>Manufacturer</div>
-              <div>Supplier</div>
-              <div>Unit</div>
-              <div>Stock</div>
-              <div>Barcode</div>
-              <div className="text-right">Actions</div>
-            </div>
+      <div className="rounded-xl  border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="max-h-[400px] overflow-y-auto">
+            <table className="min-w-[1000px] w-full text-sm text-left border-collapse">
+              {/* Table Header */}
+              <thead className="sticky top-0 bg-gray-100 z-10 text-xs font-semibold text-gray-600 uppercase">
+                <tr>
+                  <th className="px-6 py-3">Code</th>
+                  <th className="px-6 py-3">Item Name</th>
+                  <th className="px-6 py-3">Category</th>
+                  <th className="px-6 py-3">Item Type</th>
+                  <th className="px-6 py-3">Price</th>
+                  <th className="px-6 py-3">Stock</th>
+                  <th className="px-6 py-3">Barcode</th>
+                  <th className="px-6 py-3 text-right">Actions</th>
+                </tr>
+              </thead>
 
-            {/* Mobile Cards */}
-            <div className="lg:hidden space-y-4 mt-4">
-              {itemBarcodeList.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-2 gap-4 bg-white p-4 rounded-xl shadow-sm border border-gray-100"
-                >
-                  <div className="text-sm font-medium text-gray-500">Sr.#</div>
-                  <div className="text-sm text-gray-900">{index + 1}</div>
-                  <div className="text-sm font-medium text-gray-500">Code</div>
-                  <div className="text-sm text-gray-900">{item.code}</div>
-                  <div className="text-sm font-medium text-gray-500">Item Name</div>
-                  <div className="text-sm text-gray-900 truncate">{(item?.itemDetail?.itemName)}</div>
-                  <div className="text-sm font-medium text-gray-500">Category</div>
-                  <div className="text-sm text-gray-900">{item?.category?.categoryName}</div>
-                  <div className="text-sm font-medium text-gray-500">Manufacturer</div>
-                  <div className="text-sm text-gray-900">{item?.manufacturer?.manufacturerName}</div>
-                  <div className="text-sm font-medium text-gray-500">Supplier</div>
-                  <div className="text-sm text-gray-900">{item?.supplier?.supplierName}</div>
-                  <div className="text-sm font-medium text-gray-500">Unit</div>
-                  <div className="text-sm text-gray-900">{(item?.unit?.unitName)}</div>
-                  <div className="text-sm font-medium text-gray-500">Stock</div>
-                  <div className="text-sm text-gray-900">{item.stock}</div>
-                  <div className="text-sm font-medium text-gray-500">Reorder Level</div>
-                  <div className="text-sm text-gray-900">{item.reorderLevel}</div>
-                  <div className="text-sm font-medium text-gray-500">Price</div>
-                  <div className="text-sm text-gray-900">${item.salePrice}</div>
-                  <div className="text-sm font-medium text-gray-500">Barcode</div>
-                  <div className="text-sm text-gray-900">
-                    <div id={`barcode-${item.code}`}>
-                      <Barcode value={item.code} height={40} width={1.5} />
-                    </div>
-                  </div>
-                  <div className="col-span-2 text-right">
-                    <div className="relative group">
-                      <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                      <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50">
-                        <button
-                          onClick={() => handlePrint(item)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100 text-blue-600 flex items-center gap-2"
-                        >
-                          Print
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Desktop Table */}
-            <div className="mt-4 flex flex-col gap-[14px] pb-14 lg:flex">
-              {itemBarcodeList.map((item, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-9 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
-                >
-                  <div className="text-sm text-gray-600">{item.code}</div>
-                  <div className="text-sm text-gray-600 truncate">{(item?.itemDetail?.itemName)}</div>
-                  <div className="text-sm text-gray-600">{(item?.category?.categoryName)}</div>
-                  <div className="text-sm text-gray-600">{(item?.manufacturer?.manufacturerName)}</div>
-                  <div className="text-sm text-gray-600">{item?.supplier?.supplierName}</div>
-                  <div className="text-sm text-gray-600">{(item?.unit?.unitName)}</div>
-                  <div className="text-sm text-gray-600">{item.stock}</div>
-                  <div id={`barcode-${item.code}`}>
-                    <Barcode value={item.code} height={40} width={1.5} />
-                  </div>
-                  <div className="text-right relative group">
-                    <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                    <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50">
-                      <button
-                        onClick={() => handlePrint(item)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100 text-blue-600 flex items-center gap-2"
-                      >
-                        Print
-                      </button>
-                    </div>
-                  </div>
-                  {/* Hidden barcode for printing */}
-                  <div style={{ display: "none" }}>
-                    <div id={`barcode-${item.code}`}>
-                      <Barcode value={item.code} height={40} width={1.5} />
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+              {/* Table Body */}
+              <tbody>
+                {loading ? (
+                  <TableSkeleton
+                    rows={itemBarcodeList.length || 5}
+                    cols={userInfo?.isAdmin ? 8 : 6}
+                  />
+                ) : itemBarcodeList.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} className="text-center py-4 text-gray-500">
+                      No items found.
+                    </td>
+                  </tr>
+                ) : (
+                  itemBarcodeList.map((item, index) => (
+                    <tr
+                      key={index}
+                      className="border-b border-gray-200 hover:bg-gray-100"
+                    >
+                      <td className="px-6 py-3">{item.code}</td>
+                      <td className="px-6 py-3 truncate">
+                        {item?.itemDetail?.itemName}
+                      </td>
+                      <td className="px-6 py-3">
+                        {item?.category?.categoryName}
+                      </td>
+                      <td className="px-6 py-3">{item?.itemType}</td>
+                      <td className="px-6 py-3">${item.price}</td>
+                      <td className="px-6 py-3">{item.stock}</td>
+                      <td className="px-6 py-3">
+                        <Barcode
+                          value={item.barcode}
+                          height={20}
+                          width={1.2}
+                          background="transparent"
+                        />
+                      </td>
+                      <td className="px-6 py-3 text-right">
+                        <div className="inline-flex justify-end border-newPrimary px-1 py-1 rounded-[5px] border items-center gap-3">
+                          <button
+                            onClick={() => {
+                              setSelectedItem(item);
+                              setIsModalOpen(true);
+                            }}
+                            className="text-newPrimary"
+                          >
+                            <BarcodeIcon size={18} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      {/* SLIDER FORM */}
-      {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 z-50">
-          <div
-            ref={sliderRef}
-            className="fixed right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl overflow-y-auto"
-            style={{ display: "block" }}
-          >
-            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-newPrimary">Add Item Barcode</h2>
-              <button
-                className="w-6 h-6 text-white rounded-full flex justify-center items-center hover:text-gray-400 text-xl bg-newPrimary"
-                onClick={() => setIsSliderOpen(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="p-6 space-y-6">
-              <div className="border rounded-lg p-4">
-                <div className="grid grid-cols-1 gap-4">
-                  <div>
-                    <label className="block text-gray-700 mb-1">Code <span className="text-red-500">*</span></label>
-                    <input
-                      type="text"
-                      value={code}
-                      onChange={(e) => setCode(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Category <span className="text-red-500">*</span></label>
-                    <select
-                      value={categoryId}
-                      onChange={(e) => setCategoryId(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    >
-                      <option value="">Select Category</option>
-                      {categoryList.map((category) => (
-                        <option key={category._id} value={category._id}>
-                          {category.categoryName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Manufacturer <span className="text-red-500">*</span></label>
-                    <select
-                      value={manufacturerId}
-                      onChange={(e) => setManufacturerId(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    >
-                      <option value="">Select Manufacturer</option>
-                      {manufacturerList.map((manufacturer) => (
-                        <option key={manufacturer._id} value={manufacturer._id}>
-                          {manufacturer.manufacturerName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Supplier</label>
-                    <select
-                      value={supplierId}
-                      onChange={(e) => setSupplierId(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    >
-                      <option value="">Select Supplier (Optional)</option>
-                      {supplierList.map((supplier) => (
-                        <option key={supplier._id} value={supplier._id}>
-                          {supplier.supplierName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Item Detail <span className="text-red-500">*</span></label>
-                    <select
-                      value={itemDetailId}
-                      onChange={(e) => setItemDetailId(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    >
-                      <option value="">Select Item</option>
-                      {itemDetailList.map((item) => (
-                        <option key={item._id} value={item._id}>
-                          {item.itemName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Unit <span className="text-red-500">*</span></label>
-                    <select
-                      value={unitId}
-                      onChange={(e) => setUnitId(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    >
-                      <option value="">Select Unit</option>
-                      {unitList.map((unit) => (
-                        <option key={unit._id} value={unit._id}>
-                          {unit.unitName}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Stock <span className="text-red-500">*</span></label>
-                    <input
-                      type="number"
-                      value={stock}
-                      onChange={(e) => setStock(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Reorder Level <span className="text-red-500">*</span></label>
-                    <input
-                      type="number"
-                      value={reorderLevel}
-                      onChange={(e) => setReorderLevel(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-gray-700 mb-1">Sale Price <span className="text-red-500">*</span></label>
-                    <input
-                      type="number"
-                      value={salePrice}
-                      onChange={(e) => setSalePrice(e.target.value)}
-                      className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
-                    />
-                  </div>
-                </div>
+      {/* MODAL */}
+      {isModalOpen && selectedItem && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-2xl relative">
+            {/* Close button */}
+            <button
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
+              onClick={() => setIsModalOpen(false)}
+            >
+              ✕
+            </button>
+
+            <h2 className="text-xl font-bold text-newPrimary mb-4">
+              Barcode Details
+            </h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Primary Barcode */}
+              <div className="border rounded-lg p-4 flex flex-col items-center">
+                <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                  Primary Barcode
+                </h3>
+                <Barcode
+                  value={selectedItem.barcode}
+                  height={40}
+                  width={1.5}
+                  background="transparent"
+                />
+                <p className="mt-2 text-sm text-gray-600">
+                  Code: {selectedItem.code}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Item: {selectedItem?.itemDetail?.itemName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Category: {selectedItem?.category?.categoryName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Price: ${selectedItem.price}
+                </p>
               </div>
-              <div className="flex justify-end gap-3 pt-4">
-                <button
-                  className="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
-                  onClick={() => setIsSliderOpen(false)}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="bg-newPrimary text-white px-6 py-2 rounded-lg hover:bg-primaryDark transition-colors duration-200"
-                  onClick={handleSave}
-                >
-                  Save Item
-                </button>
+
+              {/* Secondary Barcode */}
+              <div className="border rounded-lg p-4 flex flex-col items-center">
+                <h3 className="text-lg font-semibold mb-2 text-gray-700">
+                  Secondary Barcode
+                </h3>
+                <Barcode
+                  value={selectedItem.barcode}
+                  height={40}
+                  width={1.5}
+                  background="transparent"
+                />
+                <p className="mt-2 text-sm text-gray-600">
+                  Code: {selectedItem.code}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Item: {selectedItem?.itemDetail?.itemName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Category: {selectedItem?.category?.categoryName}
+                </p>
+                <p className="text-sm text-gray-600">
+                  Price: ${selectedItem.price}
+                </p>
               </div>
             </div>
           </div>

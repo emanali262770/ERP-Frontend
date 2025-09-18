@@ -7,6 +7,7 @@ import axios from "axios";
 import Barcode from "react-barcode";
 import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../components/CommanHeader";
 
 
 const ItemList = () => {
@@ -46,12 +47,7 @@ const ItemList = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   // --- Dummy Data ---
 
-const [dummyItems, setDummyItems] = useState([]);
-
-// Simulate API call
-useEffect(() => {
-  const timer = setTimeout(() => {
-    setDummyItems([
+const [dummyItems, setDummyItems] = useState([
       {
         _id: "1",
         itemType: { itemTypeName: "Beverages" },
@@ -73,11 +69,9 @@ useEffect(() => {
         itemImage: { url: "https://via.placeholder.com/50" },
       },
     ]);
-    setLoading(false);
-  }, 1000);
 
-  return () => clearTimeout(timer);
-}, []);
+// Simulate API call
+
 
   // Slider animation
   useEffect(() => {
@@ -436,11 +430,15 @@ useEffect(() => {
   //     </div>
   //   );
   // }
+ 
+
   
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-      <div className="flex justify-between items-center mb-6">
+      {/* Coomon header */}
+      <CommanHeader/>
+      <div className="flex justify-between items-center mt-6 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Items List</h1>
           
@@ -454,7 +452,7 @@ useEffect(() => {
       </div>
 
       {/* Item Table */}
-    <div className="rounded-xl shadow border border-gray-200 w-full overflow-hidden">
+    <div className="rounded-xl  border border-gray-200 w-full overflow-hidden">
   <div className="overflow-x-auto">
     <table className="min-w-[1000px] w-full text-sm text-left border-collapse">
       {/* Table Header */}
@@ -476,11 +474,15 @@ useEffect(() => {
       <tbody>
   {loading ? (
     // Skeleton shown while loading
-    <TableSkeleton rows={5} cols={userInfo?.isAdmin ? 7 : 6} />
+   <TableSkeleton 
+  rows={dummyItems.length || 5} 
+  cols={userInfo?.isAdmin ? 7 : 6} 
+/>
   ) : (
     dummyItems.map((item, index) => (
       <tr
         key={item._id}
+
         className={`border-b border-gray-200 hover:bg-gray-50 ${
           index % 2 === 0 ? "bg-white" : "bg-gray-50"
         }`}
