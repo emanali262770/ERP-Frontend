@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 import { HashLoader } from "react-spinners";
 import { FaEdit, FaTrash, FaPrint, } from "react-icons/fa"
 import { TbTruckReturn } from "react-icons/tb";
+import { Printer, SquarePen, Trash2, Truck } from "lucide-react";
 
 
 const SalesInvoice = () => {
@@ -20,7 +21,52 @@ const SalesInvoice = () => {
   const [loading, setLoading] = useState(true);
 
   // Static invoice data
-  const [invoices, setInvoices] = useState([]);
+  // Inside SalesInvoice component, instead of fetching at first
+const [invoices, setInvoices] = useState([
+  {
+    _id: "1",
+    receiptNo: "INV-1001",
+    customerName: "Ali Khan",
+    mobile: "03001234567",
+    items: [
+      { itemName: "Coca Cola 1L", price: 50, qty: 2, total: 100 },
+      { itemName: "Lays Chips", price: 30, qty: 3, total: 90 },
+    ],
+    discount: 20,
+    payable: 170,
+    givenAmount: 200,
+    returnAmount: 30,
+  },
+  {
+    _id: "2",
+    receiptNo: "INV-1002",
+    customerName: "Sara Ahmed",
+    mobile: "03007654321",
+    items: [
+      { itemName: "Milk 1L", price: 120, qty: 1, total: 120 },
+      { itemName: "Bread", price: 50, qty: 2, total: 100 },
+    ],
+    discount: 10,
+    payable: 210,
+    givenAmount: 210,
+    returnAmount: 0,
+  },
+  {
+    _id: "3",
+    receiptNo: "INV-1003",
+    customerName: "Usman Ali",
+    mobile: "03211234567",
+    items: [
+      { itemName: "Shampoo", price: 300, qty: 1, total: 300 },
+      { itemName: "Soap", price: 80, qty: 4, total: 320 },
+    ],
+    discount: 50,
+    payable: 570,
+    givenAmount: 600,
+    returnAmount: 30,
+  },
+]);
+
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   // console.log("userInfo", userInfo);
@@ -488,141 +534,136 @@ const SalesInvoice = () => {
 
 
       {/* Responsive Table Container */}
-      <div className="rounded-xl shadow p-4 sm:p-6 border border-gray-100">
-        {/* Mobile Cards (show on small screens) */}
-        <div className="lg:hidden space-y-4">
-          {invoices.map((inv, index) => (
-            <div key={index} className="bg-white p-4 rounded-xl shadow-sm border border-gray-200">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-sm font-medium text-gray-500">Receipt No.</div>
-                <div className="text-sm text-gray-900">{inv.receiptNo}</div>
+      <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+  {/* Mobile Cards (show on small screens) */}
+  <div className="lg:hidden space-y-4 p-4">
+    {invoices.map((inv, index) => (
+      <div
+        key={index}
+        className="bg-gray-100 p-4 rounded-xl shadow-sm border border-gray-200"
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div className="text-sm font-medium text-gray-500">Receipt No.</div>
+          <div className="text-sm text-gray-900">{inv.receiptNo}</div>
 
-                <div className="text-sm font-medium text-gray-500">Customer Name</div>
-                <div className="text-sm text-gray-900">{inv.customerName}</div>
+          <div className="text-sm font-medium text-gray-500">Customer Name</div>
+          <div className="text-sm text-gray-900">{inv.customerName}</div>
 
-                <div className="text-sm font-medium text-gray-500">Mobile #</div>
-                <div className="text-sm text-gray-900">{inv.mobile}</div>
+          <div className="text-sm font-medium text-gray-500">Mobile #</div>
+          <div className="text-sm text-gray-900">{inv.mobile}</div>
 
-                <div className="text-sm font-medium text-gray-500">Payable</div>
-                <div className="text-sm text-gray-900">{inv.payable}</div>
+          <div className="text-sm font-medium text-gray-500">Payable</div>
+          <div className="text-sm text-gray-900">{inv.payable}</div>
 
-                <div className="text-sm font-medium text-gray-500">Given</div>
-                <div className="text-sm text-gray-900">{inv.givenAmount}</div>
+          <div className="text-sm font-medium text-gray-500">Given</div>
+          <div className="text-sm text-gray-900">{inv.givenAmount}</div>
 
-                <div className="text-sm font-medium text-gray-500">Return</div>
-                <div className="text-sm text-gray-900">{inv.returnAmount}</div>
-              </div>
-
-              <div className="mt-4 flex justify-end">
-                <div className="relative group">
-                  <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                  <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-
-                    <button
-                      onClick={() => handleEdit(inv)}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
-                    >
-                      ✏️ Edit
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(inv._id)}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-red-500 flex items-center gap-2"
-                    >
-                      🗑️ Delete
-                    </button>
-
-                    <button
-                      onClick={() => handlePrint(inv)}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-blue-700 flex items-center gap-2"
-                    >
-                      🖨️ Print
-                    </button>
-
-                    {/* ✅ Return to Sales */}
-                    <button
-                      onClick={() => handleReturn(inv)}
-                      className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-green-600 flex items-center gap-2"
-                    >
-                      ↩ Return
-                    </button>
-                  </div>
-                </div>
-              </div>
-
-            </div>
-          ))}
+          <div className="text-sm font-medium text-gray-500">Return</div>
+          <div className="text-sm text-gray-900">{inv.returnAmount}</div>
         </div>
 
-        {/* Desktop Table (show on large screens) */}
-        <div className="hidden lg:block overflow-x-auto">
-          <div className="min-w-[800px]">
-            {/* Table header */}
-            <div className="grid grid-cols-7 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div className="min-w-[100px]">Receipt No.</div>
-              <div className="min-w-[150px]">Customer Name</div>
-              <div className="min-w-[100px]">Mobile #</div>
-              <div className="min-w-[80px]">Payable</div>
-              <div className="min-w-[80px]">Given</div>
-              <div className="min-w-[80px]">Return</div>
-              <div className="min-w-[80px] text-right">Actions</div>
-            </div>
-
-            {/* Table rows */}
-            <div className="mt-4 flex flex-col gap-[14px]">
-              {invoices.map((inv, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm"
-                >
-                  <div className="min-w-[100px]">{inv.receiptNo}</div>
-                  <div className="min-w-[150px]">{inv.customerName}</div>
-                  <div className="min-w-[100px]">{inv.mobile}</div>
-                  <div className="min-w-[80px]">{inv.payable}</div>
-                  <div className="min-w-[80px]">{inv.givenAmount}</div>
-                  <div className="min-w-[80px]">{inv.returnAmount}</div>
-
-                  <div className="min-w-[100px] flex justify-end items-center gap-3">
-                    <button
-                      onClick={() => handleEdit(inv)}
-                      className="text-green-400 hover:text-green-500 text-xl flex items-center gap-1"
-                      title="Edit"
-                    >
-                      <FaEdit />
-                    </button>
-
-                    <button
-                      onClick={() => handleDelete(inv._id)}
-                      className="text-red-500 hover:text-red-700 text-xl flex items-center gap-1"
-                      title="Delete"
-                    >
-                      <FaTrash />
-                    </button>
-
-                    <button
-                      onClick={() => handlePrint(inv)}
-                      className="text-blue-600 hover:text-blue-800 text-xl flex items-center gap-1"
-                      title="Print"
-                    >
-                      <FaPrint />
-                    </button>
-
-                    {/* ✅ Return Sales */}
-                    <button
-                      onClick={() => handleReturn(inv)}
-                      className="text-green-600 hover:text-green-800 text-2xl flex items-center gap-1"
-                      title="Return Sales"
-                    >
-                      <TbTruckReturn />
-                    </button>
-                  </div>
-
-                </div>
-              ))}
+        {/* Actions */}
+        <div className="mt-4 flex justify-end">
+          <div className="relative group">
+            <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
+            <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
+              <button
+                onClick={() => handleEdit(inv)}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
+              >
+                <SquarePen size={18} />
+              </button>
+              <button
+                onClick={() => handleDelete(inv._id)}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
+              >
+               <Trash2 size={18} />
+              </button>
+              <button
+                onClick={() => handlePrint(inv)}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-blue-600/10 text-blue-700 flex items-center gap-2"
+              >
+                 <Printer size={18} />
+              </button>
+              <button
+                onClick={() => handleReturn(inv)}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-green-50 text-green-600 flex items-center gap-2"
+              >
+                 <Truck size={18}/>
+              </button>
             </div>
           </div>
         </div>
       </div>
+    ))}
+  </div>
+
+  {/* Desktop Table (show on large screens) */}
+  <div className="hidden lg:block overflow-x-auto">
+    <div className="min-w-[1000px]">
+      {/* Table Header */}
+      <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200">
+        <div className="text-left">Receipt No.</div>
+        <div className="text-left">Customer Name</div>
+        <div className="text-left">Mobile #</div>
+        <div className="text-left">Payable</div>
+        <div className="text-left">Given</div>
+        <div className="text-left">Return</div>
+        <div className="text-right">Actions</div>
+      </div>
+
+      {/* Table Body */}
+      <div className="divide-y divide-gray-200">
+        {invoices.map((inv, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+          >
+            <div className="font-medium text-gray-700">{inv.receiptNo}</div>
+            <div className="text-gray-600">{inv.customerName}</div>
+            <div className="text-gray-600">{inv.mobile}</div>
+            <div className="text-gray-600">{inv.payable}</div>
+            <div className="text-gray-600">{inv.givenAmount}</div>
+            <div className="text-gray-600">{inv.returnAmount}</div>
+
+            {/* Actions */}
+            <div className="flex justify-end items-center gap-3">
+              <button
+                onClick={() => handleEdit(inv)}
+                className="text-blue-500 hover:text-blue-700 "
+                title="Edit"
+              >
+                  <SquarePen size={18} />
+              </button>
+              <button
+                onClick={() => handleDelete(inv._id)}
+                className="text-red-500 hover:text-red-700 "
+                title="Delete"
+              >
+                <Trash2 size={18} />
+              </button>
+              <button
+                onClick={() => handlePrint(inv)}
+                className="text-blue-600 hover:text-blue-800 "
+                title="Print"
+              >
+                <Printer size={18} />
+              </button>
+              <button
+                onClick={() => handleReturn(inv)}
+                className="text-green-600 hover:text-green-800 "
+                title="Return Sales"
+              >
+                <Truck size={18}/>
+              </button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Slider Form */}
       {isSliderOpen && (
@@ -639,7 +680,7 @@ const SalesInvoice = () => {
                 className="text-gray-500 hover:text-gray-800 text-2xl"
                 onClick={() => setIsSliderOpen(false)}
               >
-                ×
+                x
               </button>
             </div>
 

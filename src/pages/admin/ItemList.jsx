@@ -5,6 +5,9 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axios from "axios";
 import Barcode from "react-barcode";
+import { SquarePen, Trash2 } from "lucide-react";
+import TableSkeleton from "./Skeleton";
+
 
 const ItemList = () => {
   const [categoryList, setCategoryList] = useState([]);
@@ -41,6 +44,40 @@ const ItemList = () => {
   const [imagePreview, setImagePreview] = useState(null);
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  // --- Dummy Data ---
+
+const [dummyItems, setDummyItems] = useState([]);
+
+// Simulate API call
+useEffect(() => {
+  const timer = setTimeout(() => {
+    setDummyItems([
+      {
+        _id: "1",
+        itemType: { itemTypeName: "Beverages" },
+        itemName: "Coca Cola 1L",
+        purchase: 50,
+        price: 80,
+        stock: 120,
+        labelBarcode: "BAR1234567890",
+        itemImage: { url: "https://via.placeholder.com/50" },
+      },
+      {
+        _id: "2",
+        itemType: { itemTypeName: "Snacks" },
+        itemName: "Lays Chips",
+        purchase: 20,
+        price: 40,
+        stock: 300,
+        labelBarcode: "BAR9876543210",
+        itemImage: { url: "https://via.placeholder.com/50" },
+      },
+    ]);
+    setLoading(false);
+  }, 1000);
+
+  return () => clearTimeout(timer);
+}, []);
 
   // Slider animation
   useEffect(() => {
@@ -390,22 +427,23 @@ const ItemList = () => {
   }
 
   // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
+  
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Items List</h1>
-          <p className="text-gray-500 text-sm">Manage your items details</p>
+          
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-primaryDark"
@@ -416,95 +454,74 @@ const ItemList = () => {
       </div>
 
       {/* Item Table */}
-      <div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
-        <div className="overflow-x-auto scrollbar-hide">
-          {/* Table wrapper with minimum width */}
-          <div className="min-w-[1000px]">
-            {/* Table Headers */}
-            <div className="grid grid-cols-7 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div className="min-w-[120px]">Item Category</div>
-              <div className="min-w-[150px]">Item Name</div>
-              <div className="min-w-[80px]">Purchase</div>
-              <div className="min-w-[80px]">Sales</div>
-              <div className="min-w-[80px]">Stock</div>
-              <div className="min-w-[100px]">Barcode</div>
-              {userInfo?.isAdmin && (
-                <div className="min-w-[80px] text-right">Actions</div>
-              )}
-            </div>
+    <div className="rounded-xl shadow border border-gray-200 w-full overflow-hidden">
+  <div className="overflow-x-auto">
+    <table className="min-w-[1000px] w-full text-sm text-left border-collapse">
+      {/* Table Header */}
+      <thead className="sticky top-0 bg-gray-100 z-10 text-xs font-semibold text-gray-600 uppercase">
+        <tr>
+          <th className="px-6 py-3 text-left">Item Category</th>
+          <th className="px-6 py-3 text-left">Item Name</th>
+          <th className="px-6 py-3 text-left">Purchase</th>
+          <th className="px-6 py-3 text-left">Sales</th>
+          <th className="px-6 py-3 text-left">Stock</th>
+          <th className="px-6 py-3 text-left">Barcode</th>
+          {userInfo?.isAdmin && (
+            <th className="px-6 py-3 text-right">Actions</th>
+          )}
+        </tr>
+      </thead>
 
-            {/* Items in Table */}
-            <div className="mt-4 flex flex-col gap-[6px] mb-14">
-              {itemList.map((item) => (
-                <div
-                  key={item._id}
-                  className="grid grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
-                >
-                  {/* Item Category */}
-                  <div className="min-w-[120px] flex items-center gap-3">
-                    <img
-                      src={item.itemImage?.url}
-                      alt="Product Icon"
-                      className="w-7 h-7 object-cover rounded-full"
-                    />
-                    <span className="text-sm font-medium text-gray-900">
-                      {capitalizeFirstLetter(item?.itemType?.itemTypeName)}
-                    </span>
-                  </div>
+      {/* Table Body */}
+      <tbody>
+  {loading ? (
+    // Skeleton shown while loading
+    <TableSkeleton rows={5} cols={userInfo?.isAdmin ? 7 : 6} />
+  ) : (
+    dummyItems.map((item, index) => (
+      <tr
+        key={item._id}
+        className={`border-b border-gray-200 hover:bg-gray-50 ${
+          index % 2 === 0 ? "bg-white" : "bg-gray-50"
+        }`}
+      >
+        <td className="px-6 py-3 flex items-center gap-3">
+          <img
+            src={item.itemImage?.url}
+            alt="Product Icon"
+            className="w-7 h-7 object-cover rounded-full"
+          />
+          <span className="font-medium text-gray-900">
+            {item?.itemType?.itemTypeName}
+          </span>
+        </td>
+        <td className="px-6 py-3 text-gray-600">{item.itemName}</td>
+        <td className="px-6 py-3 font-semibold text-gray-600">{item.purchase}</td>
+        <td className="px-6 py-3 font-semibold text-gray-600">{item.price}</td>
+        <td className="px-6 py-3 font-semibold text-gray-600">{item.stock}</td>
+        <td className="px-6 py-3 font-semibold text-gray-600">
+          {item.labelBarcode.slice(0, 12)}
+        </td>
+        {userInfo?.isAdmin && (
+          <td className="px-6 py-3 text-right">
+            <button className="text-blue-500 hover:underline mr-3">
+              <SquarePen size={18} />
+            </button>
+            <button className="text-red-500 hover:underline">
+              <Trash2 size={18} />
+            </button>
+          </td>
+        )}
+      </tr>
+    ))
+  )}
+</tbody>
 
-                  {/* Item Name */}
-                  <div className="min-w-[150px] text-sm text-gray-500">
-                    {item.itemName}
-                  </div>
+    </table>
+  </div>
+</div>
 
-                  {/* Purchase */}
-                  <div className="min-w-[80px] text-sm font-semibold text-gray-500">
-                    {item.purchase}
-                  </div>
 
-                  {/* Sales */}
-                  <div className="min-w-[80px] text-sm font-semibold text-gray-500">
-                    {item.price}
-                  </div>
-
-                  {/* Stock */}
-                  <div className="min-w-[80px] text-sm font-semibold text-gray-500">
-                    {item.stock}
-                  </div>
-
-                  {/* Barcode */}
-                  <div className="min-w-[100px] text-sm font-semibold text-gray-500">
-                    {item.labelBarcode.slice(0, 12)}
-                  </div>
-
-                  {/* Actions */}
-                  {userInfo?.isAdmin && (
-                    <div className="min-w-[80px] text-right relative group">
-                      <button className="text-gray-400 hover:text-gray-600 text-xl">
-                        ⋯
-                      </button>
-                      <div className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col justify-between">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-newPrimary/10 text-newPrimary flex items-center gap-2"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item._id)}
-                          className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Slider */}
       {isSliderOpen && (
