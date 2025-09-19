@@ -310,6 +310,7 @@ console.log("Payload", payload);
         {loading?(<TableSkeleton
                     rows={customerList.length || 5}
                     cols={userInfo?.isAdmin ? 7 : 6}
+                    className="lg:grid-cols-7"
                   />):customerList.map((client, index) => (
           <div
             key={index}

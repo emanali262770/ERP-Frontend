@@ -1,10 +1,12 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
-import { Bell, X, Sun, Cloud, Moon } from "lucide-react";
-
+import { Bell, X, Sun, Cloud, Moon} from "lucide-react";
+import {FiUser} from 'react-icons/fi'
 const CommanHeader = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [sales, setSales] = useState(0);
+  const [userName, setUserName] = useState('Admin');
+  const [userRole, setUserRole] = useState('Admin');
   const [revenue, setRevenue] = useState(0);
   const [bookingPending, setBookingPending] = useState(0);
   const [notifications, setNotifications] = useState([]);
@@ -14,6 +16,7 @@ const CommanHeader = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const base = import.meta.env.VITE_API_BASE_URL;
 
+const [loading, setLoading] = useState(true);
   // ✅ Update clock every minute
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -40,7 +43,9 @@ const CommanHeader = () => {
         setNotifications(notifRes.data || []);
       } catch (err) {
         console.error("Header data fetch failed:", err);
-      }
+      } finally {
+      setTimeout(() => setLoading(false), 800); // small delay for smooth skeleton
+    }
     };
 
     fetchData();
@@ -103,7 +108,7 @@ const CommanHeader = () => {
   };
 
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+    <div className="flex flex-row justify-between items-center mb-6">
       {/* Greeting */}
       <div className="mb-4 md:mb-0">
         <div className="flex items-center gap-2 mb-2">
@@ -139,8 +144,8 @@ const CommanHeader = () => {
         </div> */}
 
         {/* Notifications */}
-        {/* <div className="h-8 w-px bg-newPrimary/30 hidden sm:block"></div> */}
-        <div className="relative" ref={dropdownRef}>
+        <div className="">
+        <div className="relative flex  flex-row gap-3" ref={dropdownRef}>
           <button
             className="relative p-2 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 "
             onClick={() => setOpen(!open)}
@@ -195,6 +200,23 @@ const CommanHeader = () => {
               </div>
             </div>
           )}
+                      {/* User Profile */}
+            <div className="flex items-center space-x-2">
+              <div className="relative">
+                <div className="w-8 h-8 md:w-10 md:h-10 bg-gradient-to-r from-green-400 to-green-500 rounded-full flex items-center justify-center text-white">
+                  <FiUser size={16} />
+                </div>
+                <span className="absolute bottom-0 right-0 w-2 h-2 bg-green-500 rounded-full border border-white"></span>
+              </div>
+              <div className="hidden sm:block text-right">
+                <div className="text-sm font-medium capitalize">{userName}</div>
+                <div className="text-xs text-gray-500 uppercase">
+                  {userRole}
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </div>

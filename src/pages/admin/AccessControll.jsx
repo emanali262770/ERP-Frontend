@@ -6,6 +6,9 @@ import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { FiSearch, FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
 import ModuleFunctionalities from "../../context/modulesConfig";
+import CommanHeader from "../../components/CommanHeader";
+import TableSkeleton from "./Skeleton";
+import { SquarePen, Trash2 } from "lucide-react";
 
 const ModulesFunctionalities = () => {
   const [functionalityList, setFunctionalityList] = useState([]);
@@ -227,16 +230,18 @@ const ModulesFunctionalities = () => {
       });
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <HashLoader color="#84CF16" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="min-h-screen flex items-center justify-center">
+  //       <HashLoader color="#84CF16" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+        {/* Coomon header */}
+      <CommanHeader/>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-newPrimary">Assign Rights</h1>
@@ -263,85 +268,94 @@ const ModulesFunctionalities = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl shadow border p-4 overflow-hidden">
-        <div className="overflow-x-auto">
-          <div className="hidden md:grid grid-cols-3 gap-4 bg-gray-50 p-3 text-xs font-medium text-gray-500 uppercase">
-            <div>Module</div>
-            <div>Functionalities</div>
-            {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-          </div>
-          <div className="mt-2 flex flex-col gap-2">
-            {filteredFunctionalityList.length > 0 ? (
-              filteredFunctionalityList.map((func) => (
-                <div
-                  key={func._id}
-                  className="grid grid-cols-1 md:grid-cols-3 items-center gap-4 bg-white p-3 rounded-lg border hover:shadow-md"
-                >
-                  {/* Group name */}
-                  <div className="md:hidden font-medium text-gray-900">{func?.group?.groupName}</div>
+      <div className="rounded-xl border border-gray-100 overflow-hidden">
+  <div className="overflow-x-auto scrollbar-hide">
+    <div className="min-w-full">
 
-                  {/* Module */}
-                  <div className="md:hidden font-medium text-gray-900">{func?.module}</div>
-                  <div className="hidden md:block text-sm text-gray-900">{func?.module}</div>
-
-                  {/* Functionalities */}
-                  <div className="flex flex-wrap gap-2">
-                    {Array.isArray(func.functionalities) && func.functionalities.length > 0 ? (
-                      func.functionalities.map((f, idx) => {
-                        // pick a color based on index (rotate)
-                        const colors = [
-                          "bg-blue-100 text-blue-800",
-                          "bg-green-100 text-green-800",
-                          "bg-purple-100 text-purple-800",
-                          "bg-pink-100 text-pink-800",
-                          "bg-yellow-100 text-yellow-800",
-                          "bg-red-100 text-red-800",
-                        ];
-                        const colorClass = colors[idx % colors.length];
-
-                        return (
-                          <span
-                            key={idx}
-                            className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
-                          >
-                            {f}
-                          </span>
-                        );
-                      })
-                    ) : (
-                      <span className="text-gray-500">—</span>
-                    )}
-                  </div>
-
-
-                  {/* Actions (only for Admin) */}
-                  {userInfo?.isAdmin && (
-                    <div className="flex justify-end gap-2">
-                      <button
-                        onClick={() => handleEdit(func)}
-                        className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg"
-                      >
-                        <FiEdit size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(func._id)}
-                        className="p-2 text-red-600 hover:bg-red-100 rounded-lg"
-                      >
-                        <FiTrash2 size={16} />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              ))
-            ) : (
-              <div className="text-center py-8 text-gray-500">
-                No functionalities found {searchQuery && `matching "${searchQuery}"`}
-              </div>
-            )}
-
-          </div>
-        </div>
+      {/* ✅ Table Header (sticky like previous tables) */}
+      <div className="hidden md:grid grid-cols-[1fr_2fr_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Module</div>
+        <div>Functionalities</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
       </div>
+
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100">
+        {loading ? (
+          <TableSkeleton 
+            rows={filteredFunctionalityList.length || 5} 
+            cols={userInfo?.isAdmin ? 3 : 2} 
+          />
+        ) : filteredFunctionalityList.length > 0 ? (
+          filteredFunctionalityList.map((func) => (
+            <div
+              key={func._id}
+              className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+            >
+              {/* 📱 Mobile header info */}
+              <div className="md:hidden font-medium text-gray-900 border-b pb-2 mb-2">
+                {func?.group?.groupName}
+              </div>
+
+              {/* Module */}
+              <div className="font-medium text-gray-900">{func?.module}</div>
+
+              {/* Functionalities */}
+              <div className="flex flex-wrap gap-2">
+                {Array.isArray(func.functionalities) && func.functionalities.length > 0 ? (
+                  func.functionalities.map((f, idx) => {
+                    const colors = [
+                      "bg-blue-100 text-blue-800",
+                      "bg-green-100 text-green-800",
+                      "bg-purple-100 text-purple-800",
+                      "bg-pink-100 text-pink-800",
+                      "bg-yellow-100 text-yellow-800",
+                      "bg-red-100 text-red-800",
+                    ];
+                    const colorClass = colors[idx % colors.length];
+                    return (
+                      <span
+                        key={idx}
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
+                      >
+                        {f}
+                      </span>
+                    );
+                  })
+                ) : (
+                  <span className="text-gray-500">—</span>
+                )}
+              </div>
+
+              {/* Actions */}
+              {userInfo?.isAdmin && (
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => handleEdit(func)}
+                    className="p-2 text-blue-600  rounded-lg transition-colors"
+                  >
+                    <SquarePen size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(func._id)}
+                    className="p-2 text-red-600  rounded-lg transition-colors"
+                  >
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <div className="text-center py-6 text-gray-500 bg-white">
+            No functionalities found {searchQuery && `matching "${searchQuery}"`}
+          </div>
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {isSliderOpen && (
         <div className="fixed inset-0 bg-gray-600/50 flex justify-end z-50">

@@ -4,8 +4,9 @@ import gsap from "gsap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import { Search } from "lucide-react";
+import { Search, SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../components/CommanHeader";
+import TableSkeleton from "./Skeleton";
 
 const PromotionItem = () => {
   const [categories, setCategories] = useState([]);
@@ -209,15 +210,15 @@ const filterdata = items.filter((item) =>{
     // ... (no changes in your delete function)
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -238,83 +239,91 @@ const filterdata = items.filter((item) =>{
         </div>
 
         {/* Table */}
-        {/* Manufacturer Table */}
-        <div className="rounded-xl shadow border border-gray-100">
-          <div className="table-container max-w-full overflow-x-auto ">
-            <div className="min-w-[1000px] max-w-[100%]">
-              {/* Table Headers */}
-              <div className="grid grid-cols-[150px_150px_150px_400px_140px_150px_210px] gap-2 bg-gray-50 py-2 px-3 text-xs font-medium text-gray-500 uppercase rounded-t-lg">
-                <div>Promotion</div>
-                <div>Category</div>
-                <div>Item Type</div>
-                <div>Item Names</div>
-                <div>Discount</div>
-                <div>End Date</div>
-                {userInfo?.isAdmin && (
-                  <div className="text-center">Actions</div>
-                )}
+       
+        <div className="rounded-xl  border border-gray-100 overflow-hidden">
+  <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
+    <div className="min-w-[1000px]">
+      {/* ✅ Table Header */}
+      <div className="hidden lg:grid grid-cols-[150px_150px_150px_400px_140px_150px_210px] gap-4 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Promotion</div>
+        <div>Category</div>
+        <div>Item Type</div>
+        <div>Item Names</div>
+        <div>Discount</div>
+        <div>End Date</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+      </div>
+
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100">
+        {loading ? (
+    // Skeleton shown while loading
+   <TableSkeleton 
+  rows={promotions.length } 
+  cols={userInfo?.isAdmin ? 7 : 6}
+  className="lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px]" 
+/>
+  ):promotions.length === 0 ? (
+          <div className="text-center py-4 text-gray-500 bg-white">
+            No promotions found.
+          </div>
+        ) : (
+          promotions.map((promo) => (
+            <div
+              key={promo._id || promo.id}
+              className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+            >
+              {/* Promotion */}
+              <div className="font-medium text-gray-900 truncate">
+                {promo.promotion}
               </div>
 
-              {/* Promotion in Table */}
-              <div className="flex flex-col gap-2 mb-16">
-                {promotions.map((promo) => (
-                  <div
-                    key={promo.id}
-                    className="grid grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-2 bg-white p-2 rounded-lg border-b border-gray-100 hover:bg-gray-50 transition"
-                  >
-                    <div className="text-sm font-medium text-gray-900 truncate">
-                      {promo.promotion}
-                    </div>
-                    <div className="text-sm text-gray-500 truncate">
-                      {promo.category}
-                    </div>
-                    <div className="text-sm text-gray-500 truncate">
-                      {promo.itemType}
-                    </div>
-                    <div>
-                      {promo.items.map((item, idx) => (
-                        <span key={idx} className="inline-block mr-4">
-                          {item.name} ({item.price})
-                        </span>
-                      ))}
-                    </div>
+              {/* Category */}
+              <div className="text-gray-600 truncate">{promo.category}</div>
 
-                    <div className="text-sm text-gray-500 truncate">
-                      {promo.discount}
-                    </div>
-                    <div className="text-sm text-gray-500 truncate">
-                      {promo.endDate}
-                    </div>
+              {/* Item Type */}
+              <div className="text-gray-600 truncate">{promo.itemType}</div>
 
-                    {userInfo?.isAdmin && (
-                      <div className="flex justify-center">
-                        <div className="relative group">
-                          <button className="text-gray-400 hover:text-gray-600 text-xl">
-                            ⋯
-                          </button>
-                          <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-                            <button
-                              onClick={() => handleEdit(promo)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-newPrimary/10 text-newPrimary flex items-center gap-2"
-                            >
-                              Edit
-                            </button>
-                            <button
-                              onClick={() => handleDelete(promo._id)}
-                              className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
+              {/* Items */}
+              <div className="text-gray-600 truncate">
+                {promo.items.map((item, idx) => (
+                  <span key={idx} className="inline-block mr-3">
+                    {item.name} ({item.price})
+                  </span>
                 ))}
               </div>
+
+              {/* Discount */}
+              <div className="text-gray-600 truncate">{promo.discount}</div>
+
+              {/* End Date */}
+              <div className="text-gray-500">{promo.endDate}</div>
+
+              {/* Actions */}
+              {userInfo?.isAdmin && (
+                <div className="flex justify-end gap-3">
+                  <button
+                    onClick={() => handleEdit(promo)}
+                    className=" py-1 text-sm rounded  text-blue-600 "
+                  >
+                    <SquarePen size={18}/>
+                  </button>
+                  <button
+                    onClick={() => handleDelete(promo._id)}
+                    className="py-1 text-sm rounded  text-red-600 "
+                  >
+                    <Trash2 size={18}/>
+                  </button>
+                </div>
+              )}
             </div>
-          </div>
-        </div>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
         {/* Slider */}
         {isSliderOpen && (
