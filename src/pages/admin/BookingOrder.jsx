@@ -5,10 +5,64 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import CommanHeader from "../../components/CommanHeader";
+import { SquarePen, Trash2 } from "lucide-react";
+import TableSkeleton from "./Skeleton";
 
 const BookingOrder = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [item, setItem] = useState([]);
+  const [item, setItem] = useState([
+    {
+      _id: "1",
+      customerName: "Ali Khan",
+      mobileNo: "03001234567",
+      address: "Model Town, Lahore",
+      date: "2025-09-18",
+      time: "14:30",
+      items: [
+        { itemName: "Paracetamol", rate: 50, qty: 2, amount: 100 },
+        { itemName: "Cough Syrup", rate: 200, qty: 1, amount: 200 },
+      ],
+      total: 300,
+      discount: 20,
+      payable: 280,
+      paid: 200,
+      balance: 80,
+      paymentMethod: "Cash",
+    },
+    {
+      _id: "2",
+      customerName: "Sara Ahmed",
+      mobileNo: "03211234567",
+      address: "DHA Phase 5, Karachi",
+      date: "2025-09-18",
+      time: "16:00",
+      items: [
+        { itemName: "Vitamin C", rate: 150, qty: 3, amount: 450 },
+        { itemName: "Face Mask", rate: 20, qty: 10, amount: 200 },
+      ],
+      total: 650,
+      discount: 50,
+      payable: 600,
+      paid: 600,
+      balance: 0,
+      paymentMethod: "Card",
+    },
+    {
+      _id: "3",
+      customerName: "Usman Ali",
+      mobileNo: "03142345678",
+      address: "Iqbal Town, Islamabad",
+      date: "2025-09-19",
+      time: "11:15",
+      items: [{ itemName: "Antibiotics", rate: 500, qty: 1, amount: 500 }],
+      total: 500,
+      discount: 0,
+      payable: 500,
+      paid: 700,
+      balance: -200, // means 200 return
+      paymentMethod: "Transfer",
+    },
+  ]);
   // ===== State =====
   const [formData, setFormData] = useState({
     customerName: "",
@@ -477,20 +531,20 @@ const BookingOrder = () => {
   };
 
   // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Common Header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold text-newPrimary">
@@ -509,117 +563,126 @@ const BookingOrder = () => {
       <div className="rounded-xl border border-gray-100">
         {/* Mobile Cards (show on small screens) */}
         <div className="lg:hidden space-y-4">
-          {item.map((staff, index) => {
-            const total = staff.total?.$numberInt || staff.total || 0;
-            const discount = staff.discount?.$numberInt || staff.discount || 0;
-            const payable = staff.payable?.$numberInt || staff.payable || 0;
-            const paid = staff.paid?.$numberInt || staff.paid || 0;
-            const balance = staff.balance?.$numberInt || staff.balance || 0;
+          { 
+            item.map((staff, index) => {
+              const total = staff.total?.$numberInt || staff.total || 0;
+              const discount =
+                staff.discount?.$numberInt || staff.discount || 0;
+              const payable = staff.payable?.$numberInt || staff.payable || 0;
+              const paid = staff.paid?.$numberInt || staff.paid || 0;
+              const balance = staff.balance?.$numberInt || staff.balance || 0;
 
-            return (
-              <div
-                key={index}
-                className="bg-white p-4 rounded-xl shadow-sm border border-gray-200"
-              >
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-sm font-medium text-gray-500">
-                    Customer Name
-                  </div>
-                  <div className="text-sm text-gray-900">
-                    {staff.customerName || "—"}
-                  </div>
+              return (
+                <div
+                  key={index}
+                  className="bg-white p-4 rounded-xl shadow-sm border border-gray-200"
+                >
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="text-sm font-medium text-gray-500">
+                      Customer Name
+                    </div>
+                    <div className="text-sm text-gray-900">
+                      {staff.customerName || "—"}
+                    </div>
 
-                  <div className="text-sm font-medium text-gray-500">
-                    Mobile No.
-                  </div>
-                  <div className="text-sm text-gray-900">
-                    {staff.mobileNo || "—"}
-                  </div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Mobile No.
+                    </div>
+                    <div className="text-sm text-gray-900">
+                      {staff.mobileNo || "—"}
+                    </div>
 
-                  <div className="text-sm font-medium text-gray-500">
-                    Address
-                  </div>
-                  <div className="text-sm text-gray-900 truncate">
-                    {staff.address || "—"}
-                  </div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Address
+                    </div>
+                    <div className="text-sm text-gray-900 truncate">
+                      {staff.address || "—"}
+                    </div>
 
-                  <div className="text-sm font-medium text-gray-500">Items</div>
-                  <div className="text-sm text-gray-900">
-                    {Array.isArray(staff.items) && staff.items.length > 0
-                      ? staff.items
-                          .map((item) => {
-                            const qty = item.qty?.$numberInt || item.qty || 0;
-                            return `${item.itemName || ""} (${qty}x)`;
-                          })
-                          .join(", ")
-                      : "—"}
-                  </div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Items
+                    </div>
+                    <div className="text-sm text-gray-900">
+                      {Array.isArray(staff.items) && staff.items.length > 0
+                        ? staff.items
+                            .map((item) => {
+                              const qty = item.qty?.$numberInt || item.qty || 0;
+                              return `${item.itemName || ""} (${qty}x)`;
+                            })
+                            .join(", ")
+                        : "—"}
+                    </div>
 
-                  <div className="text-sm font-medium text-gray-500">Total</div>
-                  <div className="text-sm text-gray-900">{total}</div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Total
+                    </div>
+                    <div className="text-sm text-gray-900">{total}</div>
 
-                  <div className="text-sm font-medium text-gray-500">
-                    Discount
-                  </div>
-                  <div className="text-sm text-gray-900">{discount}</div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Discount
+                    </div>
+                    <div className="text-sm text-gray-900">{discount}</div>
 
-                  <div className="text-sm font-medium text-gray-500">
-                    Payable
-                  </div>
-                  <div className="text-sm text-gray-900">{payable}</div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Payable
+                    </div>
+                    <div className="text-sm text-gray-900">{payable}</div>
 
-                  <div className="text-sm font-medium text-gray-500">Paid</div>
-                  <div className="text-sm text-gray-900">{paid}</div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Paid
+                    </div>
+                    <div className="text-sm text-gray-900">{paid}</div>
 
-                  <div className="text-sm font-medium text-gray-500">
-                    Balance
-                  </div>
-                  <div className="text-sm text-gray-900">{balance}</div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Balance
+                    </div>
+                    <div className="text-sm text-gray-900">{balance}</div>
 
-                  <div className="text-sm font-medium text-gray-500">
-                    Payment Method
-                  </div>
-                  <div
-                    className={`text-sm font-semibold ${
-                      staff.paymentMethod === "Cash"
-                        ? "text-green-500"
-                        : staff.paymentMethod === "Card"
-                        ? "text-orange-400"
-                        : staff.paymentMethod === "Transfer"
-                        ? "text-blue-500"
-                        : "text-gray-500"
-                    }`}
-                  >
-                    {staff.paymentMethod || "—"}
-                  </div>
-                </div>
-
-                {userInfo?.isAdmin && (
-                  <div className="mt-4 flex justify-end">
-                    <div className="relative group">
-                      <button className="text-gray-400 hover:text-gray-600 text-xl">
-                        ⋯
-                      </button>
-                      <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-                        <button
-                          onClick={() => handleEditClick(staff)}
-                          className="w-full text-left px-4 py-4 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(staff._id)}
-                          className="w-full text-left px-4 py-4 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                        >
-                          Delete
-                        </button>
-                      </div>
+                    <div className="text-sm font-medium text-gray-500">
+                      Payment Method
+                    </div>
+                    <div
+                      className={`text-sm font-semibold ${
+                        staff.paymentMethod === "Cash"
+                          ? "text-green-500"
+                          : staff.paymentMethod === "Card"
+                          ? "text-orange-400"
+                          : staff.paymentMethod === "Transfer"
+                          ? "text-blue-500"
+                          : "text-gray-500"
+                      }`}
+                    >
+                      {staff.paymentMethod || "—"}
                     </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
+
+                  {userInfo?.isAdmin && (
+                    <div className="mt-4 flex justify-end">
+                      <div className="relative group">
+                        <button className="text-gray-400 hover:text-gray-600 text-xl">
+                          ⋯
+                        </button>
+                        <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
+                          <button
+                            onClick={() => handleEditClick(staff)}
+                            className="w-full text-left px-4 py-4 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(staff._id)}
+                            className="w-full text-left px-4 py-4 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
+                          >
+                            Delete
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          }
         </div>
 
         {/* Desktop Table (show on large screens) */}
@@ -647,86 +710,95 @@ const BookingOrder = () => {
 
               {/* Table Body */}
               <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
-                {item.map((staff, index) => {
-                  const total = staff.total?.$numberInt || staff.total || 0;
-                  const discount =
-                    staff.discount?.$numberInt || staff.discount || 0;
-                  const payable =
-                    staff.payable?.$numberInt || staff.payable || 0;
-                  const paid = staff.paid?.$numberInt || staff.paid || 0;
-                  const balance =
-                    staff.balance?.$numberInt || staff.balance || 0;
+                {loading ? (
+                  // Skeleton shown while loading
+                  <TableSkeleton
+                    rows={item.length || 5}
+                    cols={userInfo?.isAdmin ? 11 : 6}
+                    className="lg:grid-cols-[1.5fr_1fr_2fr_1.5fr_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                  />
+                ) : (
+                  item.map((staff, index) => {
+                    const total = staff.total?.$numberInt || staff.total || 0;
+                    const discount =
+                      staff.discount?.$numberInt || staff.discount || 0;
+                    const payable =
+                      staff.payable?.$numberInt || staff.payable || 0;
+                    const paid = staff.paid?.$numberInt || staff.paid || 0;
+                    const balance =
+                      staff.balance?.$numberInt || staff.balance || 0;
 
-                  return (
-                    <div
-                      key={index}
-                      className="grid grid-cols-[1.5fr_1fr_2fr_1.5fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] 
-                         items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      <div className="font-medium text-gray-900">
-                        {staff.customerName || "—"}
-                      </div>
-                      <div className="text-gray-600">
-                        {staff.mobileNo || "—"}
-                      </div>
-                      <div className="text-gray-600 truncate">
-                        {staff.address || "—"}
-                      </div>
-
-                      {/* Items */}
-                      <div className="text-gray-600">
-                        {Array.isArray(staff.items) && staff.items.length > 0
-                          ? staff.items
-                              .map((item) => {
-                                const qty =
-                                  item.qty?.$numberInt || item.qty || 0;
-                                return `${item.itemName || ""} (${qty}x)`;
-                              })
-                              .join(", ")
-                          : "—"}
-                      </div>
-
-                      <div className="text-gray-600">{total}</div>
-                      <div className="text-gray-600">{discount}</div>
-                      <div className="text-gray-600">{payable}</div>
-                      <div className="text-gray-600">{paid}</div>
-
-                      {/* Payment Method */}
+                    return (
                       <div
-                        className={`font-semibold ${
-                          staff.paymentMethod === "Cash"
-                            ? "text-green-500"
-                            : staff.paymentMethod === "Card"
-                            ? "text-orange-400"
-                            : staff.paymentMethod === "Transfer"
-                            ? "text-blue-500"
-                            : "text-gray-500"
-                        }`}
+                        key={index}
+                        className="grid grid-cols-[1.5fr_1fr_2fr_1.5fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] 
+                         items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
-                        {staff.paymentMethod || "—"}
-                      </div>
-
-                      <div className="text-gray-600">{balance}</div>
-
-                      {userInfo?.isAdmin && (
-                        <div className="flex justify-end gap-2">
-                          <button
-                            onClick={() => handleEditClick(staff)}
-                            className="px-2 py-2 hover:bg-blue-50 text-blue-600 rounded"
-                          >
-                            <SquarePen size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(staff._id)}
-                            className="px-2 py-2 hover:bg-red-50 text-red-500 rounded"
-                          >
-                            <Trash2 size={18} />
-                          </button>
+                        <div className="font-medium text-gray-900">
+                          {staff.customerName || "—"}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
+                        <div className="text-gray-600">
+                          {staff.mobileNo || "—"}
+                        </div>
+                        <div className="text-gray-600 truncate">
+                          {staff.address || "—"}
+                        </div>
+
+                        {/* Items */}
+                        <div className="text-gray-600">
+                          {Array.isArray(staff.items) && staff.items.length > 0
+                            ? staff.items
+                                .map((item) => {
+                                  const qty =
+                                    item.qty?.$numberInt || item.qty || 0;
+                                  return `${item.itemName || ""} (${qty}x)`;
+                                })
+                                .join(", ")
+                            : "—"}
+                        </div>
+
+                        <div className="text-gray-600">{total}</div>
+                        <div className="text-gray-600">{discount}</div>
+                        <div className="text-gray-600">{payable}</div>
+                        <div className="text-gray-600">{paid}</div>
+
+                        {/* Payment Method */}
+                        <div
+                          className={`font-semibold ${
+                            staff.paymentMethod === "Cash"
+                              ? "text-green-500"
+                              : staff.paymentMethod === "Card"
+                              ? "text-orange-400"
+                              : staff.paymentMethod === "Transfer"
+                              ? "text-blue-500"
+                              : "text-gray-500"
+                          }`}
+                        >
+                          {staff.paymentMethod || "—"}
+                        </div>
+
+                        <div className="text-gray-600">{balance}</div>
+
+                        {userInfo?.isAdmin && (
+                          <div className="flex justify-end gap-2">
+                            <button
+                              onClick={() => handleEditClick(staff)}
+                              className="px-2 py-2 hover:bg-blue-50 text-blue-600 rounded"
+                            >
+                              <SquarePen size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(staff._id)}
+                              className="px-2 py-2 hover:bg-red-50 text-red-500 rounded"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>

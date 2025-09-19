@@ -6,6 +6,9 @@ import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { FiSearch, FiPlus, FiEdit, FiTrash2, FiKey } from "react-icons/fi";
+import CommanHeader from "../../components/CommanHeader";
+import { SquarePen, Trash2 } from "lucide-react";
+import TableSkeleton from "./Skeleton";
 
 const Users = () => {
   const [userList, setUserList] = useState([]);
@@ -283,23 +286,25 @@ const Users = () => {
   };
 
   // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader
-            height="150"
-            width="150"
-            radius={1}
-            color="#84CF16"
-          />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader
+  //           height="150"
+  //           width="150"
+  //           radius={1}
+  //           color="#84CF16"
+  //         />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
+        {/* Coomon header */}
+      <CommanHeader/>
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-newPrimary">User List</h1>
@@ -331,123 +336,133 @@ const Users = () => {
       </div>
 
       {/* User Table */}
-      <div className="rounded-xl shadow p-4 md:p-6 border border-gray-100 w-full overflow-hidden">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="min-w-full">
-            {/* Table Headers */}
-            <div className="hidden md:grid grid-cols-7 gap-4 bg-gray-50 py-3 px-4 md:px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div>Group</div>
-              <div>Name</div>
-              <div>Email</div>
-              <div>Mobile Number</div>
-              <div>Designation</div>
-              <div>Password</div>
-              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-            </div>
+      <div className="rounded-xl  border border-gray-100 overflow-hidden">
+  <div className="overflow-x-auto scrollbar-hide">
+    <div className="min-w-full">
+      
+      {/* ✅ Table Header (desktop only, sticky like previous tables) */}
+      <div className="hidden md:grid grid-cols-[1fr_1fr_2fr_1.5fr_1.5fr_1.5fr_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Group</div>
+        <div>Name</div>
+        <div>Email</div>
+        <div>Mobile Number</div>
+        <div>Designation</div>
+        <div>Password</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+      </div>
 
-            {/* User Table */}
-            <div className="mt-4 flex flex-col gap-3">
-              {filteredUserList.length > 0 ? (
-                filteredUserList.map((user) => (
-                  <div
-                    key={user._id}
-                    className="grid grid-cols-1 md:grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100">
+        {loading ? (
+    // Skeleton shown while loading
+   <TableSkeleton 
+  rows={filteredUserList.length } 
+  cols={userInfo?.isAdmin ? 7 : 6} 
+/>
+  ):filteredUserList.length > 0 ? (
+          filteredUserList.map((user) => (
+            <div
+              key={user._id}
+              className="grid grid-cols-1 md:grid-cols-[1fr_1fr_2fr_1.5fr_1.5fr_1.5fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+            >
+              {/* 📱 Mobile view header */}
+              <div className="md:hidden flex justify-between items-center border-b pb-2 mb-2">
+                <div className="text-sm font-medium text-gray-900">{user.name}</div>
+                <div className="text-right">
+                  <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {user.groupName?.groupName}
+                  </span>
+                </div>
+              </div>
+
+              {/* 💻 Desktop cells */}
+              <div className="hidden md:block text-sm font-medium text-gray-900 truncate">
+                {user.groupName?.groupName}
+              </div>
+              <div className="hidden md:block text-sm font-medium text-gray-900 truncate">
+                {user.name}
+              </div>
+              <div className="hidden md:block text-sm text-gray-500 truncate">
+                {user.email}
+              </div>
+              <div className="hidden md:block text-sm text-gray-500 truncate">
+                {user.number}
+              </div>
+              <div className="hidden md:block text-sm text-gray-500 truncate">
+                {user.designation}
+              </div>
+
+              {/* 📱 Mobile detail rows */}
+              <div className="md:hidden grid grid-cols-2 gap-2 mt-2 text-sm">
+                <div className="text-xs text-gray-500">Email:</div>
+                <div>{user.email}</div>
+
+                <div className="text-xs text-gray-500">Mobile:</div>
+                <div>{user.number}</div>
+
+                <div className="text-xs text-gray-500">Designation:</div>
+                <div>{user.designation}</div>
+
+                <div className="text-xs text-gray-500">Password:</div>
+                <div className="flex items-center">
+                  {visiblePasswords[user._id] ? user.password : "•••••"}
+                  <button
+                    type="button"
+                    onClick={() => togglePasswordVisibility(user._id)}
+                    className="ml-2 text-gray-600 hover:text-gray-800"
                   >
-                    {/* Mobile view header */}
-                    <div className="md:hidden flex justify-between items-center border-b pb-2 mb-2">
-                      <div className="flex items-center gap-3">
-                        <div className="text-sm font-medium text-gray-900">{user.name}</div>
-                      </div>
-                      <div className="text-right">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                          {user.groupName?.groupName}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    {/* Desktop view cells */}
-                    <div className="hidden md:block text-sm font-medium text-gray-900 truncate">
-                      {user.groupName?.groupName}
-                    </div>
-                    <div className="hidden md:block text-sm font-medium text-gray-900 truncate">
-                      {user.name}
-                    </div>
-                    <div className="hidden md:block text-sm text-gray-500 truncate">{user.email}</div>
-                    <div className="hidden md:block text-sm text-gray-500 truncate">{user.number}</div>
-                    <div className="hidden md:block text-sm text-gray-500 truncate">{user.designation}</div>
-                    
-                    {/* Mobile view content */}
-                    <div className="md:hidden grid grid-cols-2 gap-2 mt-2">
-                      <div className="text-xs text-gray-500">Email:</div>
-                      <div className="text-sm">{user.email}</div>
-                      
-                      <div className="text-xs text-gray-500">Mobile:</div>
-                      <div className="text-sm">{user.number}</div>
-                      
-                      <div className="text-xs text-gray-500">Designation:</div>
-                      <div className="text-sm">{user.designation}</div>
-                      
-                      <div className="text-xs text-gray-500">Password:</div>
-                      <div className="flex items-center text-sm">
-                        {visiblePasswords[user._id] ? user.password : "•••••"}
-                        <button
-                          type="button"
-                          onClick={() => togglePasswordVisibility(user._id)}
-                          className="ml-2 text-gray-600 hover:text-gray-800"
-                        >
-                          {visiblePasswords[user._id] ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                        </button>
-                      </div>
-                    </div>
-                    
-                    {/* Password - Desktop */}
-                    <div className="hidden md:flex items-center text-sm text-gray-500">
-                      {visiblePasswords[user._id] ? user.password : "•••••"}
-                      <button
-                        type="button"
-                        onClick={() => togglePasswordVisibility(user._id)}
-                        className="ml-2 text-gray-600 hover:text-gray-800"
-                      >
-                        {visiblePasswords[user._id] ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                      </button>
-                    </div>
-                    
-                    {/* Actions - visible on both mobile and desktop */}
-                    {userInfo?.isAdmin && (
-                      <div className="flex justify-end md:justify-end col-span-1 md:col-span-1 mt-2 md:mt-0">
-                        <div className="flex space-x-2">
-                          <button
-                            onClick={() => handleEdit(user)}
-                            className="p-2 text-blue-600 hover:bg-blue-100 rounded-lg transition-colors"
-                          >
-                            <FiEdit size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleOpenChangePassword(user)}
-                            className="p-2 text-yellow-600 hover:bg-yellow-100 rounded-lg transition-colors"
-                          >
-                            <FiKey size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(user._id)}
-                            className="p-2 text-red-600 hover:bg-red-100 rounded-lg transition-colors"
-                          >
-                            <FiTrash2 size={16} />
-                          </button>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ))
-              ) : (
-                <div className="text-center py-8 text-gray-500">
-                  No users found {searchQuery && `matching "${searchQuery}"`}
+                    {visiblePasswords[user._id] ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                  </button>
+                </div>
+              </div>
+
+              {/* 💻 Password - Desktop */}
+              <div className="hidden md:flex items-center text-gray-500">
+                {visiblePasswords[user._id] ? user.password : "•••••"}
+                <button
+                  type="button"
+                  onClick={() => togglePasswordVisibility(user._id)}
+                  className="ml-2 text-gray-600 hover:text-gray-800"
+                >
+                  {visiblePasswords[user._id] ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                </button>
+              </div>
+
+              {/* ⚙️ Actions */}
+              {userInfo?.isAdmin && (
+                <div className="flex justify-end gap-2">
+                  <button
+                    onClick={() => handleEdit(user)}
+                    className="p-2 text-blue-600  rounded-lg transition-colors"
+                  >
+                    <SquarePen size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleOpenChangePassword(user)}
+                    className="p-2 text-yellow-600 rounded-lg transition-colors"
+                  >
+                    <FiKey size={18} />
+                  </button>
+                  <button
+                    onClick={() => handleDelete(user._id)}
+                    className="p-2 text-red-600 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={18} />
+                  </button>
                 </div>
               )}
             </div>
+          ))
+        ) : (
+          <div className="text-center py-6 text-gray-500 bg-white">
+            No users found {searchQuery && `matching "${searchQuery}"`}
           </div>
-        </div>
+        )}
       </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Right-Side Slider */}
       {isSliderOpen && (

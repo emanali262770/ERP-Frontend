@@ -5,9 +5,64 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { HashLoader } from "react-spinners";
 import CommanHeader from "../../components/CommanHeader";
+import TableSkeleton from "./Skeleton";
+import { SquarePen, Trash2 } from "lucide-react";
 
 const ExpiryTags = () => {
-  const [expiryTagList, setExpiryTagList] = useState([]);
+  const [expiryTagList, setExpiryTagList] = useState([
+  {
+    _id: "tag1",
+    receiptNo: "RCP-1001",
+    itemCode: "ITM-001",
+    itemName: "Paracetamol",
+    category: "Medicines",
+    price: 50,
+    salePrice: 65,
+    manufacturer: "ABC Pharma",
+    supplier: "MediSupply Pvt Ltd",
+    manufactureDate: "2025-08-01T10:00:00",
+    expiryDate: "2026-08-01T10:00:00",
+  },
+  {
+    _id: "tag2",
+    receiptNo: "RCP-1002",
+    itemCode: "ITM-002",
+    itemName: "Vitamin C Syrup",
+    category: "Medicines",
+    price: 120,
+    salePrice: 150,
+    manufacturer: "HealthCare Labs",
+    supplier: "Wellness Suppliers",
+    manufactureDate: "2025-07-15T09:00:00",
+    expiryDate: "2026-01-15T09:00:00",
+  },
+  {
+    _id: "tag3",
+    receiptNo: "RCP-1003",
+    itemCode: "ITM-003",
+    itemName: "Charger",
+    category: "Electronics",
+    price: 800,
+    salePrice: 950,
+    manufacturer: "TechGear",
+    supplier: "ElectroWorld",
+    manufactureDate: "2025-05-10T08:30:00",
+    expiryDate: "2027-05-10T08:30:00",
+  },
+  {
+    _id: "tag4",
+    receiptNo: "RCP-1004",
+    itemCode: "ITM-004",
+    itemName: "Injections",
+    category: "Medicines",
+    price: 300,
+    salePrice: 380,
+    manufacturer: "LifeLine Pharma",
+    supplier: "Global Meds",
+    manufactureDate: "2025-06-20T11:15:00",
+    expiryDate: "2026-06-20T11:15:00",
+  },
+]);
   const [loading, setLoading] = useState(true);
 
   // Form states
@@ -32,7 +87,7 @@ const ExpiryTags = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [itemCategory, setItemCategory] = useState("");
   const [suggestions, setSuggestions] = useState([]);
-
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   // Animate slider
   useEffect(() => {
     if (isSliderOpen && sliderRef.current) {
@@ -267,13 +322,13 @@ const ExpiryTags = () => {
     setIsSliderOpen(true);
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <HashLoader size={150} color="#84CF16" />
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <HashLoader size={150} color="#84CF16" />
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -297,71 +352,72 @@ const ExpiryTags = () => {
       </div>
 
       {/* Table */}
-      <div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="w-full">
-            {/* Table Headers */}
-            <div className="hidden lg:grid grid-cols-7 gap-4 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div>Item Name</div>
-              <div>Item Code</div>
-              <div>Category</div>
-              <div>Price</div>
-              <div>Sale Price</div>
-              <div>Expiry Date</div>
-              <div className="text-right">Actions</div>
-            </div>
+      <div className="rounded-xl border border-gray-100 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-full">
+      {/* ✅ Table Header (sticky + consistent style) */}
+      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_100px_100px_150px_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+        <div>Item Name</div>
+        <div>Item Code</div>
+        <div>Category</div>
+        <div>Price</div>
+        <div>Sale Price</div>
+        <div>Expiry Date</div>
+        <div className="text-right">Actions</div>
+      </div>
 
-            {/* Expiry Tags Table */}
-            <div className="mt-4 flex flex-col gap-[14px] pb-14">
-              {expiryTagList.map((tag, index) => (
-                <div
-                  key={index}
-                  className="grid grid-cols-7 items-center gap-4 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+        {loading ? (
+          <TableSkeleton rows={expiryTagList.length || 5} cols={userInfo?.isAdmin ? 7 : 6} className="lg:grid-cols-[1fr_1fr_1fr_100px_100px_150px_auto]"/>
+        ) : expiryTagList.map((tag, index) => (
+          <div
+            key={index}
+            className="grid grid-cols-[1fr_1fr_1fr_100px_100px_150px_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+          >
+            {/* Item Name */}
+            <div className="font-medium text-gray-900">{tag.itemName}</div>
+
+            {/* Item Code */}
+            <div className="font-semibold text-green-600">{tag.itemCode}</div>
+
+            {/* Category */}
+            <div className="text-gray-600">{tag.category}</div>
+
+            {/* Price */}
+            <div className="text-gray-600">{tag.price}</div>
+
+            {/* Sale Price */}
+            <div className="text-gray-600">{tag.salePrice}</div>
+
+            {/* Expiry Date */}
+            <div className="text-gray-600">{tag.expiryDate}</div>
+
+            {/* Actions */}
+            <div className="text-right relative group">
+            
+              <div className="flex gap-3">
+                <button
+                  onClick={() => handleEdit(tag)}
+                  className="w-full text-left  py-1 text-sm  text-blue-600 "
                 >
-                  {/* Item Name */}
-                  <div className="text-sm font-medium text-gray-900">{tag.itemName}</div>
-
-                  {/* Item Code */}
-                  <div className="text-sm font-semibold text-green-600">{tag.itemCode}</div>
-
-                  {/* Category */}
-                  <div className="text-sm text-gray-500">{tag.category}</div>
-
-                  {/* Price */}
-                  <div className="text-sm text-gray-500">{tag.price}</div>
-
-                  {/* Sale Price */}
-                  <div className="text-sm text-gray-500">{tag.salePrice}</div>
-
-                  {/* Expiry Date */}
-                  <div className="text-sm text-gray-500">{tag.expiryDate}</div>
-
-                  {/* Actions */}
-                  <div className="text-right relative group">
-                    <button className="text-gray-400 hover:text-gray-600 text-xl">⋯</button>
-                    <div className="absolute right-0 top-6 w-28 h-20 bg-white border border-gray-200 rounded-md shadow-lg 
-                      opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto 
-                      transition-opacity duration-300 z-50 flex flex-col justify-between">
-                      <button
-                        onClick={() => handleEdit(tag)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-blue-100 text-blue-600 flex items-center gap-2"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(tag._id)}
-                        className="w-full text-left px-4 py-2 text-sm hover:bg-red-100 text-red-500 flex items-center gap-2"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+                  <SquarePen size={18}/>
+                </button>
+                <button
+                  onClick={() => handleDelete(tag._id)}
+                  className="w-full text-left  py-1 text-sm  text-red-500 "
+                >
+                <Trash2 size={18}/>
+                </button>
+              </div>
             </div>
           </div>
-        </div>
+        ))}
       </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Right-Side Slider */}
       {isSliderOpen && (

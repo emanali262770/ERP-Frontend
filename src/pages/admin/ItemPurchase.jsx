@@ -376,93 +376,84 @@ export default function PurchaseManager() {
                 + Add New Purchase
               </button>
             </div>
+            {/* Table Section */}
             <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-              <div className="overflow-x-auto">
-                <div className="max-h-[400px] overflow-y-auto">
-                  <table className="min-w-[1000px] w-full text-sm text-left border-collapse">
-                    {/* Table Header */}
-                    <thead className="sticky top-0 bg-gray-100 z-10 text-xs font-semibold text-gray-600 uppercase">
-                      <tr>
-                        <th className="px-6 py-3">Sr.#</th>
-                        <th className="px-6 py-3">GRN No</th>
-                        <th className="px-6 py-3">GRN Date</th>
-                        <th className="px-6 py-3">Invoice No</th>
-                        <th className="px-6 py-3">Supplier</th>
-                        <th className="px-6 py-3">Items</th>
-                        <th className="px-6 py-3">Total Purchase</th>
-                        <th className="px-6 py-3">Total Qty</th>
-                        <th className="px-6 py-3">Discount</th>
-                        <th className="px-6 py-3">Payable</th>
-                        <th className="px-6 py-3 text-right">Actions</th>
-                      </tr>
-                    </thead>
+  <div className="overflow-x-auto">
+    <div className="max-h-[400px] overflow-y-auto">
+      <div className="min-w-[1000px] w-full text-sm">
+        {/* Table Header */}
+        <div className="hidden lg:grid grid-cols-[60px_120px_120px_150px_150px_1fr_150px_120px_120px_150px_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+          <div>Sr.#</div>
+          <div>GRN No</div>
+          <div>GRN Date</div>
+          <div>Invoice No</div>
+          <div>Supplier</div>
+          <div>Items</div>
+          <div>Total Purchase</div>
+          <div>Total Qty</div>
+          <div>Discount</div>
+          <div>Payable</div>
+          <div className="text-right">Actions</div>
+        </div>
 
-                    {/* Table Body */}
-                    <tbody>
-                      {loading ? (
-                        // Skeleton shown while loading
-                        <TableSkeleton
-                          rows={purchases.length || 5}
-                          cols={userInfo?.isAdmin ?11 : 6}
-                        />
-                      ) : purchases.length === 0 ? (
-                        <tr>
-                          <td
-                            colSpan={11}
-                            className="text-center py-4 text-gray-500"
-                          >
-                            No purchases found.
-                          </td>
-                        </tr>
-                      ) : (
-                        purchases.map((p, idx) => {
-                          const totalPurchase = p.items.reduce(
-                            (sum, it) => sum + it.total,
-                            0
-                          );
-                          const totalQty = p.items.reduce(
-                            (sum, it) => sum + it.qty,
-                            0
-                          );
-
-                          return (
-                            <tr
-                              key={p._id}
-                              className="border-b border-gray-200 hover:bg-gray-100"
-                            >
-                              <td className="px-6 py-3">{idx + 1}</td>
-                              <td className="px-6 py-3">{p.grnNo}</td>
-                              <td className="px-6 py-3">
-                                {new Date(p.grnDate).toLocaleDateString()}
-                              </td>
-                              <td className="px-6 py-3">{p.invoiceNo}</td>
-                              <td className="px-6 py-3">
-                                {p.supplier?.supplierName}
-                              </td>
-                              <td className="px-6 py-3 truncate">
-                                {p.items.map((it) => it.name).join(", ")}
-                              </td>
-                              <td className="px-6 py-3">{totalPurchase}</td>
-                              <td className="px-6 py-3">{totalQty}</td>
-                              <td className="px-6 py-3">{p.discountAmount}</td>
-                              <td className="px-6 py-3">{p.payable}</td>
-                              <td className="px-6 py-3 text-right">
-                                <button className="text-blue-500 hover:underline mr-3">
-                                  <SquarePen size={18} />
-                                </button>
-                                <button className="text-red-500 hover:underline">
-                                  <Trash2 size={18} />
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
+        {/* Table Body */}
+        <div className="flex flex-col divide-y divide-gray-100">
+          {loading ? (
+            <TableSkeleton
+              rows={purchases.length || 5}
+              cols={11}
+              className="lg:grid-cols-[60px_120px_120px_150px_150px_1fr_150px_120px_120px_150px_auto]"
+            />
+          ) : purchases.length === 0 ? (
+            <div className="text-center py-4 text-gray-500 bg-white">
+              No purchases found.
             </div>
+          ) : (
+            purchases.map((p, idx) => {
+              const totalPurchase = p.items.reduce(
+                (sum, it) => sum + it.total,
+                0
+              );
+              const totalQty = p.items.reduce(
+                (sum, it) => sum + it.qty,
+                0
+              );
+
+              return (
+                <div
+                  key={p._id}
+                  className="grid grid-cols-[60px_120px_120px_150px_150px_1fr_150px_120px_120px_150px_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                >
+                  <div>{idx + 1}</div>
+                  <div>{p.grnNo}</div>
+                  <div>{new Date(p.grnDate).toLocaleDateString()}</div>
+                  <div>{p.invoiceNo}</div>
+                  <div>{p.supplier?.supplierName}</div>
+                  <div className="truncate">
+                    {p.items.map((it) => it.name).join(", ")}
+                  </div>
+                  <div>{totalPurchase}</div>
+                  <div>{totalQty}</div>
+                  <div>{p.discountAmount}</div>
+                  <div>{p.payable}</div>
+                  <div className="flex justify-end gap-3">
+                    <button className="text-blue-500 hover:underline">
+                      <SquarePen size={18} />
+                    </button>
+                    <button className="text-red-500 hover:underline">
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
           </div>
         )}
 

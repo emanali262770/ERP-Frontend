@@ -161,6 +161,7 @@ setTimeout(() => {
           <TableSkeleton
             rows={filteredRecords.length || 5}
             cols={userInfo?.isAdmin ? 8 : 7}
+            className="lg:grid-cols-8"
           />
         ) : filteredRecords.map((rec, index) => (
           <div

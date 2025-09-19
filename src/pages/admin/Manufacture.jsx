@@ -5,6 +5,8 @@ import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import CommanHeader from "../../components/CommanHeader";
+import { SquarePen, Trash2 } from "lucide-react";
+import TableSkeleton from "./Skeleton";
 
 const Manufacture = () => {
   const [manufacturerList, setManufacturerList] = useState([]);
@@ -208,15 +210,15 @@ const Manufacture = () => {
       });
   };
 
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -238,93 +240,109 @@ const Manufacture = () => {
       </div>
 
       {/* Manufacturer Table */}
-      <div className="rounded-xl shadow border border-gray-100">
-        <div className="table-container max-w-full overflow-x-auto">
-          <div className="min-w-[1000px] max-w-[100%]">
-            {/* Table Headers */}
-            <div className="grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] gap-2 bg-gray-50 py-2 px-3 text-xs font-medium text-gray-500 uppercase rounded-t-lg">
-              
-              <div>Name</div>
-              <div>Address</div>
-              <div>Phone Number</div>
-              <div>Email</div>
-              <div>Contact Person</div>
-              <div>Mobile Number</div>
-              <div>NTN</div>
-              <div>GST</div>
-              <div className="text-center">Status</div>
-              {userInfo?.isAdmin && <div className="text-center">Actions</div>}
-            </div>
-
-            {/* Manufacturers in Table */}
-            <div className="flex flex-col gap-2 mb-16">
-              {manufacturerList.map((manufacturer) => (
-                <div
-                  key={manufacturer._id}
-                  className="grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] items-center gap-2 bg-white p-2 rounded-lg border-b border-gray-100 hover:bg-gray-50 transition"
-                >
-                  
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.manufacturerName}
-                  </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.address}
-                  </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.phoneNumber}
-                  </div>
-                   <div className="text-sm text-gray-500 truncate">
-                    {manufacturer?.email || "-"}
-                  </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.personName}
-                  </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.mobileNumber}
-                  </div>
-                 
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.ntn}
-                  </div>
-                  <div className="text-sm text-gray-500 truncate">
-                    {manufacturer.gstNumber}
-                  </div>
-                  <div className="text-sm font-semibold text-center">
-                    {manufacturer.status ? (
-                      <span className="text-green-600">Active</span>
-                    ) : (
-                      <span className="text-red-600">Inactive</span>
-                    )}
-                  </div>
-                  {userInfo?.isAdmin && (
-                    <div className="flex justify-center">
-                      <div className="relative group">
-                        <button className="text-gray-400 hover:text-gray-600 text-xl">
-                          ⋯
-                        </button>
-                        <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-                          <button
-                            onClick={() => handleEdit(manufacturer)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-newPrimary/10 text-newPrimary flex items-center gap-2"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(manufacturer._id)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="rounded-xl  border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-[1200px]">
+      
+      {/* ✅ Table Header - styled like previous tables */}
+      <div className="hidden lg:grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Name</div>
+        <div>Address</div>
+        <div>Phone Number</div>
+        <div>Email</div>
+        <div>Contact Person</div>
+        <div>Mobile Number</div>
+        <div>NTN</div>
+        <div>GST</div>
+        <div className="text-center">Status</div>
+        {userInfo?.isAdmin && <div className="text-center">Actions</div>}
       </div>
+
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+        {loading ? (
+    // Skeleton shown while loading
+   <TableSkeleton 
+  rows={manufacturerList.length } 
+  cols={userInfo?.isAdmin ? 10 : 6} 
+/>
+  ):manufacturerList.length === 0 ? (
+          <div className="text-center py-4 text-gray-500 bg-white">
+            No manufacturers found.
+          </div>
+        ) : (
+          manufacturerList.map((manufacturer) => (
+            <div
+              key={manufacturer._id}
+              className="grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] gap-4 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+            >
+              {/* Name */}
+              <div className="font-medium text-gray-900 truncate">
+                {manufacturer.manufacturerName}
+              </div>
+
+              {/* Address */}
+              <div className="text-gray-600 truncate">{manufacturer.address}</div>
+
+              {/* Phone Number */}
+              <div className="text-gray-600 truncate">{manufacturer.phoneNumber}</div>
+
+              {/* Email */}
+              <div className="text-gray-600 truncate">
+                {manufacturer?.email || "-"}
+              </div>
+
+              {/* Contact Person */}
+              <div className="text-gray-600 truncate">{manufacturer.personName}</div>
+
+              {/* Mobile Number */}
+              <div className="text-gray-600 truncate">{manufacturer.mobileNumber}</div>
+
+              {/* NTN */}
+              <div className="text-gray-600 truncate">{manufacturer.ntn}</div>
+
+              {/* GST */}
+              <div className="text-gray-600 truncate">{manufacturer.gstNumber}</div>
+
+              {/* Status */}
+              <div className="font-semibold text-center">
+                {manufacturer.status ? (
+                  <span className="text-green-600">Active</span>
+                ) : (
+                  <span className="text-red-600">Inactive</span>
+                )}
+              </div>
+
+              {/* Actions */}
+              {userInfo?.isAdmin && (
+                <div className="flex justify-center">
+                  <div className="relative group">
+                   
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() => handleEdit(manufacturer)}
+                        className="w-full text-left  py-1 text-sm hover:bg-newPrimary/10 text-blue-600 flex items-center gap-2"
+                      >
+                        <SquarePen size={18}/>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(manufacturer._id)}
+                        className="w-full text-left  py-1 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
+                      >
+                        <Trash2 size={18}/>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Slider */}
       {isSliderOpen && (

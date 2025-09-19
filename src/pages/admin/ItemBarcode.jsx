@@ -362,7 +362,7 @@ const ItemBarcode = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Common Header */}
-      <CommanHeader/>
+      <CommanHeader />
       {/* HEADER */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -380,63 +380,73 @@ const ItemBarcode = () => {
       </div>
 
       {/* TABLE/CARDS */}
-      <div className="rounded-xl  border border-gray-200 overflow-hidden">
+      <div className="rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <div className="max-h-[400px] overflow-y-auto">
-            <table className="min-w-[1000px] w-full text-sm text-left border-collapse">
+            <div className="min-w-[1000px] w-full text-sm">
               {/* Table Header */}
-              <thead className="sticky top-0 bg-gray-100 z-10 text-xs font-semibold text-gray-600 uppercase">
-                <tr>
-                  <th className="px-6 py-3">Code</th>
-                  <th className="px-6 py-3">Item Name</th>
-                  <th className="px-6 py-3">Category</th>
-                  <th className="px-6 py-3">Item Type</th>
-                  <th className="px-6 py-3">Price</th>
-                  <th className="px-6 py-3">Stock</th>
-                  <th className="px-6 py-3">Barcode</th>
-                  <th className="px-6 py-3 text-right">Actions</th>
-                </tr>
-              </thead>
+              <div className="hidden lg:grid grid-cols-8 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Code</div>
+                <div>Item Name</div>
+                <div>Category</div>
+                <div>Item Type</div>
+                <div>Price</div>
+                <div>Stock</div>
+                <div>Barcode</div>
+                <div className="text-right">Actions</div>
+              </div>
 
               {/* Table Body */}
-              <tbody>
+              <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
                     rows={itemBarcodeList.length || 5}
-                    cols={userInfo?.isAdmin ? 8 : 6}
+                    cols={8}
+                    className="lg:grid-cols-8"
                   />
                 ) : itemBarcodeList.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="text-center py-4 text-gray-500">
-                      No items found.
-                    </td>
-                  </tr>
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No items found.
+                  </div>
                 ) : (
                   itemBarcodeList.map((item, index) => (
-                    <tr
+                    <div
                       key={index}
-                      className="border-b border-gray-200 hover:bg-gray-100"
+                      className="grid grid-cols-8 gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <td className="px-6 py-3">{item.code}</td>
-                      <td className="px-6 py-3 truncate">
+                      {/* Code */}
+                      <div>{item.code}</div>
+
+                      {/* Item Name */}
+                      <div className="truncate">
                         {item?.itemDetail?.itemName}
-                      </td>
-                      <td className="px-6 py-3">
-                        {item?.category?.categoryName}
-                      </td>
-                      <td className="px-6 py-3">{item?.itemType}</td>
-                      <td className="px-6 py-3">${item.price}</td>
-                      <td className="px-6 py-3">{item.stock}</td>
-                      <td className="px-6 py-3">
+                      </div>
+
+                      {/* Category */}
+                      <div>{item?.category?.categoryName}</div>
+
+                      {/* Item Type */}
+                      <div>{item?.itemType}</div>
+
+                      {/* Price */}
+                      <div>${item.price}</div>
+
+                      {/* Stock */}
+                      <div>{item.stock}</div>
+
+                      {/* Barcode */}
+                      <div>
                         <Barcode
                           value={item.barcode}
                           height={20}
                           width={1.2}
                           background="transparent"
                         />
-                      </td>
-                      <td className="px-6 py-3 text-right">
-                        <div className="inline-flex justify-end border-newPrimary px-1 py-1 rounded-[5px] border items-center gap-3">
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex justify-end">
+                        <div className="inline-flex border border-newPrimary px-1 py-1 rounded-[5px] items-center gap-3">
                           <button
                             onClick={() => {
                               setSelectedItem(item);
@@ -447,12 +457,12 @@ const ItemBarcode = () => {
                             <BarcodeIcon size={18} />
                           </button>
                         </div>
-                      </td>
-                    </tr>
+                      </div>
+                    </div>
                   ))
                 )}
-              </tbody>
-            </table>
+              </div>
+            </div>
           </div>
         </div>
       </div>

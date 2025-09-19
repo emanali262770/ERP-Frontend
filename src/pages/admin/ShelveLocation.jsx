@@ -5,6 +5,8 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axios from "axios";
 import CommanHeader from "../../components/CommanHeader";
+import { SquarePen, Trash2 } from "lucide-react";
+import TableSkeleton from "./Skeleton";
 
 const ShelveLocation = () => {
   const [shelveLocationList, setShelveLocationList] = useState([]);
@@ -175,16 +177,16 @@ const ShelveLocation = () => {
       });
   };
 
-  // Show loading spinner
-  if (loading) {
-    return (
-      <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-        </div>
-      </div>
-    );
-  }
+  // // Show loading spinner
+  // if (loading) {
+  //   return (
+  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //       <div className="text-center">
+  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -206,75 +208,74 @@ const ShelveLocation = () => {
       </div>
 
       {/* Shelve Location Table */}
-      <div className="rounded-xl shadow p-6 border border-gray-100 w-full overflow-hidden">
-        <div className="overflow-x-auto scrollbar-hide">
-          <div className="w-full">
-            {/* Table Headers */}
-            <div className="hidden lg:grid grid-cols-[150px_150px_150px_200px_80px] gap-6 bg-gray-50 py-3 px-6 text-xs font-medium text-gray-500 uppercase rounded-lg">
-              <div>Shelf Name / Code</div>
-              {/* <div>Section</div>
-              <div>Current Stock Count</div> */}
-              <div>Description</div>
-              {userInfo?.isAdmin && <div className="text-center">Actions</div>}
-            </div>
-
-            {/* Shelve Locations in Table */}
-            <div className="mt-4 flex flex-col gap-[14px] pb-14">
-              {shelveLocationList.map((shelveLocation) => (
-                <div
-                  key={shelveLocation._id}
-                  className="grid grid-cols-[150px_150px_150px_200px_80px] items-center gap-6 bg-white p-4 rounded-xl shadow-sm hover:shadow-md transition border border-gray-100"
-                >
-                  {/* Shelf Name / Code */}
-                  <div className="text-sm text-gray-500">
-                    {shelveLocation.shelfNameCode}
-                  </div>
-
-                  {/* Section
-                  <div className="text-sm text-gray-500">
-                    {shelveLocation.section}
-                  </div>
-
-                  {/* Current Stock Count */}
-                  {/* <div className="text-sm text-gray-500">
-                    {shelveLocation.currentStockCount}
-                  </div> */}
-
-                  {/* Description */}
-                  <div className="text-sm text-gray-500">
-                    {shelveLocation.description}
-                  </div>
-
-                  {/* Actions */}
-                  {userInfo?.isAdmin && (
-                    <div className="flex justify-center">
-                      <div className="relative group">
-                        <button className="text-gray-400 hover:text-gray-600 text-xl">
-                          ⋯
-                        </button>
-                        <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-                          <button
-                            onClick={() => handleEdit(shelveLocation)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-newPrimary/10 text-newPrimary flex items-center gap-2"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(shelveLocation._id)}
-                            className="w-full text-left px-4 py-2 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+     <div className="rounded-xl  border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-[600px]">
+      
+      {/* ✅ Table Header - styled like previous tables */}
+      <div className="hidden lg:grid grid-cols-[1fr_2fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Shelf Name / Code</div>
+        <div>Description</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
       </div>
+
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+        {loading ? (
+    // Skeleton shown while loading
+   <TableSkeleton 
+  rows={shelveLocationList.length } 
+  cols={userInfo?.isAdmin ? 3 : 6} 
+  className="lg:grid-cols-[1fr_2fr_auto]"
+/>
+  ):shelveLocationList.length === 0 ? (
+          <div className="text-center py-4 text-gray-500 bg-white">
+            No shelves found.
+          </div>
+        ) : (
+          shelveLocationList.map((shelveLocation) => (
+            <div
+              key={shelveLocation._id}
+              className="grid grid-cols-[1fr_2fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+            >
+              {/* Shelf Name / Code */}
+              <div className="font-medium text-gray-900">
+                {shelveLocation.shelfNameCode}
+              </div>
+
+              {/* Description */}
+              <div className="text-gray-600">{shelveLocation.description}</div>
+
+              {/* Actions */}
+              {userInfo?.isAdmin && (
+                <div className="flex justify-end">
+                  <div className="relative group">
+                   
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => handleEdit(shelveLocation)}
+                        className="w-full text-left py-1 text-sm  text-blue-600 flex items-center gap-2"
+                      >
+                        <SquarePen size={18}/>
+                      </button>
+                      <button
+                        onClick={() => handleDelete(shelveLocation._id)}
+                        className="w-full text-left py-1 text-sm  text-red-500 flex items-center gap-2"
+                      >
+                        <Trash2 size={18}/>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Slider */}
       {isSliderOpen && (
