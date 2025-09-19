@@ -6,7 +6,7 @@ import CommanHeader from "../../components/CommanHeader";
 const OpeningBalance = () => {
   const categories = ["Clothing", "Electronics", "Grocery"];
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const itemTypes = [
     { type: "Type 1", items: ["Item A", "Item B", "Item C"] },
     {
@@ -28,7 +28,8 @@ const [loading, setLoading] = useState(true);
     itemType: "",
     itemSearch: "",
   });
-
+  // Filter items based on selected type
+  
   // Static 25 Records
   const [records, setRecords] = useState(
     Array.from({ length: 25 }, (_, i) => ({
@@ -63,14 +64,14 @@ const [loading, setLoading] = useState(true);
   const filteredRecords = records.filter((rec) =>
     rec.item.toLowerCase().includes(form.itemSearch.toLowerCase())
   );
-setTimeout(() => {
-  setLoading(false)
-}, 2000);
+  setTimeout(() => {
+    setLoading(false)
+  }, 2000);
   return (
     <div className="p-6 space-y-6">
       {/* Heading */}
       {/* Common Header */}
-      <CommanHeader/>
+      <CommanHeader />
       <h1 className="text-2xl font-bold text-newPrimary">Opening Balance</h1>
 
       {/* Form */}
@@ -102,7 +103,7 @@ setTimeout(() => {
             </label>
             <select
               value={form.itemType}
-              onChange={(e) => setForm({ ...form, itemType: e.target.value })}
+              onChange={(e) => setForm({ ...form, itemType: e.target.value, item: "" })}
               className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
             >
               <option value="">Select Item Type</option>
@@ -114,153 +115,157 @@ setTimeout(() => {
             </select>
           </div>
 
-          {/* Search bar with icon (no label) */}
+          
 
-          <div className="w-full">
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search size={18} className="text-gray-400" />
-              </span>
-              <input
-                type="text"
-                value={form.itemSearch}
-                onChange={(e) =>
-                  setForm({ ...form, itemSearch: e.target.value })
-                }
-                placeholder="Search Item..."
-                aria-label="Search Item"
-                className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+          {/* Search bar with icon (no label) */}
+              
+          {/* {selectedType.length < 0 && */}
+            <div className="w-full">
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search size={18} className="text-gray-400" />
+                </span>
+                <input
+                  type="text"
+                  value={form.itemSearch}
+                  onChange={(e) =>
+                    setForm({ ...form, itemSearch: e.target.value })
+                  }
+                  placeholder="Search Item..."
+                  aria-label="Search Item"
+                  className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
                  placeholder:text-gray-400"
-              />
+                />
+              </div>
             </div>
-          </div>
+          {/* } */}
         </div>
       </div>
 
       {/* Table */}
-   <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[1000px]">
-      
-      {/* ✅ Table Header (sticky like your previous tables) */}
-      <div className="grid grid-cols-8 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
-        <div>Sr</div>
-        <div>Code</div>
-        <div>Type</div>
-        <div>Item</div>
-        <div>Purchase</div>
-        <div>Sales</div>
-        <div>Stock</div>
-        <div className="text-right">Action</div>
-      </div>
+      <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-[1000px]">
 
-      {/* ✅ Scrollable Table Body */}
-      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
-        {loading ? (
-          <TableSkeleton
-            rows={filteredRecords.length || 5}
-            cols={userInfo?.isAdmin ? 8 : 7}
-            className="lg:grid-cols-8"
-          />
-        ) : filteredRecords.map((rec, index) => (
-          <div
-            key={rec.code}
-            className="grid grid-cols-8 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-          >
-            <div className="text-gray-700">{rec.sr}</div>
-            <div className="text-gray-600">{rec.code}</div>
-            <div className="text-gray-600">{rec.type}</div>
-            <div className="font-medium text-gray-900">{rec.item}</div>
-
-            {/* Purchase */}
-            <div className="text-gray-600">
-              {editing[`${index}-purchase`] ? (
-                <input
-                  type="number"
-                  value={rec.purchase}
-                  onChange={(e) =>
-                    handleChange(index, "purchase", e.target.value)
-                  }
-                  onBlur={() => handleBlur(index, "purchase")}
-                  autoFocus
-                  className="w-20 border rounded p-1"
-                />
-              ) : (
-                <span
-                  onClick={() => handleFocus(index, "purchase")}
-                  className="cursor-pointer"
-                >
-                  {rec.purchase}
-                </span>
-              )}
+            {/* ✅ Table Header (sticky like your previous tables) */}
+            <div className="grid grid-cols-8 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+              <div>Sr</div>
+              <div>Code</div>
+              <div>Type</div>
+              <div>Item</div>
+              <div>Purchase</div>
+              <div>Sales</div>
+              <div>Stock</div>
+              <div className="text-right">Action</div>
             </div>
 
-            {/* Sales */}
-            <div className="text-gray-600">
-              {editing[`${index}-sales`] ? (
-                <input
-                  type="number"
-                  value={rec.sales}
-                  onChange={(e) =>
-                    handleChange(index, "sales", e.target.value)
-                  }
-                  onBlur={() => handleBlur(index, "sales")}
-                  autoFocus
-                  className="w-20 border rounded p-1"
+            {/* ✅ Scrollable Table Body */}
+            <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
+              {loading ? (
+                <TableSkeleton
+                  rows={filteredRecords.length || 5}
+                  cols={userInfo?.isAdmin ? 8 : 7}
+                  className="lg:grid-cols-8"
                 />
-              ) : (
-                <span
-                  onClick={() => handleFocus(index, "sales")}
-                  className="cursor-pointer"
+              ) : filteredRecords.map((rec, index) => (
+                <div
+                  key={rec.code}
+                  className="grid grid-cols-8 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                 >
-                  {rec.sales}
-                </span>
-              )}
-            </div>
+                  <div className="text-gray-700">{rec.sr}</div>
+                  <div className="text-gray-600">{rec.code}</div>
+                  <div className="text-gray-600">{rec.type}</div>
+                  <div className="font-medium text-gray-900">{rec.item}</div>
 
-            {/* Stock */}
-            <div className="text-gray-600">
-              {editing[`${index}-stock`] ? (
-                <input
-                  type="number"
-                  value={rec.stock}
-                  onChange={(e) =>
-                    handleChange(index, "stock", e.target.value)
-                  }
-                  onBlur={() => handleBlur(index, "stock")}
-                  autoFocus
-                  className="w-20 border rounded p-1"
-                />
-              ) : (
-                <span
-                  onClick={() => handleFocus(index, "stock")}
-                  className="cursor-pointer"
-                >
-                  {rec.stock}
-                </span>
-              )}
-            </div>
+                  {/* Purchase */}
+                  <div className="text-gray-600">
+                    {editing[`${index}-purchase`] ? (
+                      <input
+                        type="number"
+                        value={rec.purchase}
+                        onChange={(e) =>
+                          handleChange(index, "purchase", e.target.value)
+                        }
+                        onBlur={() => handleBlur(index, "purchase")}
+                        autoFocus
+                        className="w-20 border rounded p-1"
+                      />
+                    ) : (
+                      <span
+                        onClick={() => handleFocus(index, "purchase")}
+                        className="cursor-pointer"
+                      >
+                        {rec.purchase}
+                      </span>
+                    )}
+                  </div>
 
-            {/* Action */}
-            <div className="flex justify-end">
-              <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
-                <SaveIcon size={18} />
-              </button>
+                  {/* Sales */}
+                  <div className="text-gray-600">
+                    {editing[`${index}-sales`] ? (
+                      <input
+                        type="number"
+                        value={rec.sales}
+                        onChange={(e) =>
+                          handleChange(index, "sales", e.target.value)
+                        }
+                        onBlur={() => handleBlur(index, "sales")}
+                        autoFocus
+                        className="w-20 border rounded p-1"
+                      />
+                    ) : (
+                      <span
+                        onClick={() => handleFocus(index, "sales")}
+                        className="cursor-pointer"
+                      >
+                        {rec.sales}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Stock */}
+                  <div className="text-gray-600">
+                    {editing[`${index}-stock`] ? (
+                      <input
+                        type="number"
+                        value={rec.stock}
+                        onChange={(e) =>
+                          handleChange(index, "stock", e.target.value)
+                        }
+                        onBlur={() => handleBlur(index, "stock")}
+                        autoFocus
+                        className="w-20 border rounded p-1"
+                      />
+                    ) : (
+                      <span
+                        onClick={() => handleFocus(index, "stock")}
+                        className="cursor-pointer"
+                      >
+                        {rec.stock}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Action */}
+                  <div className="flex justify-end">
+                    <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
+                      <SaveIcon size={18} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+
+              {/* Show message if nothing found */}
+              {!loading && filteredRecords.length === 0 && (
+                <div className="px-6 py-4 text-center text-gray-500">
+                  No items found.
+                </div>
+              )}
             </div>
           </div>
-        ))}
-
-        {/* Show message if nothing found */}
-        {!loading && filteredRecords.length === 0 && (
-          <div className="px-6 py-4 text-center text-gray-500">
-            No items found.
-          </div>
-        )}
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
     </div>
   );
