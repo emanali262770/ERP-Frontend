@@ -259,7 +259,7 @@ const ModulesFunctionalities = () => {
             />
           </div>
           <button
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
+            className="bg-newPrimary text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
             onClick={handleAddFunctionality}
           >
             <FiPlus />
