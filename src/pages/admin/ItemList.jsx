@@ -43,34 +43,13 @@ const ItemList = () => {
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
+  const [itemTypeList, setItemTypeList] = useState([]);
+
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  // --- Dummy Data ---
 
-const [dummyItems, setDummyItems] = useState([
-      {
-        _id: "1",
-        itemType: { itemTypeName: "Beverages" },
-        itemName: "Coca Cola 1L",
-        purchase: 50,
-        price: 80,
-        stock: 120,
-        labelBarcode: "BAR1234567890",
-        itemImage: { url: "https://via.placeholder.com/50" },
-      },
-      {
-        _id: "2",
-        itemType: { itemTypeName: "Snacks" },
-        itemName: "Lays Chips",
-        purchase: 20,
-        price: 40,
-        stock: 300,
-        labelBarcode: "BAR9876543210",
-        itemImage: { url: "https://via.placeholder.com/50" },
-      },
-    ]);
 
-// Simulate API call
+  // Simulate API call
 
 
   // Slider animation
@@ -108,7 +87,7 @@ const [dummyItems, setDummyItems] = useState([
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/item-type/list`
+        `${import.meta.env.VITE_API_BASE_URL}/categories`
       );
       setCategoryList(res.data); // store actual categories array
       console.log("Categories ", res.data);
@@ -121,6 +100,27 @@ const [dummyItems, setDummyItems] = useState([
   useEffect(() => {
     fetchCategoryList();
   }, [fetchCategoryList]);
+
+  // Fetch itemTypes when category changes
+  useEffect(() => {
+    if (!itemCategory) return; // only call when category selected
+
+    const fetchItemTypes = async () => {
+      try {
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/item-type/category/${itemCategory}`
+        );
+        setItemTypeList(res.data);
+      } catch (error) {
+        console.error("Failed to fetch item types", error);
+      }
+    };
+
+    fetchItemTypes();
+  }, [itemCategory]);
+
+
+
 
   // Item Unit List Fetch
   const fetchItemUnitList = useCallback(async () => {
@@ -430,18 +430,18 @@ const [dummyItems, setDummyItems] = useState([
   //     </div>
   //   );
   // }
- 
 
-  
+
+
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex justify-between items-center mt-6 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Items List</h1>
-          
+
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-primaryDark"
@@ -452,87 +452,87 @@ const [dummyItems, setDummyItems] = useState([
       </div>
 
       {/* Item Table */}
-    <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[1000px]">
-      {/* Header */}
-      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Item Category</div>
-        <div>Item Name</div>
-        <div>Purchase</div>
-        <div>Sales</div>
-        <div>Stock</div>
-        <div>Barcode</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
+      <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-[1000px]">
+            {/* Header */}
+            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>Item Category</div>
+              <div>Item Name</div>
+              <div>Purchase</div>
+              <div>Sales</div>
+              <div>Stock</div>
+              <div>Barcode</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
-      {/* Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <TableSkeleton
-            rows={dummyItems.length || 5}
-            cols={userInfo?.isAdmin ? 7 : 6}
-            className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-          />
-        ) : (
-          dummyItems.map((item, index) => (
-            <div
-              key={item._id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Item Category (with icon) */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={item.itemImage?.url}
-                  alt="Product Icon"
-                  className="w-7 h-7 object-cover rounded-full"
+            {/* Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={itemList.length || 5}
+                  cols={userInfo?.isAdmin ? 7 : 6}
+                  className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
                 />
-                <span className="font-medium text-gray-900">
-                  {item?.itemType?.itemTypeName}
-                </span>
-              </div>
+              ) : (
+                itemList.map((item, index) => (
+                  <div
+                    key={item._id}
+                    className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                  >
+                    {/* Item Category (with icon) */}
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={item.itemImage?.url || item.itemImage}
+                        alt="Product Icon"
+                        className="w-7 h-7 object-cover rounded-full"
+                      />
+                      <span className="font-medium text-gray-900">
+                        {item?.itemType?.itemTypeName}
+                      </span>
+                    </div>
 
-              {/* Item Name */}
-              <div className="text-gray-600">{item.itemName}</div>
+                    {/* Item Name */}
+                    <div className="text-gray-600">{item.itemName}</div>
 
-              {/* Purchase */}
-              <div className="font-semibold text-gray-600">
-                {item.purchase}
-              </div>
+                    {/* Purchase */}
+                    <div className="font-semibold text-gray-600">
+                      {item.purchase}
+                    </div>
 
-              {/* Sales */}
-              <div className="font-semibold text-gray-600">
-                {item.price}
-              </div>
+                    {/* Sales */}
+                    <div className="font-semibold text-gray-600">
+                      {item.price}
+                    </div>
 
-              {/* Stock */}
-              <div className="font-semibold text-gray-600">
-                {item.stock}
-              </div>
+                    {/* Stock */}
+                    <div className="font-semibold text-gray-600">
+                      {item.stock}
+                    </div>
 
-              {/* Barcode */}
-              <div className="font-semibold text-gray-600">
-                {item.labelBarcode.slice(0, 12)}
-              </div>
+                    {/* Barcode */}
+                    <div className="font-semibold text-gray-600">
+                      {item.labelBarcode.slice(0, 12)}
+                    </div>
 
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-end gap-3">
-                  <button className="text-blue-500 hover:underline">
-                    <SquarePen size={18} />
-                  </button>
-                  <button className="text-red-500 hover:underline">
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+                    {/* Actions */}
+                    {userInfo?.isAdmin && (
+                      <div className="flex justify-end gap-3">
+                        <button className="text-blue-500 hover:underline">
+                          <SquarePen size={18} />
+                        </button>
+                        <button className="text-red-500 hover:underline">
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
               )}
             </div>
-          ))
-        )}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
 
 
@@ -591,12 +591,14 @@ const [dummyItems, setDummyItems] = useState([
                 >
                   <option value="">Select Category</option>
                   {categoryList.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.itemTypeName}
+                    <option key={category._id} value={category.categoryName}>
+                      {category.categoryName}
                     </option>
                   ))}
                 </select>
               </div>
+
+              {/* Item Type */}
               <div>
                 <label className="block text-gray-700 font-medium">
                   Item Type <span className="text-newPrimary">*</span>
@@ -608,16 +610,14 @@ const [dummyItems, setDummyItems] = useState([
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select Item Type</option>
-                  {/* {categoryList.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.itemTypeName}
+                  {itemTypeList.map((type) => (
+                    <option key={type._id} value={type._id}>
+                      {type.itemTypeName}
                     </option>
-                  ))} */}
-                  <option value="">tyep1</option>
-                  <option value="">tyep2</option>
-                  <option value="">tyep3</option>
+                  ))}
                 </select>
               </div>
+
 
               {/* Manufacture */}
               <div>
@@ -713,7 +713,7 @@ const [dummyItems, setDummyItems] = useState([
                 </select>
               </div>
 
-             
+
 
               {/* Purchase */}
               <div>
@@ -742,8 +742,8 @@ const [dummyItems, setDummyItems] = useState([
                   className="w-full p-2 border rounded"
                 />
               </div>
-               
-                {/* Per Unit */}
+
+              {/* Per Unit */}
               <div>
                 <label className="block text-gray-700 font-medium">
                   Per Unit
@@ -793,23 +793,23 @@ const [dummyItems, setDummyItems] = useState([
                   required
                   onChange={(e) => setBarcode(e.target.value)}
                   className="w-full p-2 border rounded"
-                  placeholder="e.g. BAR1234567890" 
-                   minLength={5}
-  maxLength={20}  
+                  placeholder="e.g. BAR1234567890"
+                  minLength={5}
+                  maxLength={20}
                   onBlur={(e) => setBarcode(e.target.value)} // update on blur
                 />
 
                 {/* Show barcode only if input is not empty */}
                 {barcode && (
                   <div className="mt-3">
-                      <Barcode value={barcode} height={60} />  
+                    <Barcode value={barcode} height={60} />
                   </div>
                 )}
               </div>
 
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Expiry Day 
+                  Expiry Day
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
@@ -838,7 +838,7 @@ const [dummyItems, setDummyItems] = useState([
               {/* Conditionally show expiry date field */}
               {expiryOption === "HasExpiry" && (
                 <div className="mt-3">
-              
+
                   <input
                     type="number"
                     value={expiryDay}
@@ -924,14 +924,12 @@ const [dummyItems, setDummyItems] = useState([
                 <button
                   type="button"
                   onClick={() => setEnabled(!enabled)}
-                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${
-                    enabled ? "bg-green-500" : "bg-gray-300"
-                  }`}
+                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${enabled ? "bg-green-500" : "bg-gray-300"
+                    }`}
                 >
                   <div
-                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                      enabled ? "translate-x-7" : "translate-x-0"
-                    }`}
+                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enabled ? "translate-x-7" : "translate-x-0"
+                      }`}
                   />
                 </button>
               </div>
