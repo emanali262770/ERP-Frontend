@@ -28,7 +28,8 @@ const OpeningBalance = () => {
     itemType: "",
     itemSearch: "",
   });
-
+  // Filter items based on selected type
+  
   // Static 25 Records
   const [records, setRecords] = useState(
     Array.from({ length: 25 }, (_, i) => ({
@@ -64,7 +65,7 @@ const OpeningBalance = () => {
     rec.item.toLowerCase().includes(form.itemSearch.toLowerCase())
   );
   setTimeout(() => {
-    setLoading(false);
+    setLoading(false)
   }, 2000);
   return (
     <div className="p-6 space-y-6">
@@ -102,7 +103,7 @@ const OpeningBalance = () => {
             </label>
             <select
               value={form.itemType}
-              onChange={(e) => setForm({ ...form, itemType: e.target.value })}
+              onChange={(e) => setForm({ ...form, itemType: e.target.value, item: "" })}
               className="w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200"
             >
               <option value="">Select Item Type</option>
@@ -114,37 +115,47 @@ const OpeningBalance = () => {
             </select>
           </div>
 
-          {/* Search bar with icon (no label) */}
+          
 
-          <div className="w-full">
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search size={18} className="text-gray-400" />
-              </span>
-              <input
-                type="text"
-                value={form.itemSearch}
-                onChange={(e) =>
-                  setForm({ ...form, itemSearch: e.target.value })
-                }
-                placeholder="Search Item..."
-                aria-label="Search Item"
-                className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+          {/* Search bar with icon (no label) */}
+              
+          {/* {selectedType.length < 0 && */}
+            <div className="w-full">
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Search size={18} className="text-gray-400" />
+                </span>
+                <input
+                  type="text"
+                  value={form.itemSearch}
+                  onChange={(e) =>
+                    setForm({ ...form, itemSearch: e.target.value })
+                  }
+                  placeholder="Search Item..."
+                  aria-label="Search Item"
+                  className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
                  focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
                  placeholder:text-gray-400"
-              />
+                />
+              </div>
             </div>
-          </div>
+          {/* } */}
         </div>
       </div>
 
       {/* Table */}
+
       {/* TABLE / CARDS */}
+    
+        
+
       <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="w-full min-w-full text-sm">
-            {/* ✅ Table Header (Desktop Only) */}
-            <div className="hidden lg:grid grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+          <div className="min-w-[1000px]">
+
+            {/* ✅ Table Header (sticky like your previous tables) */}
+            <div className="grid grid-cols-8 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+
               <div>Sr</div>
               <div>Code</div>
               <div>Type</div>
@@ -155,149 +166,141 @@ const OpeningBalance = () => {
               <div className="text-right">Action</div>
             </div>
 
-            {/* ✅ Table Body */}
-            <div className="max-h-screen overflow-y-auto divide-y divide-gray-100">
-              {loading ? (
-                <TableSkeleton
-                  rows={filteredRecords.length > 0 ? filteredRecords.length : 5}
-                  cols={8}
-                  className="lg:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto]"
-                />
-              ) : filteredRecords.length === 0 ? (
-                <div className="text-center py-4 text-gray-500 bg-white">
-                  No items found.
-                </div>
-              ) : (
-                filteredRecords.map((rec, index) => (
-                  <>
-                    {/* ✅ Desktop Grid */}
-                    <div
-                      key={rec.code}
-                      className="hidden lg:grid grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      <div className="text-gray-700">{rec.sr}</div>
-                      <div className="text-gray-600">{rec.code}</div>
-                      <div className="text-gray-600">{rec.type}</div>
-                      <div className="font-medium text-gray-900">
-                        {rec.item}
-                      </div>
+{/* ✅ Table Body */}
+<div className="max-h-screen overflow-y-auto divide-y divide-gray-100">
+  {loading ? (
+    <TableSkeleton
+      rows={filteredRecords.length > 0 ? filteredRecords.length : 5}
+      cols={8}
+      className="lg:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto]"
+    />
+  ) : filteredRecords.length === 0 ? (
+    <div className="text-center py-4 text-gray-500 bg-white">
+      No items found.
+    </div>
+  ) : (
+    filteredRecords.map((rec, index) => (
+      <>
+        {/* ✅ Desktop Grid */}
+        <div
+          key={rec.code}
+          className="hidden lg:grid grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+        >
+          <div className="text-gray-700">{rec.sr}</div>
+          <div className="text-gray-600">{rec.code}</div>
+          <div className="text-gray-600">{rec.type}</div>
+          <div className="font-medium text-gray-900">{rec.item}</div>
 
-                      {/* Editable Purchase */}
-                      <div className="text-gray-600">
-                        {editing[`${index}-purchase`] ? (
-                          <input
-                            type="number"
-                            value={rec.purchase}
-                            onChange={(e) =>
-                              handleChange(index, "purchase", e.target.value)
-                            }
-                            onBlur={() => handleBlur(index, "purchase")}
-                            autoFocus
-                            className="w-20 border rounded p-1"
-                          />
-                        ) : (
-                          <span
-                            onClick={() => handleFocus(index, "purchase")}
-                            className="cursor-pointer"
-                          >
-                            {rec.purchase}
-                          </span>
-                        )}
-                      </div>
+          {/* Editable Purchase */}
+          <div className="text-gray-600">
+            {editing[`${index}-purchase`] ? (
+              <input
+                type="number"
+                value={rec.purchase}
+                onChange={(e) =>
+                  handleChange(index, "purchase", e.target.value)
+                }
+                onBlur={() => handleBlur(index, "purchase")}
+                autoFocus
+                className="w-20 border rounded p-1"
+              />
+            ) : (
+              <span
+                onClick={() => handleFocus(index, "purchase")}
+                className="cursor-pointer"
+              >
+                {rec.purchase}
+              </span>
+            )}
+          </div>
 
-                      {/* Editable Sales */}
-                      <div className="text-gray-600">
-                        {editing[`${index}-sales`] ? (
-                          <input
-                            type="number"
-                            value={rec.sales}
-                            onChange={(e) =>
-                              handleChange(index, "sales", e.target.value)
-                            }
-                            onBlur={() => handleBlur(index, "sales")}
-                            autoFocus
-                            className="w-20 border rounded p-1"
-                          />
-                        ) : (
-                          <span
-                            onClick={() => handleFocus(index, "sales")}
-                            className="cursor-pointer"
-                          >
-                            {rec.sales}
-                          </span>
-                        )}
-                      </div>
+          {/* Editable Sales */}
+          <div className="text-gray-600">
+            {editing[`${index}-sales`] ? (
+              <input
+                type="number"
+                value={rec.sales}
+                onChange={(e) =>
+                  handleChange(index, "sales", e.target.value)
+                }
+                onBlur={() => handleBlur(index, "sales")}
+                autoFocus
+                className="w-20 border rounded p-1"
+              />
+            ) : (
+              <span
+                onClick={() => handleFocus(index, "sales")}
+                className="cursor-pointer"
+              >
+                {rec.sales}
+              </span>
+            )}
+          </div>
 
-                      {/* Editable Stock */}
-                      <div className="text-gray-600">
-                        {editing[`${index}-stock`] ? (
-                          <input
-                            type="number"
-                            value={rec.stock}
-                            onChange={(e) =>
-                              handleChange(index, "stock", e.target.value)
-                            }
-                            onBlur={() => handleBlur(index, "stock")}
-                            autoFocus
-                            className="w-20 border rounded p-1"
-                          />
-                        ) : (
-                          <span
-                            onClick={() => handleFocus(index, "stock")}
-                            className="cursor-pointer"
-                          >
-                            {rec.stock}
-                          </span>
-                        )}
-                      </div>
+          {/* Editable Stock */}
+          <div className="text-gray-600">
+            {editing[`${index}-stock`] ? (
+              <input
+                type="number"
+                value={rec.stock}
+                onChange={(e) =>
+                  handleChange(index, "stock", e.target.value)
+                }
+                onBlur={() => handleBlur(index, "stock")}
+                autoFocus
+                className="w-20 border rounded p-1"
+              />
+            ) : (
+              <span
+                onClick={() => handleFocus(index, "stock")}
+                className="cursor-pointer"
+              >
+                {rec.stock}
+              </span>
+            )}
+          </div>
 
-                      {/* Action */}
-                      <div className="flex justify-end">
-                        <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
-                          <SaveIcon size={18} />
-                        </button>
-                      </div>
-                    </div>
+          {/* Action */}
+          <div className="flex justify-end">
+            <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
+              <SaveIcon size={18} />
+            </button>
+          </div>
+        </div>
 
-                    {/* ✅ Mobile Card */}
-                    <div
-                      key={`mobile-${rec.code}`}
-                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
-                    >
-                      <div className="flex justify-between mb-2">
-                        <span className="text-sm font-semibold text-gray-700">
-                          {rec.item}
-                        </span>
-                        <span className="text-xs text-gray-500">
-                          {rec.code}
-                        </span>
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Type: {rec.type}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Purchase: {rec.purchase}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Sales: {rec.sales}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        Stock: {rec.stock}
-                      </div>
+        {/* ✅ Mobile Card */}
+        <div
+          key={`mobile-${rec.code}`}
+          className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+        >
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-semibold text-gray-700">
+              {rec.item}
+            </span>
+            <span className="text-xs text-gray-500">{rec.code}</span>
+          </div>
+          <div className="text-sm text-gray-600">Type: {rec.type}</div>
+          <div className="text-sm text-gray-600">
+            Purchase: {rec.purchase}
+          </div>
+          <div className="text-sm text-gray-600">Sales: {rec.sales}</div>
+          <div className="text-sm text-gray-600">Stock: {rec.stock}</div>
 
-                      <div className="mt-3 flex justify-end">
-                        <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
-                          <SaveIcon size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  </>
-                ))
-              )}
-            </div>
+          <div className="mt-3 flex justify-end">
+            <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
+              <SaveIcon size={18} />
+            </button>
+          </div>
+        </div>
+      </>
+    ))
+  )}
+</div>
+
           </div>
         </div>
       </div>
+
     </div>
   );
 };

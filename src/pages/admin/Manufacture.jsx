@@ -76,8 +76,8 @@ const Manufacture = () => {
 
   const handleSave = async () => {
     const formData = {
-      manufacturerId,
-      manufacturerName,
+     _id: manufacturerId,
+       name: manufacturerName,
       address,
       phoneNumber,
       personName,
@@ -97,19 +97,20 @@ const Manufacture = () => {
         "Content-Type": "application/json",
       };
 
-      if (isEdit && editId) {
-        // 🔄 Update existing category
-        const res = await axios.put(`${API_URL}/${editId}`, formData, {
-          headers,
-        });
 
-        toast.success("✅ Manufacturer updated successfully");
-      } else {
-        const res = await axios.post(API_URL, formData, {
-          headers,
-        });
-        toast.success("✅ Manufacturer added successfully");
-      }
+    if (isEdit && editId) {
+  // 🔄 Update existing category
+  const res = await axios.put(`${API_URL}/${editId}`, formData, {
+    headers,
+  });
+  toast.success("✅ Manufacturer updated successfully");
+} else {
+  const res = await axios.post(API_URL, formData, {
+    headers,
+  });
+  toast.success("✅ Manufacturer added successfully");
+}
+
 
       setManufacturerId("");
       setManufacturerName("");
@@ -132,6 +133,7 @@ const Manufacture = () => {
     }
   };
 
+
   const handleEdit = (manufacturer) => {
     setIsEdit(true);
     setEditId(manufacturer._id);
@@ -148,7 +150,6 @@ const Manufacture = () => {
     setStatus(manufacturer.status);
     setIsSliderOpen(true);
   };
-
   const handleDelete = async (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {

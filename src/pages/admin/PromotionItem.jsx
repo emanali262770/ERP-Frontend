@@ -9,7 +9,12 @@ import CommanHeader from "../../components/CommanHeader";
 import TableSkeleton from "./Skeleton";
 
 const PromotionItem = () => {
-  const [categories, setCategories] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
+  const [promotionList, setPromotionList] = useState([]);
+  const [itemTypeList, setItemTypeList] = useState([]);
+  const [promotionItems, setPromotionItems] = useState([]);
+  const [editingPromotionItem, setEditingPromotionItem] = useState(null);
+  const [promotionName, setPromotionName] = useState("");
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -20,35 +25,93 @@ const PromotionItem = () => {
   const [selectedPromotion, setSelectedPromotion] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [selectedItemType, setSelectedItemType] = useState("");
-  const [discountPrice, setDiscountPrice] = useState("");
+  const [discountPercentage, setDiscountPercentage] = useState("");
   const [itemSearch, setItemSearch] = useState("");
 
-  const [categoryName, setCategoryName] = useState("");
+
   const [isEnable, setIsEnable] = useState(true);
-  const [editingCategory, setEditingCategory] = useState(null);
   const sliderRef = useRef(null);
 
-  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/categories`;
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/promotion-items`;
+  let userInfo = null;
+  try {
+    userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  } catch (e) {
+    userInfo = null;
+  }
 
-  // Fetch categories
-  const fetchCategoiresList = useCallback(async () => {
+  // Fetch all data in proper sequence
+  const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/categories`
-      );
-      setCategories(res.data);
-      console.log("Categories  ", res.data);
+      
+      // Fetch all necessary data first
+      const [promotionsRes, categoriesRes, itemTypesRes, promotionItemsRes] = await Promise.all([
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/promotion`),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/list`),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`),
+        axios.get(API_URL)
+      ]);
+
+      setPromotionList(promotionsRes.data);
+      setCategoryList(categoriesRes.data);
+      setItemTypeList(itemTypesRes.data);
+      // Map promotion items with proper names
+const itemsWithNames = promotionItemsRes.data.map(item => {
+  const promotion = promotionsRes.data.find(p => p._id === item.promotion) || {};
+  const category = categoriesRes.data.find(c => c._id === item.category) || {};
+  const itemType = itemTypesRes.data.find(it => it._id === item.itemType) || {};
+
+  return {
+    ...item,
+    promotionName: promotion.promotionName || promotion.name || "N/A",
+    categoryName: category.categoryName || category.name || "N/A",
+    itemTypeName: itemType.itemTypeName || itemType.name || "N/A",
+    items: item.items || []
+  };
+});
+
+
+      
+      setPromotionItems(itemsWithNames);
+      
     } catch (error) {
-      console.error("Failed to fetch Supplier", error);
+      console.error("Failed to fetch data", error);
+      // Fallback to static data if API fails
+      setPromotionItems([
+        {
+          id: 1,
+          promotionName: "Summer Sale",
+          categoryName: "Clothing",
+          itemTypeName: "Shoes",
+          items: [
+            { itemName: "Nike", price: "$120" },
+            { itemName: "Adidas", price: "$100" },
+          ],
+          discountPercentage: "20%",
+          endDate: "2025-09-30",
+        },
+        {
+          id: 2,
+          promotionName: "Electronics Offer",
+          categoryName: "Mobiles",
+          itemTypeName: "Smartphones",
+          items: [
+            { itemName: "Apple iPhone", price: "$1200" },
+            { itemName: "Samsung Galaxy", price: "$1000" },
+          ],
+          discountPercentage: "15%",
+          endDate: "2025-10-15",
+        },
+      ]);
     } finally {
       setTimeout(() => setLoading(false), 1000);
     }
-  }, []);
+  }, [API_URL]);
+
   useEffect(() => {
-    fetchCategoiresList();
-  }, [fetchCategoiresList]);
+    fetchAllData();
+  }, [fetchAllData]);
 
   // Slider animation
   useEffect(() => {
@@ -63,163 +126,138 @@ const PromotionItem = () => {
 
   // Handlers
   const handleAddClick = () => {
-    setEditingCategory(null);
-    setCategoryName("");
+    setEditingPromotionItem(null);
+    setPromotionName("");
     setDetails("");
     setStartDate("");
     setEndDate("");
     setSelectedPromotion("");
     setSelectedCategory("");
     setSelectedItemType("");
-    setDiscountPrice("");
+    setDiscountPercentage("");
     setIsEnable(true);
     setIsSliderOpen(true);
   };
 
   const items = [
-    { id: 1, name: "Nike", price: "$120" },
-    { id: 2, name: "Adidas", price: "$100" },
-    { id: 3, name: "Puma", price: "$90" },
-    { id: 4, name: "Audi", price: "$50,000" },
-    { id: 5, name: "BMW", price: "$60,000" },
-    { id: 6, name: "Apple", price: "$1,200" },
-    { id: 7, name: "Samsung", price: "$1,000" },
+    { id: 1, itemName: "Nike", price: "$120" },
+    { id: 2, itemName: "Adidas", price: "$100" },
+    { id: 3, itemName: "Puma", price: "$90" },
+    { id: 4, itemName: "Audi", price: "$50,000" },
+    { id: 5, itemName: "BMW", price: "$60,000" },
+    { id: 6, itemName: "Apple", price: "$1,200" },
+    { id: 7, itemName: "Samsung", price: "$1,000" },
   ];
 
-  const promotions = [
-    {
-      id: 1,
-      promotion: "Summer Sale",
-      category: "Clothing",
-      itemType: "Shoes",
-      items: [
-        { name: "Nike", price: "$120" },
-        { name: "Adidas", price: "$100" },
-      ],
-      discount: "20%",
-      endDate: "2025-09-30",
-    },
-    {
-      id: 2,
-      promotion: "Electronics Offer",
-      category: "Mobiles",
-      itemType: "Smartphones",
-      items: [
-        { name: "Apple iPhone", price: "$1200" },
-        { name: "Samsung Galaxy", price: "$1000" },
-      ],
-      discount: "15%",
-      endDate: "2025-10-15",
-    },
-  ];
-  const filterdata = items.filter((item) => {
-    return item.name.toLowerCase().includes(itemSearch.toLowerCase());
-  });
-  const handleEditClick = (category) => {
-    setEditingCategory(category);
-    setCategoryName(category.categoryName);
-    setIsEnable(category.isEnable);
-    // If your backend provides these fields, prefill them here
-    setDetails(category.details || "");
-    setStartDate(category.startDate || "");
-    setEndDate(category.endDate || "");
-    setSelectedPromotion(category.selectedPromotion || "");
-    setSelectedCategory(category.selectedCategory || "");
-    setSelectedItemType(category.selectedItemType || "");
-    setDiscountPrice(category.discountPrice || "");
-    setIsSliderOpen(true);
-  };
+const filterdata = items.filter((item) => {
+  return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
+});
+
+const handleEditClick = (promotionitem) => {
+  setEditingPromotionItem(promotionitem);
+  setPromotionName(promotionitem.promotionName || "");
+  setIsEnable(promotionitem.isEnable ?? true);
+  setDetails(promotionitem.details || "");
+  setStartDate(promotionitem.startDate || "");
+  setEndDate(promotionitem.endDate || "");
+  setSelectedPromotion(promotionitem.promotion || ""); // ✅ backend key
+  setSelectedCategory(promotionitem.category || "");   // ✅ backend key
+  setSelectedItemType(promotionitem.itemType || "");   // ✅ backend key
+  setDiscountPercentage(promotionitem.discountPercentage || "");
+  setIsSliderOpen(true);
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const trimmedName = categoryName.trim();
+    const trimmedName = promotionName.trim();
 
     if (!trimmedName) {
-      toast.error("❌ Category name cannot be empty.");
+      toast.error("❌ Promotion name cannot be empty.");
       return;
     }
 
     setLoading(true);
 
     // 🔹 Full payload with new fields
-    const payload = {
-      categoryName: trimmedName,
-      isEnable,
-      details,
-      startDate,
-      endDate,
-      selectedPromotion,
-      selectedCategory,
-      selectedItemType,
-      discountPrice,
-    };
+const payload = {
+  promotion: selectedPromotion,
+  category: selectedCategory,
+  itemType: selectedItemType,
+  items: filterdata,
+  discountPercentage,
+  details,
+  startDate,
+  endDate,
+  isEnable
+};
+
+
 
     try {
       let res;
-      if (editingCategory) {
-        // 🔄 Update existing category
-        res = await axios.put(`${API_URL}/${editingCategory._id}`, payload, {
-          headers: { Authorization: `Bearer ${userInfo?.token}` },
-        });
-
-        setCategories(
-          categories.map((c) => (c._id === editingCategory._id ? res.data : c))
+      if (editingPromotionItem) {
+        // 🔄 Update existing promotion
+        res = await axios.put(
+          `${API_URL}/${editingPromotionItem._id}`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${userInfo?.token}` },
+          }
         );
-        toast.success("✅ Category updated!");
+
+        setPromotionItems(
+          promotionItems.map((p) =>
+            p._id === editingPromotionItem._id ? res.data : p
+          )
+        );
+        toast.success("✅ Promotion updated!");
       } else {
-        // ➕ Add new category
+        // ➕ Add new promotion
         res = await axios.post(API_URL, payload, {
           headers: { Authorization: `Bearer ${userInfo?.token}` },
         });
 
-        setCategories([...categories, res.data]);
-        toast.success("✅ Category added!");
+        setPromotionItems([...promotionItems, res.data]);
+        toast.success("✅ Promotion added!");
       }
 
       // Reset form state
       setIsSliderOpen(false);
-      setCategoryName("");
+      setPromotionName("");
       setDetails("");
       setStartDate("");
       setEndDate("");
       setSelectedPromotion("");
       setSelectedCategory("");
       setSelectedItemType("");
-      setDiscountPrice("");
+      setDiscountPercentage("");
       setIsEnable(true);
-      setEditingCategory(null);
-      fetchCategoiresList();
+      setEditingPromotionItem(null);
+
+      // Refetch data to update the list
+      fetchAllData();
     } catch (error) {
       console.error(error);
       toast.error(
-        `❌ Failed to ${editingCategory ? "update" : "add"} category.`
+        `❌ Failed to ${editingPromotionItem ? "update" : "add"} promotion.`
       );
     } finally {
       setLoading(false);
     }
   };
 
-  const handleToggleEnable = async (category) => {
+  const handleToggleEnable = async (promotion) => {
     // ... (no changes in your toggle function)
   };
 
-  const handleDelete = async (categoryId) => {
+  const handleDelete = async (promotionId) => {
     // ... (no changes in your delete function)
   };
 
-  // if (loading) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-  //       </div>
-  //     </div>
-  //   );
-  // }
-
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      {/* Coomon header */}
+
       <CommanHeader />
       <div className="px-6 mx-auto">
         {/* Top bar */}
@@ -237,7 +275,7 @@ const PromotionItem = () => {
 
         {/* Table */}
 
-        <div className="rounded-xl  border border-gray-100 overflow-hidden">
+        <div className="rounded-xl border border-gray-100 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[1000px]">
               {/* ✅ Table Header */}
@@ -253,75 +291,73 @@ const PromotionItem = () => {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
-                {loading ? (
-                  // Skeleton shown while loading
-                  <TableSkeleton
-                    rows={promotions.length > 0 ? promotions.length : 5}
-                    cols={userInfo?.isAdmin ? 7 : 6}
-                    className="lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px]"
-                  />
-                ) : promotions.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500 bg-white">
-                    No promotions found.
-                  </div>
-                ) : (
-                  promotions.map((promo) => (
-                    <div
-                      key={promo._id || promo.id}
-                      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      {/* Promotion */}
-                      <div className="font-medium text-gray-900 truncate">
-                        {promo.promotion}
-                      </div>
+             {loading ? (
+  // Skeleton shown while loading
+  <TableSkeleton
+    rows={promotionItems.length || 5}
+    cols={userInfo?.isAdmin ? 7 : 6}
+  />
+) : promotionItems.length === 0 ? (
+  <div className="text-center py-4 text-gray-500 bg-white">
+    No promotions found.
+  </div>
+) : (
+  promotionItems.map((promo) => (
+    <div
+      key={promo._id || promo.id}
+      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+    >
+      {/* Promotion */}
+      <div className="font-medium text-gray-900 truncate">
+        {promo.promotionName}
+      </div>
 
-                      {/* Category */}
-                      <div className="text-gray-600 truncate">
-                        {promo.category}
-                      </div>
+      {/* Category */}
+      <div className="text-gray-600 truncate">{promo.categoryName}</div>
 
-                      {/* Item Type */}
-                      <div className="text-gray-600 truncate">
-                        {promo.itemType}
-                      </div>
+      {/* Item Type */}
+      <div className="text-gray-600 truncate">{promo.itemTypeName}</div>
 
-                      {/* Items */}
-                      <div className="text-gray-600 truncate">
-                        {promo.items.map((item, idx) => (
-                          <span key={idx} className="inline-block mr-3">
-                            {item.name} ({item.price})
-                          </span>
-                        ))}
-                      </div>
+      {/* Items */}
+      <div className="text-gray-600 truncate">
+        {promo.items && promo.items.length > 0 ? (
+          promo.items.map((item, idx) => (
+            <span key={idx} className="inline-block mr-3">
+              {item.itemName} {item.price && `(${item.price})`}
+            </span>
+          ))
+        ) : (
+          <span className="text-gray-400">No items</span>
+        )}
+      </div>
 
-                      {/* Discount */}
-                      <div className="text-gray-600 truncate">
-                        {promo.discount}
-                      </div>
+      {/* Discount */}
+      <div className="text-gray-600 truncate">{promo.discountPercentage}</div>
 
-                      {/* End Date */}
-                      <div className="text-gray-500">{promo.endDate}</div>
+      {/* End Date */}
+      <div className="text-gray-500">{promo.endDate || "N/A"}</div>
 
-                      {/* Actions */}
-                      {userInfo?.isAdmin && (
-                        <div className="flex justify-end gap-3">
-                          <button
-                            onClick={() => handleEdit(promo)}
-                            className=" py-1 text-sm rounded  text-blue-600 "
-                          >
-                            <SquarePen size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(promo._id)}
-                            className="py-1 text-sm rounded  text-red-600 "
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
+      {/* Actions */}
+      {userInfo?.isAdmin && (
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => handleEditClick(promo)}
+            className="py-1 text-sm rounded text-blue-600"
+          >
+            <SquarePen size={18} />
+          </button>
+          <button
+            onClick={() => handleDelete(promo._id)}
+            className="py-1 text-sm rounded text-red-600"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      )}
+    </div>
+  ))
+)}
+
               </div>
             </div>
           </div>
@@ -336,22 +372,22 @@ const PromotionItem = () => {
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingCategory ? "Update Promotion" : "Add a New Promotion"}
+                  {editingPromotionItem ? "Update Promotion Item" : "Add a New Promotion Item"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
                   onClick={() => {
                     setIsSliderOpen(false);
-                    setCategoryName("");
+                    setPromotionName("");
                     setDetails("");
                     setStartDate("");
                     setEndDate("");
                     setSelectedPromotion("");
                     setSelectedCategory("");
                     setSelectedItemType("");
-                    setDiscountPrice("");
+                    setDiscountPercentage("");
                     setIsEnable(true);
-                    setEditingCategory(null);
+                    setEditingPromotionItem(null);
                   }}
                 >
                   ×
@@ -364,6 +400,20 @@ const PromotionItem = () => {
                   Promotion on Item
                 </h3>
 
+                {/* Promotion Name */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Promotion Name
+                  </label>
+                  <input
+                    type="text"
+                    value={promotionName}
+                    onChange={(e) => setPromotionName(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter promotion name"
+                  />
+                </div>
+
                 {/* Promotion Select */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
@@ -372,11 +422,14 @@ const PromotionItem = () => {
                   <select
                     value={selectedPromotion}
                     onChange={(e) => setSelectedPromotion(e.target.value)}
-                    className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                   >
                     <option value="">-- Select Promotion --</option>
-                    <option value="promo1">Promotion 1</option>
-                    <option value="promo2">Promotion 2</option>
+                    {promotionList.map((promo) => (
+                      <option key={promo._id || promo.id} value={promo._id || promo.id}>
+                        {promo.promotionName || promo.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -388,11 +441,14 @@ const PromotionItem = () => {
                   <select
                     value={selectedCategory}
                     onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                   >
                     <option value="">-- Select Category --</option>
-                    <option value="cat1">Category 1</option>
-                    <option value="cat2">Category 2</option>
+                    {categoryList.map((cat) => (
+                      <option key={cat._id || cat.id} value={cat._id || cat.id}>
+                        {cat.categoryName || cat.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -404,81 +460,119 @@ const PromotionItem = () => {
                   <select
                     value={selectedItemType}
                     onChange={(e) => setSelectedItemType(e.target.value)}
-                    className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                   >
                     <option value="">-- Select Item Type --</option>
-                    <option value="type1">Type 1</option>
-                    <option value="type2">Type 2</option>
+                    {itemTypeList.map((type) => (
+                      <option key={type._id || type.id} value={type._id || type.id}>
+                        {type.itemTypeName || type.name}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
-                {/* Item Name */}
-                <div className="grid grid-cols-2 items-center">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Select Item Name
-                  </label>
-                  <div className="w-full">
-                    <div className="relative">
-                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Search size={18} className="text-gray-400" />
-                      </span>
-                      <input
-                        type="text"
-                        value={itemSearch}
-                        onChange={(e) => setItemSearch(e.target.value)}
-                        placeholder="Search Item..."
-                        aria-label="Search Item"
-                        className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
-                 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
-                 placeholder:text-gray-400"
-                      />
-                    </div>
-                  </div>
-                </div>
+                {/* Item Search */}
+             <div>
+  <label className="block text-gray-700 font-medium mb-2">
+    Search Items
+  </label>
+  <div className="w-full">
+    <div className="relative">
+      <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Search size={18} className="text-gray-400" />
+      </span>
+      <input
+        type="text"
+        value={itemSearch}
+        onChange={(e) => setItemSearch(e.target.value)}
+        placeholder="Search Item..."
+        aria-label="Search Item"
+        className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
+          placeholder:text-gray-400"
+      />
+    </div>
+  </div>
+</div>
 
-                <div className="w-full border rounded-lg shadow p-4 max-h-60 overflow-y-auto">
-                  <ul className="space-y-3">
-                    {filterdata.map((item) => (
-                      <li
-                        key={item.id}
-                        className="flex justify-between items-center border-b pb-2"
-                      >
-                        <div>
-                          <p className="font-medium">{item.name}</p>
-                          <p className="text-sm text-gray-500">{item.price}</p>
-                        </div>
-                        <input
-                          type="checkbox"
-                          value={item.id}
-                          className="h-5 w-5 accent-blue-600 rounded-sm" // square checkbox
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </div>
 
-                {/* Discount Price */}
+                {/* Discount Percentage */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Discount Price
+                    Discount Percentage
                   </label>
                   <input
                     type="number"
                     min="0"
-                    value={discountPrice}
-                    onChange={(e) => setDiscountPrice(e.target.value)}
-                    className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter discount price"
+                    value={discountPercentage}
+                    onChange={(e) => setDiscountPercentage(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter discount percentage"
                   />
+                </div>
+
+                {/* Start Date */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                  />
+                </div>
+
+                {/* End Date */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                  />
+                </div>
+
+                {/* Details */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Details
+                  </label>
+                  <textarea
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter promotion details"
+                    rows="3"
+                  />
+                </div>
+
+                {/* Status */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={isEnable}
+                    onChange={(e) => setIsEnable(e.target.value === "true")}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                  >
+                    <option value={true}>Enabled</option>
+                    <option value={false}>Disabled</option>
+                  </select>
                 </div>
 
                 {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-newPrimary text-white px-4 py-4 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
+                  className="w-full bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
                 >
-                  {loading ? "Saving..." : "Save Promotion"}
+                  {loading ? "Saving..." : editingPromotionItem ? "Update Promotion Item" : "Save Promotion Item"}
                 </button>
               </form>
             </div>
