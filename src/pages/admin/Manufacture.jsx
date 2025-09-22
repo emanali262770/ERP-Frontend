@@ -42,7 +42,9 @@ const Manufacture = () => {
   const fetchManufacturersList = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/manufacturers`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/manufacturers`
+      );
       setManufacturerList(res.data); // store actual categories array
       console.log("Manufacturers  ", res.data);
     } catch (error) {
@@ -54,7 +56,6 @@ const Manufacture = () => {
   useEffect(() => {
     fetchManufacturersList();
   }, [fetchManufacturersList]);
-
 
   const handleAddManufacturer = () => {
     setIsSliderOpen(true);
@@ -97,22 +98,16 @@ const Manufacture = () => {
       };
 
       if (isEdit && editId) {
-       // 🔄 Update existing category
-       const res = await axios.put(
-        `${API_URL}/${editId}`,
-        formData,
-        { headers }
-      );
+        // 🔄 Update existing category
+        const res = await axios.put(`${API_URL}/${editId}`, formData, {
+          headers,
+        });
 
         toast.success("✅ Manufacturer updated successfully");
       } else {
-         const res = await axios.post(
-          API_URL,
-          formData,
-          {
-            headers
-          }
-        );
+        const res = await axios.post(API_URL, formData, {
+          headers,
+        });
         toast.success("✅ Manufacturer added successfully");
       }
 
@@ -185,7 +180,6 @@ const Manufacture = () => {
               },
             });
 
-
             setManufacturerList(manufacturerList.filter((m) => m._id !== id));
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -223,13 +217,15 @@ const Manufacture = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">
             Manufacturers List
           </h1>
-          <p className="text-gray-500 text-sm">Manage your manufacturer details</p>
+          <p className="text-gray-500 text-sm">
+            Manage your manufacturer details
+          </p>
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/90"
@@ -240,109 +236,131 @@ const Manufacture = () => {
       </div>
 
       {/* Manufacturer Table */}
-      <div className="rounded-xl  border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[1200px]">
-      
-      {/* ✅ Table Header - styled like previous tables */}
-      <div className="hidden lg:grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Name</div>
-        <div>Address</div>
-        <div>Phone Number</div>
-        <div>Email</div>
-        <div>Contact Person</div>
-        <div>Mobile Number</div>
-        <div>NTN</div>
-        <div>GST</div>
-        <div className="text-center">Status</div>
-        {userInfo?.isAdmin && <div className="text-center">Actions</div>}
-      </div>
+    
+      <div className="rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-full">
+            {/* ✅ Table Header (desktop only) */}
+            <div className="hidden lg:grid grid-cols-[150px_200px_150px_150px_150px_120px_120px_120px_120px_auto] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>Name</div>
+              <div>Address</div>
+              <div>Phone</div>
+              <div>Email</div>
+              <div>Contact Person</div>
+              <div>Mobile</div>
+              <div>NTN</div>
+              <div>GST</div>
+              <div>Status</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-    // Skeleton shown while loading
-   <TableSkeleton 
-  rows={manufacturerList.length } 
-  cols={userInfo?.isAdmin ? 10 : 6} 
-/>
-  ):manufacturerList.length === 0 ? (
-          <div className="text-center py-4 text-gray-500 bg-white">
-            No manufacturers found.
-          </div>
-        ) : (
-          manufacturerList.map((manufacturer) => (
-            <div
-              key={manufacturer._id}
-              className="grid grid-cols-[120px_120px_200px_180px_180px_140px_140px_140px_140px_120px] gap-4 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Name */}
-              <div className="font-medium text-gray-900 truncate">
-                {manufacturer.manufacturerName}
-              </div>
-
-              {/* Address */}
-              <div className="text-gray-600 truncate">{manufacturer.address}</div>
-
-              {/* Phone Number */}
-              <div className="text-gray-600 truncate">{manufacturer.phoneNumber}</div>
-
-              {/* Email */}
-              <div className="text-gray-600 truncate">
-                {manufacturer?.email || "-"}
-              </div>
-
-              {/* Contact Person */}
-              <div className="text-gray-600 truncate">{manufacturer.personName}</div>
-
-              {/* Mobile Number */}
-              <div className="text-gray-600 truncate">{manufacturer.mobileNumber}</div>
-
-              {/* NTN */}
-              <div className="text-gray-600 truncate">{manufacturer.ntn}</div>
-
-              {/* GST */}
-              <div className="text-gray-600 truncate">{manufacturer.gstNumber}</div>
-
-              {/* Status */}
-              <div className="font-semibold text-center">
-                {manufacturer.status ? (
-                  <span className="text-green-600">Active</span>
-                ) : (
-                  <span className="text-red-600">Inactive</span>
-                )}
-              </div>
-
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-center">
-                  <div className="relative group">
-                   
-                    <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => handleEdit(manufacturer)}
-                        className="w-full text-left  py-1 text-sm hover:bg-newPrimary/10 text-blue-600 flex items-center gap-2"
-                      >
-                        <SquarePen size={18}/>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(manufacturer._id)}
-                        className="w-full text-left  py-1 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                      >
-                        <Trash2 size={18}/>
-                      </button>
-                    </div>
-                  </div>
+            {/* ✅ Table Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={
+                    manufacturerList.length > 0 ? manufacturerList.length : 5
+                  }
+                  cols={userInfo?.isAdmin ? 10 : 9}
+                  className="lg:grid-cols-[150px_200px_150px_150px_150px_120px_120px_120px_120px_auto]"
+                />
+              ) : manufacturerList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No manufacturers found.
                 </div>
+              ) : (
+                manufacturerList.map((m) => (
+                  <>
+                    {/* ✅ Desktop Row */}
+                    <div
+                      key={m._id}
+                      className="hidden lg:grid grid-cols-[150px_200px_150px_150px_150px_120px_120px_120px_120px_auto] gap-4 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium text-gray-900">
+                        {m.manufacturerName}
+                      </div>
+                      <div className="text-gray-600 truncate">{m.address}</div>
+                      <div className="text-gray-600">{m.phoneNumber}</div>
+                      <div className="text-gray-600">{m.email || "—"}</div>
+                      <div className="text-gray-600">{m.personName}</div>
+                      <div className="text-gray-600">{m.mobileNumber}</div>
+                      <div className="text-gray-600">{m.ntn}</div>
+                      <div className="text-gray-600">{m.gstNumber}</div>
+                      <div className="text-center font-semibold">
+                        {m.status ? (
+                          <span className="text-green-600">Active</span>
+                        ) : (
+                          <span className="text-red-600">Inactive</span>
+                        )}
+                      </div>
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => handleEdit(m)}
+                            className="text-blue-600 hover:underline"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(m._id)}
+                            className="text-red-600 hover:underline"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ✅ Mobile Card */}
+                    <div
+                      key={`mobile-${m._id}`}
+                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                    >
+                      <h3 className="font-semibold text-gray-800">
+                        {m.manufacturerName}
+                      </h3>
+                      <p className="text-sm text-gray-600">{m.address}</p>
+                      <p className="text-sm text-gray-600">{m.phoneNumber}</p>
+                      <p className="text-sm text-gray-600">{m.email || "—"}</p>
+                      <p className="text-sm text-gray-600">
+                        Contact: {m.personName} ({m.mobileNumber})
+                      </p>
+                      <p className="text-sm text-gray-600">NTN: {m.ntn}</p>
+                      <p className="text-sm text-gray-600">
+                        GST: {m.gstNumber}
+                      </p>
+                      <p
+                        className={`text-sm font-semibold ${
+                          m.status ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {m.status ? "Active" : "Inactive"}
+                      </p>
+
+                      {userInfo?.isAdmin && (
+                        <div className="mt-3 flex justify-end gap-3">
+                          <button
+                            className="text-blue-500"
+                            onClick={() => handleEdit(m)}
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDelete(m._id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ))
               )}
             </div>
-          ))
-        )}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
 
       {/* Slider */}
       {isSliderOpen && (
@@ -379,7 +397,6 @@ const Manufacture = () => {
             </div>
 
             <div className="space-y-4">
-               
               <div>
                 <label className="block text-gray-700 font-medium">
                   Manufacturer Name <span className="text-newPrimary">*</span>
@@ -404,7 +421,7 @@ const Manufacture = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-               <div>
+              <div>
                 <label className="block text-gray-700 font-medium">
                   Phone Number <span className="text-newPrimary">*</span>
                 </label>
@@ -429,7 +446,7 @@ const Manufacture = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-             
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Contact Person<span className="text-newPrimary">*</span>
@@ -455,7 +472,7 @@ const Manufacture = () => {
                   placeholder="e.g. +82-10-9876-5432"
                 />
               </div>
-            
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   NTN <span className="text-newPrimary">*</span>

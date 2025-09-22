@@ -528,7 +528,7 @@ const SalesInvoice = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Common Header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-6 gap-3">
         <h1 className="text-xl sm:text-2xl font-bold text-newPrimary">
           Sales Invoice List
@@ -619,81 +619,82 @@ const SalesInvoice = () => {
 
         {/* Desktop Table (show on large screens) */}
         <div className="hidden lg:block overflow-x-auto">
-  <div className="min-w-[1000px]">
-    {/* Table Header */}
-    <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200">
-      <div className="text-left">Receipt No.</div>
-      <div className="text-left">Customer Name</div>
-      <div className="text-left">Mobile #</div>
-      <div className="text-left">Payable</div>
-      <div className="text-left">Given</div>
-      <div className="text-left">Return</div>
-      <div className="text-right">Actions</div>
-    </div>
+          <div className="min-w-[1000px]">
+            {/* Table Header */}
+            <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200">
+              <div className="text-left">Receipt No.</div>
+              <div className="text-left">Customer Name</div>
+              <div className="text-left">Mobile #</div>
+              <div className="text-left">Payable</div>
+              <div className="text-left">Given</div>
+              <div className="text-left">Return</div>
+              <div className="text-right">Actions</div>
+            </div>
 
-    {/* Table Body */}
-    <div className="divide-y divide-gray-200">
-      {loading ? (
-        <TableSkeleton
-          rows={invoices.length || 5}
-          cols={7}
-          className="lg:grid-cols-7"
-        />
-      ) : invoices.length === 0 ? (
-        <div className="text-center py-4 text-gray-500 bg-white">
-          No invoices found.
-        </div>
-      ) : (
-        invoices.map((inv, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-          >
-            <div className="font-medium text-gray-700">{inv.receiptNo}</div>
-            <div className="text-gray-600">{inv.customerName}</div>
-            <div className="text-gray-600">{inv.mobile}</div>
-            <div className="text-gray-600">{inv.payable}</div>
-            <div className="text-gray-600">{inv.givenAmount}</div>
-            <div className="text-gray-600">{inv.returnAmount}</div>
+            {/* Table Body */}
+            <div className="divide-y divide-gray-200">
+              {loading ? (
+                <TableSkeleton
+                  rows={invoices.length>0?invoices.length:5}
+                  cols={7}
+                  className="lg:grid-cols-7"
+                />
+              ) : invoices.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No invoices found.
+                </div>
+              ) : (
+                invoices.map((inv, index) => (
+                  <div
+                    key={index}
+                    className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                  >
+                    <div className="font-medium text-gray-700">
+                      {inv.receiptNo}
+                    </div>
+                    <div className="text-gray-600">{inv.customerName}</div>
+                    <div className="text-gray-600">{inv.mobile}</div>
+                    <div className="text-gray-600">{inv.payable}</div>
+                    <div className="text-gray-600">{inv.givenAmount}</div>
+                    <div className="text-gray-600">{inv.returnAmount}</div>
 
-            {/* Actions */}
-            <div className="flex justify-end items-center gap-3">
-              <button
-                onClick={() => handleEdit(inv)}
-                className="text-blue-500 hover:text-blue-700"
-                title="Edit"
-              >
-                <SquarePen size={18} />
-              </button>
-              <button
-                onClick={() => handleDelete(inv._id)}
-                className="text-red-500 hover:text-red-700"
-                title="Delete"
-              >
-                <Trash2 size={18} />
-              </button>
-              <button
-                onClick={() => handlePrint(inv)}
-                className="text-blue-600 hover:text-blue-800"
-                title="Print"
-              >
-                <Printer size={18} />
-              </button>
-              <button
-                onClick={() => handleReturn(inv)}
-                className="text-green-600 hover:text-green-800"
-                title="Return Sales"
-              >
-                <Truck size={18} />
-              </button>
+                    {/* Actions */}
+                    <div className="flex justify-end items-center gap-3">
+                      <button
+                        onClick={() => handleEdit(inv)}
+                        className="text-blue-500 hover:text-blue-700"
+                        title="Edit"
+                      >
+                        <SquarePen size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(inv._id)}
+                        className="text-red-500 hover:text-red-700"
+                        title="Delete"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handlePrint(inv)}
+                        className="text-blue-600 hover:text-blue-800"
+                        title="Print"
+                      >
+                        <Printer size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleReturn(inv)}
+                        className="text-green-600 hover:text-green-800"
+                        title="Return Sales"
+                      >
+                        <Truck size={18} />
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
-        ))
-      )}
-    </div>
-  </div>
-</div>
-
+        </div>
       </div>
 
       {/* Slider Form */}

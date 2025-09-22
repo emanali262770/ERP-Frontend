@@ -46,9 +46,8 @@ const Promotion = () => {
       },
     ]);
     setTimeout(() => {
-        setLoading(false); 
+      setLoading(false);
     }, 2000);
-   
   }, []);
 
   // Slider animation
@@ -163,15 +162,15 @@ const Promotion = () => {
     toast.success("✅ Promotion deleted!");
   };
 
-//   if (loading) {
-//     return (
-//       <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-//         <div className="text-center">
-//           <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-//         </div>
-//       </div>
-//     );
-//   }
+  //   if (loading) {
+  //     return (
+  //       <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //         <div className="text-center">
+  //           <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //         </div>
+  //       </div>
+  //     );
+  //   }
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -192,85 +191,89 @@ const Promotion = () => {
           </button>
         </div>
 
-       <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-  <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
-    <div className="min-w-[800px]">
-      
-      {/* ✅ Table Header */}
-      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Promotion Name</div>
-        <div>Details</div>
-        <div>Start Date</div>
-        <div>End Date</div>
-        <div className="text-right">Actions</div>
-      </div>
-
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100">
-        {loading ? (
-    // Skeleton shown while loading
-   <TableSkeleton 
-  rows={categories.length } 
-  cols={userInfo?.isAdmin ? 5 : 6} 
-  className="lg:grid-cols-[1fr_1fr_1fr_1fr_auto]"
-/>
-  ):categories.length === 0 ? (
-          <div className="text-center py-4 text-gray-500 bg-white">
-            No promotions found.
-          </div>
-        ) : (
-          categories.map((category) => (
-            <div
-              key={category._id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Promotion Name */}
-              <div className="font-medium text-gray-900">
-                {category.categoryName}
+        <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+          <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
+            <div className="min-w-[800px]">
+              {/* ✅ Table Header */}
+              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Promotion Name</div>
+                <div>Details</div>
+                <div>Start Date</div>
+                <div>End Date</div>
+                <div className="text-right">Actions</div>
               </div>
 
-              {/* Details */}
-              <div className="text-gray-600 truncate">{category.details}</div>
+              {/* ✅ Table Body */}
+              <div className="flex flex-col divide-y divide-gray-100">
+                {loading ? (
+                  // Skeleton shown while loading
+                  <TableSkeleton
+                    rows={categories.length > 0 ? categories.length : 5}
+                    cols={userInfo?.isAdmin ? 5 : 6}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_auto]"
+                  />
+                ) : categories.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No promotions found.
+                  </div>
+                ) : (
+                  categories.map((category) => (
+                    <div
+                      key={category._id}
+                      className="grid grid-cols-[1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      {/* Promotion Name */}
+                      <div className="font-medium text-gray-900">
+                        {category.categoryName}
+                      </div>
 
-              {/* Start Date */}
-              <div className="text-gray-500 text-end  max-w-32">{category.startDate}</div>
+                      {/* Details */}
+                      <div className="text-gray-600 truncate">
+                        {category.details}
+                      </div>
 
-              {/* End Date */}
-              <div className="text-gray-500 text-end max-w-40">{category.endDate}</div>
+                      {/* Start Date */}
+                      <div className="text-gray-500 text-end  max-w-32">
+                        {category.startDate}
+                      </div>
 
-              {/* Actions */}
-              <div className="flex justify-end gap-2">
-                <button
-                  onClick={() => handleEditClick(category)}
-                  className="px-3 py-1 text-sm rounded  text-blue-600 "
-                >
-                  <SquarePen size={18}/>
-                </button>
-                <button
-                  onClick={() => handleToggleEnable(category)}
-                  className={`px-3 py-1 text-sm rounded ${
-                    category.isEnable
-                      ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-                      : "bg-green-100 text-green-600 hover:bg-green-200"
-                  }`}
-                >
-                  {category.isEnable ? "Disable" : "Enable"}
-                </button>
-                <button
-                  onClick={() => handleDelete(category._id)}
-                  className="px-3 py-1 text-sm rounded  text-red-600 "
-                >
-                  <Trash2 size={18}/>
-                </button>
+                      {/* End Date */}
+                      <div className="text-gray-500 text-end max-w-40">
+                        {category.endDate}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEditClick(category)}
+                          className="px-3 py-1 text-sm rounded  text-blue-600 "
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleToggleEnable(category)}
+                          className={`px-3 py-1 text-sm rounded ${
+                            category.isEnable
+                              ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                              : "bg-green-100 text-green-600 hover:bg-green-200"
+                          }`}
+                        >
+                          {category.isEnable ? "Disable" : "Enable"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(category._id)}
+                          className="px-3 py-1 text-sm rounded  text-red-600 "
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             </div>
-          ))
-        )}
-      </div>
-    </div>
-  </div>
-</div>
-
+          </div>
+        </div>
 
         {isSliderOpen && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">

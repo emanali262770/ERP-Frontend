@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import gsap from "gsap";
 import { toast } from "react-toastify";
-import axios from 'axios';
+import axios from "axios";
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { SquarePen, Trash2 } from "lucide-react";
@@ -10,52 +10,52 @@ import CommanHeader from "../../components/CommanHeader";
 
 const CustomerData = () => {
   const [customerList, setCustomerList] = useState([
-  {
-    _id: "c1",
-    customerName: "John Doe",
-    address: "123 Main Street, Cityville",
-    mobileNumber: "03001234567",
-    previousBalance: "5000",
-    nearby: "Near City Mall",
-    paymentMethod: "Cash",
-  },
-  {
-    _id: "c2",
-    customerName: "Sarah Smith",
-    address: "456 Market Road, Townsville",
-    mobileNumber: "03007654321",
-    previousBalance: "2500",
-    nearby: "Near Central Park",
-    paymentMethod: "Credit Card",
-  },
-  {
-    _id: "c3",
-    customerName: "Ali Khan",
-    address: "789 Gulshan Block, Karachi",
-    mobileNumber: "03211234567",
-    previousBalance: "0",
-    nearby: "Opposite City Tower",
-    paymentMethod: "Bank Transfer",
-  },
-  {
-    _id: "c4",
-    customerName: "Maria Garcia",
-    address: "12 Green Avenue, Lahore",
-    mobileNumber: "03331239876",
-    previousBalance: "700",
-    nearby: "Close to Metro Station",
-    paymentMethod: "Cash",
-  },
-  {
-    _id: "c5",
-    customerName: "David Johnson",
-    address: "45 Sunset Blvd, Islamabad",
-    mobileNumber: "03459876543",
-    previousBalance: "1500",
-    nearby: "Next to Airport",
-    paymentMethod: "Debit Card",
-  },
-]);
+    {
+      _id: "c1",
+      customerName: "John Doe",
+      address: "123 Main Street, Cityville",
+      mobileNumber: "03001234567",
+      previousBalance: "5000",
+      nearby: "Near City Mall",
+      paymentMethod: "Cash",
+    },
+    {
+      _id: "c2",
+      customerName: "Sarah Smith",
+      address: "456 Market Road, Townsville",
+      mobileNumber: "03007654321",
+      previousBalance: "2500",
+      nearby: "Near Central Park",
+      paymentMethod: "Credit Card",
+    },
+    {
+      _id: "c3",
+      customerName: "Ali Khan",
+      address: "789 Gulshan Block, Karachi",
+      mobileNumber: "03211234567",
+      previousBalance: "0",
+      nearby: "Opposite City Tower",
+      paymentMethod: "Bank Transfer",
+    },
+    {
+      _id: "c4",
+      customerName: "Maria Garcia",
+      address: "12 Green Avenue, Lahore",
+      mobileNumber: "03331239876",
+      previousBalance: "700",
+      nearby: "Close to Metro Station",
+      paymentMethod: "Cash",
+    },
+    {
+      _id: "c5",
+      customerName: "David Johnson",
+      address: "45 Sunset Blvd, Islamabad",
+      mobileNumber: "03459876543",
+      previousBalance: "1500",
+      nearby: "Next to Airport",
+      paymentMethod: "Debit Card",
+    },
+  ]);
 
   const [staffMembers, setStaffMember] = useState([]);
   const [productList, setProductList] = useState([]);
@@ -105,7 +105,9 @@ const CustomerData = () => {
   const fetchCustomerData = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/customers`);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/customers`
+      );
       const result = await response.json();
       console.log("Customers ", result);
       setCustomerData(result);
@@ -122,24 +124,23 @@ const CustomerData = () => {
 
   console.log("Customer Data", customerList);
 
-
   // Save Customer Data
   const handleSave = async () => {
-const payload = {
-  customerName,
-  address,
-  mobileNumber,
-  previousBalance,
-  nearby,
-  paymentMethod,
-};
+    const payload = {
+      customerName,
+      address,
+      mobileNumber,
+      previousBalance,
+      nearby,
+      paymentMethod,
+    };
 
-console.log("Payload", payload);
+    console.log("Payload", payload);
 
     try {
       const { token } = JSON.parse(localStorage.getItem("userInfo")) || {};
       const headers = {
-        Authorization: `Bearer ${token}`
+        Authorization: `Bearer ${token}`,
       };
 
       if (isEdit && editId) {
@@ -275,7 +276,7 @@ console.log("Payload", payload);
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Common Header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Customer List</h1>
@@ -290,81 +291,126 @@ console.log("Payload", payload);
       </div>
 
       {/* Customer Table */}
+    
       <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[1000px]">
-      
-      {/* ✅ Table Header (sticky) */}
-      <div className="grid grid-cols-7 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
-        <div>Name</div>
-        <div>Address</div>
-        <div>Mobile No./WhatsApp</div>
-        <div>Previous Balance</div>
-        <div>Nearby</div>
-        <div>Payment Method</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
-
-      {/* ✅ Scrollable Table Body */}
-      <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
-        {loading?(<TableSkeleton
-                    rows={customerList.length || 5}
-                    cols={userInfo?.isAdmin ? 7 : 6}
-                    className="lg:grid-cols-7"
-                  />):customerList.map((client, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-7 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-          >
-            {/* Name */}
-            <div className="font-medium text-gray-900">
-              {client.customerName}
-            </div>
-
-            {/* Address */}
-            <div className="font-semibold text-green-600">
-              {client.address}
-            </div>
-
-            {/* Mobile No./WhatsApp */}
-            <div className="text-gray-500">{client.mobileNumber}</div>
-
-            {/* Previous Balance */}
-            <div className="text-gray-500">{client.previousBalance}</div>
-
-            {/* Nearby */}
-            <div className="text-gray-500">{client.nearby}</div>
-
-            {/* Payment Method */}
-            <div className="text-gray-500">{client.paymentMethod}</div>
-
-            {/* Actions */}
-            {userInfo?.isAdmin && (
-              <div className=" ">
-                
-                <div className="flex justify-end">
-                  <button
-                    onClick={() => handleEdit(client)}
-                    className=" text-left px-2 py-2 text-sm hover:bg-blue-50 text-blue-600 "
-                  >
-                    <SquarePen size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(client._id)}
-                    className=" text-left px-2 py-2 text-sm hover:bg-red-50 text-red-500 "
-                  >
-                   <Trash2 size={18} />
-                  </button>
-                </div>
+        <div className="overflow-x-auto">
+          <div className="max-h-screen overflow-y-auto">
+            <div className="w-full min-w-full text-sm">
+              {/* ✅ Table Header (Desktop Only) */}
+              <div className="hidden lg:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Name</div>
+                <div>Address</div>
+                <div>Mobile No./WhatsApp</div>
+                <div>Previous Balance</div>
+                <div>Nearby</div>
+                <div>Payment Method</div>
+                {userInfo?.isAdmin && <div className="text-right">Actions</div>}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </div>
-  </div>
-</div>
 
+              {/* ✅ Table Body */}
+              <div className="flex flex-col divide-y divide-gray-100">
+                {loading ? (
+                  <TableSkeleton
+                    rows={customerList.length > 0 ? customerList.length : 5}
+                    cols={userInfo?.isAdmin ? 7 : 6}
+                    className="lg:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_auto]"
+                  />
+                ) : customerList.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No customers found.
+                  </div>
+                ) : (
+                  customerList.map((client, idx) => (
+                    <>
+                      {/* ✅ Desktop Grid */}
+                      <div
+                        key={client._id}
+                        className="hidden lg:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      >
+                        <div className="font-medium text-gray-900">
+                          {client.customerName}
+                        </div>
+                        <div className="font-semibold text-green-600">
+                          {client.address}
+                        </div>
+                        <div className="text-gray-500">
+                          {client.mobileNumber}
+                        </div>
+                        <div className="text-gray-500">
+                          {client.previousBalance}
+                        </div>
+                        <div className="text-gray-500">{client.nearby}</div>
+                        <div className="text-gray-500">
+                          {client.paymentMethod}
+                        </div>
+                        {userInfo?.isAdmin && (
+                          <div className="flex justify-end gap-3">
+                            <button
+                              onClick={() => handleEdit(client)}
+                              className="text-blue-500 hover:underline"
+                            >
+                              <SquarePen size={18} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(client._id)}
+                              className="text-red-500 hover:underline"
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* ✅ Mobile Card */}
+                      <div
+                        key={`mobile-${client._id}`}
+                        className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                      >
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm font-semibold text-gray-700">
+                            {client.customerName}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {client.mobileNumber}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Address: {client.address}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Prev Balance: {client.previousBalance}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Nearby: {client.nearby}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Payment: {client.paymentMethod}
+                        </div>
+                        {userInfo?.isAdmin && (
+                          <div className="mt-3 flex justify-end gap-3">
+                            <button
+                              className="text-blue-500"
+                              onClick={() => handleEdit(client)}
+                            >
+                              <SquarePen size={18} />
+                            </button>
+                            <button
+                              className="text-red-500"
+                              onClick={() => handleDelete(client._id)}
+                            >
+                              <Trash2 size={18} />
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  ))
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Right-Side Slider */}
       {isSliderOpen && (
@@ -375,7 +421,9 @@ console.log("Payload", payload);
             style={{ display: "block" }}
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-newPrimary">{isEdit ? "Edit Customer" : "Add Customer"}</h2>
+              <h2 className="text-xl font-bold text-newPrimary">
+                {isEdit ? "Edit Customer" : "Add Customer"}
+              </h2>
               <button
                 className="w-6 h-6 text-white rounded-full flex justify-center items-center hover:text-gray-400 text-xl bg-newPrimary"
                 onClick={() => setIsSliderOpen(false)}
@@ -408,7 +456,9 @@ console.log("Payload", payload);
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Mobile No./WhatsApp</label>
+                    <label className="block text-gray-700 mb-1">
+                      Mobile No./WhatsApp
+                    </label>
                     <input
                       type="text"
                       value={mobileNumber}
@@ -418,7 +468,9 @@ console.log("Payload", payload);
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Previous Balance</label>
+                    <label className="block text-gray-700 mb-1">
+                      Previous Balance
+                    </label>
                     <input
                       type="text"
                       value={previousBalance}
@@ -438,14 +490,17 @@ console.log("Payload", payload);
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Payment Terms</label>
+                    <label className="block text-gray-700 mb-1">
+                      Payment Terms
+                    </label>
                     <select
                       value={paymentMethod}
                       onChange={(e) => setPaymentMethod(e.target.value)}
                       className="w-full p-2 border rounded focus:ring-2 focus:ring-newPrimary/50 focus:border-newPrimary outline-none transition-all"
                     >
                       <option value="">Select Payment Method</option>
-                      <option value="Card">Card</option>   {/* ✅ Matches schema */}
+                      <option value="Card">Card</option>{" "}
+                      {/* ✅ Matches schema */}
                       <option value="Cash">Cash</option>
                       <option value="Cash on Delivery">Cash on Delivery</option>
                     </select>

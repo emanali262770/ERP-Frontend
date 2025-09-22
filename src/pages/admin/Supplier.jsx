@@ -41,8 +41,6 @@ const SupplierList = () => {
     }
   }, [isSliderOpen]);
 
-
-
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/suppliers`;
 
   const fetchSuppliersList = useCallback(async () => {
@@ -60,8 +58,6 @@ const SupplierList = () => {
   useEffect(() => {
     fetchSuppliersList();
   }, [fetchSuppliersList]);
-
-  
 
   // Handlers
   const handleAddSupplier = () => {
@@ -84,23 +80,26 @@ const SupplierList = () => {
 
   const validateEmail = (email) => {
     console.log("Emmm", email);
-    
+
     const re = /^\S+@\S+\.\S+$/;
     return re.test(email);
   };
 
-
   // Save or Update Supplier
   const handleSave = async () => {
-    if (paymentTerms === "CreditCard" && status && (!creditLimit || creditLimit > 5000000)) {
+    if (
+      paymentTerms === "CreditCard" &&
+      status &&
+      (!creditLimit || creditLimit > 5000000)
+    ) {
       toast.error("❌ Credit limit is required and must not exceed 50 lac");
       return;
     }
-    
-  if (!validateEmail(email)) {
-    toast.error("Please enter a valid email address");
-    return;
-  }
+
+    if (!validateEmail(email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
 
     const formData = {
       supplierName,
@@ -112,12 +111,12 @@ const SupplierList = () => {
       ntn,
       gst,
       paymentTerms,
-      creditLimit: paymentTerms === "CreditCard" && status ? creditLimit : undefined,
+      creditLimit:
+        paymentTerms === "CreditCard" && status ? creditLimit : undefined,
       status,
     };
 
     console.log("From Data ", formData);
-    
 
     try {
       const { token } = userInfo || {};
@@ -127,25 +126,16 @@ const SupplierList = () => {
       };
       let res;
       if (isEdit && editId) {
-        res = await axios.put(
-          `${API_URL}/${editId}`,
-          formData,
-          { headers }
-        );
+        res = await axios.put(`${API_URL}/${editId}`, formData, { headers });
 
-       
         toast.success("✅ Supplier updated successfully");
       } else {
-        res = await axios.post(
-          `${API_URL}`,
-          formData,
-          { headers }
-        );
-       
+        res = await axios.post(`${API_URL}`, formData, { headers });
+
         setSupplierList([...supplierList, res.data]);
         toast.success("✅ Supplier added successfully");
       }
-      fetchSuppliersList()
+      fetchSuppliersList();
       setSupplierName("");
       setContactPerson("");
       setEmail("");
@@ -255,7 +245,7 @@ const SupplierList = () => {
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Suppliers List</h1>
@@ -270,102 +260,122 @@ const SupplierList = () => {
       </div>
 
       {/* Supplier Table */}
-     <div className="rounded-xl  border border-gray-200 overflow-hidden">
+    {/* Supplier Table */}
+<div className="rounded-xl border border-gray-200 overflow-hidden">
   <div className="overflow-x-auto">
     <div className="min-w-[1100px]">
-      
-      {/* ✅ Table Header - consistent styling */}
-      <div className="hidden lg:grid grid-cols-[1fr_2fr_1.5fr_2fr_3fr_2fr_2fr_1fr_0.5fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Supplier ID</div>
-        <div>Supplier Name</div>
-        <div>Contact Person</div>
+      {/* ✅ Table Header (desktop only) */}
+      <div className="hidden lg:grid grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>ID</div>
+        <div>Name</div>
+        <div>Contact</div>
         <div>Email</div>
         <div>Address</div>
-        <div>Phone Number</div>
-        <div>Payment Terms</div>
+        <div>Phone</div>
+        <div>Payment</div>
         <div>Status</div>
-        {userInfo?.isAdmin && <div className="text-center">Actions</div>}
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
       </div>
 
       {/* ✅ Table Body */}
       <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
         {loading ? (
-    // Skeleton shown while loading
-   <TableSkeleton 
-  rows={supplierList.length } 
-  cols={userInfo?.isAdmin ? 9 : 6} 
-  className="lg:grid-cols-[1fr_2fr_1.5fr_2fr_3fr_2fr_2fr_1fr_0.5fr]"
-/>
-  ):supplierList.length === 0 ? (
+          <TableSkeleton
+            rows={supplierList.length > 0 ? supplierList.length : 5}
+            cols={userInfo?.isAdmin ? 9 : 8}
+            className="lg:grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto]"
+          />
+        ) : supplierList.length === 0 ? (
           <div className="text-center py-4 text-gray-500 bg-white">
             No suppliers found.
           </div>
         ) : (
-          supplierList.map((supplier) => (
-            <div
-              key={supplier._id}
-              className="grid grid-cols-[1fr_2fr_1.5fr_2fr_3fr_2fr_2fr_1fr_0.5fr] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Supplier ID */}
-              <div className="font-medium text-gray-900 truncate">
-                {supplier._id?.slice(0, 5) || "N/A"}
-              </div>
-
-              {/* Supplier Name */}
-              <div className="text-gray-600 truncate">{supplier.supplierName}</div>
-
-              {/* Contact Person */}
-              <div className="text-gray-600 truncate">{supplier.contactPerson}</div>
-
-              {/* Email */}
-              <div className="text-gray-600 truncate">{supplier.email}</div>
-
-              {/* Address */}
-              <div className="text-gray-600 truncate">{supplier.address}</div>
-
-              {/* Phone Number */}
-              <div className="text-gray-600 truncate">{supplier.phoneNumber}</div>
-
-              {/* Payment Terms */}
-              <div className="text-gray-600 truncate">
-                {supplier.paymentTerms}
-                {supplier.paymentTerms === "CreditCard" && supplier.creditLimit
-                  ? ` (${supplier.creditLimit})`
-                  : ""}
-              </div>
-
-              {/* Status */}
-              <div className="font-semibold ">
-                {supplier.status ? (
-                  <span className="text-green-600">Active</span>
-                ) : (
-                  <span className="text-red-600">Inactive</span>
+          supplierList.map((s) => (
+            <>
+              {/* ✅ Desktop Row */}
+              <div
+                key={s._id}
+                className="hidden lg:grid grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+              >
+                <div className="font-medium text-gray-900">{s._id?.slice(0, 6)}</div>
+                <div className="text-gray-700">{s.supplierName}</div>
+                <div className="text-gray-600">{s.contactPerson}</div>
+                <div className="text-gray-600">{s.email}</div>
+                <div className="text-gray-600 truncate">{s.address}</div>
+                <div className="text-gray-600">{s.phoneNumber}</div>
+                <div className="text-gray-600">
+                  {s.paymentTerms}
+                  {s.paymentTerms === "CreditCard" && s.creditLimit
+                    ? ` (${s.creditLimit})`
+                    : ""}
+                </div>
+                <div className="text-center font-semibold">
+                  {s.status ? (
+                    <span className="text-green-600">Active</span>
+                  ) : (
+                    <span className="text-red-600">Inactive</span>
+                  )}
+                </div>
+                {userInfo?.isAdmin && (
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => handleEdit(s)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      <SquarePen size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(s._id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
                 )}
               </div>
 
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-center">
-                  <div className="relative group">
-                  
-                    <div className="flex gap-3">
-                      <button
-                        onClick={() => handleEdit(supplier)}
-                        className="w-full text-left  py-1 text-sm  text-blue-600 flex items-center gap-2"
-                      >
-                        <SquarePen size={18}/>
-                      </button>
-                      <button
-                        onClick={() => handleDelete(supplier._id)}
-                        className="w-full text-left py-1 text-sm  text-red-500 flex items-center gap-2"
-                      >
-                        <Trash2 size={18}/>
-                      </button>
-                    </div>
+              {/* ✅ Mobile Card */}
+              <div
+                key={`mobile-${s._id}`}
+                className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+              >
+                <h3 className="font-semibold text-gray-800">{s.supplierName}</h3>
+                <p className="text-sm text-gray-600">{s.contactPerson}</p>
+                <p className="text-sm text-gray-600">{s.email}</p>
+                <p className="text-sm text-gray-600">{s.phoneNumber}</p>
+                <p className="text-sm text-gray-600 truncate">{s.address}</p>
+                <p className="text-sm text-gray-600">
+                  {s.paymentTerms}{" "}
+                  {s.paymentTerms === "CreditCard" && s.creditLimit
+                    ? `(Limit: ${s.creditLimit})`
+                    : ""}
+                </p>
+                <p
+                  className={`text-sm font-semibold ${
+                    s.status ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {s.status ? "Active" : "Inactive"}
+                </p>
+
+                {userInfo?.isAdmin && (
+                  <div className="mt-3 flex justify-end gap-3">
+                    <button
+                      className="text-blue-500"
+                      onClick={() => handleEdit(s)}
+                    >
+                      <SquarePen size={18} />
+                    </button>
+                    <button
+                      className="text-red-500"
+                      onClick={() => handleDelete(s._id)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            </>
           ))
         )}
       </div>
@@ -523,7 +533,7 @@ const SupplierList = () => {
                       onChange={(e) => setPaymentTerms(e.target.value)}
                       className="form-radio"
                     />
-                    Credit 
+                    Credit
                   </label>
                   <label className="flex items-center gap-2">
                     <input
@@ -540,7 +550,7 @@ const SupplierList = () => {
               {paymentTerms === "CreditCard" && status && (
                 <div>
                   <label className="block text-gray-700 font-medium">
-                    Credit Limit  <span className="text-newPrimary">*</span>
+                    Credit Limit <span className="text-newPrimary">*</span>
                   </label>
                   <input
                     type="number"
@@ -549,14 +559,13 @@ const SupplierList = () => {
                     onChange={(e) => setCreditLimit(e.target.value)}
                     className="w-full p-2 border rounded"
                     placeholder="Enter credit limit (e.g. 4000000)"
-                      
                   />
                 </div>
               )}
               {paymentTerms === "Cash" && status && (
                 <div>
                   <label className="block text-gray-700 font-medium">
-                    Cash Limit  <span className="text-newPrimary">*</span>
+                    Cash Limit <span className="text-newPrimary">*</span>
                   </label>
                   <input
                     type="number"
@@ -565,7 +574,6 @@ const SupplierList = () => {
                     onChange={(e) => setCreditLimit(e.target.value)}
                     className="w-full p-2 border rounded"
                     placeholder="Enter credit limit (e.g. 4000000)"
-                   
                   />
                 </div>
               )}

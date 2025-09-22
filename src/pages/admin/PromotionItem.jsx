@@ -23,7 +23,6 @@ const PromotionItem = () => {
   const [discountPrice, setDiscountPrice] = useState("");
   const [itemSearch, setItemSearch] = useState("");
 
-
   const [categoryName, setCategoryName] = useState("");
   const [isEnable, setIsEnable] = useState(true);
   const [editingCategory, setEditingCategory] = useState(null);
@@ -113,11 +112,9 @@ const PromotionItem = () => {
       endDate: "2025-10-15",
     },
   ];
-const filterdata = items.filter((item) =>{
-    return item.name.toLowerCase().includes(itemSearch.toLowerCase())
-}
- 
-);
+  const filterdata = items.filter((item) => {
+    return item.name.toLowerCase().includes(itemSearch.toLowerCase());
+  });
   const handleEditClick = (category) => {
     setEditingCategory(category);
     setCategoryName(category.categoryName);
@@ -223,7 +220,7 @@ const filterdata = items.filter((item) =>{
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       {/* Coomon header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="px-6 mx-auto">
         {/* Top bar */}
         <div className="flex justify-between items-center mb-4">
@@ -239,91 +236,96 @@ const filterdata = items.filter((item) =>{
         </div>
 
         {/* Table */}
-       
+
         <div className="rounded-xl  border border-gray-100 overflow-hidden">
-  <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
-    <div className="min-w-[1000px]">
-      {/* ✅ Table Header */}
-      <div className="hidden lg:grid grid-cols-[150px_150px_150px_400px_140px_150px_210px] gap-4 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Promotion</div>
-        <div>Category</div>
-        <div>Item Type</div>
-        <div>Item Names</div>
-        <div>Discount</div>
-        <div>End Date</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
-
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100">
-        {loading ? (
-    // Skeleton shown while loading
-   <TableSkeleton 
-  rows={promotions.length } 
-  cols={userInfo?.isAdmin ? 7 : 6}
-  className="lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px]" 
-/>
-  ):promotions.length === 0 ? (
-          <div className="text-center py-4 text-gray-500 bg-white">
-            No promotions found.
-          </div>
-        ) : (
-          promotions.map((promo) => (
-            <div
-              key={promo._id || promo.id}
-              className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Promotion */}
-              <div className="font-medium text-gray-900 truncate">
-                {promo.promotion}
+          <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
+            <div className="min-w-[1000px]">
+              {/* ✅ Table Header */}
+              <div className="hidden lg:grid grid-cols-[150px_150px_150px_400px_140px_150px_210px] gap-4 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Promotion</div>
+                <div>Category</div>
+                <div>Item Type</div>
+                <div>Item Names</div>
+                <div>Discount</div>
+                <div>End Date</div>
+                {userInfo?.isAdmin && <div className="text-right">Actions</div>}
               </div>
 
-              {/* Category */}
-              <div className="text-gray-600 truncate">{promo.category}</div>
+              {/* ✅ Table Body */}
+              <div className="flex flex-col divide-y divide-gray-100">
+                {loading ? (
+                  // Skeleton shown while loading
+                  <TableSkeleton
+                    rows={promotions.length > 0 ? promotions.length : 5}
+                    cols={userInfo?.isAdmin ? 7 : 6}
+                    className="lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px]"
+                  />
+                ) : promotions.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No promotions found.
+                  </div>
+                ) : (
+                  promotions.map((promo) => (
+                    <div
+                      key={promo._id || promo.id}
+                      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      {/* Promotion */}
+                      <div className="font-medium text-gray-900 truncate">
+                        {promo.promotion}
+                      </div>
 
-              {/* Item Type */}
-              <div className="text-gray-600 truncate">{promo.itemType}</div>
+                      {/* Category */}
+                      <div className="text-gray-600 truncate">
+                        {promo.category}
+                      </div>
 
-              {/* Items */}
-              <div className="text-gray-600 truncate">
-                {promo.items.map((item, idx) => (
-                  <span key={idx} className="inline-block mr-3">
-                    {item.name} ({item.price})
-                  </span>
-                ))}
+                      {/* Item Type */}
+                      <div className="text-gray-600 truncate">
+                        {promo.itemType}
+                      </div>
+
+                      {/* Items */}
+                      <div className="text-gray-600 truncate">
+                        {promo.items.map((item, idx) => (
+                          <span key={idx} className="inline-block mr-3">
+                            {item.name} ({item.price})
+                          </span>
+                        ))}
+                      </div>
+
+                      {/* Discount */}
+                      <div className="text-gray-600 truncate">
+                        {promo.discount}
+                      </div>
+
+                      {/* End Date */}
+                      <div className="text-gray-500">{promo.endDate}</div>
+
+                      {/* Actions */}
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => handleEdit(promo)}
+                            className=" py-1 text-sm rounded  text-blue-600 "
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(promo._id)}
+                            className="py-1 text-sm rounded  text-red-600 "
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
-
-              {/* Discount */}
-              <div className="text-gray-600 truncate">{promo.discount}</div>
-
-              {/* End Date */}
-              <div className="text-gray-500">{promo.endDate}</div>
-
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-end gap-3">
-                  <button
-                    onClick={() => handleEdit(promo)}
-                    className=" py-1 text-sm rounded  text-blue-600 "
-                  >
-                    <SquarePen size={18}/>
-                  </button>
-                  <button
-                    onClick={() => handleDelete(promo._id)}
-                    className="py-1 text-sm rounded  text-red-600 "
-                  >
-                    <Trash2 size={18}/>
-                  </button>
-                </div>
-              )}
             </div>
-          ))
-        )}
-      </div>
-    </div>
-  </div>
-</div>
-
+          </div>
+        </div>
 
         {/* Slider */}
         {isSliderOpen && (
@@ -423,9 +425,7 @@ const filterdata = items.filter((item) =>{
                       <input
                         type="text"
                         value={itemSearch}
-                        onChange={(e) =>
-                          setItemSearch(e.target.value)
-                        }
+                        onChange={(e) => setItemSearch(e.target.value)}
                         placeholder="Search Item..."
                         aria-label="Search Item"
                         className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg

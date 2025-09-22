@@ -323,7 +323,7 @@ const Signup = () => {
                 disabled={loading}
                 className="w-full bg-gradient-to-r flex justify-center from-newPrimary to-blue-400 text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition"
               >
-                {loading ? "Creating Account..." : "Create Account"}
+                {loading ? <span className="animate-spin"><Loader size={18} /></span>  : "Create Account"}
               </button>
             </form>
 

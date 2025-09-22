@@ -334,21 +334,21 @@ export default function PurchaseManager() {
       });
   };
 
-//   // Show loading spinner
-//   if (loading) {
-//     return (
-//       <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-//         <div className="text-center">
-//           <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-//         </div>
-//       </div>
-//     );
-//   }
+  //   // Show loading spinner
+  //   if (loading) {
+  //     return (
+  //       <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
+  //         <div className="text-center">
+  //           <HashLoader height="150" width="150" radius={1} color="#84CF16" />
+  //         </div>
+  //       </div>
+  //     );
+  //   }
 
   return (
     <div className="p-4 px-6 bg-gray-50 min-h-screen">
-        {/* Common Header */}
-        <CommanHeader/>
+      {/* Common Header */}
+      <CommanHeader />
       <div className=" mt-6">
         {view === "list" && (
           <div>
@@ -378,82 +378,132 @@ export default function PurchaseManager() {
             </div>
             {/* Table Section */}
             <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="max-h-[400px] overflow-y-auto">
-      <div className="min-w-[1000px] w-full text-sm">
-        {/* Table Header */}
-        <div className="hidden lg:grid grid-cols-[60px_120px_120px_150px_150px_1fr_150px_120px_120px_150px_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-          <div>Sr.#</div>
-          <div>GRN No</div>
-          <div>GRN Date</div>
-          <div>Invoice No</div>
-          <div>Supplier</div>
-          <div>Items</div>
-          <div>Total Purchase</div>
-          <div>Total Qty</div>
-          <div>Discount</div>
-          <div>Payable</div>
-          <div className="text-right">Actions</div>
-        </div>
+              <div className="overflow-x-auto">
+                <div className="max-h-screen overflow-y-auto">
+                  <div className="w-full min-w-full text-sm">
+                    {/* Table Header */}
+                    <div className="hidden lg:grid grid-cols-[60px_1fr_1fr_1fr_1fr_2fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                      <div>Sr.#</div>
+                      <div>GRN No</div>
+                      <div>GRN Date</div>
+                      <div>Invoice No</div>
+                      <div>Supplier</div>
+                      <div>Items</div>
+                      <div>Total Purchase</div>
+                      <div>Total Qty</div>
+                      <div>Discount</div>
+                      <div>Payable</div>
+                      <div className="text-right">Actions</div>
+                    </div>
 
-        {/* Table Body */}
-        <div className="flex flex-col divide-y divide-gray-100">
-          {loading ? (
-            <TableSkeleton
-              rows={purchases.length || 5}
-              cols={11}
-              className="lg:grid-cols-[60px_120px_120px_150px_150px_1fr_150px_120px_120px_150px_auto]"
-            />
-          ) : purchases.length === 0 ? (
-            <div className="text-center py-4 text-gray-500 bg-white">
-              No purchases found.
-            </div>
-          ) : (
-            purchases.map((p, idx) => {
-              const totalPurchase = p.items.reduce(
-                (sum, it) => sum + it.total,
-                0
-              );
-              const totalQty = p.items.reduce(
-                (sum, it) => sum + it.qty,
-                0
-              );
+                    {/* Table Body */}
+                    <div className="flex flex-col divide-y divide-gray-100">
+                      {loading ? (
+                        <TableSkeleton
+                          rows={purchases.length > 0 ? purchases.length : 5}
+                          cols={11}
+                          className="lg:grid-cols-[60px_1fr_1fr_1fr_1fr_2fr_1fr_1fr_1fr_1fr_auto]"
+                        />
+                      ) : purchases.length === 0 ? (
+                        <div className="text-center py-4 text-gray-500 bg-white">
+                          No purchases found.
+                        </div>
+                      ) : (
+                        purchases.map((p, idx) => {
+                          const totalPurchase = p.items.reduce(
+                            (sum, it) => sum + it.total,
+                            0
+                          );
+                          const totalQty = p.items.reduce(
+                            (sum, it) => sum + it.qty,
+                            0
+                          );
 
-              return (
-                <div
-                  key={p._id}
-                  className="grid grid-cols-[60px_120px_120px_150px_150px_1fr_150px_120px_120px_150px_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                >
-                  <div>{idx + 1}</div>
-                  <div>{p.grnNo}</div>
-                  <div>{new Date(p.grnDate).toLocaleDateString()}</div>
-                  <div>{p.invoiceNo}</div>
-                  <div>{p.supplier?.supplierName}</div>
-                  <div className="truncate">
-                    {p.items.map((it) => it.name).join(", ")}
-                  </div>
-                  <div>{totalPurchase}</div>
-                  <div>{totalQty}</div>
-                  <div>{p.discountAmount}</div>
-                  <div>{p.payable}</div>
-                  <div className="flex justify-end gap-3">
-                    <button className="text-blue-500 hover:underline">
-                      <SquarePen size={18} />
-                    </button>
-                    <button className="text-red-500 hover:underline">
-                      <Trash2 size={18} />
-                    </button>
+                          return (
+                            <>
+                              {/* ✅ Desktop Grid */}
+                              <div
+                                key={p._id}
+                                className="hidden lg:grid grid-cols-[60px_1fr_1fr_1fr_1fr_2fr_1fr_1fr_1fr_1fr_auto] 
+                       gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                              >
+                                <div>{idx + 1}</div>
+                                <div>{p.grnNo}</div>
+                                <div>
+                                  {new Date(p.grnDate).toLocaleDateString()}
+                                </div>
+                                <div>{p.invoiceNo}</div>
+                                <div>{p.supplier?.supplierName}</div>
+                                <div className="truncate">
+                                  {p.items.map((it) => it.name).join(", ")}
+                                </div>
+                                <div>{totalPurchase}</div>
+                                <div>{totalQty}</div>
+                                <div>{p.discountAmount}</div>
+                                <div>{p.payable}</div>
+                                <div className="flex justify-end gap-3">
+                                  <button className="text-blue-500 hover:underline">
+                                    <SquarePen size={18} />
+                                  </button>
+                                  <button className="text-red-500 hover:underline">
+                                    <Trash2 size={18} />
+                                  </button>
+                                </div>
+                              </div>
+
+                              {/* ✅ Mobile Card */}
+                              <div
+                                key={`mobile-${p._id}`}
+                                className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                              >
+                                <div className="flex justify-between mb-2">
+                                  <span className="text-sm font-semibold text-gray-700">
+                                    {p.supplier?.supplierName}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(p.grnDate).toLocaleDateString()}
+                                  </span>
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  GRN: {p.grnNo}
+                                </div>
+                                <div className="text-sm text-gray-600">
+                                  Invoice: {p.invoiceNo}
+                                </div>
+                                <div className="text-sm text-gray-600 truncate">
+                                  Items:{" "}
+                                  {p.items.map((it) => it.name).join(", ")}
+                                </div>
+                                <div className="mt-2 flex justify-between text-sm font-medium text-gray-700">
+                                  <span>Total: {totalPurchase}</span>
+                                  <span>Qty: {totalQty}</span>
+                                </div>
+                                <div className="mt-1 text-sm text-gray-600">
+                                  Discount: {p.discountAmount}
+                                </div>
+                                <div className="text-sm font-semibold text-newPrimary">
+                                  Payable: {p.payable}
+                                </div>
+
+                                {/* Actions */}
+                                <div className="mt-3 flex justify-end gap-3">
+                                  <button className="text-blue-500">
+                                    <SquarePen size={18} />
+                                  </button>
+                                  <button className="text-red-500">
+                                    <Trash2 size={18} />
+                                  </button>
+                                </div>
+                              </div>
+                            </>
+                          );
+                        })
+                      )}
+                    </div>
                   </div>
                 </div>
-              );
-            })
-          )}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
+              </div>
+            </div>
           </div>
         )}
 

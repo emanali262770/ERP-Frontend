@@ -9,7 +9,6 @@ import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "./Skeleton";
 import CommanHeader from "../../components/CommanHeader";
 
-
 const ItemList = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [itemUnitList, setItemUnitList] = useState([]);
@@ -47,31 +46,30 @@ const ItemList = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   // --- Dummy Data ---
 
-const [dummyItems, setDummyItems] = useState([
-      {
-        _id: "1",
-        itemType: { itemTypeName: "Beverages" },
-        itemName: "Coca Cola 1L",
-        purchase: 50,
-        price: 80,
-        stock: 120,
-        labelBarcode: "BAR1234567890",
-        itemImage: { url: "https://via.placeholder.com/50" },
-      },
-      {
-        _id: "2",
-        itemType: { itemTypeName: "Snacks" },
-        itemName: "Lays Chips",
-        purchase: 20,
-        price: 40,
-        stock: 300,
-        labelBarcode: "BAR9876543210",
-        itemImage: { url: "https://via.placeholder.com/50" },
-      },
-    ]);
+  const [dummyItems, setDummyItems] = useState([
+    {
+      _id: "1",
+      itemType: { itemTypeName: "Beverages" },
+      itemName: "Coca Cola 1L",
+      purchase: 50,
+      price: 80,
+      stock: 120,
+      labelBarcode: "BAR1234567890",
+      itemImage: { url: "https://via.placeholder.com/50" },
+    },
+    {
+      _id: "2",
+      itemType: { itemTypeName: "Snacks" },
+      itemName: "Lays Chips",
+      purchase: 20,
+      price: 40,
+      stock: 300,
+      labelBarcode: "BAR9876543210",
+      itemImage: { url: "https://via.placeholder.com/50" },
+    },
+  ]);
 
-// Simulate API call
-
+  // Simulate API call
 
   // Slider animation
   useEffect(() => {
@@ -430,18 +428,14 @@ const [dummyItems, setDummyItems] = useState([
   //     </div>
   //   );
   // }
- 
-
-  
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex justify-between items-center mt-6 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Items List</h1>
-          
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-primaryDark"
@@ -452,90 +446,122 @@ const [dummyItems, setDummyItems] = useState([
       </div>
 
       {/* Item Table */}
-    <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[1000px]">
-      {/* Header */}
-      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Item Category</div>
-        <div>Item Name</div>
-        <div>Purchase</div>
-        <div>Sales</div>
-        <div>Stock</div>
-        <div>Barcode</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
+      <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-full w-full overflow-x-auto">
+            {/* Header */}
+            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>Item Category</div>
+              <div>Item Name</div>
+              <div>Purchase</div>
+              <div>Sales</div>
+              <div>Stock</div>
+              <div>Barcode</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
-      {/* Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <TableSkeleton
-            rows={dummyItems.length || 5}
-            cols={userInfo?.isAdmin ? 7 : 6}
-            className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-          />
-        ) : (
-          dummyItems.map((item, index) => (
-            <div
-              key={item._id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Item Category (with icon) */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={item.itemImage?.url}
-                  alt="Product Icon"
-                  className="w-7 h-7 object-cover rounded-full"
+            {/* Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={dummyItems.length > 0 ? dummyItems.length : 5}
+                  cols={userInfo?.isAdmin ? 7 : 6}
+                  className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
                 />
-                <span className="font-medium text-gray-900">
-                  {item?.itemType?.itemTypeName}
-                </span>
-              </div>
-
-              {/* Item Name */}
-              <div className="text-gray-600">{item.itemName}</div>
-
-              {/* Purchase */}
-              <div className="font-semibold text-gray-600">
-                {item.purchase}
-              </div>
-
-              {/* Sales */}
-              <div className="font-semibold text-gray-600">
-                {item.price}
-              </div>
-
-              {/* Stock */}
-              <div className="font-semibold text-gray-600">
-                {item.stock}
-              </div>
-
-              {/* Barcode */}
-              <div className="font-semibold text-gray-600">
-                {item.labelBarcode.slice(0, 12)}
-              </div>
-
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-end gap-3">
-                  <button className="text-blue-500 hover:underline">
-                    <SquarePen size={18} />
-                  </button>
-                  <button className="text-red-500 hover:underline">
-                    <Trash2 size={18} />
-                  </button>
+              ) : dummyItems.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No items found.
                 </div>
+              ) : (
+                dummyItems.map((item, index) => (
+                  <React.Fragment key={item._id}>
+                    {/* ✅ Desktop Grid */}
+                    <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition">
+                      {/* Category */}
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={item.itemImage?.url}
+                          alt="Product Icon"
+                          className="w-7 h-7 object-cover rounded-full"
+                        />
+                        <span className="font-medium text-gray-900">
+                          {item?.itemType?.itemTypeName}
+                        </span>
+                      </div>
+                      <div className="text-gray-600">{item.itemName}</div>
+                      <div className="font-semibold text-gray-600">
+                        {item.purchase}
+                      </div>
+                      <div className="font-semibold text-gray-600">
+                        {item.price}
+                      </div>
+                      <div className="font-semibold text-gray-600">
+                        {item.stock}
+                      </div>
+                      <div className="font-semibold text-gray-600">
+                        {item.labelBarcode.slice(0, 12)}
+                      </div>
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button className="text-blue-500">
+                            <SquarePen size={18} />
+                          </button>
+                          <button className="text-red-500">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ✅ Mobile Card */}
+                    <div className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4">
+                      <div className="flex items-center gap-3 mb-2">
+                        <img
+                          src={item.itemImage?.url}
+                          alt="Product Icon"
+                          className="w-10 h-10 object-cover rounded-full"
+                        />
+                        <div>
+                          <div className="text-sm font-semibold text-gray-900">
+                            {item.itemName}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {item?.itemType?.itemTypeName}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="text-sm text-gray-600">
+                        Purchase: {item.purchase}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Sales: {item.price}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Stock: {item.stock}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Barcode: {item.labelBarcode.slice(0, 12)}
+                      </div>
+
+                      {userInfo?.isAdmin && (
+                        <div className="mt-3 flex justify-end gap-3">
+                          <button className="text-blue-500">
+                            <SquarePen size={18} />
+                          </button>
+                          <button className="text-red-500">
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </React.Fragment>
+                ))
               )}
             </div>
-          ))
-        )}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
-
-
 
       {/* Slider */}
       {isSliderOpen && (
@@ -713,8 +739,6 @@ const [dummyItems, setDummyItems] = useState([
                 </select>
               </div>
 
-             
-
               {/* Purchase */}
               <div>
                 <label className="block text-gray-700 font-medium">
@@ -742,8 +766,8 @@ const [dummyItems, setDummyItems] = useState([
                   className="w-full p-2 border rounded"
                 />
               </div>
-               
-                {/* Per Unit */}
+
+              {/* Per Unit */}
               <div>
                 <label className="block text-gray-700 font-medium">
                   Per Unit
@@ -793,23 +817,23 @@ const [dummyItems, setDummyItems] = useState([
                   required
                   onChange={(e) => setBarcode(e.target.value)}
                   className="w-full p-2 border rounded"
-                  placeholder="e.g. BAR1234567890" 
-                   minLength={5}
-  maxLength={20}  
+                  placeholder="e.g. BAR1234567890"
+                  minLength={5}
+                  maxLength={20}
                   onBlur={(e) => setBarcode(e.target.value)} // update on blur
                 />
 
                 {/* Show barcode only if input is not empty */}
                 {barcode && (
                   <div className="mt-3">
-                      <Barcode value={barcode} height={60} />  
+                    <Barcode value={barcode} height={60} />
                   </div>
                 )}
               </div>
 
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Expiry Day 
+                  Expiry Day
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
@@ -838,7 +862,6 @@ const [dummyItems, setDummyItems] = useState([
               {/* Conditionally show expiry date field */}
               {expiryOption === "HasExpiry" && (
                 <div className="mt-3">
-              
                   <input
                     type="number"
                     value={expiryDay}
