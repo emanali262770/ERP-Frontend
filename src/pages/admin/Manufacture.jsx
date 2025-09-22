@@ -75,8 +75,8 @@ const Manufacture = () => {
 
   const handleSave = async () => {
     const formData = {
-      manufacturerId,
-      manufacturerName,
+     _id: manufacturerId,
+       name: manufacturerName,
       address,
       phoneNumber,
       personName,
@@ -96,23 +96,19 @@ const Manufacture = () => {
         "Content-Type": "application/json",
       };
 
-      if (isEdit && editId) {
-       // 🔄 Update existing category
-       const res = await axios.put(
-        `${API_URL}/${editId}`,
-        formData,
-        { headers }
-      );
-
+  if (isEdit && editId) {
+        setManufacturerList(
+          manufacturerList.map((m) =>
+            m._id === editId ? { ...m, ...formData } : m
+          )
+        );
         toast.success("✅ Manufacturer updated successfully");
       } else {
-         const res = await axios.post(
-          API_URL,
-          formData,
-          {
-            headers
-          }
-        );
+        const newManufacturer = {
+          ...formData,
+          _id: String(10000 + manufacturerList.length + 1),
+        };
+        setManufacturerList([...manufacturerList, newManufacturer]);
         toast.success("✅ Manufacturer added successfully");
       }
 
@@ -137,6 +133,7 @@ const Manufacture = () => {
     }
   };
 
+
   const handleEdit = (manufacturer) => {
     setIsEdit(true);
     setEditId(manufacturer._id);
@@ -153,7 +150,6 @@ const Manufacture = () => {
     setStatus(manufacturer.status);
     setIsSliderOpen(true);
   };
-
   const handleDelete = async (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
