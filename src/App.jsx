@@ -10,6 +10,11 @@ import { ToastContainer } from "react-toastify";
 import ShelveLocation from "./pages/admin/ShelveLocation";
 import "react-toastify/dist/ReactToastify.css";
 import CategoryItem from "./pages/admin/CategoryItem";
+import PurchaseRequisition from "./pages/admin/PurchaseRequisition";
+import PurchaseApproval from "./pages/admin/PurchaseApproval";
+import Quotation from "./pages/admin/Quotation";
+import Estimation from "./pages/admin/Estimation";
+import GatePassIN from "./pages/admin/GatePassIN";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierList from "./pages/admin/Supplier";
 import Manufacture from "./pages/admin/Manufacture";
@@ -76,6 +81,11 @@ function AppContent() {
             <Route path="groups" element={<GroupManagement />} />
             <Route path="access-rights" element={<AccessControll />} />
             <Route path="modules" element={<Modules />} />
+            <Route path="purchase-requisition" element={<PurchaseRequisition />} />
+            <Route path="purchase-approval" element={<PurchaseApproval />} />
+            <Route path="quotation" element={<Quotation />} />
+            <Route path="estimation" element={<Estimation />} />
+            <Route path="gatepass-in" element={<GatePassIN />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
