@@ -16,17 +16,40 @@ const PurchaseRequisition = () => {
   const [details, setDetails] = useState("");
   const [items, setItems] = useState("");
   const [category, setCategory] = useState("");
-  const [quantity, setQuantity] = useState("");
   const [isEnable, setIsEnable] = useState(true);
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
+
+
+  const [itemName, setItemName] = useState("");
+  const [quantity, setQuantity] = useState("");
+  const [itemsList, setItemsList] = useState([]);
+
+  const handleAddItem = () => {
+    if (!itemName || !quantity) return;
+
+    const newItem = {
+      id: itemsList.length + 1,
+      name: itemName,
+      qty: quantity,
+    };
+
+    setItemsList([...itemsList, newItem]);
+
+    // clear inputs after save
+    setItemName("");
+    setQuantity("");
+  };
+
+
+
 
   // Static data to ensure rendering
   const staticData = [
     {
       _id: "1",
       requisitionId: "REQ001",
-      date: "2025-09-01",
+      date: "2025-09-12",
       department: "IT",
       employee: "John Doe",
       requirement: "Regular Purchase",
@@ -37,12 +60,11 @@ const PurchaseRequisition = () => {
       ],
       category: "Electronics",
       isEnable: true,
-      createdAt: new Date().toISOString(),
     },
     {
       _id: "2",
       requisitionId: "REQ002",
-      date: "2025-09-15",
+      date: "2025-09-16",
       department: "HR",
       employee: "Jane Smith",
       requirement: "Monthly Purchase",
@@ -54,7 +76,6 @@ const PurchaseRequisition = () => {
       ],
       category: "Stationery",
       isEnable: false,
-      createdAt: new Date().toISOString(),
     },
   ];
 
@@ -81,11 +102,6 @@ const PurchaseRequisition = () => {
   }, [fetchRequistionList]);
 
 
-  // Format date for display
-  const formatDate = (date) => {
-    if (!date) return "";
-    return new Date(date).toISOString().split("T")[0];
-  };
 
   // Load static data on mount
   useEffect(() => {
@@ -209,6 +225,21 @@ const PurchaseRequisition = () => {
     setEditingRequisition(null);
     setIsSliderOpen(false);
   };
+
+const formatDate = (date) => {
+  if (!date) return "N/A";
+
+  const parsed = new Date(date);
+  if (isNaN(parsed.getTime())) return "Invalid Date";
+
+  const day = String(parsed.getDate()).padStart(2, "0");
+  const month = String(parsed.getMonth() + 1).padStart(2, "0");
+  const year = parsed.getFullYear();
+
+  return `${day}-${month}-${year}`; // DD-MM-YYYY
+};
+
+
 
 
   const handleToggleEnable = (requisition) => {
@@ -437,7 +468,8 @@ const PurchaseRequisition = () => {
                   </label>
                   <input
                     type="text"
-                    value={requisitionId}
+                    value={requisitionId} 
+                    readOnly
                     onChange={(e) => setRequisitionId(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
                     placeholder="Enter requisition ID"
@@ -513,18 +545,7 @@ const PurchaseRequisition = () => {
                     rows="3"
                   />
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Items
-                  </label>
-                  <input
-                    type="text"
-                    value={items}
-                    onChange={(e) => setItems(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter items"
-                  />
-                </div>
+
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Category <span className="text-red-500">*</span>
@@ -544,19 +565,73 @@ const PurchaseRequisition = () => {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Quantity
-                  </label>
-                  <input
-                    type="number"
-                    value={quantity}
-                    onChange={(e) => setQuantity(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter quantity"
-                    min="1"
-                  />
+
+                <div className="space-y-3">
+                  {/* Inputs with Save Button */}
+                  <div className="flex justify-between gap-2 items-end">
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Item Name
+                      </label>
+                      <input
+                        type="text"
+                        value={itemName}
+                        onChange={(e) => setItemName(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter item name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Quantity
+                      </label>
+                      <input
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter quantity"
+                        min="1"
+                      />
+                    </div>
+
+                    <div className="">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="w-16 h-12 bg-newPrimary text-white  rounded-lg hover:bg-newPrimary/80 transition"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Items Table */}
+                  {itemsList.length > 0 && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                          <tr>
+                            <th className="px-4 py-2 border-b">Sr #</th>
+                            <th className="px-4 py-2 border-b">Item Name</th>
+                            <th className="px-4 py-2 border-b">Quantity</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-gray-700 text-sm">
+                          {itemsList.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
+                              <td className="px-4 py-2 border-b">{item.name}</td>
+                              <td className="px-4 py-2 border-b text-center">{item.qty}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
+
                 <div className="flex items-center justify-between">
                   <label className="text-gray-700 font-medium">Status</label>
                   <div className="flex items-center gap-3">
