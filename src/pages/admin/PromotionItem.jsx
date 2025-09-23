@@ -17,7 +17,7 @@ const PromotionItem = () => {
   const [promotionName, setPromotionName] = useState("");
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-
+  const [checkedItems, setCheckedItems] = useState([]);
   // 🔹 New States
   const [details, setDetails] = useState("");
   const [startDate, setStartDate] = useState("");
@@ -34,6 +34,10 @@ const PromotionItem = () => {
 
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/promotion-items`;
   let userInfo = null;
+  const formatDate = (date) => {
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
+  };
   try {
     userInfo = JSON.parse(localStorage.getItem("userInfo"));
   } catch (e) {
@@ -44,7 +48,7 @@ const PromotionItem = () => {
   const fetchAllData = useCallback(async () => {
     try {
       setLoading(true);
-      
+
       // Fetch all necessary data first
       const [promotionsRes, categoriesRes, itemTypesRes, promotionItemsRes] = await Promise.all([
         axios.get(`${import.meta.env.VITE_API_BASE_URL}/promotion`),
@@ -57,24 +61,26 @@ const PromotionItem = () => {
       setCategoryList(categoriesRes.data);
       setItemTypeList(itemTypesRes.data);
       // Map promotion items with proper names
-const itemsWithNames = promotionItemsRes.data.map(item => {
-  const promotion = promotionsRes.data.find(p => p._id === item.promotion) || {};
-  const category = categoriesRes.data.find(c => c._id === item.category) || {};
-  const itemType = itemTypesRes.data.find(it => it._id === item.itemType) || {};
+      const itemsWithNames = promotionItemsRes.data.map(item => {
+        const promotion = promotionsRes.data.find(p => p._id === item.promotion) || {};
+        const category = categoriesRes.data.find(c => c._id === item.category) || {};
+        const itemType = itemTypesRes.data.find(it => it._id === item.itemType) || {};
 
-  return {
-    ...item,
-    promotionName: promotion.promotionName || promotion.name || "N/A",
-    categoryName: category.categoryName || category.name || "N/A",
-    itemTypeName: itemType.itemTypeName || itemType.name || "N/A",
-    items: item.items || []
-  };
-});
+        return {
+          ...item,
+          promotionId: promotion._id || item.promotion,
+          promotionName: promotion.promotionName || "N/A",
+          categoryId: category._id || item.category,
+          categoryName: category.categoryName || "N/A",
+          itemTypeId: itemType._id || item.itemType,
+          itemTypeName: itemType.itemTypeName || "N/A",
+        };
+      });
 
 
-      
+
       setPromotionItems(itemsWithNames);
-      
+
     } catch (error) {
       console.error("Failed to fetch data", error);
       // Fallback to static data if API fails
@@ -153,6 +159,7 @@ const filterdata = items.filter((item) => {
   return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
 });
 
+
 const handleEditClick = (promotionitem) => {
   setEditingPromotionItem(promotionitem);
   setPromotionName(promotionitem.promotionName || "");
@@ -168,29 +175,36 @@ const handleEditClick = (promotionitem) => {
 };
 
 
+    setItemSearch("");
+    setIsSliderOpen(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmedName = promotionName.trim();
 
-    if (!trimmedName) {
-      toast.error("❌ Promotion name cannot be empty.");
+    if (!selectedPromotion) {
+      toast.error("❌ Please select a promotion.");
       return;
     }
+
 
     setLoading(true);
 
     // 🔹 Full payload with new fields
-const payload = {
-  promotion: selectedPromotion,
-  category: selectedCategory,
-  itemType: selectedItemType,
-  items: filterdata,
-  discountPercentage,
-  details,
-  startDate,
-  endDate,
-  isEnable
-};
+    const payload = {
+      promotion: selectedPromotion,
+      category: selectedCategory,
+      itemType: selectedItemType,
+      items: items
+        .filter((i) => checkedItems.includes(i._id))   // ✅ filter by _id, not id
+        .map((i) => ({ _id: i._id, itemName: i.itemName, price: i.price })),
+      discountPercentage,
+      details,
+      startDate,
+      endDate,
+      isEnable
+    };
 
 
 
@@ -225,9 +239,6 @@ const payload = {
       // Reset form state
       setIsSliderOpen(false);
       setPromotionName("");
-      setDetails("");
-      setStartDate("");
-      setEndDate("");
       setSelectedPromotion("");
       setSelectedCategory("");
       setSelectedItemType("");
@@ -251,8 +262,64 @@ const payload = {
     // ... (no changes in your toggle function)
   };
 
-  const handleDelete = async (promotionId) => {
-    // ... (no changes in your delete function)
+  const handleDelete = async (id) => {
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
+    });
+
+    swalWithTailwindButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const { token } = userInfo || {};
+            const headers = {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            };
+
+            // ✅ Delete from backend
+            await axios.delete(`${API_URL}/${id}`, { headers });
+
+            // ✅ Update UI
+            setPromotionItems((prev) => prev.filter((p) => p._id !== id));
+
+            swalWithTailwindButtons.fire(
+              "Deleted!",
+              "Promotion item deleted successfully.",
+              "success"
+            );
+          } catch (error) {
+            console.error("Delete error:", error);
+            swalWithTailwindButtons.fire(
+              "Error!",
+              "Failed to delete promotion item.",
+              "error"
+            );
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithTailwindButtons.fire(
+            "Cancelled",
+            "Promotion item is safe 🙂",
+            "error"
+          );
+        }
+      });
   };
 
   return (
@@ -291,6 +358,7 @@ const payload = {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
+
              {loading ? (
   // Skeleton shown while loading
   <TableSkeleton
@@ -358,6 +426,7 @@ const payload = {
   ))
 )}
 
+
               </div>
             </div>
           </div>
@@ -401,7 +470,7 @@ const payload = {
                 </h3>
 
                 {/* Promotion Name */}
-                <div>
+                {/* <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Promotion Name
                   </label>
@@ -412,7 +481,7 @@ const payload = {
                     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                     placeholder="Enter promotion name"
                   />
-                </div>
+                </div> */}
 
                 {/* Promotion Select */}
                 <div>
@@ -471,6 +540,7 @@ const payload = {
                   </select>
                 </div>
 
+
                 {/* Item Search */}
              <div>
   <label className="block text-gray-700 font-medium mb-2">
@@ -496,6 +566,32 @@ const payload = {
 </div>
 
 
+
+                <div className="w-full border rounded-lg shadow p-4 max-h-60 overflow-y-auto">
+                  <ul className="space-y-3">
+                    {filterdata.map((item) => (
+                      <li
+                        key={item.id}
+                        className="flex justify-between items-center border-b pb-2"
+                      >
+                        <div>
+                          <p className="font-medium">{item.itemName}</p>
+                          <p className="text-sm text-gray-500">{item.price}</p>
+                        </div>
+                        <input
+                          type="checkbox"
+                          value={item._id}
+                          className="h-5 w-5 accent-blue-600 rounded-sm" // square checkbox
+                        />
+
+
+
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+
                 {/* Discount Percentage */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
@@ -511,7 +607,7 @@ const payload = {
                   />
                 </div>
 
-                {/* Start Date */}
+                {/* Start Date
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Start Date
@@ -522,10 +618,10 @@ const payload = {
                     onChange={(e) => setStartDate(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                   />
-                </div>
+                </div> */}
 
                 {/* End Date */}
-                <div>
+                {/* <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     End Date
                   </label>
@@ -535,21 +631,9 @@ const payload = {
                     onChange={(e) => setEndDate(e.target.value)}
                     className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                   />
-                </div>
+                </div> */}
 
-                {/* Details */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Details
-                  </label>
-                  <textarea
-                    value={details}
-                    onChange={(e) => setDetails(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter promotion details"
-                    rows="3"
-                  />
-                </div>
+
 
                 {/* Status */}
                 <div>
