@@ -342,7 +342,7 @@ const BookingOrder = () => {
     } catch (error) {
       console.error("Failed to fetch categories", error);
     } finally {
-      setTimeout(() => setLoading(false), 1000);
+      setTimeout(() => setLoading(false), 2000);
     }
   }, []);
   useEffect(() => {
@@ -443,7 +443,7 @@ const BookingOrder = () => {
     } catch (error) {
       console.error("Failed to fetch booking or categories", error);
     } finally {
-      setTimeout(() => setLoading(false), 1000);
+      setTimeout(() => setLoading(false), 2000);
     }
   }, []);
 
@@ -560,250 +560,154 @@ const BookingOrder = () => {
         </button>
       </div>
 
-      <div className="rounded-xl border border-gray-100">
-        {/* Mobile Cards (show on small screens) */}
-        <div className="lg:hidden space-y-4">
-          { 
-            item.map((staff, index) => {
-              const total = staff.total?.$numberInt || staff.total || 0;
+      <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="max-h-screen overflow-y-auto">
+      <div className="w-full min-w-full text-sm">
+        {/* ✅ Table Header (Desktop Only) */}
+        <div className="hidden lg:grid grid-cols-[1.5fr_1fr_2fr_2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+          <div>Customer Name</div>
+          <div>Mobile No.</div>
+          <div>Address</div>
+          <div>Items</div>
+          <div>Total</div>
+          <div>Discount</div>
+          <div>Payable</div>
+          <div>Paid</div>
+          <div>Balance</div>
+          {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+        </div>
+
+        {/* ✅ Table Body */}
+        <div className="flex flex-col divide-y divide-gray-100">
+          {loading ? (
+            <TableSkeleton
+              rows={item.length > 0 ? item.length : 5}
+              cols={userInfo?.isAdmin ? 10 : 9}
+              className="lg:grid-cols-[1.5fr_1fr_2fr_2fr_1fr_1fr_1fr_1fr_1fr_auto]"
+            />
+          ) : item.length === 0 ? (
+            <div className="text-center py-4 text-gray-500 bg-white">
+              No bookings found.
+            </div>
+          ) : (
+            item.map((booking, idx) => {
+              const total = booking.total?.$numberInt || booking.total || 0;
               const discount =
-                staff.discount?.$numberInt || staff.discount || 0;
-              const payable = staff.payable?.$numberInt || staff.payable || 0;
-              const paid = staff.paid?.$numberInt || staff.paid || 0;
-              const balance = staff.balance?.$numberInt || staff.balance || 0;
+                booking.discount?.$numberInt || booking.discount || 0;
+              const payable =
+                booking.payable?.$numberInt || booking.payable || 0;
+              const paid = booking.paid?.$numberInt || booking.paid || 0;
+              const balance =
+                booking.balance?.$numberInt || booking.balance || 0;
 
               return (
-                <div
-                  key={index}
-                  className="bg-white p-4 rounded-xl shadow-sm border border-gray-200"
-                >
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-sm font-medium text-gray-500">
-                      Customer Name
+                <>
+                  {/* ✅ Desktop Grid */}
+                  <div
+                    key={booking._id}
+                    className="hidden lg:grid grid-cols-[1.5fr_1fr_2fr_2fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                  >
+                    <div className="font-medium text-gray-900">
+                      {booking.customerName}
                     </div>
-                    <div className="text-sm text-gray-900">
-                      {staff.customerName || "—"}
-                    </div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Mobile No.
-                    </div>
-                    <div className="text-sm text-gray-900">
-                      {staff.mobileNo || "—"}
-                    </div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Address
-                    </div>
-                    <div className="text-sm text-gray-900 truncate">
-                      {staff.address || "—"}
-                    </div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Items
-                    </div>
-                    <div className="text-sm text-gray-900">
-                      {Array.isArray(staff.items) && staff.items.length > 0
-                        ? staff.items
-                            .map((item) => {
-                              const qty = item.qty?.$numberInt || item.qty || 0;
-                              return `${item.itemName || ""} (${qty}x)`;
-                            })
+                    <div className="text-gray-600">{booking.mobileNo}</div>
+                    <div className="text-gray-600 truncate">{booking.address}</div>
+                    <div className="text-gray-600">
+                      {Array.isArray(booking.items) && booking.items.length > 0
+                        ? booking.items
+                            .map(
+                              (it) =>
+                                `${it.itemName || ""} (${it.qty?.$numberInt || it.qty || 0}x)`
+                            )
                             .join(", ")
                         : "—"}
                     </div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Total
-                    </div>
-                    <div className="text-sm text-gray-900">{total}</div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Discount
-                    </div>
-                    <div className="text-sm text-gray-900">{discount}</div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Payable
-                    </div>
-                    <div className="text-sm text-gray-900">{payable}</div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Paid
-                    </div>
-                    <div className="text-sm text-gray-900">{paid}</div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Balance
-                    </div>
-                    <div className="text-sm text-gray-900">{balance}</div>
-
-                    <div className="text-sm font-medium text-gray-500">
-                      Payment Method
-                    </div>
-                    <div
-                      className={`text-sm font-semibold ${
-                        staff.paymentMethod === "Cash"
-                          ? "text-green-500"
-                          : staff.paymentMethod === "Card"
-                          ? "text-orange-400"
-                          : staff.paymentMethod === "Transfer"
-                          ? "text-blue-500"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {staff.paymentMethod || "—"}
-                    </div>
+                    <div>{total}</div>
+                    <div>{discount}</div>
+                    <div>{payable}</div>
+                    <div>{paid}</div>
+                    <div>{balance}</div>
+                    {userInfo?.isAdmin && (
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => handleEditClick(booking)}
+                          className="text-blue-500 hover:underline"
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(booking._id)}
+                          className="text-red-500 hover:underline"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {userInfo?.isAdmin && (
-                    <div className="mt-4 flex justify-end">
-                      <div className="relative group">
-                        <button className="text-gray-400 hover:text-gray-600 text-xl">
-                          ⋯
-                        </button>
-                        <div className="absolute right-0 top-6 w-28 bg-white border border-gray-200 rounded-md shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-300 z-50 flex flex-col">
-                          <button
-                            onClick={() => handleEditClick(staff)}
-                            className="w-full text-left px-4 py-4 text-sm hover:bg-blue-600/10 text-newPrimary flex items-center gap-2"
-                          >
-                            Edit
-                          </button>
-                          <button
-                            onClick={() => handleDelete(staff._id)}
-                            className="w-full text-left px-4 py-4 text-sm hover:bg-red-50 text-red-500 flex items-center gap-2"
-                          >
-                            Delete
-                          </button>
-                        </div>
-                      </div>
+                  {/* ✅ Mobile Card */}
+                  <div
+                    key={`mobile-${booking._id}`}
+                    className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                  >
+                    <div className="flex justify-between mb-2">
+                      <span className="text-sm font-semibold text-gray-700">
+                        {booking.customerName}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {booking.mobileNo}
+                      </span>
                     </div>
-                  )}
-                </div>
+                    <div className="text-sm text-gray-600 truncate">
+                      {booking.address}
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Items:{" "}
+                      {Array.isArray(booking.items) && booking.items.length > 0
+                        ? booking.items
+                            .map(
+                              (it) =>
+                                `${it.itemName || ""} (${it.qty?.$numberInt || it.qty || 0}x)`
+                            )
+                            .join(", ")
+                        : "—"}
+                    </div>
+                    <div className="mt-2 flex justify-between text-sm">
+                      <span>Total: {total}</span>
+                      <span>Payable: {payable}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">Discount: {discount}</div>
+                    <div className="text-sm text-gray-600">Paid: {paid}</div>
+                    <div className="text-sm text-gray-600">Balance: {balance}</div>
+
+                    {userInfo?.isAdmin && (
+                      <div className="mt-3 flex justify-end gap-3">
+                        <button
+                          className="text-blue-500"
+                          onClick={() => handleEditClick(booking)}
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                        <button
+                          className="text-red-500"
+                          onClick={() => handleDelete(booking._id)}
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </>
               );
             })
-          }
-        </div>
-
-        {/* Desktop Table (show on large screens) */}
-        <div className="rounded-xl  border border-gray-200 overflow-hidden">
-          <div className="overflow-x-auto">
-            <div className="min-w-[1400px]">
-              {/* Table Header */}
-              <div
-                className="grid grid-cols-[1.5fr_1fr_2fr_1.5fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] 
-                      bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase 
-                      border-b border-gray-200 sticky top-0 z-10"
-              >
-                <div>Customer Name</div>
-                <div>Mobile No.</div>
-                <div>Address</div>
-                <div>Items</div>
-                <div>Total</div>
-                <div>Discount</div>
-                <div>Payable</div>
-                <div>Paid</div>
-                <div>Payment Method</div>
-                <div>Balance</div>
-                {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-              </div>
-
-              {/* Table Body */}
-              <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
-                {loading ? (
-                  // Skeleton shown while loading
-                  <TableSkeleton
-                    rows={item.length || 5}
-                    cols={userInfo?.isAdmin ? 11 : 6}
-                    className="lg:grid-cols-[1.5fr_1fr_2fr_1.5fr_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-                  />
-                ) : (
-                  item.map((staff, index) => {
-                    const total = staff.total?.$numberInt || staff.total || 0;
-                    const discount =
-                      staff.discount?.$numberInt || staff.discount || 0;
-                    const payable =
-                      staff.payable?.$numberInt || staff.payable || 0;
-                    const paid = staff.paid?.$numberInt || staff.paid || 0;
-                    const balance =
-                      staff.balance?.$numberInt || staff.balance || 0;
-
-                    return (
-                      <div
-                        key={index}
-                        className="grid grid-cols-[1.5fr_1fr_2fr_1.5fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] 
-                         items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                      >
-                        <div className="font-medium text-gray-900">
-                          {staff.customerName || "—"}
-                        </div>
-                        <div className="text-gray-600">
-                          {staff.mobileNo || "—"}
-                        </div>
-                        <div className="text-gray-600 truncate">
-                          {staff.address || "—"}
-                        </div>
-
-                        {/* Items */}
-                        <div className="text-gray-600">
-                          {Array.isArray(staff.items) && staff.items.length > 0
-                            ? staff.items
-                                .map((item) => {
-                                  const qty =
-                                    item.qty?.$numberInt || item.qty || 0;
-                                  return `${item.itemName || ""} (${qty}x)`;
-                                })
-                                .join(", ")
-                            : "—"}
-                        </div>
-
-                        <div className="text-gray-600">{total}</div>
-                        <div className="text-gray-600">{discount}</div>
-                        <div className="text-gray-600">{payable}</div>
-                        <div className="text-gray-600">{paid}</div>
-
-                        {/* Payment Method */}
-                        <div
-                          className={`font-semibold ${
-                            staff.paymentMethod === "Cash"
-                              ? "text-green-500"
-                              : staff.paymentMethod === "Card"
-                              ? "text-orange-400"
-                              : staff.paymentMethod === "Transfer"
-                              ? "text-blue-500"
-                              : "text-gray-500"
-                          }`}
-                        >
-                          {staff.paymentMethod || "—"}
-                        </div>
-
-                        <div className="text-gray-600">{balance}</div>
-
-                        {userInfo?.isAdmin && (
-                          <div className="flex justify-end gap-2">
-                            <button
-                              onClick={() => handleEditClick(staff)}
-                              className="px-2 py-2 hover:bg-blue-50 text-blue-600 rounded"
-                            >
-                              <SquarePen size={18} />
-                            </button>
-                            <button
-                              onClick={() => handleDelete(staff._id)}
-                              className="px-2 py-2 hover:bg-red-50 text-red-500 rounded"
-                            >
-                              <Trash2 size={18} />
-                            </button>
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Slider */}
       {isSliderOpen && (

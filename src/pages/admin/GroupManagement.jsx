@@ -69,7 +69,6 @@ const GroupManagement = () => {
   // Filter groups based on search query
   const filteredGroups = groupList.filter((group) =>
     group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
-    
   );
 
   // GSAP Animation for Slider
@@ -135,7 +134,6 @@ const GroupManagement = () => {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
-      
     }
   }, [userInfo?.token]);
 
@@ -299,8 +297,6 @@ const GroupManagement = () => {
   //   );
   // }
 
- 
-
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
@@ -364,7 +360,7 @@ const GroupManagement = () => {
               {loading ? (
                 // Skeleton shown while loading
                 <TableSkeleton
-                  rows={filteredGroups.length}
+                  rows={filteredGroups.length > 0 ? filteredGroups.length : 5}
                   cols={userInfo?.isAdmin ? 3 : 6}
                   variant="grid"
                 />

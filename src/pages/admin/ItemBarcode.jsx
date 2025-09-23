@@ -380,85 +380,122 @@ const ItemBarcode = () => {
       </div>
 
       {/* TABLE/CARDS */}
-      <div className="rounded-xl border border-gray-200 overflow-hidden">
+      {/* TABLE/CARDS */}
+      <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <div className="max-h-[400px] overflow-y-auto">
-            <div className="min-w-[1000px] w-full text-sm">
-              {/* Table Header */}
-              <div className="hidden lg:grid grid-cols-8 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+            <div className="w-full min-w-full text-sm">
+              {/* ✅ Table Header (Desktop Only) */}
+              <div className="hidden lg:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_2fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>Code</div>
                 <div>Item Name</div>
                 <div>Category</div>
-                <div>Item Type</div>
+                <div>Type</div>
                 <div>Price</div>
                 <div>Stock</div>
                 <div>Barcode</div>
                 <div className="text-right">Actions</div>
               </div>
 
-              {/* Table Body */}
+              {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={itemBarcodeList.length || 5}
+                    rows={
+                      itemBarcodeList.length > 0 ? itemBarcodeList.length : 5
+                    }
                     cols={8}
-                    className="lg:grid-cols-8"
+                    className="lg:grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_2fr_auto]"
                   />
                 ) : itemBarcodeList.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No items found.
                   </div>
                 ) : (
-                  itemBarcodeList.map((item, index) => (
-                    <div
-                      key={index}
-                      className="grid grid-cols-8 gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      {/* Code */}
-                      <div>{item.code}</div>
-
-                      {/* Item Name */}
-                      <div className="truncate">
-                        {item?.itemDetail?.itemName}
-                      </div>
-
-                      {/* Category */}
-                      <div>{item?.category?.categoryName}</div>
-
-                      {/* Item Type */}
-                      <div>{item?.itemType}</div>
-
-                      {/* Price */}
-                      <div>${item.price}</div>
-
-                      {/* Stock */}
-                      <div>{item.stock}</div>
-
-                      {/* Barcode */}
-                      <div>
-                        <Barcode
-                          value={item.barcode}
-                          height={20}
-                          width={1.2}
-                          background="transparent"
-                        />
-                      </div>
-
-                      {/* Actions */}
-                      <div className="flex justify-end">
-                        <div className="inline-flex border border-newPrimary px-1 py-1 rounded-[5px] items-center gap-3">
+                  itemBarcodeList.map((item, idx) => (
+                    <>
+                      {/* ✅ Desktop Grid */}
+                      <div
+                        key={item.code}
+                        className="hidden lg:grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr_2fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      >
+                        <div>{item.code}</div>
+                        <div className="truncate">
+                          {item?.itemDetail?.itemName}
+                        </div>
+                        <div>{item?.category?.categoryName}</div>
+                        <div>{item?.itemType}</div>
+                        <div>${item.price}</div>
+                        <div>{item.stock}</div>
+                        <div>
+                          <Barcode
+                            value={item.barcode}
+                            height={20}
+                            width={1.2}
+                            background="transparent"
+                          />
+                        </div>
+                        <div className="flex justify-end">
                           <button
                             onClick={() => {
                               setSelectedItem(item);
                               setIsModalOpen(true);
                             }}
-                            className="text-newPrimary"
+                            className="text-newPrimary hover:text-green-600"
                           >
                             <BarcodeIcon size={18} />
                           </button>
                         </div>
                       </div>
-                    </div>
+
+                      {/* ✅ Mobile Card */}
+                      <div
+                        key={`mobile-${item.code}`}
+                        className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                      >
+                        <div className="flex justify-between mb-2">
+                          <span className="text-sm font-semibold text-gray-700">
+                            {item?.itemDetail?.itemName}
+                          </span>
+                          <span className="text-xs text-gray-500">
+                            {item.code}
+                          </span>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Category: {item?.category?.categoryName}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Type: {item?.itemType}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Price: ${item.price}
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          Stock: {item.stock}
+                        </div>
+                        <div className="mt-2">
+                          <Barcode
+                            value={item.barcode}
+                            height={30}
+                            width={1.4}
+                            background="transparent"
+                          />
+                        </div>
+
+                        {/* Actions */}
+                        <div className="mt-3 flex justify-end">
+                          <button
+                            className="text-newPrimary hover:text-green-600"
+                            onClick={() => {
+                              setSelectedItem(item);
+                              setIsModalOpen(true);
+                            }}
+                          >
+                            <BarcodeIcon size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    </>
                   ))
                 )}
               </div>

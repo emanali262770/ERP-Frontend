@@ -64,7 +64,7 @@ const ItemType = () => {
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
-      setTimeout(() => setLoading(false), 1000);
+      setTimeout(() => setLoading(false), 2000);
     }
   }, []);
   useEffect(() => {
@@ -236,23 +236,23 @@ const ItemType = () => {
       </div>
 
       {/* Item Type Table */}
+      {/* Item Type Table */}
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <div className="min-w-full">
-            {/* ✅ Table Header (sticky style like previous tables) */}
+            {/* ✅ Table Header (Desktop Only) */}
             <div className="hidden lg:grid grid-cols-[1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-              <div>Category Name</div>
+              <div>Category</div>
               <div>Item Type</div>
               {userInfo?.isAdmin && <div className="text-right">Actions</div>}
             </div>
 
             {/* ✅ Table Body */}
-            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
               {loading ? (
-                // Skeleton shown while loading
                 <TableSkeleton
-                  rows={itemTypeList.length}
-                  cols={userInfo?.isAdmin ? 3 : 6}
+                  rows={itemTypeList.length > 0 ? itemTypeList.length : 5}
+                  cols={userInfo?.isAdmin ? 3 : 2}
                   className="lg:grid-cols-[1fr_1fr_auto]"
                 />
               ) : itemTypeList?.length === 0 ? (
@@ -260,37 +260,67 @@ const ItemType = () => {
                   No item types found.
                 </div>
               ) : (
-                itemTypeList.map((Item) => (
-                  <div
-                    key={Item._id}
-                    className="grid grid-cols-[1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                  >
-                    {/* Category Name */}
-                    <div className="font-medium text-gray-900">
-                      {Item?.category?.categoryName}
+                itemTypeList.map((item) => (
+                  <>
+                    {/* ✅ Desktop Grid */}
+                    <div
+                      key={item._id}
+                      className="hidden lg:grid grid-cols-[1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium text-gray-900">
+                        {item?.category?.categoryName}
+                      </div>
+                      <div className="text-gray-600">{item.itemTypeName}</div>
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-4">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="text-blue-600 hover:underline"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="text-red-600 hover:underline"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
                     </div>
 
-                    {/* Item Type */}
-                    <div className="text-gray-600">{Item.itemTypeName}</div>
-
-                    {/* Actions */}
-                    {userInfo?.isAdmin && (
-                      <div className="flex justify-end gap-4">
-                        <button
-                          onClick={() => handleEdit(Item)}
-                          className=" py-1 text-sm rounded  text-blue-600 "
-                        >
-                          <SquarePen size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(Item._id)}
-                          className="py-1 text-sm rounded  text-red-600 "
-                        >
-                          <Trash2 size={18} />
-                        </button>
+                    {/* ✅ Mobile Card */}
+                    <div
+                      key={`mobile-${item._id}`}
+                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                    >
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700">
+                          {item.itemTypeName}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {item?.category?.categoryName}
+                        </span>
                       </div>
-                    )}
-                  </div>
+
+                      {userInfo?.isAdmin && (
+                        <div className="mt-3 flex justify-end gap-3">
+                          <button
+                            className="text-blue-500"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDelete(item._id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
                 ))
               )}
             </div>
