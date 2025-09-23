@@ -6,7 +6,6 @@ import {
   FaFileInvoiceDollar,
   FaBookOpen,
   FaBox,
-  FaShoppingCart,
   FaReceipt,
   FaUsers,
   FaBarcode,
@@ -20,6 +19,17 @@ import {
   FaUsersCog,
   FaBalanceScale,
   FaUserCog,
+    FaShoppingCart,
+  FaFileAlt,
+  FaCheckCircle,
+  FaCommentsDollar,
+  FaCalculator,
+  FaClipboardCheck,
+  FaSignInAlt,
+  FaCheckDouble,
+  FaFileInvoice,
+  FaUndoAlt,
+  FaSignOutAlt,
 } from "react-icons/fa";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
@@ -28,12 +38,29 @@ import { NavLink, useNavigate } from "react-router-dom";
 const links = [
   { to: "/admin", label: "Dashboard", icon: <RiDashboardFill /> },
   { to: "/admin/item-details", label: "Item Details", icon: <FaBox />, key: "isItemDetails" },
-  { to: "/admin/item-purchase", label: "Purchase", icon: <FaShoppingCart />, key: "isPurchase" },
+  {
+     label: "Purchase",
+  icon: <FaShoppingCart />,
+  children: [
+    { to: "/admin/category-item", label: "Purchase Requisition", icon: <FaFileAlt />, key: "isItemCategory" },
+    { to: "/admin/item-type", label: "Purchase Approval", icon: <FaCheckCircle /> },
+    { to: "/admin/manufacture", label: "Market Quotation", icon: <FaCommentsDollar />, key: "isItemManufacturer" },
+    { to: "/admin/supplier", label: "Estimation", icon: <FaCalculator />, key: "isItemSupplier" },
+    { to: "/admin/shelve-location", label: "Approval of Estimation", icon: <FaClipboardCheck />, key: "isItemLocation" },
+    { to: "/admin/item-unit", label: "Purchase Order", icon: <FaFileInvoiceDollar />, key: "isItemUnit" },
+    { to: "/admin/promotion", label: "GatePass IN", icon: <FaSignInAlt /> },
+    { to: "/admin/quality-checking", label: "Quality Checking", icon: <FaCheckDouble /> },
+{ to: "/admin/goods-receipt-note", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
+{ to: "/admin/purchase-return", label: "Purchase Return", icon: <FaUndoAlt /> },
+{ to: "/admin/gatepass-out", label: "GatePass OUT", icon: <FaSignOutAlt /> },
+
+  ],
+  },
   { to: "/admin/sales-invoice", label: "Sales", icon: <FaReceipt />, key: "isSales" },
   { to: "/admin/customers", label: "Customers", icon: <FaUsers />, key: "isCustomer" },
   { to: "/admin/customers-booking", label: "Booking Customer", icon: <FaUsers />, key: "isBookingCustomer" },
   { to: "/admin/item-barcode", label: "Item Barcode", icon: <FaBarcode />, key: "isInventory" }, // map barcode under inventory
-  { to: "/admin/open-balance", label: "Opening Balance", icon: <FaBarcode />,},
+  { to: "/admin/open-balance", label: "Opening Balance", icon: <FaBarcode />, },
   { to: "/admin/expiry-tags", label: "Expiry Tags", icon: <FaTags />, key: "isSettings" },       // or add new field if backend supports
   { to: "/admin/report", label: "Report", icon: <FaChartBar />, key: "isReports" },
 

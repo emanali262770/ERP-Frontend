@@ -9,7 +9,6 @@ import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "./Skeleton";
 import CommanHeader from "../../components/CommanHeader";
 
-
 const ItemList = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [itemUnitList, setItemUnitList] = useState([]);
@@ -47,9 +46,6 @@ const ItemList = () => {
 
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-
-  // Simulate API call
 
 
   // Slider animation
@@ -229,8 +225,8 @@ const ItemList = () => {
 
     const formData = new FormData();
 
-    formData.append("itemType", itemCategory);
-
+    formData.append("itemCategory", itemCategory); // ✅ ObjectId
+    formData.append("itemType", itemType);         // ✅ ObjectId
     formData.append("itemName", itemName);
     formData.append("details", details);
     formData.append("manufacturer", manufacture);
@@ -241,7 +237,7 @@ const ItemList = () => {
     formData.append("purchase", parseFloat(purchase) || 0);
     formData.append("price", parseFloat(sales) || 0);
     formData.append("stock", parseInt(stock) || 0);
-    formData.append("labelBarcode", barcode);
+    formData.append("secondaryBarcode", barcode);
     formData.append("reorder", parseInt(reorder) || 0);
     formData.append("isEnable", enabled);
 
@@ -413,26 +409,12 @@ const ItemList = () => {
     setImagePreview("");
   };
 
-  // Capitalize First Letter
-  function capitalizeFirstLetter(value) {
-    if (!value) return "";
-    const str = String(value); // ensure it's a string
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  // Show loading spinner
-  // if (loading) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-  //       </div>
-  //     </div>
-  //   );
+  // // Capitalize First Letter
+  // function capitalizeFirstLetter(value) {
+  //   if (!value) return "";
+  //   const str = String(value); // ensure it's a string
+  //   return str.charAt(0).toUpperCase() + str.slice(1);
   // }
-
-
-
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -454,7 +436,7 @@ const ItemList = () => {
       {/* Item Table */}
       <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-w-[1000px]">
+          <div className="min-w-full w-full overflow-x-auto">
             {/* Header */}
             <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
               <div>Item Category</div>
@@ -534,9 +516,6 @@ const ItemList = () => {
         </div>
       </div>
 
-
-
-
       {/* Slider */}
       {isSliderOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
@@ -591,7 +570,7 @@ const ItemList = () => {
                 >
                   <option value="">Select Category</option>
                   {categoryList.map((category) => (
-                    <option key={category._id} value={category.categoryName}>
+                    <option key={category._id} value={category._id}>
                       {category.categoryName}
                     </option>
                   ))}
@@ -606,8 +585,11 @@ const ItemList = () => {
                 <select
                   value={itemType}
                   required
+                  disabled={!itemCategory}
+                  className={`w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200 
+      ${!itemCategory ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   onChange={(e) => setItemType(e.target.value)}
-                  className="w-full p-2 border rounded"
+
                 >
                   <option value="">Select Item Type</option>
                   {itemTypeList.map((type) => (
@@ -712,7 +694,6 @@ const ItemList = () => {
                   ))}
                 </select>
               </div>
-
 
 
               {/* Purchase */}
