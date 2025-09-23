@@ -33,6 +33,9 @@ import Promotion from "./pages/admin/PromotionDetail.jsx";
 import PromotionItem from "./pages/admin/PromotionItem.jsx";
 import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
 import ScrollToTop from "./helper/ScrollToTop.jsx";
+import Designation from "./pages/admin/Designation.jsx";
+import Employee from "./pages/admin/Employee.jsx";
+import Departments from "./pages/admin/Departments.jsx";
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -78,6 +81,9 @@ function AppContent() {
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
             <Route path="day-book" element={<DayBook />} />
             <Route path="open-balance" element={<OpeningBalance />} />
+            <Route path="designation" element={<Designation />} />
+            <Route path="employee" element={<Employee />} />
+            <Route path="departments" element={<Departments />} />
             
             <Route path="promotion-item" element={<PromotionItem />}/>
             <Route path='item-type' element={<ItemType/>}/>
