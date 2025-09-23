@@ -177,7 +177,6 @@ const handleEditClick = (promotionitem) => {
 
     setItemSearch("");
     setIsSliderOpen(true);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -665,6 +664,6 @@ const handleEditClick = (promotionitem) => {
       </div>
     </div>
   );
-};
+}
 
 export default PromotionItem;
