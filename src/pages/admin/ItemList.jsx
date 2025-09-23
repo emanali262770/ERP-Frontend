@@ -9,7 +9,6 @@ import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "./Skeleton";
 import CommanHeader from "../../components/CommanHeader";
 
-
 const ItemList = () => {
   const [categoryList, setCategoryList] = useState([]);
   const [itemUnitList, setItemUnitList] = useState([]);
@@ -47,9 +46,6 @@ const ItemList = () => {
 
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-
-  // Simulate API call
 
 
   // Slider animation
@@ -432,8 +428,6 @@ const ItemList = () => {
   // }
 
 
-
-
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
@@ -452,90 +446,87 @@ const ItemList = () => {
       </div>
 
       {/* Item Table */}
-      <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
-        <div className="overflow-x-auto">
-          <div className="min-w-[1000px]">
-            {/* Header */}
-            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-              <div>Item Category</div>
-              <div>Item Name</div>
-              <div>Purchase</div>
-              <div>Sales</div>
-              <div>Stock</div>
-              <div>Barcode</div>
-              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-            </div>
-
-            {/* Body */}
-            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-              {loading ? (
-                <TableSkeleton
-                  rows={itemList.length || 5}
-                  cols={userInfo?.isAdmin ? 7 : 6}
-                  className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-                />
-              ) : (
-                itemList.map((item, index) => (
-                  <div
-                    key={item._id}
-                    className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                  >
-                    {/* Item Category (with icon) */}
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={item.itemImage?.url || item.itemImage}
-                        alt="Product Icon"
-                        className="w-7 h-7 object-cover rounded-full"
-                      />
-                      <span className="font-medium text-gray-900">
-                        {item?.itemType?.itemTypeName}
-                      </span>
-                    </div>
-
-                    {/* Item Name */}
-                    <div className="text-gray-600">{item.itemName}</div>
-
-                    {/* Purchase */}
-                    <div className="font-semibold text-gray-600">
-                      {item.purchase}
-                    </div>
-
-                    {/* Sales */}
-                    <div className="font-semibold text-gray-600">
-                      {item.price}
-                    </div>
-
-                    {/* Stock */}
-                    <div className="font-semibold text-gray-600">
-                      {item.stock}
-                    </div>
-
-                    {/* Barcode */}
-                    <div className="font-semibold text-gray-600">
-                      {item.labelBarcode.slice(0, 12)}
-                    </div>
-
-                    {/* Actions */}
-                    {userInfo?.isAdmin && (
-                      <div className="flex justify-end gap-3">
-                        <button className="text-blue-500 hover:underline">
-                          <SquarePen size={18} />
-                        </button>
-                        <button className="text-red-500 hover:underline">
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
+     <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-full w-full overflow-x-auto">
+      {/* Header */}
+      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Item Category</div>
+        <div>Item Name</div>
+        <div>Purchase</div>
+        <div>Sales</div>
+        <div>Stock</div>
+        <div>Barcode</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
       </div>
 
+      {/* Body */}
+      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+        {loading ? (
+          <TableSkeleton
+            rows={itemList.length || 5}
+            cols={userInfo?.isAdmin ? 7 : 6}
+            className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+          />
+        ) : (
+          itemList.map((item, index) => (
+            <div
+              key={item._id}
+              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+            >
+              {/* Item Category (with icon) */}
+              <div className="flex items-center gap-3">
+                <img
+                  src={item.itemImage?.url || item.itemImage}
+                  alt="Product Icon"
+                  className="w-7 h-7 object-cover rounded-full"
+                />
+                <span className="font-medium text-gray-900">
+                  {item?.itemType?.itemTypeName}
+                </span>
+              </div>
 
+              {/* Item Name */}
+              <div className="text-gray-600">{item.itemName}</div>
 
+              {/* Purchase */}
+              <div className="font-semibold text-gray-600">
+                {item.purchase}
+              </div>
+
+              {/* Sales */}
+              <div className="font-semibold text-gray-600">
+                {item.price}
+              </div>
+
+              {/* Stock */}
+              <div className="font-semibold text-gray-600">
+                {item.stock}
+              </div>
+
+              {/* Barcode */}
+              <div className="font-semibold text-gray-600">
+                {item.labelBarcode.slice(0, 12)}
+              </div>
+
+              {/* Actions */}
+              {userInfo?.isAdmin && (
+                <div className="flex justify-end gap-3">
+                  <button className="text-blue-500 hover:underline">
+                    <SquarePen size={18} />
+                  </button>
+                  <button className="text-red-500 hover:underline">
+                    <Trash2 size={18} />
+                  </button>
+                </div>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
 
       {/* Slider */}
       {isSliderOpen && (
@@ -712,7 +703,6 @@ const ItemList = () => {
                   ))}
                 </select>
               </div>
-
 
 
               {/* Purchase */}

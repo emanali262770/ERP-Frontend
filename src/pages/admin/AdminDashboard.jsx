@@ -435,7 +435,7 @@ const AdminDashboard = () => {
       icon: <Users size={24} />,
       change: "+12%",
       color: "bg-blue-100 text-blue-600",
-      border: "border-l-4 border-blue-600",
+      border: "border-l-4 border-blue-700",
     },
     {
       name: "Total Products",
@@ -459,7 +459,7 @@ const AdminDashboard = () => {
       icon: <CreditCard size={24} />,
       change: "+18%",
       color: "bg-amber-100 text-amber-600",
-      border: "border-l-4 border-amber-600",
+      border: "border-l-4 border-amber-500",
     },
     {
       name: "Total Revenue",
@@ -467,7 +467,7 @@ const AdminDashboard = () => {
       icon: <DollarSign size={24} />,
       change: "+15%",
       color: "bg-emerald-100 text-emerald-600",
-      border: "border-l-4 border-emerald-600",
+      border: "border-l-4 border-emerald-500",
     },
     {
       name: "Bookings",

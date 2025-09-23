@@ -33,7 +33,9 @@ const Category = () => {
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
-      setTimeout(() => setLoading(false), 1000);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   }, []);
   useEffect(() => {
@@ -289,7 +291,7 @@ const Category = () => {
                 {loading ? (
                   // Skeleton shown while loading
                   <TableSkeleton
-                    rows={categories.length}
+                    rows={categories.length > 0 ? categories.length : 5}
                     cols={userInfo?.isAdmin ? 5 : 6}
                     className="lg:grid-cols-[80px_1fr_150px_150px_200px]"
                   />

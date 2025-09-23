@@ -144,12 +144,18 @@ const OpeningBalance = () => {
       </div>
 
       {/* Table */}
+
+      {/* TABLE / CARDS */}
+    
+        
+
       <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <div className="min-w-[1000px]">
 
             {/* ✅ Table Header (sticky like your previous tables) */}
             <div className="grid grid-cols-8 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+
               <div>Sr</div>
               <div>Code</div>
               <div>Type</div>
@@ -160,109 +166,137 @@ const OpeningBalance = () => {
               <div className="text-right">Action</div>
             </div>
 
-            {/* ✅ Scrollable Table Body */}
-            <div className="max-h-[400px] overflow-y-auto divide-y divide-gray-100">
-              {loading ? (
-                <TableSkeleton
-                  rows={filteredRecords.length || 5}
-                  cols={userInfo?.isAdmin ? 8 : 7}
-                  className="lg:grid-cols-8"
-                />
-              ) : filteredRecords.map((rec, index) => (
-                <div
-                  key={rec.code}
-                  className="grid grid-cols-8 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                >
-                  <div className="text-gray-700">{rec.sr}</div>
-                  <div className="text-gray-600">{rec.code}</div>
-                  <div className="text-gray-600">{rec.type}</div>
-                  <div className="font-medium text-gray-900">{rec.item}</div>
+{/* ✅ Table Body */}
+<div className="max-h-screen overflow-y-auto divide-y divide-gray-100">
+  {loading ? (
+    <TableSkeleton
+      rows={filteredRecords.length > 0 ? filteredRecords.length : 5}
+      cols={8}
+      className="lg:grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto]"
+    />
+  ) : filteredRecords.length === 0 ? (
+    <div className="text-center py-4 text-gray-500 bg-white">
+      No items found.
+    </div>
+  ) : (
+    filteredRecords.map((rec, index) => (
+      <>
+        {/* ✅ Desktop Grid */}
+        <div
+          key={rec.code}
+          className="hidden lg:grid grid-cols-[0.5fr_1fr_1fr_2fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+        >
+          <div className="text-gray-700">{rec.sr}</div>
+          <div className="text-gray-600">{rec.code}</div>
+          <div className="text-gray-600">{rec.type}</div>
+          <div className="font-medium text-gray-900">{rec.item}</div>
 
-                  {/* Purchase */}
-                  <div className="text-gray-600">
-                    {editing[`${index}-purchase`] ? (
-                      <input
-                        type="number"
-                        value={rec.purchase}
-                        onChange={(e) =>
-                          handleChange(index, "purchase", e.target.value)
-                        }
-                        onBlur={() => handleBlur(index, "purchase")}
-                        autoFocus
-                        className="w-20 border rounded p-1"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleFocus(index, "purchase")}
-                        className="cursor-pointer"
-                      >
-                        {rec.purchase}
-                      </span>
-                    )}
-                  </div>
+          {/* Editable Purchase */}
+          <div className="text-gray-600">
+            {editing[`${index}-purchase`] ? (
+              <input
+                type="number"
+                value={rec.purchase}
+                onChange={(e) =>
+                  handleChange(index, "purchase", e.target.value)
+                }
+                onBlur={() => handleBlur(index, "purchase")}
+                autoFocus
+                className="w-20 border rounded p-1"
+              />
+            ) : (
+              <span
+                onClick={() => handleFocus(index, "purchase")}
+                className="cursor-pointer"
+              >
+                {rec.purchase}
+              </span>
+            )}
+          </div>
 
-                  {/* Sales */}
-                  <div className="text-gray-600">
-                    {editing[`${index}-sales`] ? (
-                      <input
-                        type="number"
-                        value={rec.sales}
-                        onChange={(e) =>
-                          handleChange(index, "sales", e.target.value)
-                        }
-                        onBlur={() => handleBlur(index, "sales")}
-                        autoFocus
-                        className="w-20 border rounded p-1"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleFocus(index, "sales")}
-                        className="cursor-pointer"
-                      >
-                        {rec.sales}
-                      </span>
-                    )}
-                  </div>
+          {/* Editable Sales */}
+          <div className="text-gray-600">
+            {editing[`${index}-sales`] ? (
+              <input
+                type="number"
+                value={rec.sales}
+                onChange={(e) =>
+                  handleChange(index, "sales", e.target.value)
+                }
+                onBlur={() => handleBlur(index, "sales")}
+                autoFocus
+                className="w-20 border rounded p-1"
+              />
+            ) : (
+              <span
+                onClick={() => handleFocus(index, "sales")}
+                className="cursor-pointer"
+              >
+                {rec.sales}
+              </span>
+            )}
+          </div>
 
-                  {/* Stock */}
-                  <div className="text-gray-600">
-                    {editing[`${index}-stock`] ? (
-                      <input
-                        type="number"
-                        value={rec.stock}
-                        onChange={(e) =>
-                          handleChange(index, "stock", e.target.value)
-                        }
-                        onBlur={() => handleBlur(index, "stock")}
-                        autoFocus
-                        className="w-20 border rounded p-1"
-                      />
-                    ) : (
-                      <span
-                        onClick={() => handleFocus(index, "stock")}
-                        className="cursor-pointer"
-                      >
-                        {rec.stock}
-                      </span>
-                    )}
-                  </div>
+          {/* Editable Stock */}
+          <div className="text-gray-600">
+            {editing[`${index}-stock`] ? (
+              <input
+                type="number"
+                value={rec.stock}
+                onChange={(e) =>
+                  handleChange(index, "stock", e.target.value)
+                }
+                onBlur={() => handleBlur(index, "stock")}
+                autoFocus
+                className="w-20 border rounded p-1"
+              />
+            ) : (
+              <span
+                onClick={() => handleFocus(index, "stock")}
+                className="cursor-pointer"
+              >
+                {rec.stock}
+              </span>
+            )}
+          </div>
 
-                  {/* Action */}
-                  <div className="flex justify-end">
-                    <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
-                      <SaveIcon size={18} />
-                    </button>
-                  </div>
-                </div>
-              ))}
+          {/* Action */}
+          <div className="flex justify-end">
+            <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
+              <SaveIcon size={18} />
+            </button>
+          </div>
+        </div>
 
-              {/* Show message if nothing found */}
-              {!loading && filteredRecords.length === 0 && (
-                <div className="px-6 py-4 text-center text-gray-500">
-                  No items found.
-                </div>
-              )}
-            </div>
+        {/* ✅ Mobile Card */}
+        <div
+          key={`mobile-${rec.code}`}
+          className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+        >
+          <div className="flex justify-between mb-2">
+            <span className="text-sm font-semibold text-gray-700">
+              {rec.item}
+            </span>
+            <span className="text-xs text-gray-500">{rec.code}</span>
+          </div>
+          <div className="text-sm text-gray-600">Type: {rec.type}</div>
+          <div className="text-sm text-gray-600">
+            Purchase: {rec.purchase}
+          </div>
+          <div className="text-sm text-gray-600">Sales: {rec.sales}</div>
+          <div className="text-sm text-gray-600">Stock: {rec.stock}</div>
+
+          <div className="mt-3 flex justify-end">
+            <button className="px-3 py-1 hover:bg-green-50 text-newPrimary rounded">
+              <SaveIcon size={18} />
+            </button>
+          </div>
+        </div>
+      </>
+    ))
+  )}
+</div>
+
           </div>
         </div>
       </div>

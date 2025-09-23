@@ -66,7 +66,10 @@ const ModulesFunctionalities = () => {
       toast.error("Failed to fetch groups");
       setGroups([]);
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      
     }
   }, []);
 
@@ -118,7 +121,10 @@ const ModulesFunctionalities = () => {
     } catch (error) {
       toast.error("Error fetching functionalities");
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+         setLoading(false);
+      }, 2000);
+     
     }
   }, []);
 
@@ -283,7 +289,7 @@ const ModulesFunctionalities = () => {
       <div className="flex flex-col divide-y divide-gray-100">
         {loading ? (
           <TableSkeleton 
-            rows={filteredFunctionalityList.length || 5} 
+            rows={filteredFunctionalityList.length>0? filteredFunctionalityList.length:5} 
             cols={userInfo?.isAdmin ? 3 : 2} 
           />
         ) : filteredFunctionalityList.length > 0 ? (

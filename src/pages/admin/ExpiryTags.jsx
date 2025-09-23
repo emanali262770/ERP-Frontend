@@ -10,59 +10,59 @@ import { SquarePen, Trash2 } from "lucide-react";
 
 const ExpiryTags = () => {
   const [expiryTagList, setExpiryTagList] = useState([
-  {
-    _id: "tag1",
-    receiptNo: "RCP-1001",
-    itemCode: "ITM-001",
-    itemName: "Paracetamol",
-    category: "Medicines",
-    price: 50,
-    salePrice: 65,
-    manufacturer: "ABC Pharma",
-    supplier: "MediSupply Pvt Ltd",
-    manufactureDate: "2025-08-01T10:00:00",
-    expiryDate: "2026-08-01T10:00:00",
-  },
-  {
-    _id: "tag2",
-    receiptNo: "RCP-1002",
-    itemCode: "ITM-002",
-    itemName: "Vitamin C Syrup",
-    category: "Medicines",
-    price: 120,
-    salePrice: 150,
-    manufacturer: "HealthCare Labs",
-    supplier: "Wellness Suppliers",
-    manufactureDate: "2025-07-15T09:00:00",
-    expiryDate: "2026-01-15T09:00:00",
-  },
-  {
-    _id: "tag3",
-    receiptNo: "RCP-1003",
-    itemCode: "ITM-003",
-    itemName: "Charger",
-    category: "Electronics",
-    price: 800,
-    salePrice: 950,
-    manufacturer: "TechGear",
-    supplier: "ElectroWorld",
-    manufactureDate: "2025-05-10T08:30:00",
-    expiryDate: "2027-05-10T08:30:00",
-  },
-  {
-    _id: "tag4",
-    receiptNo: "RCP-1004",
-    itemCode: "ITM-004",
-    itemName: "Injections",
-    category: "Medicines",
-    price: 300,
-    salePrice: 380,
-    manufacturer: "LifeLine Pharma",
-    supplier: "Global Meds",
-    manufactureDate: "2025-06-20T11:15:00",
-    expiryDate: "2026-06-20T11:15:00",
-  },
-]);
+    {
+      _id: "tag1",
+      receiptNo: "RCP-1001",
+      itemCode: "ITM-001",
+      itemName: "Paracetamol",
+      category: "Medicines",
+      price: 50,
+      salePrice: 65,
+      manufacturer: "ABC Pharma",
+      supplier: "MediSupply Pvt Ltd",
+      manufactureDate: "2025-08-01T10:00:00",
+      expiryDate: "2026-08-01T10:00:00",
+    },
+    {
+      _id: "tag2",
+      receiptNo: "RCP-1002",
+      itemCode: "ITM-002",
+      itemName: "Vitamin C Syrup",
+      category: "Medicines",
+      price: 120,
+      salePrice: 150,
+      manufacturer: "HealthCare Labs",
+      supplier: "Wellness Suppliers",
+      manufactureDate: "2025-07-15T09:00:00",
+      expiryDate: "2026-01-15T09:00:00",
+    },
+    {
+      _id: "tag3",
+      receiptNo: "RCP-1003",
+      itemCode: "ITM-003",
+      itemName: "Charger",
+      category: "Electronics",
+      price: 800,
+      salePrice: 950,
+      manufacturer: "TechGear",
+      supplier: "ElectroWorld",
+      manufactureDate: "2025-05-10T08:30:00",
+      expiryDate: "2027-05-10T08:30:00",
+    },
+    {
+      _id: "tag4",
+      receiptNo: "RCP-1004",
+      itemCode: "ITM-004",
+      itemName: "Injections",
+      category: "Medicines",
+      price: 300,
+      salePrice: 380,
+      manufacturer: "LifeLine Pharma",
+      supplier: "Global Meds",
+      manufactureDate: "2025-06-20T11:15:00",
+      expiryDate: "2026-06-20T11:15:00",
+    },
+  ]);
   const [loading, setLoading] = useState(true);
 
   // Form states
@@ -135,13 +135,17 @@ const ExpiryTags = () => {
   const fetchExpiryTags = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/expirayTags`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/expirayTags`
+      );
       setExpiryTagList(res.data);
     } catch (error) {
       console.error("Error fetching expiry tags:", error);
       toast.error("Failed to fetch expiry tags");
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   }, []);
 
@@ -152,7 +156,9 @@ const ExpiryTags = () => {
   // Fetch categories
   const fetchCategoryList = useCallback(async () => {
     try {
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/list`);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/categories/list`
+      );
       setCategoryList(res.data);
     } catch (error) {
       console.error("Error fetching categories", error);
@@ -168,7 +174,9 @@ const ExpiryTags = () => {
     try {
       setItemCategory(categoryName);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/item-details/category/${categoryName}`
+        `${
+          import.meta.env.VITE_API_BASE_URL
+        }/item-details/category/${categoryName}`
       );
       setSuggestions(res.data);
     } catch (error) {
@@ -180,7 +188,9 @@ const ExpiryTags = () => {
     const selectedName = e.target.value;
     setItemName(selectedName);
 
-    const selectedItem = suggestions.find((item) => item.itemName === selectedName);
+    const selectedItem = suggestions.find(
+      (item) => item.itemName === selectedName
+    );
 
     if (selectedItem) {
       setPrice(selectedItem.purchase || "");
@@ -188,13 +198,17 @@ const ExpiryTags = () => {
       setManufactureDate(selectedItem.createdAt?.slice(0, 16) || "");
       if (selectedItem.manufacturer) {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/manufacturers/${selectedItem.manufacturer}`
+          `${import.meta.env.VITE_API_BASE_URL}/manufacturers/${
+            selectedItem.manufacturer
+          }`
         );
         setManufacturer(res.data.manufacturerName);
       }
       if (selectedItem.supplier) {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/suppliers/${selectedItem.supplier}`
+          `${import.meta.env.VITE_API_BASE_URL}/suppliers/${
+            selectedItem.supplier
+          }`
         );
         setSupplier(res.data.supplierName);
       }
@@ -227,10 +241,18 @@ const ExpiryTags = () => {
     try {
       const headers = { Authorization: `Bearer ${token}` };
       if (isEdit && editId) {
-        await axios.put(`${import.meta.env.VITE_API_BASE_URL}/expirayTags/${editId}`, payload, { headers });
+        await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/expirayTags/${editId}`,
+          payload,
+          { headers }
+        );
         toast.success("✅ Expiry Tag updated successfully");
       } else {
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/expirayTags`, payload, { headers });
+        await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/expirayTags`,
+          payload,
+          { headers }
+        );
         toast.success("✅ Expiry Tag added successfully");
       }
       resetForm();
@@ -277,9 +299,12 @@ const ExpiryTags = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/expirayTags/${id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
+            await axios.delete(
+              `${import.meta.env.VITE_API_BASE_URL}/expirayTags/${id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              }
+            );
             swalWithTailwindButtons.fire(
               "Deleted!",
               "Expiry Tag removed.",
@@ -332,13 +357,16 @@ const ExpiryTags = () => {
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
-     
       {/* Common Header */}
-      <CommanHeader/>
+      <CommanHeader />
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-newPrimary">Expiry Tags List</h1>
-          <p className="text-gray-500 text-sm">Expiry Tag Management Dashboard</p>
+          <h1 className="text-2xl font-bold text-newPrimary">
+            Expiry Tags List
+          </h1>
+          <p className="text-gray-500 text-sm">
+            Expiry Tag Management Dashboard
+          </p>
         </div>
         <button
           onClick={() => {
@@ -352,72 +380,119 @@ const ExpiryTags = () => {
       </div>
 
       {/* Table */}
+      {/* Table */}
       <div className="rounded-xl border border-gray-100 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-full">
-      {/* ✅ Table Header (sticky + consistent style) */}
-      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_100px_100px_150px_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
-        <div>Item Name</div>
-        <div>Item Code</div>
-        <div>Category</div>
-        <div>Price</div>
-        <div>Sale Price</div>
-        <div>Expiry Date</div>
-        <div className="text-right">Actions</div>
-      </div>
+        <div className="overflow-x-auto">
+          <div className="min-w-full">
+            {/* ✅ Table Header (Desktop Only) */}
+            <div className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1.5fr_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase border-b border-gray-200 sticky top-0 z-10">
+              <div>Item Name</div>
+              <div>Code</div>
+              <div>Category</div>
+              <div>Price</div>
+              <div>Sale Price</div>
+              <div>Expiry Date</div>
+              <div className="text-right">Actions</div>
+            </div>
 
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <TableSkeleton rows={expiryTagList.length || 5} cols={userInfo?.isAdmin ? 7 : 6} className="lg:grid-cols-[1fr_1fr_1fr_100px_100px_150px_auto]"/>
-        ) : expiryTagList.map((tag, index) => (
-          <div
-            key={index}
-            className="grid grid-cols-[1fr_1fr_1fr_100px_100px_150px_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-          >
-            {/* Item Name */}
-            <div className="font-medium text-gray-900">{tag.itemName}</div>
+            {/* ✅ Table Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={expiryTagList.length > 0 ? expiryTagList.length : 5}
+                  cols={7}
+                  className="lg:grid-cols-[2fr_1fr_1fr_1fr_1fr_1.5fr_auto]"
+                />
+              ) : expiryTagList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No tags found.
+                </div>
+              ) : (
+                expiryTagList.map((tag) => (
+                  <>
+                    {/* ✅ Desktop Grid */}
+                    <div
+                      key={tag._id}
+                      className="hidden lg:grid grid-cols-[2fr_1fr_1fr_1fr_1fr_1.5fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium text-gray-900">
+                        {tag.itemName}
+                      </div>
+                      <div className="font-semibold text-green-600">
+                        {tag.itemCode}
+                      </div>
+                      <div className="text-gray-600">{tag.category}</div>
+                      <div className="text-gray-600">{tag.price}</div>
+                      <div className="text-gray-600">{tag.salePrice}</div>
+                      <div className="text-gray-600">
+                        {tag.expiryDate?.slice(0, 10)}
+                      </div>
+                      <div className="flex justify-end gap-3">
+                        <button
+                          onClick={() => handleEdit(tag)}
+                          className="text-blue-500 hover:underline"
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(tag._id)}
+                          className="text-red-500 hover:underline"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
 
-            {/* Item Code */}
-            <div className="font-semibold text-green-600">{tag.itemCode}</div>
+                    {/* ✅ Mobile Card */}
+                    <div
+                      key={`mobile-${tag._id}`}
+                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                    >
+                      <div className="flex justify-between mb-2">
+                        <span className="text-sm font-semibold text-gray-700">
+                          {tag.itemName}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {tag.itemCode}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Category: {tag.category}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Price: {tag.price}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Sale Price: {tag.salePrice}
+                      </div>
+                      <div className="text-sm text-gray-600">
+                        Expiry: {tag.expiryDate?.slice(0, 10)}
+                      </div>
 
-            {/* Category */}
-            <div className="text-gray-600">{tag.category}</div>
-
-            {/* Price */}
-            <div className="text-gray-600">{tag.price}</div>
-
-            {/* Sale Price */}
-            <div className="text-gray-600">{tag.salePrice}</div>
-
-            {/* Expiry Date */}
-            <div className="text-gray-600">{tag.expiryDate}</div>
-
-            {/* Actions */}
-            <div className="text-right relative group">
-            
-              <div className="flex gap-3">
-                <button
-                  onClick={() => handleEdit(tag)}
-                  className="w-full text-left  py-1 text-sm  text-blue-600 "
-                >
-                  <SquarePen size={18}/>
-                </button>
-                <button
-                  onClick={() => handleDelete(tag._id)}
-                  className="w-full text-left  py-1 text-sm  text-red-500 "
-                >
-                <Trash2 size={18}/>
-                </button>
-              </div>
+                      {userInfo?.isAdmin && (
+                        <div className="mt-3 flex justify-end gap-3">
+                          <button
+                            className="text-blue-500"
+                            onClick={() => handleEdit(tag)}
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDelete(tag._id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ))
+              )}
             </div>
           </div>
-        ))}
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
 
       {/* Right-Side Slider */}
       {isSliderOpen && (
@@ -428,7 +503,9 @@ const ExpiryTags = () => {
             style={{ display: "block" }}
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
-              <h2 className="text-xl font-bold text-newPrimary">{isEdit ? "Edit Expiry Tag" : "Add Expiry Tag"}</h2>
+              <h2 className="text-xl font-bold text-newPrimary">
+                {isEdit ? "Edit Expiry Tag" : "Add Expiry Tag"}
+              </h2>
               <button
                 className="w-6 h-6 text-white rounded-full flex justify-center items-center hover:text-gray-400 text-xl bg-newPrimary"
                 onClick={handleCloseSlider}
@@ -441,7 +518,9 @@ const ExpiryTags = () => {
               <div className="border rounded-lg p-4">
                 <div className="grid grid-cols-1 gap-4">
                   <div>
-                    <label className="block text-gray-700 mb-1">Receipt No</label>
+                    <label className="block text-gray-700 mb-1">
+                      Receipt No
+                    </label>
                     <input
                       type="text"
                       value={receiptNo}
@@ -463,12 +542,16 @@ const ExpiryTags = () => {
                     >
                       <option value="">Select Category</option>
                       {categoryList.map((c) => (
-                        <option key={c._id} value={c.categoryName}>{c.categoryName}</option>
+                        <option key={c._id} value={c.categoryName}>
+                          {c.categoryName}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Item Name</label>
+                    <label className="block text-gray-700 mb-1">
+                      Item Name
+                    </label>
                     <select
                       value={itemName}
                       onChange={handleSelectItem}
@@ -476,12 +559,16 @@ const ExpiryTags = () => {
                     >
                       <option value="">Select Item</option>
                       {suggestions.map((s) => (
-                        <option key={s._id} value={s.itemName}>{s.itemName}</option>
+                        <option key={s._id} value={s.itemName}>
+                          {s.itemName}
+                        </option>
                       ))}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Item Code</label>
+                    <label className="block text-gray-700 mb-1">
+                      Item Code
+                    </label>
                     <input
                       type="text"
                       value={itemCode}
@@ -501,7 +588,9 @@ const ExpiryTags = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Sale Price</label>
+                    <label className="block text-gray-700 mb-1">
+                      Sale Price
+                    </label>
                     <input
                       type="number"
                       value={salePrice}
@@ -511,7 +600,9 @@ const ExpiryTags = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Manufacturer</label>
+                    <label className="block text-gray-700 mb-1">
+                      Manufacturer
+                    </label>
                     <input
                       type="text"
                       value={manufacturer}
@@ -531,7 +622,9 @@ const ExpiryTags = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Manufacture Date</label>
+                    <label className="block text-gray-700 mb-1">
+                      Manufacture Date
+                    </label>
                     <input
                       type="datetime-local"
                       value={manufactureDate}
@@ -540,7 +633,9 @@ const ExpiryTags = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-700 mb-1">Expiry Date</label>
+                    <label className="block text-gray-700 mb-1">
+                      Expiry Date
+                    </label>
                     <input
                       type="datetime-local"
                       value={expiryDate}

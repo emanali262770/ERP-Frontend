@@ -28,6 +28,7 @@ const PromotionItem = () => {
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [itemSearch, setItemSearch] = useState("");
 
+
   const [isEnable, setIsEnable] = useState(true);
   const sliderRef = useRef(null);
 
@@ -148,9 +149,9 @@ const itemsWithNames = promotionItemsRes.data.map(item => {
     { id: 7, itemName: "Samsung", price: "$1,000" },
   ];
 
-  const filterdata = items.filter((item) => {
-    return item.itemName.toLowerCase().includes(itemSearch.toLowerCase())
-  });
+const filterdata = items.filter((item) => {
+  return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
+});
 
 const handleEditClick = (promotionitem) => {
   setEditingPromotionItem(promotionitem);
@@ -159,9 +160,9 @@ const handleEditClick = (promotionitem) => {
   setDetails(promotionitem.details || "");
   setStartDate(promotionitem.startDate || "");
   setEndDate(promotionitem.endDate || "");
-  setSelectedPromotion(promotionitem.promotion || ""); // ✅ use correct key
-  setSelectedCategory(promotionitem.category || "");   // ✅ use correct key
-  setSelectedItemType(promotionitem.itemType || "");   // ✅ use correct key
+  setSelectedPromotion(promotionitem.promotion || ""); // ✅ backend key
+  setSelectedCategory(promotionitem.category || "");   // ✅ backend key
+  setSelectedItemType(promotionitem.itemType || "");   // ✅ backend key
   setDiscountPercentage(promotionitem.discountPercentage || "");
   setIsSliderOpen(true);
 };
@@ -256,7 +257,7 @@ const payload = {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      {/* Common header */}
+
       <CommanHeader />
       <div className="px-6 mx-auto">
         {/* Top bar */}
@@ -273,6 +274,7 @@ const payload = {
         </div>
 
         {/* Table */}
+
         <div className="rounded-xl border border-gray-100 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[1000px]">
@@ -289,72 +291,73 @@ const payload = {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
-                {loading ? (
-                  // Skeleton shown while loading
-                  <TableSkeleton
-                    rows={promotionItems.length || 5}
-                    cols={userInfo?.isAdmin ? 7 : 6}
-                  />
-                ) : promotionItems.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500 bg-white">
-                    No promotions found.
-                  </div>
-                ) : (
-                  promotionItems.map((promo) => (
-                    <div
-                      key={promo._id || promo.id}
-                      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      {/* Promotion */}
-                      <div className="font-medium text-gray-900 truncate">
-                        {promo.promotionName}
-                      </div>
+             {loading ? (
+  // Skeleton shown while loading
+  <TableSkeleton
+    rows={promotionItems.length || 5}
+    cols={userInfo?.isAdmin ? 7 : 6}
+  />
+) : promotionItems.length === 0 ? (
+  <div className="text-center py-4 text-gray-500 bg-white">
+    No promotions found.
+  </div>
+) : (
+  promotionItems.map((promo) => (
+    <div
+      key={promo._id || promo.id}
+      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+    >
+      {/* Promotion */}
+      <div className="font-medium text-gray-900 truncate">
+        {promo.promotionName}
+      </div>
 
-                      {/* Category */}
-                      <div className="text-gray-600 truncate">{promo.categoryName}</div>
+      {/* Category */}
+      <div className="text-gray-600 truncate">{promo.categoryName}</div>
 
-                      {/* Item Type */}
-                      <div className="text-gray-600 truncate">{promo.itemTypeName}</div>
+      {/* Item Type */}
+      <div className="text-gray-600 truncate">{promo.itemTypeName}</div>
 
-                      {/* Items */}
-                      <div className="text-gray-600 truncate">
-                        {promo.items && promo.items.length > 0 ? (
-                          promo.items.map((item, idx) => (
-                            <span key={idx} className="inline-block mr-3">
-                              {item.itemName} {item.price && `(${item.price})`}
-                            </span>
-                          ))
-                        ) : (
-                          <span className="text-gray-400">No items</span>
-                        )}
-                      </div>
+      {/* Items */}
+      <div className="text-gray-600 truncate">
+        {promo.items && promo.items.length > 0 ? (
+          promo.items.map((item, idx) => (
+            <span key={idx} className="inline-block mr-3">
+              {item.itemName} {item.price && `(${item.price})`}
+            </span>
+          ))
+        ) : (
+          <span className="text-gray-400">No items</span>
+        )}
+      </div>
 
-                      {/* Discount */}
-                      <div className="text-gray-600 truncate">{promo.discountPercentage}</div>
+      {/* Discount */}
+      <div className="text-gray-600 truncate">{promo.discountPercentage}</div>
 
-                      {/* End Date */}
-                      <div className="text-gray-500">{promo.endDate || "N/A"}</div>
+      {/* End Date */}
+      <div className="text-gray-500">{promo.endDate || "N/A"}</div>
 
-                      {/* Actions */}
-                      {userInfo?.isAdmin && (
-                        <div className="flex justify-end gap-3">
-                          <button
-                            onClick={() => handleEditClick(promo)}
-                            className="py-1 text-sm rounded text-blue-600"
-                          >
-                            <SquarePen size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(promo._id)}
-                            className="py-1 text-sm rounded text-red-600"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  ))
-                )}
+      {/* Actions */}
+      {userInfo?.isAdmin && (
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={() => handleEditClick(promo)}
+            className="py-1 text-sm rounded text-blue-600"
+          >
+            <SquarePen size={18} />
+          </button>
+          <button
+            onClick={() => handleDelete(promo._id)}
+            className="py-1 text-sm rounded text-red-600"
+          >
+            <Trash2 size={18} />
+          </button>
+        </div>
+      )}
+    </div>
+  ))
+)}
+
               </div>
             </div>
           </div>
@@ -469,26 +472,29 @@ const payload = {
                 </div>
 
                 {/* Item Search */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Search Items
-                  </label>
-                  <div className="relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search size={18} className="text-gray-400" />
-                    </span>
-                    <input
-                      type="text"
-                      value={itemSearch}
-                      onChange={(e) => setItemSearch(e.target.value)}
-                      placeholder="Search Item..."
-                      aria-label="Search Item"
-                      className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
-                       focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
-                       placeholder:text-gray-400"
-                    />
-                  </div>
-                </div>
+             <div>
+  <label className="block text-gray-700 font-medium mb-2">
+    Search Items
+  </label>
+  <div className="w-full">
+    <div className="relative">
+      <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Search size={18} className="text-gray-400" />
+      </span>
+      <input
+        type="text"
+        value={itemSearch}
+        onChange={(e) => setItemSearch(e.target.value)}
+        placeholder="Search Item..."
+        aria-label="Search Item"
+        className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+          focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
+          placeholder:text-gray-400"
+      />
+    </div>
+  </div>
+</div>
+
 
                 {/* Discount Percentage */}
                 <div>
