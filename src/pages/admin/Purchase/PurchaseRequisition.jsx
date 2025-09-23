@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SquarePen, Trash2 } from "lucide-react";
-import CommanHeader from "../../components/CommanHeader"; // Ensure this component exists
-import TableSkeleton from "./Skeleton"; // Ensure this component exists
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton"; // Ensure this component exists
 import Swal from "sweetalert2";
 import axios from "axios";
 const PurchaseRequisition = () => {
@@ -29,11 +29,13 @@ const PurchaseRequisition = () => {
       date: "2025-09-01",
       department: "IT",
       employee: "John Doe",
-      requirement: "Laptops",
+      requirement: "Regular Purchase",
       details: "High-performance laptops for development team",
-      items: "Dell XPS 15",
+      items: [
+        { name: "Dell XPS 15", qty: 4 },
+        { name: "Mouse", qty: 10 },
+      ],
       category: "Electronics",
-      quantity: 5,
       isEnable: true,
       createdAt: new Date().toISOString(),
     },
@@ -43,15 +45,41 @@ const PurchaseRequisition = () => {
       date: "2025-09-15",
       department: "HR",
       employee: "Jane Smith",
-      requirement: "Office Supplies",
+      requirement: "Monthly Purchase",
       details: "Stationery for new hires",
-      items: "Pens, Notebooks",
+      items: [
+        { name: "Pens", qty: 4 },
+        { name: "Notebooks", qty: 5 },
+        { name: "Markers", qty: 3 },
+      ],
       category: "Stationery",
-      quantity: 100,
       isEnable: false,
       createdAt: new Date().toISOString(),
     },
   ];
+
+
+
+  const fetchRequistionList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/requisitions`
+      );
+      setRequisitions(res.data);
+      console.log("Requistion  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Requistion", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchRequistionList();
+  }, [fetchRequistionList]);
+
 
   // Format date for display
   const formatDate = (date) => {
@@ -271,77 +299,105 @@ const PurchaseRequisition = () => {
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-          <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
-            <div className="min-w-[1200px]">
-              {/* Table Header */}
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>Requisition ID</div>
+          {/* Outer wrapper handles horizontal scroll */}
+          <div className="overflow-x-auto">
+            {/* Table wrapper with min-width only applied here */}
+            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="inline-block min-w-[1200px] w-full align-middle">
+                {/* Table Header */}
+                <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_3fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                  <div>Requisition ID</div>
+                  <div>Department</div>
+                  <div>Employee</div>
+                  <div>Requirement</div>
+                  <div>Category</div>
+                  <div>Items</div>
+                  <div>Date</div>
+                  <div className="text-right">Actions</div>
+                </div>
 
-                <div>Department</div>
-                <div>Employee</div>
-                <div>Requirement</div>
-                <div>Details</div>
-                <div>Items</div>
-                <div>Category</div>
-                <div>Quantity</div>
-                <div>Date</div>
-                <div className="text-right">Actions</div>
-              </div>
-
-              {/* Table Body */}
-              <div className="flex flex-col divide-y divide-gray-100">
-                {loading ? (
-                  <TableSkeleton
-                    rows={3}
-                    cols={10}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-                  />
-                ) : requisitions.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500 bg-white">
-                    No requisitions found.
-                  </div>
-                ) : (
-                  requisitions.map((requisition) => (
-                    <div
-                      key={requisition._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      <div className="font-medium text-gray-900">
-                        {requisition.requisitionId}
-                      </div>
-
-                      <div className="text-gray-600">{requisition.department}</div>
-                      <div className="text-gray-600">{requisition.employee}</div>
-                      <div className="text-gray-600">{requisition.requirement}</div>
-                      <div className="text-gray-600 truncate">{requisition.details}</div>
-                      <div className="text-gray-600">{requisition.items}</div>
-                      <div className="text-gray-600">{requisition.category}</div>
-                      <div className="text-gray-600">{requisition.quantity}</div>
-                      <div className="text-gray-500">{formatDate(requisition.date)}</div>
-                      <div className="flex justify-end gap-2">
-                        <button
-                          onClick={() => handleEditClick(requisition)}
-                          className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
-                          title="Edit"
-                        >
-                          <SquarePen size={18} />
-                        </button>
-
-                        <button
-                          onClick={() => handleDelete(requisition._id)}
-                          className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
+                {/* Table Body */}
+                <div className="flex flex-col divide-y divide-gray-100">
+                  {loading ? (
+                    <TableSkeleton
+                      rows={3}
+                      cols={10}
+                      className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr_auto]"
+                    />
+                  ) : requisitions.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500 bg-white">
+                      No requisitions found.
                     </div>
-                  ))
-                )}
+                  ) : (
+                    requisitions.map((requisition) => (
+                      <div
+                        key={requisition._id}
+                        className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_3fr_1fr_1fr] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      >
+                        <div className="font-medium text-gray-900">
+                          {requisition.requisitionId}
+                        </div>
+                        <div className="text-gray-600">{requisition.department}</div>
+                        <div className="text-gray-600">{requisition.employee}</div>
+                        <div className="text-gray-600">{requisition.requirement}</div>
+
+                        <div className="text-gray-600">{requisition.category}</div>
+
+                        {/* Items */}
+                        <div className="text-gray-600">
+                          <div className="flex flex-wrap gap-2">
+                            {requisition.items.map((item, idx) => (
+                              <div key={idx} className="flex gap-2">
+                                <span
+                                  className="px-3 py-1 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor: `hsl(${(idx * 70) % 360}, 80%, 85%)`,
+                                    color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
+                                  }}
+                                >
+                                  {item.name}
+                                </span>
+                                <span
+                                  className="px-3 py-1 rounded-full text-xs font-medium"
+                                  style={{
+                                    backgroundColor: `hsl(${(idx * 70 + 35) % 360
+                                      }, 80%, 85%)`,
+                                    color: `hsl(${(idx * 70 + 35) % 360}, 40%, 25%)`,
+                                  }}
+                                >
+                                  Qty: {item.qty}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        <div className="text-gray-500">{formatDate(requisition.date)}</div>
+                        <div className="flex justify-end gap-2">
+                          <button
+                            onClick={() => handleEditClick(requisition)}
+                            className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
+                            title="Edit"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(requisition._id)}
+                            className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
+
 
         {isSliderOpen && (
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">

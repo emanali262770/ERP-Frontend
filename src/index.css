@@ -4,6 +4,8 @@
 
 body {
   @apply font-sans bg-gray-100 text-gray-800;
+    overflow-x: hidden;
+
 }
 
 ::-webkit-scrollbar {

@@ -5,8 +5,8 @@ import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
-import CommanHeader from "../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
+import CommanHeader from "../../../components/CommanHeader";
 
 export default function PurchaseManager() {
   const [view, setView] = useState("list"); // list | form

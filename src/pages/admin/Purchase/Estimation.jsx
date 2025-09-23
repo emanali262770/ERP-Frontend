@@ -1,93 +1,189 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SquarePen, Trash2 } from "lucide-react";
-import CommanHeader from "../../components/CommanHeader";
-import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 
-const Quotation = () => {
-    const [quotations, setQuotations] = useState([]);
+const Estimation = () => {
+    const [estimations, setEstimations] = useState([]);
     const [isSliderOpen, setIsSliderOpen] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [quotationNo, setQuotationNo] = useState("");
+    const [statementId, setStatementId] = useState("");
     const [supplier, setSupplier] = useState("");
-    const [forDemand, setForDemand] = useState("");
-    const [person, setPerson] = useState("");
-    const [createdBy, setCreatedBy] = useState("");
-    const [designation, setDesignation] = useState("");
     const [item, setItem] = useState("");
-    const [price, setPrice] = useState("");
+    const [forDemand, setForDemand] = useState("");
+    const [rate, setRate] = useState("");
     const [quantity, setQuantity] = useState("");
     const [total, setTotal] = useState("");
-    const [editingQuotation, setEditingQuotation] = useState(null);
+    const [date, setDate] = useState("");
+    const [status, setStatus] = useState("Pending");
+    const [editingEstimation, setEditingEstimation] = useState(null);
     const sliderRef = useRef(null);
 
-    // Static data for quotations
+    // Static data for estimations
     const staticData = [
         {
             _id: "1",
-            quotationNo: "Q001",
+            statementId: "EST001",
             supplier: "ABC Corp",
-            forDemand: "Laptops (5)",
-            person: "John Doe",
-            createdBy: "Jane Smith",
-            designation: "Manager",
             item: "Dell XPS 15",
-            price: "1500",
+            forDemand: "Laptops (5)",
+            rate: "1500",
             quantity: "5",
             total: "7500",
+            date: "2025-09-01",
+            status: true,
             createdAt: new Date().toISOString(),
         },
         {
             _id: "2",
-            quotationNo: "Q002",
+            statementId: "EST002",
             supplier: "XYZ Ltd",
-            forDemand: "Printers (2)",
-            person: "Alice Brown",
-            createdBy: "Bob Johnson",
-            designation: "Supervisor",
             item: "HP LaserJet",
-            price: "300",
+            forDemand: "Printers (2)",
+            rate: "300",
             quantity: "2",
             total: "600",
+            date: "2025-09-15",
+            status: false,
             createdAt: new Date().toISOString(),
         },
         {
             _id: "3",
-            quotationNo: "Q003",
+            statementId: "EST003",
             supplier: "Tech Solutions",
-            forDemand: "Monitors (10)",
-            person: "Henry Smith",
-            createdBy: "Emma Wilson",
-            designation: "Coordinator",
             item: "Samsung 27\"",
-            price: "200",
+            forDemand: "Monitors (10)",
+            rate: "200",
             quantity: "10",
             total: "2000",
+            date: "2025-09-20",
+            status: true,
             createdAt: new Date().toISOString(),
         },
     ];
 
+    // Format date for display
+    const formatDate = (date) => {
+        if (!date) return "";
+        return new Date(date).toISOString().split("T")[0];
+    };
+
     // Load static data on mount
     useEffect(() => {
         setLoading(true);
-        setQuotations(staticData);
+        setEstimations(staticData);
         setTimeout(() => setLoading(false), 1000); // Simulate loading for 1 second
     }, []);
 
     // Handlers for form and table actions
-    const handleEditClick = (quotation) => {
-        setEditingQuotation(quotation);
-        setQuotationNo(quotation.quotationNo);
-        setSupplier(quotation.supplier);
-        setForDemand(quotation.forDemand);
-        setPerson(quotation.person);
-        setCreatedBy(quotation.createdBy);
-        setDesignation(quotation.designation);
-        setItem(quotation.item);
-        setPrice(quotation.price);
-        setQuantity(quotation.quantity);
-        setTotal(quotation.total);
+    const handleAddClick = () => {
+        setEditingEstimation(null);
+        setStatementId("");
+        setSupplier("");
+        setItem("");
+        setForDemand("");
+        setRate("");
+        setQuantity("");
+        setTotal("");
+        setDate("");
+        setStatus("Pending");
         setIsSliderOpen(true);
+    };
+
+    const handleEditClick = (estimation) => {
+        setEditingEstimation(estimation);
+        setStatementId(estimation.statementId);
+        setSupplier(estimation.supplier);
+        setItem(estimation.item);
+        setForDemand(estimation.forDemand);
+        setRate(estimation.rate);
+        setQuantity(estimation.quantity);
+        setTotal(estimation.total);
+        setDate(formatDate(estimation.date));
+        setStatus(estimation.status ? "Active" : "Inactive");
+        setIsSliderOpen(true);
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+
+        const trimmedStatementId = statementId.trim();
+        const trimmedSupplier = supplier.trim();
+        const trimmedItem = item.trim();
+        const trimmedForDemand = forDemand.trim();
+        const trimmedRate = rate.trim();
+        const trimmedQuantity = quantity.trim();
+        const trimmedTotal = total.trim();
+
+        if (
+            !trimmedStatementId ||
+            !trimmedSupplier ||
+            !trimmedItem ||
+            !trimmedForDemand ||
+            !trimmedRate ||
+            !trimmedQuantity ||
+            !trimmedTotal ||
+            !date ||
+            !status
+        ) {
+            Swal.fire({
+                icon: "warning",
+                title: "Missing Fields",
+                text: "⚠️ Please fill in all required fields.",
+                confirmButtonColor: "#d33",
+            });
+            return;
+        }
+
+        const newEstimation = {
+            _id: editingEstimation ? editingEstimation._id : Date.now().toString(),
+            statementId: trimmedStatementId,
+            supplier: trimmedSupplier,
+            item: trimmedItem,
+            forDemand: trimmedForDemand,
+            rate: trimmedRate,
+            quantity: parseInt(trimmedQuantity, 10),
+            total: trimmedTotal,
+            date,
+            status: status === "Active",
+            createdAt: new Date().toISOString(),
+        };
+
+        if (editingEstimation) {
+            setEstimations(
+                estimations.map((e) =>
+                    e._id === editingEstimation._id ? newEstimation : e
+                )
+            );
+            Swal.fire({
+                icon: "success",
+                title: "Updated!",
+                text: "Estimation updated successfully.",
+                confirmButtonColor: "#3085d6",
+            });
+        } else {
+            setEstimations([...estimations, newEstimation]);
+            Swal.fire({
+                icon: "success",
+                title: "Added!",
+                text: "Estimation added successfully.",
+                confirmButtonColor: "#3085d6",
+            });
+        }
+
+        // Reset form state
+        setStatementId("");
+        setSupplier("");
+        setItem("");
+        setForDemand("");
+        setRate("");
+        setQuantity("");
+        setTotal("");
+        setDate("");
+        setStatus("Pending");
+        setEditingEstimation(null);
+        setIsSliderOpen(false);
     };
 
     const handleDelete = (id) => {
@@ -114,130 +210,21 @@ const Quotation = () => {
             })
             .then((result) => {
                 if (result.isConfirmed) {
-                    setQuotations((prev) => prev.filter((q) => q._id !== id));
-
+                    setEstimations(estimations.filter((e) => e._id !== id));
                     swalWithTailwindButtons.fire(
                         "Deleted!",
-                        "Quotation deleted successfully.",
+                        "Estimation deleted successfully.",
                         "success"
                     );
                 } else if (result.dismiss === Swal.DismissReason.cancel) {
                     swalWithTailwindButtons.fire(
                         "Cancelled",
-                        "Quotation is safe 🙂",
+                        "Estimation is safe 🙂",
                         "error"
                     );
                 }
             });
     };
-
-    const handleAddQuotation = () => {
-        setEditingQuotation(null);
-        setQuotationNo("");
-        setSupplier("");
-        setForDemand("");
-        setPerson("");
-        setCreatedBy("");
-        setDesignation("");
-        setItem("");
-        setPrice("");
-        setQuantity("");
-        setTotal("");
-        setIsSliderOpen(true);
-    };
-
-const handleSubmit = (e) => {
-  e.preventDefault();
-
-  const trimmedQuotationNo = quotationNo.trim();
-  const trimmedSupplier = supplier.trim();
-  const trimmedForDemand = forDemand.trim();
-  const trimmedPerson = person.trim();
-  const trimmedCreatedBy = createdBy.trim();
-  const trimmedDesignation = designation.trim();
-  const trimmedItem = item.trim();
-  const trimmedPrice = price.trim();
-  const trimmedQuantity = quantity.trim();
-  const trimmedTotal = total.trim();
-
-  if (
-    !trimmedQuotationNo ||
-    !trimmedSupplier ||
-    !trimmedForDemand ||
-    !trimmedPerson ||
-    !trimmedCreatedBy ||
-    !trimmedDesignation ||
-    !trimmedItem ||
-    !trimmedPrice ||
-    !trimmedQuantity ||
-    !trimmedTotal
-  ) {
-    Swal.fire({
-      icon: "warning",
-      title: "Missing Fields",
-      text: "⚠️ All fields are required.",
-      confirmButtonColor: "#d33",
-    });
-    return;
-  }
-
-  const newQuotation = {
-    _id: editingQuotation ? editingQuotation._id : Date.now().toString(),
-    quotationNo: trimmedQuotationNo,
-    supplier: trimmedSupplier,
-    forDemand: trimmedForDemand,
-    person: trimmedPerson,
-    createdBy: trimmedCreatedBy,
-    designation: trimmedDesignation,
-    item: trimmedItem,
-    price: trimmedPrice,
-    quantity: trimmedQuantity,
-    total: trimmedTotal,
-    createdAt: new Date().toISOString(),
-  };
-
-  if (editingQuotation) {
-    // ✅ Update existing quotation in state
-    setQuotations(
-      quotations.map((q) =>
-        q._id === editingQuotation._id ? newQuotation : q
-      )
-    );
-
-    Swal.fire({
-      icon: "success",
-      title: "Updated!",
-      text: "Quotation updated successfully.",
-      confirmButtonColor: "#3085d6",
-    });
-  } else {
-    // ✅ Add new quotation in state
-    setQuotations([...quotations, newQuotation]);
-
-    Swal.fire({
-      icon: "success",
-      title: "Added!",
-      text: "Quotation added successfully.",
-      confirmButtonColor: "#3085d6",
-    });
-  }
-
-  // Reset form state
-  setQuotationNo("");
-  setSupplier("");
-  setForDemand("");
-  setPerson("");
-  setCreatedBy("");
-  setDesignation("");
-  setItem("");
-  setPrice("");
-  setQuantity("");
-  setTotal("");
-  setEditingQuotation(null);
-  setIsSliderOpen(false);
-};
-
-
 
     return (
         <div className="p-4 bg-gray-50 min-h-screen">
@@ -246,14 +233,14 @@ const handleSubmit = (e) => {
                 <div className="flex justify-between items-center mb-4">
                     <div>
                         <h1 className="text-2xl font-bold text-newPrimary">
-                            Quotation Details
+                            Estimation Details
                         </h1>
                     </div>
                     <button
-                        onClick={handleAddQuotation}
-                        className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 transition-colors"
+                        className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+                        onClick={handleAddClick}
                     >
-                        Add Quotation
+                        + Add Estimation
                     </button>
                 </div>
 
@@ -261,18 +248,17 @@ const handleSubmit = (e) => {
                     <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
                         <div className="min-w-[1200px]">
                             {/* Table Header */}
-                            <div className="hidden lg:grid grid-cols-11 gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                                <div>Quotation No.</div>
+                            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                                <div>Statement ID</div>
                                 <div>Supplier</div>
-                                <div>For Demand</div>
-                                <div>Person</div>
-                                <div>Created By</div>
-                                <div>Designation</div>
                                 <div>Item</div>
-                                <div>Price</div>
+                                <div>For Demand</div>
+                                <div>Rate</div>
                                 <div>Quantity</div>
                                 <div>Total</div>
-                                <div className="text-right">Actions</div>
+                                <div>Date</div>
+                                <div>Status</div>
+                                <div>Actions</div>
                             </div>
 
                             {/* Table Body */}
@@ -280,39 +266,47 @@ const handleSubmit = (e) => {
                                 {loading ? (
                                     <TableSkeleton
                                         rows={3}
-                                        cols={11}
-                                        className="lg:grid-cols-11"
+                                        cols={10}
+                                        className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
                                     />
-                                ) : quotations.length === 0 ? (
+                                ) : estimations.length === 0 ? (
                                     <div className="text-center py-4 text-gray-500 bg-white">
-                                        No quotations found.
+                                        No estimations found.
                                     </div>
                                 ) : (
-                                    quotations.map((quotation) => (
+                                    estimations.map((estimation) => (
                                         <div
-                                            key={quotation._id}
-                                            className="grid grid-cols-1 lg:grid-cols-11 items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                                            key={estimation._id}
+                                            className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                                         >
-                                            <div className="text-gray-600">{quotation.quotationNo}</div>
-                                            <div className="text-gray-600">{quotation.supplier}</div>
-                                            <div className="text-gray-600">{quotation.forDemand}</div>
-                                            <div className="text-gray-600">{quotation.person}</div>
-                                            <div className="text-gray-600">{quotation.createdBy}</div>
-                                            <div className="text-gray-600">{quotation.designation}</div>
-                                            <div className="text-gray-600">{quotation.item}</div>
-                                            <div className="text-gray-600">{quotation.price}</div>
-                                            <div className="text-gray-600">{quotation.quantity}</div>
-                                            <div className="text-gray-600">{quotation.total}</div>
+                                            <div className="font-medium text-gray-900">{estimation.statementId}</div>
+                                            <div className="text-gray-600">{estimation.supplier}</div>
+                                            <div className="text-gray-600">{estimation.item}</div>
+                                            <div className="text-gray-600">{estimation.forDemand}</div>
+                                            <div className="text-gray-600">{estimation.rate}</div>
+                                            <div className="text-gray-600">{estimation.quantity}</div>
+                                            <div className="text-gray-600">{estimation.total}</div>
+                                            <div className="text-gray-500">{formatDate(estimation.date)}</div>
+                                            <div className="text-gray-600">
+                                                <span
+                                                    className={`px-2 py-1 rounded-full text-xs ${estimation.status
+                                                        ? "bg-green-100 text-green-800"
+                                                        : "bg-red-100 text-red-800"
+                                                        }`}
+                                                >
+                                                    {estimation.status ? "Active" : "Inactive"}
+                                                </span>
+                                            </div>
                                             <div className="flex justify-end gap-2">
                                                 <button
-                                                    onClick={() => handleEditClick(quotation)}
+                                                    onClick={() => handleEditClick(estimation)}
                                                     className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
                                                     title="Edit"
                                                 >
                                                     <SquarePen size={18} />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(quotation._id)}
+                                                    onClick={() => handleDelete(estimation._id)}
                                                     className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
                                                     title="Delete"
                                                 >
@@ -335,23 +329,22 @@ const handleSubmit = (e) => {
                         >
                             <div className="flex justify-between items-center mb-4">
                                 <h2 className="text-xl font-bold text-newPrimary">
-                                    {editingQuotation ? "Update Quotation" : "Add a New Quotation"}
+                                    {editingEstimation ? "Update Estimation" : "Add a New Estimation"}
                                 </h2>
                                 <button
                                     className="text-2xl text-gray-500 hover:text-gray-700"
                                     onClick={() => {
                                         setIsSliderOpen(false);
-                                        setQuotationNo("");
+                                        setStatementId("");
                                         setSupplier("");
-                                        setForDemand("");
-                                        setPerson("");
-                                        setCreatedBy("");
-                                        setDesignation("");
                                         setItem("");
-                                        setPrice("");
+                                        setForDemand("");
+                                        setRate("");
                                         setQuantity("");
                                         setTotal("");
-                                        setEditingQuotation(null);
+                                        setDate("");
+                                        setStatus("Pending");
+                                        setEditingEstimation(null);
                                     }}
                                 >
                                     ×
@@ -361,20 +354,20 @@ const handleSubmit = (e) => {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Quotation No. <span className="text-newPrimary">*</span>
+                                        Statement ID <span className="text-blue-600">*</span>
                                     </label>
                                     <input
                                         type="text"
-                                        value={quotationNo}
-                                        onChange={(e) => setQuotationNo(e.target.value)}
+                                        value={statementId}
+                                        onChange={(e) => setStatementId(e.target.value)}
                                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        placeholder="Enter quotation number"
+                                        placeholder="Enter statement ID"
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Supplier <span className="text-newPrimary">*</span>
+                                        Supplier <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={supplier}
@@ -383,15 +376,35 @@ const handleSubmit = (e) => {
                                         required
                                     >
                                         <option value="">Select Supplier</option>
-                                        <option value="supplier1">ABC Traders</option>
-                                        <option value="supplier2">XYZ Enterprises</option>
-                                        <option value="supplier3">Global Supplies</option>
+                                        <option value="ABC Corp">ABC Corp</option>
+                                        <option value="XYZ Ltd">XYZ Ltd</option>
+                                        <option value="Tech Solutions">Tech Solutions</option>
+                                        <option value="Global Supplies">Global Supplies</option>
                                     </select>
-
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        For Demand <span className="text-newPrimary">*</span>
+                                        Item <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        value={item}
+                                        onChange={(e) => setItem(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        required
+                                    >
+                                        <option value="">Select Item</option>
+                                        <option value="Laptop">Laptop</option>
+                                        <option value="Desktop">Desktop</option>
+                                        <option value="Printer">Printer</option>
+                                        <option value="Scanner">Scanner</option>
+                                        <option value="Projector">Projector</option>
+                                        <option value="Stationery">Stationery</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        For Demand <span className="text-red-500">*</span>
                                     </label>
                                     <select
                                         value={forDemand}
@@ -399,116 +412,92 @@ const handleSubmit = (e) => {
                                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                         required
                                     >
-                                        <option value="">Select Demand Item</option>
-                                        <option value="Mobile">Mobile</option>
-                                        <option value="Laptop">Laptop</option>
-                                        <option value="Accessories">Accessories</option>
-                                        <option value="Other">Other</option>
+                                        <option value="">Select Item</option>
+                                        <option value="Office Supplies">Office Supplies</option>
+                                        <option value="IT Equipment">IT Equipment</option>
+                                        <option value="Furniture">Furniture</option>
+                                        <option value="Raw Materials">Raw Materials</option>
+                                        <option value="Services">Services</option>
                                     </select>
                                 </div>
 
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Person <span className="text-newPrimary">*</span>
+                                        Rate <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        type="text"
-                                        value={person}
-                                        onChange={(e) => setPerson(e.target.value)}
+                                        type="number"
+                                        value={rate}
+                                        onChange={(e) => setRate(e.target.value)}
                                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        placeholder="Enter person name"
+                                        placeholder="Enter rate"
+                                        min="0"
+                                        step="0.01"
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Created By <span className="text-newPrimary">*</span>
-                                    </label>
-                                    <select
-                                        value={createdBy}
-                                        onChange={(e) => setCreatedBy(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        required
-                                    >
-                                        <option value="">Select Employee</option>
-                                        <option value="employee1">John Doe</option>
-                                        <option value="employee2">Maryum Akmal</option>
-                                        <option value="employee3">Ali Khan</option>
-                                        <option value="employee4">Ayesha Ahmed</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Designation <span className="text-newPrimary">*</span>
+                                        Quantity <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        type="text"
-                                        value={designation}
-                                        onChange={(e) => setDesignation(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        placeholder="Enter designation"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Item <span className="text-newPrimary">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={item}
-                                        onChange={(e) => setItem(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        placeholder="Select item"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Price <span className="text-newPrimary">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        placeholder="Enter price"
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Quantity <span className="text-newPrimary">*</span>
-                                    </label>
-                                    <input
-                                        type="text"
+                                        type="number"
                                         value={quantity}
                                         onChange={(e) => setQuantity(e.target.value)}
                                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                         placeholder="Enter quantity"
+                                        min="1"
                                         required
                                     />
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Total <span className="text-newPrimary">*</span>
+                                        Total <span className="text-red-500">*</span>
                                     </label>
                                     <input
-                                        type="text"
+                                        type="number"
                                         value={total}
                                         onChange={(e) => setTotal(e.target.value)}
                                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                         placeholder="Enter total"
+                                        min="0"
+                                        step="0.01"
                                         required
                                     />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Status <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        value={status}
+                                        onChange={(e) => setStatus(e.target.value)}
+                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        required
+                                    >
+                                        <option value="Pending">Pending</option>
+                                        <option value="Active">Active</option>
+                                        <option value="Inactive">Inactive</option>
+                                    </select>
                                 </div>
                                 <button
                                     type="submit"
                                     disabled={loading}
                                     className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                                 >
-                                    {loading ? "Saving..." : editingQuotation ? "Update Quotation" : "Save Quotation"}
+                                    {loading ? "Saving..." : editingEstimation ? "Update Estimation" : "Save Estimation"}
                                 </button>
                             </form>
                         </div>
@@ -536,4 +525,4 @@ const handleSubmit = (e) => {
     );
 };
 
-export default Quotation;
+export default Estimation;
