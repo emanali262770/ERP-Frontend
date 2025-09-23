@@ -27,6 +27,8 @@ const SupplierList = () => {
   const [editId, setEditId] = useState(null);
   const sliderRef = useRef(null);
   const [loading, setLoading] = useState(true);
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [creditTime, setCreditTime] = useState("");
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -103,16 +105,17 @@ const SupplierList = () => {
 
     const formData = {
       supplierName,
-      contactPerson,
       email,
+      contactPerson,
       address,
+      mobileNumber, // <-- add this state
       phoneNumber,
       designation,
       ntn,
       gst,
-      paymentTerms,
-      creditLimit:
-        paymentTerms === "CreditCard" && status ? creditLimit : undefined,
+      paymentTerms: paymentTerms === "CreditCard" ? "Credit" : paymentTerms, // map CreditCard -> Credit
+      creditTime: paymentTerms === "CreditCard" ? creditTime : undefined, // <-- add this state
+      creditLimit: paymentTerms === "CreditCard" ? creditLimit : undefined,
       status,
     };
 
@@ -260,129 +263,134 @@ const SupplierList = () => {
       </div>
 
       {/* Supplier Table */}
-    {/* Supplier Table */}
-<div className="rounded-xl border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[1100px]">
-      {/* ✅ Table Header (desktop only) */}
-      <div className="hidden lg:grid grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>ID</div>
-        <div>Name</div>
-        <div>Contact</div>
-        <div>Email</div>
-        <div>Address</div>
-        <div>Phone</div>
-        <div>Payment</div>
-        <div>Status</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
+      {/* Supplier Table */}
+      <div className="rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-[1100px]">
+            {/* ✅ Table Header (desktop only) */}
+            <div className="hidden lg:grid grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>ID</div>
+              <div>Name</div>
+              <div>Contact</div>
+              <div>Email</div>
+              <div>Address</div>
+              <div>Phone</div>
+              <div>Payment</div>
+              <div>Status</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <TableSkeleton
-            rows={supplierList.length > 0 ? supplierList.length : 5}
-            cols={userInfo?.isAdmin ? 9 : 8}
-            className="lg:grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto]"
-          />
-        ) : supplierList.length === 0 ? (
-          <div className="text-center py-4 text-gray-500 bg-white">
-            No suppliers found.
+            {/* ✅ Table Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={supplierList.length > 0 ? supplierList.length : 5}
+                  cols={userInfo?.isAdmin ? 9 : 8}
+                  className="lg:grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto]"
+                />
+              ) : supplierList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No suppliers found.
+                </div>
+              ) : (
+                supplierList.map((s) => (
+                  <>
+                    {/* ✅ Desktop Row */}
+                    <div
+                      key={s._id}
+                      className="hidden lg:grid grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium text-gray-900">
+                        {s._id?.slice(0, 6)}
+                      </div>
+                      <div className="text-gray-700">{s.supplierName}</div>
+                      <div className="text-gray-600">{s.contactPerson}</div>
+                      <div className="text-gray-600">{s.email}</div>
+                      <div className="text-gray-600 truncate">{s.address}</div>
+                      <div className="text-gray-600">{s.phoneNumber}</div>
+                      <div className="text-gray-600">
+                        {s.paymentTerms}
+                        {s.paymentTerms === "CreditCard" && s.creditLimit
+                          ? ` (${s.creditLimit})`
+                          : ""}
+                      </div>
+                      <div className=" font-semibold">
+                        {s.status ? (
+                          <span className="text-green-600">Active</span>
+                        ) : (
+                          <span className="text-red-600">Inactive</span>
+                        )}
+                      </div>
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => handleEdit(s)}
+                            className="text-blue-600 hover:underline"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(s._id)}
+                            className="text-red-600 hover:underline"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* ✅ Mobile Card */}
+                    <div
+                      key={`mobile-${s._id}`}
+                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                    >
+                      <h3 className="font-semibold text-gray-800">
+                        {s.supplierName}
+                      </h3>
+                      <p className="text-sm text-gray-600">{s.contactPerson}</p>
+                      <p className="text-sm text-gray-600">{s.email}</p>
+                      <p className="text-sm text-gray-600">{s.phoneNumber}</p>
+                      <p className="text-sm text-gray-600 truncate">
+                        {s.address}
+                      </p>
+                      <p className="text-sm text-gray-600">
+                        {s.paymentTerms}{" "}
+                        {s.paymentTerms === "CreditCard" && s.creditLimit
+                          ? `(Limit: ${s.creditLimit})`
+                          : ""}
+                      </p>
+                      <p
+                        className={`text-sm font-semibold ${
+                          s.status ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {s.status ? "Active" : "Inactive"}
+                      </p>
+
+                      {userInfo?.isAdmin && (
+                        <div className="mt-3 flex justify-end gap-3">
+                          <button
+                            className="text-blue-500"
+                            onClick={() => handleEdit(s)}
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDelete(s._id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ))
+              )}
+            </div>
           </div>
-        ) : (
-          supplierList.map((s) => (
-            <>
-              {/* ✅ Desktop Row */}
-              <div
-                key={s._id}
-                className="hidden lg:grid grid-cols-[100px_1.5fr_1fr_1.5fr_2fr_1fr_1fr_100px_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-              >
-                <div className="font-medium text-gray-900">{s._id?.slice(0, 6)}</div>
-                <div className="text-gray-700">{s.supplierName}</div>
-                <div className="text-gray-600">{s.contactPerson}</div>
-                <div className="text-gray-600">{s.email}</div>
-                <div className="text-gray-600 truncate">{s.address}</div>
-                <div className="text-gray-600">{s.phoneNumber}</div>
-                <div className="text-gray-600">
-                  {s.paymentTerms}
-                  {s.paymentTerms === "CreditCard" && s.creditLimit
-                    ? ` (${s.creditLimit})`
-                    : ""}
-                </div>
-                <div className="text-center font-semibold">
-                  {s.status ? (
-                    <span className="text-green-600">Active</span>
-                  ) : (
-                    <span className="text-red-600">Inactive</span>
-                  )}
-                </div>
-                {userInfo?.isAdmin && (
-                  <div className="flex justify-end gap-3">
-                    <button
-                      onClick={() => handleEdit(s)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      <SquarePen size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(s._id)}
-                      className="text-red-600 hover:underline"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ✅ Mobile Card */}
-              <div
-                key={`mobile-${s._id}`}
-                className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
-              >
-                <h3 className="font-semibold text-gray-800">{s.supplierName}</h3>
-                <p className="text-sm text-gray-600">{s.contactPerson}</p>
-                <p className="text-sm text-gray-600">{s.email}</p>
-                <p className="text-sm text-gray-600">{s.phoneNumber}</p>
-                <p className="text-sm text-gray-600 truncate">{s.address}</p>
-                <p className="text-sm text-gray-600">
-                  {s.paymentTerms}{" "}
-                  {s.paymentTerms === "CreditCard" && s.creditLimit
-                    ? `(Limit: ${s.creditLimit})`
-                    : ""}
-                </p>
-                <p
-                  className={`text-sm font-semibold ${
-                    s.status ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {s.status ? "Active" : "Inactive"}
-                </p>
-
-                {userInfo?.isAdmin && (
-                  <div className="mt-3 flex justify-end gap-3">
-                    <button
-                      className="text-blue-500"
-                      onClick={() => handleEdit(s)}
-                    >
-                      <SquarePen size={18} />
-                    </button>
-                    <button
-                      className="text-red-500"
-                      onClick={() => handleDelete(s._id)}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ))
-        )}
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
 
       {/* Slider */}
       {isSliderOpen && (
@@ -443,6 +451,19 @@ const SupplierList = () => {
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   className="w-full p-2 border rounded"
                   placeholder="e.g. +1-212-555-1234"
+                />
+              </div>
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Mobile Number <span className="text-newPrimary">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={mobileNumber}
+                  required
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  className="w-full p-2 border rounded"
+                  placeholder="e.g. 03001234567"
                 />
               </div>
               <div>
@@ -548,35 +569,36 @@ const SupplierList = () => {
                 </div>
               </div>
               {paymentTerms === "CreditCard" && status && (
-                <div>
-                  <label className="block text-gray-700 font-medium">
-                    Credit Limit <span className="text-newPrimary">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={creditLimit}
-                    required
-                    onChange={(e) => setCreditLimit(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    placeholder="Enter credit limit (e.g. 4000000)"
-                  />
+                <div className="flex gap-4">
+                  <div className="w-1/2">
+                    <label className="block text-gray-700 font-medium">
+                      Credit Time Limit{" "}
+                      <span className="text-newPrimary">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={creditTime}
+                      onChange={(e) => setCreditTime(e.target.value)}
+                      className="w-full p-2 border rounded"
+                      placeholder="Enter time limit (days)"
+                    />
+                  </div>
+                  <div className="w-1/2">
+                    <label className="block text-gray-700 font-medium">
+                      Credit Cash Limit{" "}
+                      <span className="text-newPrimary">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      value={creditLimit}
+                      onChange={(e) => setCreditLimit(e.target.value)}
+                      className="w-full p-2 border rounded"
+                      placeholder="Enter cash limit"
+                    />
+                  </div>
                 </div>
               )}
-              {paymentTerms === "Cash" && status && (
-                <div>
-                  <label className="block text-gray-700 font-medium">
-                    Cash Limit <span className="text-newPrimary">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={creditLimit}
-                    required
-                    onChange={(e) => setCreditLimit(e.target.value)}
-                    className="w-full p-2 border rounded"
-                    placeholder="Enter credit limit (e.g. 4000000)"
-                  />
-                </div>
-              )}
+
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button
