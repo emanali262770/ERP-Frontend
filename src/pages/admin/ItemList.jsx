@@ -225,8 +225,8 @@ const ItemList = () => {
 
     const formData = new FormData();
 
-    formData.append("itemType", itemCategory);
-
+    formData.append("itemCategory", itemCategory); // ✅ ObjectId
+    formData.append("itemType", itemType);         // ✅ ObjectId
     formData.append("itemName", itemName);
     formData.append("details", details);
     formData.append("manufacturer", manufacture);
@@ -237,7 +237,7 @@ const ItemList = () => {
     formData.append("purchase", parseFloat(purchase) || 0);
     formData.append("price", parseFloat(sales) || 0);
     formData.append("stock", parseInt(stock) || 0);
-    formData.append("labelBarcode", barcode);
+    formData.append("secondaryBarcode", barcode);
     formData.append("reorder", parseInt(reorder) || 0);
     formData.append("isEnable", enabled);
 
@@ -409,24 +409,12 @@ const ItemList = () => {
     setImagePreview("");
   };
 
-  // Capitalize First Letter
-  function capitalizeFirstLetter(value) {
-    if (!value) return "";
-    const str = String(value); // ensure it's a string
-    return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  // Show loading spinner
-  // if (loading) {
-  //   return (
-  //     <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-  //       <div className="text-center">
-  //         <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-  //       </div>
-  //     </div>
-  //   );
+  // // Capitalize First Letter
+  // function capitalizeFirstLetter(value) {
+  //   if (!value) return "";
+  //   const str = String(value); // ensure it's a string
+  //   return str.charAt(0).toUpperCase() + str.slice(1);
   // }
-
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -446,87 +434,87 @@ const ItemList = () => {
       </div>
 
       {/* Item Table */}
-     <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-full w-full overflow-x-auto">
-      {/* Header */}
-      <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Item Category</div>
-        <div>Item Name</div>
-        <div>Purchase</div>
-        <div>Sales</div>
-        <div>Stock</div>
-        <div>Barcode</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
+      <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-full w-full overflow-x-auto">
+            {/* Header */}
+            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>Item Category</div>
+              <div>Item Name</div>
+              <div>Purchase</div>
+              <div>Sales</div>
+              <div>Stock</div>
+              <div>Barcode</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
-      {/* Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <TableSkeleton
-            rows={itemList.length || 5}
-            cols={userInfo?.isAdmin ? 7 : 6}
-            className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-          />
-        ) : (
-          itemList.map((item, index) => (
-            <div
-              key={item._id}
-              className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* Item Category (with icon) */}
-              <div className="flex items-center gap-3">
-                <img
-                  src={item.itemImage?.url || item.itemImage}
-                  alt="Product Icon"
-                  className="w-7 h-7 object-cover rounded-full"
+            {/* Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={itemList.length || 5}
+                  cols={userInfo?.isAdmin ? 7 : 6}
+                  className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
                 />
-                <span className="font-medium text-gray-900">
-                  {item?.itemType?.itemTypeName}
-                </span>
-              </div>
+              ) : (
+                itemList.map((item, index) => (
+                  <div
+                    key={item._id}
+                    className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                  >
+                    {/* Item Category (with icon) */}
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={item.itemImage?.url || item.itemImage}
+                        alt="Product Icon"
+                        className="w-7 h-7 object-cover rounded-full"
+                      />
+                      <span className="font-medium text-gray-900">
+                        {item?.itemType?.itemTypeName}
+                      </span>
+                    </div>
 
-              {/* Item Name */}
-              <div className="text-gray-600">{item.itemName}</div>
+                    {/* Item Name */}
+                    <div className="text-gray-600">{item.itemName}</div>
 
-              {/* Purchase */}
-              <div className="font-semibold text-gray-600">
-                {item.purchase}
-              </div>
+                    {/* Purchase */}
+                    <div className="font-semibold text-gray-600">
+                      {item.purchase}
+                    </div>
 
-              {/* Sales */}
-              <div className="font-semibold text-gray-600">
-                {item.price}
-              </div>
+                    {/* Sales */}
+                    <div className="font-semibold text-gray-600">
+                      {item.price}
+                    </div>
 
-              {/* Stock */}
-              <div className="font-semibold text-gray-600">
-                {item.stock}
-              </div>
+                    {/* Stock */}
+                    <div className="font-semibold text-gray-600">
+                      {item.stock}
+                    </div>
 
-              {/* Barcode */}
-              <div className="font-semibold text-gray-600">
-                {item.labelBarcode.slice(0, 12)}
-              </div>
+                    {/* Barcode */}
+                    <div className="font-semibold text-gray-600">
+                      {item.labelBarcode.slice(0, 12)}
+                    </div>
 
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-end gap-3">
-                  <button className="text-blue-500 hover:underline">
-                    <SquarePen size={18} />
-                  </button>
-                  <button className="text-red-500 hover:underline">
-                    <Trash2 size={18} />
-                  </button>
-                </div>
+                    {/* Actions */}
+                    {userInfo?.isAdmin && (
+                      <div className="flex justify-end gap-3">
+                        <button className="text-blue-500 hover:underline">
+                          <SquarePen size={18} />
+                        </button>
+                        <button className="text-red-500 hover:underline">
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
               )}
             </div>
-          ))
-        )}
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
       {/* Slider */}
       {isSliderOpen && (
@@ -582,7 +570,7 @@ const ItemList = () => {
                 >
                   <option value="">Select Category</option>
                   {categoryList.map((category) => (
-                    <option key={category._id} value={category.categoryName}>
+                    <option key={category._id} value={category._id}>
                       {category.categoryName}
                     </option>
                   ))}
@@ -597,8 +585,11 @@ const ItemList = () => {
                 <select
                   value={itemType}
                   required
+                  disabled={!itemCategory}
+                  className={`w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200 
+      ${!itemCategory ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   onChange={(e) => setItemType(e.target.value)}
-                  className="w-full p-2 border rounded"
+
                 >
                   <option value="">Select Item Type</option>
                   {itemTypeList.map((type) => (
