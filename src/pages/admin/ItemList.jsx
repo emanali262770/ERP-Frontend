@@ -17,6 +17,7 @@ const ItemList = () => {
   const [shelvesList, setShelvesList] = useState([]);
   const [expiryOption, setExpiryOption] = useState("NoExpiry");
   const [expiryDay, setExpiryDay] = useState("");
+  const [itemTypeName, setItemTypeName] = useState("");
 
   const [itemList, setItemList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -100,7 +101,8 @@ const ItemList = () => {
   // Fetch itemTypes when category changes
   useEffect(() => {
     if (!itemCategory) return; // only call when category selected
-
+   console.log(itemCategory);
+   
     const fetchItemTypes = async () => {
       try {
         const res = await axios.get(
@@ -228,7 +230,7 @@ const ItemList = () => {
     formData.append("itemCategory", itemCategory); // ✅ ObjectId
     formData.append("itemType", itemType);         // ✅ ObjectId
     formData.append("itemName", itemName);
-    formData.append("details", details);
+    // formData.append("details", details);
     formData.append("manufacturer", manufacture);
     formData.append("supplier", supplier);
     formData.append("shelveLocation", shelveLocation);
@@ -239,6 +241,7 @@ const ItemList = () => {
     formData.append("stock", parseInt(stock) || 0);
     formData.append("secondaryBarcode", barcode);
     formData.append("reorder", parseInt(reorder) || 0);
+    formData.append("hasExpiray", parseInt(expiryDay) || 0);
     formData.append("isEnable", enabled);
 
     if (image) {
@@ -416,6 +419,7 @@ const ItemList = () => {
   //   return str.charAt(0).toUpperCase() + str.slice(1);
   // }
 
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
@@ -494,7 +498,7 @@ const ItemList = () => {
 
                     {/* Barcode */}
                     <div className="font-semibold text-gray-600">
-                      {item.labelBarcode.slice(0, 12)}
+                      {item.secondaryBarcode || "N/A"}
                     </div>
 
                     {/* Actions */}
