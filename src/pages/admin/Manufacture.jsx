@@ -474,32 +474,7 @@ const Manufacture = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  NTN <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={ntn}
-                  required
-                  onChange={(e) => setNtn(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. NTN123456789"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  GST/Tax Number <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={gstNumber}
-                  required
-                  onChange={(e) => setGstNumber(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. 27ABCDE1234F1Z5"
-                />
-              </div>
+             
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button

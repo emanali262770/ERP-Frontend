@@ -30,9 +30,11 @@ import {
   FaFileInvoice,
   FaUndoAlt,
   FaSignOutAlt,
+
 } from "react-icons/fa";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
 import { NavLink, useNavigate } from "react-router-dom";
+
 
 // 🔹 Link definitions with permission keys
 const links = [
@@ -55,6 +57,15 @@ const links = [
 { to: "/admin/gatepass-out", label: "GatePass OUT", icon: <FaSignOutAlt /> },
 
   ],
+  },
+  {
+    label: "Management",
+    icon: <FaUserShield/>,
+    children: [
+      { to: "/admin/designation", label: "Designation", icon: <FaUsersCog />,  },
+      { to: "/admin/employee", label: "Employee", icon: <FaUserCog />},
+      { to: "/admin/departments", label: "Departments", icon: <FaUserShield /> },
+    ],
   },
   { to: "/admin/sales-invoice", label: "Sales", icon: <FaReceipt />, key: "isSales" },
   { to: "/admin/customers", label: "Customers", icon: <FaUsers />, key: "isCustomer" },
