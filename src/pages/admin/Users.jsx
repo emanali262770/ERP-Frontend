@@ -47,31 +47,30 @@ const Users = () => {
     setIsSliderOpen(true);
   };
 
-  // GSAP Animation for Slider
+  // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
       if (sliderRef.current) {
-        sliderRef.current.style.display = "block";
-        gsap.fromTo(
-          sliderRef.current,
-          { x: "100%", opacity: 0 },
-          { x: "0%", opacity: 1, duration: 0.5, ease: "power2.out" }
-        );
+        sliderRef.current.style.display = "block"; // ensure visible before animation
       }
+      gsap.fromTo(
+        sliderRef.current,
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+      );
     } else {
-      if (sliderRef.current) {
-        gsap.to(sliderRef.current, {
-          x: "100%",
-          opacity: 0,
-          duration: 0.5,
-          ease: "power2.in",
-          onComplete: () => {
-            if (sliderRef.current) {
-              sliderRef.current.style.display = "none";
-            }
-          },
-        });
-      }
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
 
@@ -362,7 +361,9 @@ const Users = () => {
               {loading ? (
                 // Skeleton shown while loading
                 <TableSkeleton
-                  rows={filteredUserList.length>0?filteredUserList.length:5}
+                  rows={
+                    filteredUserList.length > 0 ? filteredUserList.length : 5
+                  }
                   cols={userInfo?.isAdmin ? 7 : 6}
                   className="lg:grid-cols-7"
                 />
@@ -480,20 +481,18 @@ const Users = () => {
         </div>
       </div>
 
-      {/* Right-Side Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
-          <div className="w-full md:w-1/2 lg:w-1/3 bg-white h-full overflow-y-auto shadow-lg">
-            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+          <div
+            ref={sliderRef}
+            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          >
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
-                {isChangePassword
-                  ? "Change Password"
-                  : isEdit
-                  ? "Edit User"
-                  : "Add User"}
+                {isEdit ? "Edit Right" : "Add User"}
               </h2>
               <button
-                className="w-6 h-6 text-white rounded-full flex justify-center items-center hover:text-gray-400 text-xl bg-newPrimary"
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;
