@@ -28,7 +28,6 @@ const PromotionItem = () => {
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [itemSearch, setItemSearch] = useState("");
 
-
   const [isEnable, setIsEnable] = useState(true);
   const sliderRef = useRef(null);
 
@@ -50,21 +49,25 @@ const PromotionItem = () => {
       setLoading(true);
 
       // Fetch all necessary data first
-      const [promotionsRes, categoriesRes, itemTypesRes, promotionItemsRes] = await Promise.all([
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/promotion`),
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/list`),
-        axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`),
-        axios.get(API_URL)
-      ]);
+      const [promotionsRes, categoriesRes, itemTypesRes, promotionItemsRes] =
+        await Promise.all([
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/promotion`),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/list`),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`),
+          axios.get(API_URL),
+        ]);
 
       setPromotionList(promotionsRes.data);
       setCategoryList(categoriesRes.data);
       setItemTypeList(itemTypesRes.data);
       // Map promotion items with proper names
-      const itemsWithNames = promotionItemsRes.data.map(item => {
-        const promotion = promotionsRes.data.find(p => p._id === item.promotion) || {};
-        const category = categoriesRes.data.find(c => c._id === item.category) || {};
-        const itemType = itemTypesRes.data.find(it => it._id === item.itemType) || {};
+      const itemsWithNames = promotionItemsRes.data.map((item) => {
+        const promotion =
+          promotionsRes.data.find((p) => p._id === item.promotion) || {};
+        const category =
+          categoriesRes.data.find((c) => c._id === item.category) || {};
+        const itemType =
+          itemTypesRes.data.find((it) => it._id === item.itemType) || {};
 
         return {
           ...item,
@@ -77,10 +80,7 @@ const PromotionItem = () => {
         };
       });
 
-
-
       setPromotionItems(itemsWithNames);
-
     } catch (error) {
       console.error("Failed to fetch data", error);
       // Fallback to static data if API fails
@@ -119,14 +119,30 @@ const PromotionItem = () => {
     fetchAllData();
   }, [fetchAllData]);
 
-  // Slider animation
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
 
@@ -143,6 +159,8 @@ const PromotionItem = () => {
     setDiscountPercentage("");
     setIsEnable(true);
     setIsSliderOpen(true);
+    setItemSearch("");
+    setIsSliderOpen(true);
   };
 
   const items = [
@@ -155,28 +173,23 @@ const PromotionItem = () => {
     { id: 7, itemName: "Samsung", price: "$1,000" },
   ];
 
-const filterdata = items.filter((item) => {
-  return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
-});
+  const filterdata = items.filter((item) => {
+    return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
+  });
 
-
-const handleEditClick = (promotionitem) => {
-  setEditingPromotionItem(promotionitem);
-  setPromotionName(promotionitem.promotionName || "");
-  setIsEnable(promotionitem.isEnable ?? true);
-  setDetails(promotionitem.details || "");
-  setStartDate(promotionitem.startDate || "");
-  setEndDate(promotionitem.endDate || "");
-  setSelectedPromotion(promotionitem.promotion || ""); // ✅ backend key
-  setSelectedCategory(promotionitem.category || "");   // ✅ backend key
-  setSelectedItemType(promotionitem.itemType || "");   // ✅ backend key
-  setDiscountPercentage(promotionitem.discountPercentage || "");
-  setIsSliderOpen(true);
-};
-
-
-    setItemSearch("");
+  const handleEditClick = (promotionitem) => {
+    setEditingPromotionItem(promotionitem);
+    setPromotionName(promotionitem.promotionName || "");
+    setIsEnable(promotionitem.isEnable ?? true);
+    setDetails(promotionitem.details || "");
+    setStartDate(promotionitem.startDate || "");
+    setEndDate(promotionitem.endDate || "");
+    setSelectedPromotion(promotionitem.promotion || ""); // ✅ backend key
+    setSelectedCategory(promotionitem.category || ""); // ✅ backend key
+    setSelectedItemType(promotionitem.itemType || ""); // ✅ backend key
+    setDiscountPercentage(promotionitem.discountPercentage || "");
     setIsSliderOpen(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -187,7 +200,6 @@ const handleEditClick = (promotionitem) => {
       return;
     }
 
-
     setLoading(true);
 
     // 🔹 Full payload with new fields
@@ -196,16 +208,14 @@ const handleEditClick = (promotionitem) => {
       category: selectedCategory,
       itemType: selectedItemType,
       items: items
-        .filter((i) => checkedItems.includes(i._id))   // ✅ filter by _id, not id
+        .filter((i) => checkedItems.includes(i._id)) // ✅ filter by _id, not id
         .map((i) => ({ _id: i._id, itemName: i.itemName, price: i.price })),
       discountPercentage,
       details,
       startDate,
       endDate,
-      isEnable
+      isEnable,
     };
-
-
 
     try {
       let res;
@@ -323,7 +333,6 @@ const handleEditClick = (promotionitem) => {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-
       <CommanHeader />
       <div className="px-6 mx-auto">
         {/* Top bar */}
@@ -357,75 +366,80 @@ const handleEditClick = (promotionitem) => {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
+                {loading ? (
+                  // Skeleton shown while loading
+                  <TableSkeleton
+                    rows={promotionItems.length || 5}
+                    cols={userInfo?.isAdmin ? 7 : 6}
+                  />
+                ) : promotionItems.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No promotions found.
+                  </div>
+                ) : (
+                  promotionItems.map((promo) => (
+                    <div
+                      key={promo._id || promo.id}
+                      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      {/* Promotion */}
+                      <div className="font-medium text-gray-900 truncate">
+                        {promo.promotionName}
+                      </div>
 
-             {loading ? (
-  // Skeleton shown while loading
-  <TableSkeleton
-    rows={promotionItems.length || 5}
-    cols={userInfo?.isAdmin ? 7 : 6}
-  />
-) : promotionItems.length === 0 ? (
-  <div className="text-center py-4 text-gray-500 bg-white">
-    No promotions found.
-  </div>
-) : (
-  promotionItems.map((promo) => (
-    <div
-      key={promo._id || promo.id}
-      className="grid grid-cols-1 lg:grid-cols-[150px_150px_150px_400px_140px_150px_210px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-    >
-      {/* Promotion */}
-      <div className="font-medium text-gray-900 truncate">
-        {promo.promotionName}
-      </div>
+                      {/* Category */}
+                      <div className="text-gray-600 truncate">
+                        {promo.categoryName}
+                      </div>
 
-      {/* Category */}
-      <div className="text-gray-600 truncate">{promo.categoryName}</div>
+                      {/* Item Type */}
+                      <div className="text-gray-600 truncate">
+                        {promo.itemTypeName}
+                      </div>
 
-      {/* Item Type */}
-      <div className="text-gray-600 truncate">{promo.itemTypeName}</div>
+                      {/* Items */}
+                      <div className="text-gray-600 truncate">
+                        {promo.items && promo.items.length > 0 ? (
+                          promo.items.map((item, idx) => (
+                            <span key={idx} className="inline-block mr-3">
+                              {item.itemName} {item.price && `(${item.price})`}
+                            </span>
+                          ))
+                        ) : (
+                          <span className="text-gray-400">No items</span>
+                        )}
+                      </div>
 
-      {/* Items */}
-      <div className="text-gray-600 truncate">
-        {promo.items && promo.items.length > 0 ? (
-          promo.items.map((item, idx) => (
-            <span key={idx} className="inline-block mr-3">
-              {item.itemName} {item.price && `(${item.price})`}
-            </span>
-          ))
-        ) : (
-          <span className="text-gray-400">No items</span>
-        )}
-      </div>
+                      {/* Discount */}
+                      <div className="text-gray-600 truncate">
+                        {promo.discountPercentage}
+                      </div>
 
-      {/* Discount */}
-      <div className="text-gray-600 truncate">{promo.discountPercentage}</div>
+                      {/* End Date */}
+                      <div className="text-gray-500">
+                        {promo.endDate || "N/A"}
+                      </div>
 
-      {/* End Date */}
-      <div className="text-gray-500">{promo.endDate || "N/A"}</div>
-
-      {/* Actions */}
-      {userInfo?.isAdmin && (
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={() => handleEditClick(promo)}
-            className="py-1 text-sm rounded text-blue-600"
-          >
-            <SquarePen size={18} />
-          </button>
-          <button
-            onClick={() => handleDelete(promo._id)}
-            className="py-1 text-sm rounded text-red-600"
-          >
-            <Trash2 size={18} />
-          </button>
-        </div>
-      )}
-    </div>
-  ))
-)}
-
-
+                      {/* Actions */}
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => handleEditClick(promo)}
+                            className="py-1 text-sm rounded text-blue-600"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(promo._id)}
+                            className="py-1 text-sm rounded text-red-600"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
               </div>
             </div>
           </div>
@@ -433,14 +447,16 @@ const handleEditClick = (promotionitem) => {
 
         {/* Slider */}
         {isSliderOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-4 h-full overflow-y-auto custom-scrollbar"
+              className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingPromotionItem ? "Update Promotion Item" : "Add a New Promotion Item"}
+                  {editingPromotionItem
+                    ? "Update Promotion Item"
+                    : "Add a New Promotion Item"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -468,20 +484,6 @@ const handleEditClick = (promotionitem) => {
                   Promotion on Item
                 </h3>
 
-                {/* Promotion Name */}
-                {/* <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Promotion Name
-                  </label>
-                  <input
-                    type="text"
-                    value={promotionName}
-                    onChange={(e) => setPromotionName(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter promotion name"
-                  />
-                </div> */}
-
                 {/* Promotion Select */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
@@ -494,7 +496,10 @@ const handleEditClick = (promotionitem) => {
                   >
                     <option value="">-- Select Promotion --</option>
                     {promotionList.map((promo) => (
-                      <option key={promo._id || promo.id} value={promo._id || promo.id}>
+                      <option
+                        key={promo._id || promo.id}
+                        value={promo._id || promo.id}
+                      >
                         {promo.promotionName || promo.name}
                       </option>
                     ))}
@@ -532,40 +537,39 @@ const handleEditClick = (promotionitem) => {
                   >
                     <option value="">-- Select Item Type --</option>
                     {itemTypeList.map((type) => (
-                      <option key={type._id || type.id} value={type._id || type.id}>
+                      <option
+                        key={type._id || type.id}
+                        value={type._id || type.id}
+                      >
                         {type.itemTypeName || type.name}
                       </option>
                     ))}
                   </select>
                 </div>
 
-
                 {/* Item Search */}
-             <div>
-  <label className="block text-gray-700 font-medium mb-2">
-    Search Items
-  </label>
-  <div className="w-full">
-    <div className="relative">
-      <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-        <Search size={18} className="text-gray-400" />
-      </span>
-      <input
-        type="text"
-        value={itemSearch}
-        onChange={(e) => setItemSearch(e.target.value)}
-        placeholder="Search Item..."
-        aria-label="Search Item"
-        className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
-          focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
-          placeholder:text-gray-400"
-      />
-    </div>
-  </div>
-</div>
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Search Items
+                  </label>
+                  <div className="w-full relative">
+                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Search size={18} className="text-gray-400" />
+                    </span>
+                    <input
+                      type="text"
+                      value={itemSearch}
+                      onChange={(e) => setItemSearch(e.target.value)}
+                      placeholder="Search Item..."
+                      aria-label="Search Item"
+                      className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+                         focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
+                       placeholder:text-gray-400"
+                    />
+                  </div>
+                </div>
 
-
-
+                {/* Item List */}
                 <div className="w-full border rounded-lg shadow p-4 max-h-60 overflow-y-auto">
                   <ul className="space-y-3">
                     {filterdata.map((item) => (
@@ -580,16 +584,12 @@ const handleEditClick = (promotionitem) => {
                         <input
                           type="checkbox"
                           value={item._id}
-                          className="h-5 w-5 accent-blue-600 rounded-sm" // square checkbox
+                          className="h-5 w-5 accent-blue-600 rounded-sm"
                         />
-
-
-
                       </li>
                     ))}
                   </ul>
                 </div>
-
 
                 {/* Discount Percentage */}
                 <div>
@@ -605,34 +605,6 @@ const handleEditClick = (promotionitem) => {
                     placeholder="Enter discount percentage"
                   />
                 </div>
-
-                {/* Start Date
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Start Date
-                  </label>
-                  <input
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                  />
-                </div> */}
-
-                {/* End Date */}
-                {/* <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    End Date
-                  </label>
-                  <input
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                  />
-                </div> */}
-
-
 
                 {/* Status */}
                 <div>
@@ -655,7 +627,11 @@ const handleEditClick = (promotionitem) => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
                 >
-                  {loading ? "Saving..." : editingPromotionItem ? "Update Promotion Item" : "Save Promotion Item"}
+                  {loading
+                    ? "Saving..."
+                    : editingPromotionItem
+                    ? "Update Promotion Item"
+                    : "Save Promotion Item"}
                 </button>
               </form>
             </div>
@@ -664,6 +640,6 @@ const handleEditClick = (promotionitem) => {
       </div>
     </div>
   );
-}
+};
 
 export default PromotionItem;

@@ -33,14 +33,30 @@ const SupplierList = () => {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  // Slider animation
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
 
@@ -272,7 +288,7 @@ const SupplierList = () => {
       </div>
 
       {/* Supplier Table */}
-      
+
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <div className="min-w-[1100px]">
@@ -403,10 +419,10 @@ const SupplierList = () => {
 
       {/* Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full max-w-md bg-white p-6 h-full overflow-y-auto custom-scrollbar"
+            className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-newPrimary">
@@ -437,6 +453,7 @@ const SupplierList = () => {
             </div>
 
             <div className="space-y-4">
+              {/* Supplier Fields */}
               <div>
                 <label className="block text-gray-700 font-medium">
                   Supplier Name <span className="text-newPrimary">*</span>
@@ -449,6 +466,7 @@ const SupplierList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Phone Number <span className="text-newPrimary">*</span>
@@ -462,6 +480,7 @@ const SupplierList = () => {
                   placeholder="e.g. +1-212-555-1234"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Mobile Number <span className="text-newPrimary">*</span>
@@ -475,6 +494,7 @@ const SupplierList = () => {
                   placeholder="e.g. 03001234567"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Email Address <span className="text-newPrimary">*</span>
@@ -487,6 +507,7 @@ const SupplierList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Contact Person <span className="text-newPrimary">*</span>
@@ -499,6 +520,7 @@ const SupplierList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Address <span className="text-newPrimary">*</span>
@@ -511,6 +533,7 @@ const SupplierList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Designation <span className="text-newPrimary">*</span>
@@ -524,6 +547,7 @@ const SupplierList = () => {
                   placeholder="e.g. Sales Manager"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   NTN <span className="text-newPrimary">*</span>
@@ -537,6 +561,7 @@ const SupplierList = () => {
                   placeholder="e.g. NTN123456789"
                 />
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   GST <span className="text-newPrimary">*</span>
@@ -550,6 +575,8 @@ const SupplierList = () => {
                   placeholder="e.g. 27ABCDE1234F1Z5"
                 />
               </div>
+
+              {/* Payment Terms */}
               <div>
                 <label className="block text-gray-700 font-medium">
                   Payment Terms <span className="text-newPrimary">*</span>
@@ -577,6 +604,7 @@ const SupplierList = () => {
                   </label>
                 </div>
               </div>
+
               {paymentTerms === "CreditCard" && (
                 <div className="flex gap-4">
                   <div className="w-1/2">
@@ -608,6 +636,7 @@ const SupplierList = () => {
                 </div>
               )}
 
+              {/* Status */}
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button
@@ -625,6 +654,8 @@ const SupplierList = () => {
                 </button>
                 <span>{status ? "Active" : "Inactive"}</span>
               </div>
+
+              {/* Save Button */}
               <button
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
@@ -635,6 +666,7 @@ const SupplierList = () => {
           </div>
         </div>
       )}
+
       <style jsx>{`
         .table-container {
           max-width: 100%;
