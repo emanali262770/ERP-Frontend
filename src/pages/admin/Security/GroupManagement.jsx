@@ -13,9 +13,9 @@ import {
   FiX,
 } from "react-icons/fi";
 import { FaTimes } from "react-icons/fa";
-import CommanHeader from "../../components/CommanHeader";
+import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
+import TableSkeleton from "../Skeleton";
 
 const GroupManagement = () => {
   const [groupList, setGroupList] = useState([]);

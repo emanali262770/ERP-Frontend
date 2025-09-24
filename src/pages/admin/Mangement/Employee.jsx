@@ -277,9 +277,9 @@ const Employee = () => {
                     <div className="font-medium text-gray-900">
                       {emp._id?.slice(0, 6)}
                     </div>
-                    <div className="text-gray-700">{emp.employeeName}</div>
+                    <div className="text-gray-700">{emp?.employeeName}</div>
                     <div className="text-gray-600">
-                      {emp.departmentId.departmentName}
+                      {emp?.departmentId?.departmentName}
                     </div>
                     <div className="text-gray-600">{emp.mobile}</div>
                     <div className="text-gray-600">{emp.nicNo}</div>
