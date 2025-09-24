@@ -58,15 +58,7 @@ const links = [
 
   ],
   },
-  {
-    label: "Management",
-    icon: <FaUserShield/>,
-    children: [
-      { to: "/admin/designation", label: "Designation", icon: <FaUsersCog />,  },
-      { to: "/admin/employee", label: "Employee", icon: <FaUserCog />},
-      { to: "/admin/departments", label: "Departments", icon: <FaUserShield /> },
-    ],
-  },
+ 
   { to: "/admin/sales-invoice", label: "Sales", icon: <FaReceipt />, key: "isSales" },
   { to: "/admin/customers", label: "Customers", icon: <FaUsers />, key: "isCustomer" },
   { to: "/admin/customers-booking", label: "Booking Customer", icon: <FaUsers />, key: "isBookingCustomer" },
@@ -87,6 +79,15 @@ const links = [
       { to: "/admin/item-unit", label: "Item Unit", icon: <FaBalanceScale />, key: "isItemUnit" },
       { to: "/admin/promotion", label: "Promotion", icon: <FaBalanceScale /> },
       { to: "/admin/promotion-item", label: "Promotion Item", icon: <FaBalanceScale /> },
+    ],
+  },
+   {
+    label: "Management",
+    icon: <FaUserShield/>,
+    children: [
+      { to: "/admin/designation", label: "Designation", icon: <FaUsersCog />,  },
+      { to: "/admin/employee", label: "Employee", icon: <FaUserCog />},
+      { to: "/admin/departments", label: "Departments", icon: <FaUserShield /> },
     ],
   },
   {

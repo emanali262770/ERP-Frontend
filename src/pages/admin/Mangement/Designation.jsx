@@ -3,23 +3,23 @@ import gsap from "gsap";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { SquarePen, Trash2 } from "lucide-react";
-import CommanHeader from "../../components/CommanHeader";
-import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
 import axios from "axios";
 
-const Departments = () => {
-  const [departmentList, setDepartmentList] = useState([
-    
-  ]);
+const Designation = () => {
+  const [designationList, setDesignationList] = useState([]);
 
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [department, setDepartment] = useState("");
+  const [designation, setDesignation] = useState("");
+  const [enable, setEnable] = useState(true);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
+
   const sliderRef = useRef(null);
- const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/departments`;
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/designations`;
   // Slider animation
   useEffect(() => {
     if (isSliderOpen && sliderRef.current) {
@@ -30,131 +30,130 @@ const Departments = () => {
       );
     }
   }, [isSliderOpen]);
-// Fetch Department list
-   const fetchDepartmentList = useCallback(async () => {
+
+  // Fetch all data for Desginationn
+  const fetchDesginationList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
-      setDepartmentList(res.data);
+      setDesignationList(res.data);
       console.log("Designation  ", res.data);
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
-      setTimeout(() => setLoading(false), 2000);
+      setTimeout(() => setLoading(false), 1000);
     }
   }, []);
   useEffect(() => {
-    fetchDepartmentList();
-  }, [fetchDepartmentList]);
-
+    fetchDesginationList();
+  }, [fetchDesginationList]);
 
   // Handlers
   const handleAdd = () => {
     setIsSliderOpen(true);
     setIsEdit(false);
     setEditId(null);
-    setDepartment("");
+    setDesignation("");
+    setEnable(true);
   };
 
-  const handleSave = async() => {
-    if (!department) {
-      toast.error("❌ Department is required");
+  const handleSave = async () => {
+    if (!designation) {
+      toast.error("❌ Designation is required");
       return;
     }
-
     try {
       const { token } = userInfo || {};
       const headers = {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       };
-      const newDept = {
-      departmentName:department,
-    };
+      const newDesg = {
+        designationName: designation,
+      };
 
       if (isEdit&&editId) {
-        const res = await axios.put(`${API_URL}/${editId}`, newDept, {
+        const res = await axios.put(`${API_URL}/${editId}`, newDesg, {
           headers,
         });
-        toast.success(" Department updated successfully");
+        toast.success(" Designation updated successfully");
       } else {
-        const res = await axios.post(API_URL, newDept, {
+        const res = await axios.post(API_URL, newDesg, {
           headers,
         });
-        toast.success(" Department added successfully");
+        toast.success(" Designation added successfully");
       }
-      fetchDepartmentList();
+      fetchDesginationList();
       setIsSliderOpen(false);
     } catch (error) {
       console.error(error);
-      toast.error(`❌ ${isEdit ? "Update" : "Add"} department failed`);
+      toast.error(`❌ ${isEdit ? "Update" : "Add"} designation failed`);
     }
   };
 
   const handleEdit = (d) => {
     setIsEdit(true);
-    setEditId(d._id)
-    setDepartment(d.departmentName);
+    setEditId(d._id);
+    setDesignation(d.designationName);
     setIsSliderOpen(true);
   };
 
- const handleDelete = (id) => {
-  const swalWithTailwindButtons = Swal.mixin({
-    customClass: {
-      actions: "space-x-2",
-      confirmButton:
-        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-      cancelButton:
-        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-    },
-    buttonsStyling: false,
-  });
+  const handleDelete =async (id) => {
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
+    });
 
-  swalWithTailwindButtons
-    .fire({
-      title: "Are you sure?",
-      text: "You want to delete this department?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then(async(result) => {
-      if (result.isConfirmed) {
-        try {
+    swalWithTailwindButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You want to delete this designation?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async(result) => {
+        if (result.isConfirmed) {
+          try {
             await axios.delete(`${API_URL}/${id}`, {
               headers: {
                 Authorization: `Bearer ${userInfo?.token}`,
               },
             });
 
-           setDepartmentList(departmentList.filter((d) => d._id !== id));
+            setDesignationList(designationList.filter((d) => d._id !== id));
             swalWithTailwindButtons.fire(
               "Deleted!",
-              "Department deleted successfully.",
+              "Designation deleted successfully.",
               "success"
             );
           } catch (error) {
             console.error("Delete error:", error);
             swalWithTailwindButtons.fire(
               "Error!",
-              "Failed to delete department.",
+              "Failed to delete designation.",
               "error"
             );
           }
-        
-       
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        swalWithTailwindButtons.fire(
-          "Cancelled",
-          "Department is safe 🙂",
-          "error"
-        );
-      }
-    });
-};
-
+         
+          
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithTailwindButtons.fire(
+            "Cancelled",
+            "Designation is safe 🙂",
+            "error"
+          );
+        }
+      });
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -162,44 +161,47 @@ const Departments = () => {
       <CommanHeader />
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-newPrimary">Departments</h1>
-          <p className="text-gray-500 text-sm">Manage your department details</p>
+          <h1 className="text-2xl font-bold text-newPrimary">Designations</h1>
+          <p className="text-gray-500 text-sm">
+            Manage your designation details
+          </p>
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/90"
           onClick={handleAdd}
         >
-          + Add Department
+          + Add Designation
         </button>
       </div>
 
       {/* Table */}
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-w-[500px]">
+          <div className="min-w-[600px]">
             {/* Table Header */}
             <div className="hidden lg:grid grid-cols-[80px_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
               <div>Sr</div>
-              <div>Department</div>
+              <div>Designation</div>
               <div className="text-right">Actions</div>
             </div>
 
             {/* Table Body */}
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
-                <TableSkeleton rows={departmentList.length>0?departmentList.length:5} cols={3} />
-              ) : departmentList.length === 0 ? (
+                <TableSkeleton rows={designationList.length || 5} cols={3} className="lg:grid-cols-[80px_1fr_auto]"/>
+              ) : designationList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
-                  No departments found.
+                  No designations found.
                 </div>
               ) : (
-                departmentList.map((d, index) => (
+                designationList.map((d, index) => (
                   <div
                     key={d._id}
                     className="hidden lg:grid grid-cols-[80px_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                   >
                     <div>{index + 1}</div>
-                    <div className="text-gray-700">{d.departmentName}</div>
+                    <div className="text-gray-700">{d.designationName}</div>
+
                     <div className="flex justify-end gap-3">
                       <button
                         onClick={() => handleEdit(d)}
@@ -231,7 +233,7 @@ const Departments = () => {
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-newPrimary">
-                {isEdit ? "Update Department" : "Add a New Department"}
+                {isEdit ? "Update Designation" : "Add a New Designation"}
               </h2>
               <button
                 className="text-2xl text-gray-500 hover:text-gray-700"
@@ -244,14 +246,14 @@ const Departments = () => {
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Department <span className="text-newPrimary">*</span>
+                  Designation <span className="text-newPrimary">*</span>
                 </label>
                 <input
                   type="text"
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
+                  value={designation}
+                  onChange={(e) => setDesignation(e.target.value)}
                   className="w-full p-2 border rounded"
-                  placeholder="Enter department"
+                  placeholder="Enter designation"
                 />
               </div>
 
@@ -259,8 +261,8 @@ const Departments = () => {
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
               >
-                 {isEdit ? "Update Department" : "Save Department"}
-                
+                {isEdit ? "Update Designation" : "Save Designation"}
+               
               </button>
             </div>
           </div>
@@ -270,4 +272,4 @@ const Departments = () => {
   );
 };
 
-export default Departments;
+export default Designation;

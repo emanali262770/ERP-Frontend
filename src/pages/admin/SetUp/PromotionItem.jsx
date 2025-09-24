@@ -5,8 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { Search, SquarePen, Trash2 } from "lucide-react";
-import CommanHeader from "../../components/CommanHeader";
-import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
 
 const PromotionItem = () => {
   const [categoryList, setCategoryList] = useState([]);
@@ -143,6 +143,8 @@ const PromotionItem = () => {
     setDiscountPercentage("");
     setIsEnable(true);
     setIsSliderOpen(true);
+     setItemSearch("");
+    setIsSliderOpen(true);
   };
 
   const items = [
@@ -175,8 +177,7 @@ const handleEditClick = (promotionitem) => {
 };
 
 
-    setItemSearch("");
-    setIsSliderOpen(true);
+   
 
   const handleSubmit = async (e) => {
     e.preventDefault();

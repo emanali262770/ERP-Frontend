@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import CommanHeader from "../../components/CommanHeader";
+import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
+import TableSkeleton from "../Skeleton";
 import axios from "axios";
-import { set } from "date-fns";
+
 
 const Employee = () => {
   const [employeeList, setEmployeeList] = useState([]);
@@ -158,6 +157,20 @@ const Employee = () => {
     setIsSliderOpen(true);
   };
 
+  // Date formating
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) return "Invalid Date";
+
+    const day = String(parsed.getDate()).padStart(2, "0");
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const year = parsed.getFullYear();
+
+    return `${day}-${month}-${year}`; // DD-MM-YYYY
+  };
+
   const handleDelete = (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
@@ -270,13 +283,13 @@ const Employee = () => {
                     </div>
                     <div className="text-gray-600">{emp.mobile}</div>
                     <div className="text-gray-600">{emp.nicNo}</div>
-                    <div className="text-gray-600">{emp.dob}</div>
+                    <div className="text-gray-600">{formatDate(emp.dob)}</div>
                     <div className="text-gray-600">{emp.qualification}</div>
                     <div className=" font-semibold">
                       {emp.isEnable ? (
-                        <span className="text-green-600">Enabled</span>
+                        <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Enabled</span>
                       ) : (
-                        <span className="text-red-600">Disabled</span>
+                        <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Disabled</span>
                       )}
                     </div>
 
