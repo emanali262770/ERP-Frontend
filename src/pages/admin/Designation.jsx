@@ -1,16 +1,14 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../components/CommanHeader";
 import TableSkeleton from "./Skeleton";
+import axios from "axios";
 
 const Designation = () => {
-  const [designationList, setDesignationList] = useState([
-    { _id: "d1", designation: "Manager", enable: true },
-    { _id: "d2", designation: "Cashier", enable: false },
-  ]);
+  const [designationList, setDesignationList] = useState([]);
 
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [designation, setDesignation] = useState("");
@@ -18,8 +16,10 @@ const Designation = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const sliderRef = useRef(null);
 
+  const sliderRef = useRef(null);
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/designations`;
   // Slider animation
   useEffect(() => {
     if (isSliderOpen && sliderRef.current) {
@@ -31,6 +31,23 @@ const Designation = () => {
     }
   }, [isSliderOpen]);
 
+  // Fetch all data for Desginationn
+  const fetchDesginationList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setDesignationList(res.data);
+      console.log("Designation  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchDesginationList();
+  }, [fetchDesginationList]);
+
   // Handlers
   const handleAdd = () => {
     setIsSliderOpen(true);
@@ -40,79 +57,103 @@ const Designation = () => {
     setEnable(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!designation) {
       toast.error("❌ Designation is required");
       return;
     }
+    try {
+      const { token } = userInfo || {};
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+      const newDesg = {
+        designationName: designation,
+      };
 
-    const newDesg = {
-      _id: isEdit ? editId : Date.now().toString(),
-      designation,
-      enable,
-    };
-
-    if (isEdit) {
-      setDesignationList(
-        designationList.map((d) => (d._id === editId ? newDesg : d))
-      );
-      toast.success("✅ Designation updated successfully");
-    } else {
-      setDesignationList([...designationList, newDesg]);
-      toast.success("✅ Designation added successfully");
+      if (isEdit&&editId) {
+        const res = await axios.put(`${API_URL}/${editId}`, newDesg, {
+          headers,
+        });
+        toast.success(" Designation updated successfully");
+      } else {
+        const res = await axios.post(API_URL, newDesg, {
+          headers,
+        });
+        toast.success(" Designation added successfully");
+      }
+      fetchDesginationList();
+      setIsSliderOpen(false);
+    } catch (error) {
+      console.error(error);
+      toast.error(`❌ ${isEdit ? "Update" : "Add"} designation failed`);
     }
-
-    setIsSliderOpen(false);
   };
 
   const handleEdit = (d) => {
     setIsEdit(true);
     setEditId(d._id);
-    setDesignation(d.designation);
-    setEnable(d.enable);
+    setDesignation(d.designationName);
     setIsSliderOpen(true);
   };
 
-  const handleDelete = (id) => {
-  const swalWithTailwindButtons = Swal.mixin({
-    customClass: {
-      actions: "space-x-2",
-      confirmButton:
-        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-      cancelButton:
-        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-    },
-    buttonsStyling: false,
-  });
-
-  swalWithTailwindButtons
-    .fire({
-      title: "Are you sure?",
-      text: "You want to delete this designation?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        setDesignationList(designationList.filter((d) => d._id !== id));
-        swalWithTailwindButtons.fire(
-          "Deleted!",
-          "Designation has been deleted.",
-          "success"
-        );
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        swalWithTailwindButtons.fire(
-          "Cancelled",
-          "Designation is safe 🙂",
-          "error"
-        );
-      }
+  const handleDelete =async (id) => {
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
     });
-};
 
+    swalWithTailwindButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You want to delete this designation?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async(result) => {
+        if (result.isConfirmed) {
+          try {
+            await axios.delete(`${API_URL}/${id}`, {
+              headers: {
+                Authorization: `Bearer ${userInfo?.token}`,
+              },
+            });
+
+            setDesignationList(designationList.filter((d) => d._id !== id));
+            swalWithTailwindButtons.fire(
+              "Deleted!",
+              "Designation deleted successfully.",
+              "success"
+            );
+          } catch (error) {
+            console.error("Delete error:", error);
+            swalWithTailwindButtons.fire(
+              "Error!",
+              "Failed to delete designation.",
+              "error"
+            );
+          }
+         
+          
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithTailwindButtons.fire(
+            "Cancelled",
+            "Designation is safe 🙂",
+            "error"
+          );
+        }
+      });
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -147,7 +188,7 @@ const Designation = () => {
             {/* Table Body */}
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
-                <TableSkeleton rows={5} cols={4} />
+                <TableSkeleton rows={designationList.length || 5} cols={4} />
               ) : designationList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No designations found.
@@ -159,8 +200,8 @@ const Designation = () => {
                     className="hidden lg:grid grid-cols-[80px_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                   >
                     <div>{index + 1}</div>
-                    <div className="text-gray-700">{d.designation}</div>
-                    
+                    <div className="text-gray-700">{d.designationName}</div>
+
                     <div className="flex justify-end gap-3">
                       <button
                         onClick={() => handleEdit(d)}
@@ -216,13 +257,12 @@ const Designation = () => {
                 />
               </div>
 
-              
-
               <button
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
               >
-                Save Designation
+                {isEdit ? "Update Designation" : "Save Designation"}
+               
               </button>
             </div>
           </div>

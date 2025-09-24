@@ -7,6 +7,7 @@ import Swal from "sweetalert2";
 import CommanHeader from "../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "./Skeleton";
+import { set } from "date-fns";
 
 const SupplierList = () => {
   const [supplierList, setSupplierList] = useState([]);
@@ -73,6 +74,7 @@ const SupplierList = () => {
     setProductsSupplied("");
     setPaymentTerms("");
     setPhoneNumber("");
+    setMobileNumber("");
     setDesignation("");
     setNtn("");
     setGst("");
@@ -108,7 +110,7 @@ const SupplierList = () => {
       email,
       contactPerson,
       address,
-      mobileNumber, // <-- add this state
+      mobileNumber,
       phoneNumber,
       designation,
       ntn,
@@ -169,11 +171,17 @@ const SupplierList = () => {
     setEmail(supplier.email);
     setAddress(supplier.address);
     setPhoneNumber(supplier.phoneNumber || "");
+    setMobileNumber(supplier.mobileNumber || "");
     setDesignation(supplier.designation || "");
     setNtn(supplier.ntn || "");
     setGst(supplier.gst || "");
-    setPaymentTerms(supplier.paymentTerms || "");
+    setPaymentTerms(
+      supplier.paymentTerms === "Credit"
+        ? "CreditCard"
+        : supplier.paymentTerms || ""
+    );
     setCreditLimit(supplier.creditLimit || "");
+    setCreditTime(supplier.creditTime || "");
     setStatus(supplier.status);
     setIsSliderOpen(true);
   };
@@ -244,6 +252,7 @@ const SupplierList = () => {
   //     </div>
   //   );
   // }
+  console.log({ supplierList });
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -263,7 +272,7 @@ const SupplierList = () => {
       </div>
 
       {/* Supplier Table */}
-      {/* Supplier Table */}
+      
       <div className="rounded-xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
           <div className="min-w-[1100px]">
@@ -293,7 +302,7 @@ const SupplierList = () => {
                   No suppliers found.
                 </div>
               ) : (
-                supplierList.map((s) => (
+                supplierList?.map((s) => (
                   <>
                     {/* ✅ Desktop Row */}
                     <div
@@ -568,7 +577,7 @@ const SupplierList = () => {
                   </label>
                 </div>
               </div>
-              {paymentTerms === "CreditCard" && status && (
+              {paymentTerms === "CreditCard" && (
                 <div className="flex gap-4">
                   <div className="w-1/2">
                     <label className="block text-gray-700 font-medium">
