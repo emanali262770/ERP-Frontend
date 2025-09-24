@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import { toast } from "react-toastify";
@@ -6,38 +6,11 @@ import Swal from "sweetalert2";
 import CommanHeader from "../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "./Skeleton";
+import axios from "axios";
+import { set } from "date-fns";
 
 const Employee = () => {
-  const [employeeList, setEmployeeList] = useState([
-    {
-      _id: "e1",
-      employeeName: "Ali Khan",
-      department: "HR",
-      address: "123 Main Street",
-      city: "Lahore",
-      gender: "Male",
-      phoneNumber: "03001234567",
-      nic: "35202-1234567-8",
-      dob: "1995-05-12",
-      qualification: "MBA",
-      bloodGroup: "B+",
-      enable: true,
-    },
-    {
-      _id: "e2",
-      employeeName: "Sara Ahmed",
-      department: "Accounts",
-      address: "45 Gulberg",
-      city: "Karachi",
-      gender: "Female",
-      phoneNumber: "03007654321",
-      nic: "35201-7654321-9",
-      dob: "1998-08-21",
-      qualification: "B.Com",
-      bloodGroup: "O+",
-      enable: false,
-    },
-  ]);
+  const [employeeList, setEmployeeList] = useState([]);
 
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [employeeName, setEmployeeName] = useState("");
@@ -54,8 +27,11 @@ const Employee = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
   const sliderRef = useRef(null);
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(true);
+  const [departmentList, setDepartmentList] = useState([]);
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/employees`;
+  const DEPARTMENT_URL = `${import.meta.env.VITE_API_BASE_URL}/departments`;
   // Slider animation
   useEffect(() => {
     if (isSliderOpen && sliderRef.current) {
@@ -66,6 +42,44 @@ const Employee = () => {
       );
     }
   }, [isSliderOpen]);
+  // Fetch Department list
+  const fetchDepartmentList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${DEPARTMENT_URL}`);
+      setDepartmentList(res?.data);
+      console.log("Designation  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+      
+    }
+  }, []);
+  useEffect(() => {
+    fetchDepartmentList();
+  }, [fetchDepartmentList]);
+
+  // Fetch Department Table list
+  const fetchDepartmentTableList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setEmployeeList(res?.data);
+      console.log("EmployeeList  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchDepartmentTableList();
+  }, [fetchDepartmentTableList]);
 
   // Handlers
   const handleAddEmployee = () => {
@@ -85,37 +99,45 @@ const Employee = () => {
     setEnable(true);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!employeeName || !department) {
       toast.error("❌ Employee name and department are required");
       return;
     }
+    const { token } = userInfo || {};
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
 
     const newEmployee = {
-      _id: isEdit ? editId : Date.now().toString(),
+      departmentId: departmentList.find(
+        (dept) => dept.departmentName === department
+      )?._id,
       employeeName,
-      department,
       address,
       city,
       gender,
-      phoneNumber,
-      nic,
+      mobile: phoneNumber,
+      nicNo: nic,
       dob,
       qualification,
       bloodGroup,
-      enable,
+      isEnable: enable,
     };
 
-    if (isEdit) {
-      setEmployeeList(
-        employeeList.map((emp) => (emp._id === editId ? newEmployee : emp))
-      );
-      toast.success("✅ Employee updated successfully");
+    if (isEdit && editId) {
+      const res = await axios.put(`${API_URL}/${editId}`, newEmployee, {
+        headers,
+      });
+      toast.success(" Employee updated successfully");
     } else {
-      setEmployeeList([...employeeList, newEmployee]);
-      toast.success("✅ Employee added successfully");
+      const res = await axios.post(API_URL, newEmployee, {
+        headers,
+      });
+      toast.success(" Employee added successfully");
     }
-
+    fetchDepartmentTableList();
     setIsSliderOpen(false);
   };
 
@@ -123,59 +145,73 @@ const Employee = () => {
     setIsEdit(true);
     setEditId(emp._id);
     setEmployeeName(emp.employeeName);
-    setDepartment(emp.department);
+    setDepartment(emp.departmentId?.departmentName || "");
     setAddress(emp.address);
     setCity(emp.city);
     setGender(emp.gender);
-    setPhoneNumber(emp.phoneNumber);
-    setNic(emp.nic);
-    setDob(emp.dob);
+    setPhoneNumber(emp.mobile || "");
+    setNic(emp.nicNo || "");
+    setDob(emp.dob ? emp.dob.split("T")[0] : "");
     setQualification(emp.qualification);
     setBloodGroup(emp.bloodGroup);
-    setEnable(emp.enable);
+    setEnable(emp.isEnable);
     setIsSliderOpen(true);
   };
 
   const handleDelete = (id) => {
-  const swalWithTailwindButtons = Swal.mixin({
-    customClass: {
-      actions: "space-x-2",
-      confirmButton:
-        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-      cancelButton:
-        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-    },
-    buttonsStyling: false,
-  });
-
-  swalWithTailwindButtons
-    .fire({
-      title: "Are you sure?",
-      text: "You want to delete this employee?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        setEmployeeList(employeeList.filter((emp) => emp._id !== id));
-        swalWithTailwindButtons.fire(
-          "Deleted!",
-          "Employee has been deleted.",
-          "success"
-        );
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        swalWithTailwindButtons.fire(
-          "Cancelled",
-          "Employee is safe 🙂",
-          "error"
-        );
-      }
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
     });
-};
 
+    swalWithTailwindButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You want to delete this employee?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            await axios.delete(`${API_URL}/${id}`, {
+              headers: {
+                Authorization: `Bearer ${userInfo?.token}`,
+              },
+            });
+
+            setEmployeeList(employeeList.filter((emp) => emp._id !== id));
+            swalWithTailwindButtons.fire(
+              "Deleted!",
+              "Employee has been deleted.",
+              "success"
+            );
+          } catch (error) {
+            console.error("Delete error:", error);
+            swalWithTailwindButtons.fire(
+              "Error!",
+              "Failed to delete department.",
+              "error"
+            );
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithTailwindButtons.fire(
+            "Cancelled",
+            "Employee is safe 🙂",
+            "error"
+          );
+        }
+      });
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -214,12 +250,12 @@ const Employee = () => {
             {/* ✅ Table Body */}
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
-                <TableSkeleton rows={5} cols={9} className="lg:grid-cols-9"/>
-              ) : employeeList.length === 0 ? (
-                <div className="text-center py-4 text-gray-500 bg-white">
-                  No employees found.
-                </div>
-              ) : (
+                <TableSkeleton
+                  rows={employeeList.length > 0 ? employeeList.length : 5} 
+                  cols={9}
+                  className="lg:grid-cols-9"
+                />
+              )  : (
                 employeeList.map((emp) => (
                   <div
                     key={emp._id}
@@ -229,18 +265,21 @@ const Employee = () => {
                       {emp._id?.slice(0, 6)}
                     </div>
                     <div className="text-gray-700">{emp.employeeName}</div>
-                    <div className="text-gray-600">{emp.department}</div>
-                    <div className="text-gray-600">{emp.phoneNumber}</div>
-                    <div className="text-gray-600">{emp.nic}</div>
+                    <div className="text-gray-600">
+                      {emp.departmentId.departmentName}
+                    </div>
+                    <div className="text-gray-600">{emp.mobile}</div>
+                    <div className="text-gray-600">{emp.nicNo}</div>
                     <div className="text-gray-600">{emp.dob}</div>
                     <div className="text-gray-600">{emp.qualification}</div>
                     <div className=" font-semibold">
-                      {emp.enable ? (
+                      {emp.isEnable ? (
                         <span className="text-green-600">Enabled</span>
                       ) : (
                         <span className="text-red-600">Disabled</span>
                       )}
                     </div>
+
                     <div className="flex justify-end gap-3">
                       <button
                         onClick={() => handleEdit(emp)}
@@ -317,12 +356,14 @@ const Employee = () => {
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select Department</option>
-                  <option value="HR">HR</option>
-                  <option value="Accounts">Accounts</option>
-                  <option value="Sales">Sales</option>
-                  <option value="IT">IT</option>
+                  {departmentList.map((dept) => (
+                    <option key={dept._id} value={dept.departmentName}>
+                      {dept.departmentName}
+                    </option>
+                  ))}
                 </select>
               </div>
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Address

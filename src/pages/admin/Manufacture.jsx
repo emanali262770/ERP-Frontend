@@ -18,8 +18,6 @@ const Manufacture = () => {
   const [personName, setPersonName] = useState("");
   const [mobileNumber, setMobileNumber] = useState("");
   const [designation, setDesignation] = useState("");
-  const [ntn, setNtn] = useState("");
-  const [gstNumber, setGstNumber] = useState("");
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState(true);
   const [isEdit, setIsEdit] = useState(false);
@@ -68,23 +66,18 @@ const Manufacture = () => {
     setPersonName("");
     setMobileNumber("");
     setDesignation("");
-    setNtn("");
-    setGstNumber("");
     setEmail("");
     setStatus(true);
   };
 
   const handleSave = async () => {
     const formData = {
-     _id: manufacturerId,
-       name: manufacturerName,
+      manufacturerName: manufacturerName,
       address,
       phoneNumber,
       personName,
       mobileNumber,
       designation,
-      ntn,
-      gstNumber,
       email,
       status,
     };
@@ -97,20 +90,18 @@ const Manufacture = () => {
         "Content-Type": "application/json",
       };
 
-
-    if (isEdit && editId) {
-  // 🔄 Update existing category
-  const res = await axios.put(`${API_URL}/${editId}`, formData, {
-    headers,
-  });
-  toast.success("✅ Manufacturer updated successfully");
-} else {
-  const res = await axios.post(API_URL, formData, {
-    headers,
-  });
-  toast.success("✅ Manufacturer added successfully");
-}
-
+      if (isEdit && editId) {
+        // 🔄 Update existing category
+        const res = await axios.put(`${API_URL}/${editId}`, formData, {
+          headers,
+        });
+        toast.success(" Manufacturer updated successfully");
+      } else {
+        const res = await axios.post(API_URL, formData, {
+          headers,
+        });
+        toast.success(" Manufacturer added successfully");
+      }
 
       setManufacturerId("");
       setManufacturerName("");
@@ -119,8 +110,6 @@ const Manufacture = () => {
       setPersonName("");
       setMobileNumber("");
       setDesignation("");
-      setNtn("");
-      setGstNumber("");
       setEmail("");
       setStatus(true);
       setIsSliderOpen(false);
@@ -133,19 +122,16 @@ const Manufacture = () => {
     }
   };
 
-
   const handleEdit = (manufacturer) => {
     setIsEdit(true);
     setEditId(manufacturer._id);
     setManufacturerId(manufacturer._id);
-    setManufacturerName(manufacturer.name);
+    setManufacturerName(manufacturer.manufacturerName);
     setAddress(manufacturer.address);
     setPhoneNumber(manufacturer.phoneNumber);
     setPersonName(manufacturer.personName);
     setMobileNumber(manufacturer.mobileNumber);
     setDesignation(manufacturer.designation);
-    setNtn(manufacturer.ntn);
-    setGstNumber(manufacturer.gstNumber);
     setEmail(manufacturer.email);
     setStatus(manufacturer.status);
     setIsSliderOpen(true);
@@ -237,131 +223,118 @@ const Manufacture = () => {
       </div>
 
       {/* Manufacturer Table */}
-    
-      <div className="rounded-xl border border-gray-200 overflow-hidden">
-        <div className="overflow-x-auto">
-          <div className="min-w-full">
-            {/* ✅ Table Header (desktop only) */}
-            <div className="hidden lg:grid grid-cols-[150px_200px_150px_150px_150px_120px_120px_120px_120px_auto] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-              <div>Name</div>
-              <div>Address</div>
-              <div>Phone</div>
-              <div>Email</div>
-              <div>Contact Person</div>
-              <div>Mobile</div>
-              <div>NTN</div>
-              <div>GST</div>
-              <div>Status</div>
-              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-            </div>
 
-            {/* ✅ Table Body */}
-            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
-              {loading ? (
-                <TableSkeleton
-                  rows={
-                    manufacturerList.length > 0 ? manufacturerList.length : 5
-                  }
-                  cols={userInfo?.isAdmin ? 10 : 9}
-                  className="lg:grid-cols-[150px_200px_150px_150px_150px_120px_120px_120px_120px_auto]"
-                />
-              ) : manufacturerList.length === 0 ? (
-                <div className="text-center py-4 text-gray-500 bg-white">
-                  No manufacturers found.
-                </div>
-              ) : (
-                manufacturerList.map((m) => (
-                  <>
-                    {/* ✅ Desktop Row */}
-                    <div
-                      key={m._id}
-                      className="hidden lg:grid grid-cols-[150px_200px_150px_150px_150px_120px_120px_120px_120px_auto] gap-4 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      <div className="font-medium text-gray-900">
-                        {m.manufacturerName}
-                      </div>
-                      <div className="text-gray-600 truncate">{m.address}</div>
-                      <div className="text-gray-600">{m.phoneNumber}</div>
-                      <div className="text-gray-600">{m.email || "—"}</div>
-                      <div className="text-gray-600">{m.personName}</div>
-                      <div className="text-gray-600">{m.mobileNumber}</div>
-                      <div className="text-gray-600">{m.ntn}</div>
-                      <div className="text-gray-600">{m.gstNumber}</div>
-                      <div className="text-center font-semibold">
-                        {m.status ? (
-                          <span className="text-green-600">Active</span>
-                        ) : (
-                          <span className="text-red-600">Inactive</span>
-                        )}
-                      </div>
-                      {userInfo?.isAdmin && (
-                        <div className="flex justify-end gap-3">
-                          <button
-                            onClick={() => handleEdit(m)}
-                            className="text-blue-600 hover:underline"
-                          >
-                            <SquarePen size={18} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(m._id)}
-                            className="text-red-600 hover:underline"
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* ✅ Mobile Card */}
-                    <div
-                      key={`mobile-${m._id}`}
-                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
-                    >
-                      <h3 className="font-semibold text-gray-800">
-                        {m.manufacturerName}
-                      </h3>
-                      <p className="text-sm text-gray-600">{m.address}</p>
-                      <p className="text-sm text-gray-600">{m.phoneNumber}</p>
-                      <p className="text-sm text-gray-600">{m.email || "—"}</p>
-                      <p className="text-sm text-gray-600">
-                        Contact: {m.personName} ({m.mobileNumber})
-                      </p>
-                      <p className="text-sm text-gray-600">NTN: {m.ntn}</p>
-                      <p className="text-sm text-gray-600">
-                        GST: {m.gstNumber}
-                      </p>
-                      <p
-                        className={`text-sm font-semibold ${
-                          m.status ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {m.status ? "Active" : "Inactive"}
-                      </p>
-
-                      {userInfo?.isAdmin && (
-                        <div className="mt-3 flex justify-end gap-3">
-                          <button
-                            className="text-blue-500"
-                            onClick={() => handleEdit(m)}
-                          >
-                            <SquarePen size={18} />
-                          </button>
-                          <button
-                            className="text-red-500"
-                            onClick={() => handleDelete(m._id)}
-                          >
-                            <Trash2 size={18} />
-                          </button>
-                        </div>
-                      )}
-                    </div>
-                  </>
-                ))
-              )}
-            </div>
-          </div>
-        </div>
+    <div className="rounded-xl border border-gray-200 overflow-hidden">
+  <div className="overflow-x-auto">
+    <div className="min-w-[900px]">
+      {/* ✅ Table Header (desktop only) */}
+      <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+        <div>Name</div>
+        <div>Contact</div>
+        <div>Email</div>
+        <div>Address</div>
+        <div>Phone</div>
+        <div>Status</div>
+        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
       </div>
+
+      {/* ✅ Table Body */}
+      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+        {loading ? (
+          <TableSkeleton
+            rows={manufacturerList.length > 0 ? manufacturerList.length : 5}
+            cols={userInfo?.isAdmin ? 7 : 6}
+            className="lg:grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto]"
+          />
+        ) : manufacturerList.length === 0 ? (
+          <div className="text-center py-4 text-gray-500 bg-white">
+            No manufacturers found.
+          </div>
+        ) : (
+          manufacturerList.map((m) => (
+            <>
+              {/* ✅ Desktop Row */}
+              <div
+                key={m._id}
+                className="hidden lg:grid grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+              >
+                <div className="font-medium text-gray-900">
+                  {m.manufacturerName}
+                </div>
+                <div className="text-gray-600">{m.personName}</div>
+                <div className="text-gray-600">{m.email || "—"}</div>
+                <div className="text-gray-600 truncate">{m.address}</div>
+                <div className="text-gray-600">{m.phoneNumber}</div>
+                <div className="font-semibold">
+                  {m.status ? (
+                    <span className="text-green-600">Active</span>
+                  ) : (
+                    <span className="text-red-600">Inactive</span>
+                  )}
+                </div>
+                {userInfo?.isAdmin && (
+                  <div className="flex justify-end gap-3">
+                    <button
+                      onClick={() => handleEdit(m)}
+                      className="text-blue-600 hover:underline"
+                    >
+                      <SquarePen size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(m._id)}
+                      className="text-red-600 hover:underline"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* ✅ Mobile Card */}
+              <div
+                key={`mobile-${m._id}`}
+                className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+              >
+                <h3 className="font-semibold text-gray-800">
+                  {m.manufacturerName}
+                </h3>
+                <p className="text-sm text-gray-600">{m.personName}</p>
+                <p className="text-sm text-gray-600">{m.email || "—"}</p>
+                <p className="text-sm text-gray-600 truncate">{m.address}</p>
+                <p className="text-sm text-gray-600">{m.phoneNumber}</p>
+                <p
+                  className={`text-sm font-semibold ${
+                    m.status ? "text-green-600" : "text-red-600"
+                  }`}
+                >
+                  {m.status ? "Active" : "Inactive"}
+                </p>
+
+                {userInfo?.isAdmin && (
+                  <div className="mt-3 flex justify-end gap-3">
+                    <button
+                      className="text-blue-500"
+                      onClick={() => handleEdit(m)}
+                    >
+                      <SquarePen size={18} />
+                    </button>
+                    <button
+                      className="text-red-500"
+                      onClick={() => handleDelete(m._id)}
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          ))
+        )}
+      </div>
+    </div>
+  </div>
+</div>
+
 
       {/* Slider */}
       {isSliderOpen && (
@@ -387,8 +360,8 @@ const Manufacture = () => {
                   setPersonName("");
                   setMobileNumber("");
                   setDesignation("");
-                  setNtn("");
-                  setGstNumber("");
+                  
+               
                   setEmail("");
                   setStatus(true);
                 }}
@@ -474,7 +447,6 @@ const Manufacture = () => {
                 />
               </div>
 
-             
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button
@@ -496,7 +468,8 @@ const Manufacture = () => {
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
               >
-                Save Manufacturer
+                {isEdit ? "Update Manufacturer" : "Save Manufacturer"}
+                
               </button>
             </div>
           </div>

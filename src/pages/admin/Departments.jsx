@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../components/CommanHeader";
 import TableSkeleton from "./Skeleton";
+import axios from "axios";
 
 const Departments = () => {
   const [departmentList, setDepartmentList] = useState([
-    { _id: "dep1", department: "HR" },
-    { _id: "dep2", department: "Accounts" },
+    
   ]);
 
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -18,7 +18,8 @@ const Departments = () => {
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(false);
   const sliderRef = useRef(null);
-
+ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/departments`;
   // Slider animation
   useEffect(() => {
     if (isSliderOpen && sliderRef.current) {
@@ -29,6 +30,23 @@ const Departments = () => {
       );
     }
   }, [isSliderOpen]);
+// Fetch Department list
+   const fetchDepartmentList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setDepartmentList(res.data);
+      console.log("Designation  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchDepartmentList();
+  }, [fetchDepartmentList]);
+
 
   // Handlers
   const handleAdd = () => {
@@ -38,34 +56,45 @@ const Departments = () => {
     setDepartment("");
   };
 
-  const handleSave = () => {
+  const handleSave = async() => {
     if (!department) {
       toast.error("❌ Department is required");
       return;
     }
 
-    const newDept = {
-      _id: isEdit ? editId : Date.now().toString(),
-      department,
+    try {
+      const { token } = userInfo || {};
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+      const newDept = {
+      departmentName:department,
     };
 
-    if (isEdit) {
-      setDepartmentList(
-        departmentList.map((d) => (d._id === editId ? newDept : d))
-      );
-      toast.success("✅ Department updated successfully");
-    } else {
-      setDepartmentList([...departmentList, newDept]);
-      toast.success("✅ Department added successfully");
+      if (isEdit&&editId) {
+        const res = await axios.put(`${API_URL}/${editId}`, newDept, {
+          headers,
+        });
+        toast.success(" Department updated successfully");
+      } else {
+        const res = await axios.post(API_URL, newDept, {
+          headers,
+        });
+        toast.success(" Department added successfully");
+      }
+      fetchDepartmentList();
+      setIsSliderOpen(false);
+    } catch (error) {
+      console.error(error);
+      toast.error(`❌ ${isEdit ? "Update" : "Add"} department failed`);
     }
-
-    setIsSliderOpen(false);
   };
 
   const handleEdit = (d) => {
     setIsEdit(true);
-    setEditId(d._id);
-    setDepartment(d.department);
+    setEditId(d._id)
+    setDepartment(d.departmentName);
     setIsSliderOpen(true);
   };
 
@@ -91,14 +120,31 @@ const Departments = () => {
       cancelButtonText: "No, cancel!",
       reverseButtons: true,
     })
-    .then((result) => {
+    .then(async(result) => {
       if (result.isConfirmed) {
-        setDepartmentList(departmentList.filter((d) => d._id !== id));
-        swalWithTailwindButtons.fire(
-          "Deleted!",
-          "Department has been deleted.",
-          "success"
-        );
+        try {
+            await axios.delete(`${API_URL}/${id}`, {
+              headers: {
+                Authorization: `Bearer ${userInfo?.token}`,
+              },
+            });
+
+           setDepartmentList(departmentList.filter((d) => d._id !== id));
+            swalWithTailwindButtons.fire(
+              "Deleted!",
+              "Department deleted successfully.",
+              "success"
+            );
+          } catch (error) {
+            console.error("Delete error:", error);
+            swalWithTailwindButtons.fire(
+              "Error!",
+              "Failed to delete department.",
+              "error"
+            );
+          }
+        
+       
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         swalWithTailwindButtons.fire(
           "Cancelled",
@@ -141,7 +187,7 @@ const Departments = () => {
             {/* Table Body */}
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
-                <TableSkeleton rows={5} cols={3} />
+                <TableSkeleton rows={departmentList.length>0?departmentList.length:5} cols={3} />
               ) : departmentList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No departments found.
@@ -153,7 +199,7 @@ const Departments = () => {
                     className="hidden lg:grid grid-cols-[80px_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                   >
                     <div>{index + 1}</div>
-                    <div className="text-gray-700">{d.department}</div>
+                    <div className="text-gray-700">{d.departmentName}</div>
                     <div className="flex justify-end gap-3">
                       <button
                         onClick={() => handleEdit(d)}
@@ -213,7 +259,8 @@ const Departments = () => {
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
               >
-                Save Department
+                 {isEdit ? "Update Department" : "Save Department"}
+                
               </button>
             </div>
           </div>
