@@ -27,13 +27,32 @@ const Manufacture = () => {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/manufacturers`;
+
+
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
 
@@ -72,7 +91,9 @@ const Manufacture = () => {
 
   const handleSave = async () => {
     const formData = {
+
       manufacturerName: manufacturerName,
+
       address,
       phoneNumber,
       personName,
@@ -90,18 +111,23 @@ const Manufacture = () => {
         "Content-Type": "application/json",
       };
 
+
       if (isEdit && editId) {
         // 🔄 Update existing category
         const res = await axios.put(`${API_URL}/${editId}`, formData, {
           headers,
         });
+
         toast.success(" Manufacturer updated successfully");
+
       } else {
         const res = await axios.post(API_URL, formData, {
           headers,
         });
+
         toast.success(" Manufacturer added successfully");
       }
+
 
       setManufacturerId("");
       setManufacturerName("");
@@ -224,6 +250,7 @@ const Manufacture = () => {
 
       {/* Manufacturer Table */}
 
+
     <div className="rounded-xl border border-gray-200 overflow-hidden">
   <div className="overflow-x-auto">
     <div className="min-w-[900px]">
@@ -284,6 +311,7 @@ const Manufacture = () => {
                       onClick={() => handleDelete(m._id)}
                       className="text-red-600 hover:underline"
                     >
+
                       <Trash2 size={18} />
                     </button>
                   </div>
@@ -338,10 +366,10 @@ const Manufacture = () => {
 
       {/* Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full max-w-md bg-white p-6 h-full overflow-y-auto shadow-lg"
+            className="w-full max-w-lg bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-newPrimary">
@@ -369,7 +397,6 @@ const Manufacture = () => {
                 ×
               </button>
             </div>
-
             <div className="space-y-4">
               <div>
                 <label className="block text-gray-700 font-medium">
@@ -447,19 +474,18 @@ const Manufacture = () => {
                 />
               </div>
 
+
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button
                   type="button"
                   onClick={() => setStatus(!status)}
-                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${
-                    status ? "bg-green-500" : "bg-gray-300"
-                  }`}
+                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${status ? "bg-green-500" : "bg-gray-300"
+                    }`}
                 >
                   <div
-                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                      status ? "translate-x-7" : "translate-x-0"
-                    }`}
+                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${status ? "translate-x-7" : "translate-x-0"
+                      }`}
                   />
                 </button>
                 <span>{status ? "Active" : "Inactive"}</span>

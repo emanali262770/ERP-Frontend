@@ -69,7 +69,7 @@ const ModulesFunctionalities = () => {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
-      
+
     }
   }, []);
 
@@ -85,20 +85,24 @@ const ModulesFunctionalities = () => {
     setEditId(null);
   };
 
-  // GSAP Animation for Slider
+  // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 0.5, ease: "power2.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
     } else {
       gsap.to(sliderRef.current, {
-        x: "100%",
+        scale: 0.7,
         opacity: 0,
-        duration: 0.5,
-        ease: "power2.in",
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
         onComplete: () => {
           if (sliderRef.current) {
             sliderRef.current.style.display = "none";
@@ -107,6 +111,8 @@ const ModulesFunctionalities = () => {
       });
     }
   }, [isSliderOpen]);
+
+
 
   // Fetch Functionality Data
   const fetchFunctionalityData = useCallback(async () => {
@@ -122,9 +128,9 @@ const ModulesFunctionalities = () => {
       toast.error("Error fetching functionalities");
     } finally {
       setTimeout(() => {
-         setLoading(false);
+        setLoading(false);
       }, 2000);
-     
+
     }
   }, []);
 
@@ -246,8 +252,8 @@ const ModulesFunctionalities = () => {
 
   return (
     <div className="p-4 md:p-6 bg-gray-50 min-h-screen">
-        {/* Coomon header */}
-      <CommanHeader/>
+      {/* Coomon header */}
+      <CommanHeader />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
           <h1 className="text-xl md:text-2xl font-bold text-newPrimary">Assign Rights</h1>
@@ -275,101 +281,106 @@ const ModulesFunctionalities = () => {
       </div>
 
       <div className="rounded-xl border border-gray-100 overflow-hidden">
-  <div className="overflow-x-auto scrollbar-hide">
-    <div className="min-w-full">
+        <div className="overflow-x-auto scrollbar-hide">
+          <div className="min-w-full">
 
-      {/* ✅ Table Header (sticky like previous tables) */}
-      <div className="hidden md:grid grid-cols-[1fr_2fr_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Module</div>
-        <div>Functionalities</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
+            {/* ✅ Table Header (sticky like previous tables) */}
+            <div className="hidden md:grid grid-cols-[1fr_2fr_auto] gap-6 bg-gray-50 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>Module</div>
+              <div>Functionalities</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100">
-        {loading ? (
-          <TableSkeleton 
-            rows={filteredFunctionalityList.length>0? filteredFunctionalityList.length:5} 
-            cols={userInfo?.isAdmin ? 3 : 2} 
-          />
-        ) : filteredFunctionalityList.length > 0 ? (
-          filteredFunctionalityList.map((func) => (
-            <div
-              key={func._id}
-              className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-            >
-              {/* 📱 Mobile header info */}
-              <div className="md:hidden font-medium text-gray-900 border-b pb-2 mb-2">
-                {func?.group?.groupName}
-              </div>
-
-              {/* Module */}
-              <div className="font-medium text-gray-900">{func?.module}</div>
-
-              {/* Functionalities */}
-              <div className="flex flex-wrap gap-2">
-                {Array.isArray(func.functionalities) && func.functionalities.length > 0 ? (
-                  func.functionalities.map((f, idx) => {
-                    const colors = [
-                      "bg-blue-100 text-blue-800",
-                      "bg-green-100 text-green-800",
-                      "bg-purple-100 text-purple-800",
-                      "bg-pink-100 text-pink-800",
-                      "bg-yellow-100 text-yellow-800",
-                      "bg-red-100 text-red-800",
-                    ];
-                    const colorClass = colors[idx % colors.length];
-                    return (
-                      <span
-                        key={idx}
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
-                      >
-                        {f}
-                      </span>
-                    );
-                  })
-                ) : (
-                  <span className="text-gray-500">—</span>
-                )}
-              </div>
-
-              {/* Actions */}
-              {userInfo?.isAdmin && (
-                <div className="flex justify-end gap-2">
-                  <button
-                    onClick={() => handleEdit(func)}
-                    className="p-2 text-blue-600  rounded-lg transition-colors"
+            {/* ✅ Table Body */}
+            <div className="flex flex-col divide-y divide-gray-100">
+              {loading ? (
+                <TableSkeleton
+                  rows={filteredFunctionalityList.length > 0 ? filteredFunctionalityList.length : 5}
+                  cols={userInfo?.isAdmin ? 3 : 2}
+                />
+              ) : filteredFunctionalityList.length > 0 ? (
+                filteredFunctionalityList.map((func) => (
+                  <div
+                    key={func._id}
+                    className="grid grid-cols-1 md:grid-cols-[1fr_2fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                   >
-                    <SquarePen size={18} />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(func._id)}
-                    className="p-2 text-red-600  rounded-lg transition-colors"
-                  >
-                    <Trash2 size={18} />
-                  </button>
+                    {/* 📱 Mobile header info */}
+                    <div className="md:hidden font-medium text-gray-900 border-b pb-2 mb-2">
+                      {func?.group?.groupName}
+                    </div>
+
+                    {/* Module */}
+                    <div className="font-medium text-gray-900">{func?.module}</div>
+
+                    {/* Functionalities */}
+                    <div className="flex flex-wrap gap-2">
+                      {Array.isArray(func.functionalities) && func.functionalities.length > 0 ? (
+                        func.functionalities.map((f, idx) => {
+                          const colors = [
+                            "bg-blue-100 text-blue-800",
+                            "bg-green-100 text-green-800",
+                            "bg-purple-100 text-purple-800",
+                            "bg-pink-100 text-pink-800",
+                            "bg-yellow-100 text-yellow-800",
+                            "bg-red-100 text-red-800",
+                          ];
+                          const colorClass = colors[idx % colors.length];
+                          return (
+                            <span
+                              key={idx}
+                              className={`px-2 py-1 rounded-full text-xs font-medium ${colorClass}`}
+                            >
+                              {f}
+                            </span>
+                          );
+                        })
+                      ) : (
+                        <span className="text-gray-500">—</span>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    {userInfo?.isAdmin && (
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(func)}
+                          className="p-2 text-blue-600  rounded-lg transition-colors"
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleDelete(func._id)}
+                          className="p-2 text-red-600  rounded-lg transition-colors"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-6 text-gray-500 bg-white">
+                  No functionalities found {searchQuery && `matching "${searchQuery}"`}
                 </div>
               )}
             </div>
-          ))
-        ) : (
-          <div className="text-center py-6 text-gray-500 bg-white">
-            No functionalities found {searchQuery && `matching "${searchQuery}"`}
           </div>
-        )}
+        </div>
       </div>
-    </div>
-  </div>
-</div>
 
 
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600/50 flex justify-end z-50">
-          <div ref={sliderRef} className="w-full md:w-96 bg-white h-full shadow-lg overflow-y-auto">
-            <div className="flex justify-between items-center p-4 border-b bg-white sticky top-0">
-              <h2 className="text-xl font-bold text-blue-600">{isEdit ? "Edit Right" : "Add Right"}</h2>
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+          <div
+            ref={sliderRef}
+            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+          >
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
+              <h2 className="text-xl font-bold text-newPrimary">
+                {isEdit ? "Edit Right" : "Add Right"}
+              </h2>
               <button
-                className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700"
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;
@@ -440,7 +451,7 @@ const ModulesFunctionalities = () => {
                   Cancel
                 </button>
                 <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="px-4 py-2 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/70"
                   onClick={handleSave}
                 >
                   {isEdit ? "Update Right" : "Save Right"}

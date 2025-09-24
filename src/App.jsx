@@ -10,11 +10,16 @@ import { ToastContainer } from "react-toastify";
 import ShelveLocation from "./pages/admin/ShelveLocation";
 import "react-toastify/dist/ReactToastify.css";
 import CategoryItem from "./pages/admin/CategoryItem";
+import PurchaseRequisition from "./pages/admin/Purchase/PurchaseRequisition";
+import PurchaseApproval from "./pages/admin/Purchase/PurchaseApproval.jsx";
+import Quotation from "./pages/admin/Purchase/Quotation.jsx";
+import Estimation from "./pages/admin/Purchase/Estimation";
+import GatePassIN from "./pages/admin/Purchase/GatePassIN.jsx";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierList from "./pages/admin/Supplier";
 import Manufacture from "./pages/admin/Manufacture";
 import ItemBarcode from "./pages/admin/ItemBarcode";
-import ItemPurchase from "./pages/admin/ItemPurchase";
+import ItemPurchase from "./pages/admin/Purchase/ItemPurchase";
 import  SalesInvoice from './pages/admin/SalesInvoice';
 import ExpiryTags from "./pages/admin/ExpiryTags";
 import BookingOrder from "./pages/admin/BookingOrder";
@@ -76,6 +81,11 @@ function AppContent() {
             <Route path="groups" element={<GroupManagement />} />
             <Route path="access-rights" element={<AccessControll />} />
             <Route path="modules" element={<Modules />} />
+            <Route path="purchase-requisition" element={<PurchaseRequisition />} />
+            <Route path="purchase-approval" element={<PurchaseApproval />} />
+            <Route path="quotation" element={<Quotation />} />
+            <Route path="estimation" element={<Estimation />} />
+            <Route path="gatepass-in" element={<GatePassIN />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />

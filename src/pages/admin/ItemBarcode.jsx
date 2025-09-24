@@ -371,12 +371,7 @@ const ItemBarcode = () => {
             Item Barcode Management Dashboard
           </p>
         </div>
-        <button
-          className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-primaryDark transition-colors duration-200"
-          onClick={handleAddItem}
-        >
-          + Add Item Barcode
-        </button>
+        
       </div>
 
       {/* TABLE/CARDS */}
