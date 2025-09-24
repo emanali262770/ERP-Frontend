@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { Eye, SquarePen, Trash2 ,X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton"; // Ensure this component exists
 import Swal from "sweetalert2";
 import axios from "axios";
+import ViewModel from "./ViewModel";
+
+
 const PurchaseRequisition = () => {
   const [requisitions, setRequisitions] = useState([]);
   const [employeeName, setEmployeeName] = useState([]);
@@ -19,12 +22,17 @@ const PurchaseRequisition = () => {
   const [items, setItems] = useState("");
   const [category, setCategory] = useState("");
   const [isEnable, setIsEnable] = useState(true);
+  const [isView, setisView] = useState(false)
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
   const [departmentList, setDepartmentList] = useState([]);
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [itemsList, setItemsList] = useState([]);
+   const [selectedRequisition, setSelectedRequisition] = useState(null);
+
+
+
  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const handleAddItem = () => {
     if (!itemName || !quantity) return;
@@ -327,6 +335,19 @@ const PurchaseRequisition = () => {
     );
     alert(`Requisition ${!requisition.isEnable ? "enabled" : "disabled"}.`);
   };
+
+  // Handle view button
+  const handleView = (req) => {
+    setSelectedRequisition(req);
+    setisView(true);
+  };
+
+  const closeModal = () => {
+    setisView(false);
+    setSelectedRequisition(null);
+  };
+
+
   const handleDelete = async (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
@@ -477,7 +498,7 @@ const PurchaseRequisition = () => {
                             <Trash2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(emp._id)}
+                            onClick={() => handleView(requisition)}
                             className="text-amber-600 hover:underline"
                           >
                             <Eye size={18} />
@@ -744,6 +765,15 @@ const PurchaseRequisition = () => {
             </div>
           </div>
         )}
+
+
+      {/* Show popup only if isView is true */}
+      {isView && selectedRequisition && (
+        <ViewModel
+          requisition={selectedRequisition} // ✅ pass as prop
+          onClose={() => setisView(false)}
+        />
+      )}
 
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {
