@@ -4,9 +4,9 @@ import gsap from "gsap";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import CommanHeader from "../../components/CommanHeader";
+import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
+import TableSkeleton from "../Skeleton";
 import { set } from "date-fns";
 
 const SupplierList = () => {
@@ -79,6 +79,7 @@ const SupplierList = () => {
     setNtn("");
     setGst("");
     setCreditLimit("");
+    setCreditTime("")
     setStatus(true);
   };
 
@@ -133,12 +134,12 @@ const SupplierList = () => {
       if (isEdit && editId) {
         res = await axios.put(`${API_URL}/${editId}`, formData, { headers });
 
-        toast.success("✅ Supplier updated successfully");
+        toast.success(" Supplier updated successfully");
       } else {
         res = await axios.post(`${API_URL}`, formData, { headers });
 
         setSupplierList([...supplierList, res.data]);
-        toast.success("✅ Supplier added successfully");
+        toast.success("Supplier added successfully");
       }
       fetchSuppliersList();
       setSupplierName("");
@@ -152,13 +153,14 @@ const SupplierList = () => {
       setNtn("");
       setGst("");
       setCreditLimit("");
+      setCreditTime("")
       setStatus(true);
       setIsSliderOpen(false);
       setIsEdit(false);
       setEditId(null);
     } catch (error) {
       console.error(error);
-      toast.error(`❌ ${isEdit ? "Update" : "Add"} supplier failed`);
+      toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -325,9 +327,9 @@ const SupplierList = () => {
                       </div>
                       <div className=" font-semibold">
                         {s.status ? (
-                          <span className="text-green-600">Active</span>
+                          <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Active</span>
                         ) : (
-                          <span className="text-red-600">Inactive</span>
+                          <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Inactive</span>
                         )}
                       </div>
                       {userInfo?.isAdmin && (
