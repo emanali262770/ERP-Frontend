@@ -10,14 +10,16 @@ const Estimation = () => {
     const [loading, setLoading] = useState(true);
     const [statementId, setStatementId] = useState("");
     const [supplier, setSupplier] = useState("");
-    const [item, setItem] = useState("");
+    const [itemsList, setItemsList] = useState([]);
+    const [itemName, setItemName] = useState("");
+    const [itemQuantity, setItemQuantity] = useState("");
     const [forDemand, setForDemand] = useState("");
     const [rate, setRate] = useState("");
-    const [quantity, setQuantity] = useState("");
     const [total, setTotal] = useState("");
     const [date, setDate] = useState("");
     const [status, setStatus] = useState("Pending");
     const [editingEstimation, setEditingEstimation] = useState(null);
+    const [errors, setErrors] = useState({});
     const sliderRef = useRef(null);
 
     // Static data for estimations
@@ -26,10 +28,9 @@ const Estimation = () => {
             _id: "1",
             statementId: "EST001",
             supplier: "ABC Corp",
-            item: "Dell XPS 15",
+            items: [{ name: "Dell XPS 15", qty: 5 }],
             forDemand: "Laptops (5)",
             rate: "1500",
-            quantity: "5",
             total: "7500",
             date: "2025-09-01",
             status: true,
@@ -39,10 +40,9 @@ const Estimation = () => {
             _id: "2",
             statementId: "EST002",
             supplier: "XYZ Ltd",
-            item: "HP LaserJet",
+            items: [{ name: "HP LaserJet", qty: 2 }],
             forDemand: "Printers (2)",
             rate: "300",
-            quantity: "2",
             total: "600",
             date: "2025-09-15",
             status: false,
@@ -52,10 +52,9 @@ const Estimation = () => {
             _id: "3",
             statementId: "EST003",
             supplier: "Tech Solutions",
-            item: "Samsung 27\"",
+            items: [{ name: "Samsung 27\"", qty: 10 }],
             forDemand: "Monitors (10)",
             rate: "200",
-            quantity: "10",
             total: "2000",
             date: "2025-09-20",
             status: true,
@@ -76,18 +75,54 @@ const Estimation = () => {
         setTimeout(() => setLoading(false), 1000); // Simulate loading for 1 second
     }, []);
 
-    // Handlers for form and table actions
-    const handleAddClick = () => {
-        setEditingEstimation(null);
+    // Reset form fields
+    const resetForm = () => {
         setStatementId("");
         setSupplier("");
-        setItem("");
+        setItemsList([]);
+        setItemName("");
+        setItemQuantity("");
         setForDemand("");
         setRate("");
-        setQuantity("");
         setTotal("");
         setDate("");
         setStatus("Pending");
+        setEditingEstimation(null);
+        setErrors({});
+        setIsSliderOpen(false);
+    };
+
+    // Validate form fields
+    const validateForm = () => {
+        const newErrors = {};
+        const trimmedStatementId = statementId.trim();
+        const trimmedSupplier = supplier.trim();
+        const trimmedForDemand = forDemand.trim();
+        const trimmedRate = rate.trim();
+        const trimmedTotal = total.trim();
+        const parsedRate = parseFloat(rate);
+        const parsedTotal = parseFloat(total);
+
+        if (!trimmedStatementId) newErrors.statementId = "Statement ID is required";
+        if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
+        if (!trimmedForDemand) newErrors.forDemand = "For Demand is required";
+        if (itemsList.length === 0) newErrors.itemsList = "At least one item is required";
+        if (!trimmedRate || isNaN(parsedRate) || parsedRate <= 0) {
+            newErrors.rate = "Rate must be a positive number";
+        }
+        if (!trimmedTotal || isNaN(parsedTotal) || parsedTotal <= 0) {
+            newErrors.total = "Total must be a positive number";
+        }
+        if (!date) newErrors.date = "Date is required";
+        if (!status) newErrors.status = "Status is required";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Handlers for form and table actions
+    const handleAddClick = () => {
+        resetForm();
         setIsSliderOpen(true);
     };
 
@@ -95,42 +130,48 @@ const Estimation = () => {
         setEditingEstimation(estimation);
         setStatementId(estimation.statementId);
         setSupplier(estimation.supplier);
-        setItem(estimation.item);
+        setItemsList(estimation.items);
+        setItemName("");
+        setItemQuantity("");
         setForDemand(estimation.forDemand);
         setRate(estimation.rate);
-        setQuantity(estimation.quantity);
         setTotal(estimation.total);
         setDate(formatDate(estimation.date));
         setStatus(estimation.status ? "Active" : "Inactive");
+        setErrors({});
         setIsSliderOpen(true);
+    };
+
+    const handleAddItem = () => {
+        const trimmedItemName = itemName.trim();
+        const parsedItemQuantity = parseInt(itemQuantity, 10);
+
+        if (!trimmedItemName || !itemQuantity || isNaN(parsedItemQuantity) || parsedItemQuantity <= 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Item",
+                text: "Please enter a valid item name and a positive quantity.",
+                confirmButtonColor: "#d33",
+            });
+            return;
+        }
+
+        setItemsList([...itemsList, { name: trimmedItemName, qty: parsedItemQuantity }]);
+        setItemName("");
+        setItemQuantity("");
+        setErrors((prev) => ({ ...prev, itemsList: null }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const trimmedStatementId = statementId.trim();
-        const trimmedSupplier = supplier.trim();
-        const trimmedItem = item.trim();
-        const trimmedForDemand = forDemand.trim();
-        const trimmedRate = rate.trim();
-        const trimmedQuantity = quantity.trim();
-        const trimmedTotal = total.trim();
-
-        if (
-            !trimmedStatementId ||
-            !trimmedSupplier ||
-            !trimmedItem ||
-            !trimmedForDemand ||
-            !trimmedRate ||
-            !trimmedQuantity ||
-            !trimmedTotal ||
-            !date ||
-            !status
-        ) {
+        if (!validateForm()) {
             Swal.fire({
                 icon: "warning",
-                title: "Missing Fields",
-                text: "⚠️ Please fill in all required fields.",
+                title: "Missing or Invalid Fields",
+                html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(errors)
+                    .map((err) => `<li>${err}</li>`)
+                    .join("")}</ul>`,
                 confirmButtonColor: "#d33",
             });
             return;
@@ -138,13 +179,12 @@ const Estimation = () => {
 
         const newEstimation = {
             _id: editingEstimation ? editingEstimation._id : Date.now().toString(),
-            statementId: trimmedStatementId,
-            supplier: trimmedSupplier,
-            item: trimmedItem,
-            forDemand: trimmedForDemand,
-            rate: trimmedRate,
-            quantity: parseInt(trimmedQuantity, 10),
-            total: trimmedTotal,
+            statementId: statementId.trim(),
+            supplier: supplier.trim(),
+            items: itemsList,
+            forDemand: forDemand.trim(),
+            rate: rate.trim(),
+            total: total.trim(),
             date,
             status: status === "Active",
             createdAt: new Date().toISOString(),
@@ -172,18 +212,7 @@ const Estimation = () => {
             });
         }
 
-        // Reset form state
-        setStatementId("");
-        setSupplier("");
-        setItem("");
-        setForDemand("");
-        setRate("");
-        setQuantity("");
-        setTotal("");
-        setDate("");
-        setStatus("Pending");
-        setEditingEstimation(null);
-        setIsSliderOpen(false);
+        resetForm();
     };
 
     const handleDelete = (id) => {
@@ -248,13 +277,12 @@ const Estimation = () => {
                     <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
                         <div className="min-w-[1200px]">
                             {/* Table Header */}
-                            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                            <div className="hidden lg:grid grid-cols-[1fr_1fr_3fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                                 <div>Statement ID</div>
                                 <div>Supplier</div>
-                                <div>Item</div>
+                                <div>Items</div>
                                 <div>For Demand</div>
                                 <div>Rate</div>
-                                <div>Quantity</div>
                                 <div>Total</div>
                                 <div>Date</div>
                                 <div>Status</div>
@@ -266,8 +294,8 @@ const Estimation = () => {
                                 {loading ? (
                                     <TableSkeleton
                                         rows={3}
-                                        cols={10}
-                                        className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                                        cols={9}
+                                        className="lg:grid-cols-[1fr_1fr_3fr_1fr_1fr_1fr_1fr_1fr_1fr]"
                                     />
                                 ) : estimations.length === 0 ? (
                                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -277,14 +305,38 @@ const Estimation = () => {
                                     estimations.map((estimation) => (
                                         <div
                                             key={estimation._id}
-                                            className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                                            className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_3fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                                         >
                                             <div className="font-medium text-gray-900">{estimation.statementId}</div>
                                             <div className="text-gray-600">{estimation.supplier}</div>
-                                            <div className="text-gray-600">{estimation.item}</div>
+                                            <div className="text-gray-600">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {estimation.items.map((item, idx) => (
+                                                        <div key={idx} className="flex gap-2">
+                                                            <span
+                                                                className="px-3 py-1 rounded-full text-xs font-medium"
+                                                                style={{
+                                                                    backgroundColor: `hsl(${(idx * 70) % 360}, 80%, 85%)`,
+                                                                    color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
+                                                                }}
+                                                            >
+                                                                {item.name}
+                                                            </span>
+                                                            <span
+                                                                className="px-3 py-1 rounded-full text-xs font-medium"
+                                                                style={{
+                                                                    backgroundColor: `hsl(${(idx * 70 + 35) % 360}, 80%, 85%)`,
+                                                                    color: `hsl(${(idx * 70 + 35) % 360}, 40%, 25%)`,
+                                                                }}
+                                                            >
+                                                                Qty: {item.qty}
+                                                            </span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            </div>
                                             <div className="text-gray-600">{estimation.forDemand}</div>
                                             <div className="text-gray-600">{estimation.rate}</div>
-                                            <div className="text-gray-600">{estimation.quantity}</div>
                                             <div className="text-gray-600">{estimation.total}</div>
                                             <div className="text-gray-500">{formatDate(estimation.date)}</div>
                                             <div className="text-gray-600">
@@ -297,10 +349,10 @@ const Estimation = () => {
                                                     {estimation.status ? "Active" : "Inactive"}
                                                 </span>
                                             </div>
-                                            <div className="flex justify-end gap-2">
+                                            <div>
                                                 <button
                                                     onClick={() => handleEditClick(estimation)}
-                                                    className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
+                                                    className=" py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
                                                     title="Edit"
                                                 >
                                                     <SquarePen size={18} />
@@ -333,19 +385,7 @@ const Estimation = () => {
                                 </h2>
                                 <button
                                     className="text-2xl text-gray-500 hover:text-gray-700"
-                                    onClick={() => {
-                                        setIsSliderOpen(false);
-                                        setStatementId("");
-                                        setSupplier("");
-                                        setItem("");
-                                        setForDemand("");
-                                        setRate("");
-                                        setQuantity("");
-                                        setTotal("");
-                                        setDate("");
-                                        setStatus("Pending");
-                                        setEditingEstimation(null);
-                                    }}
+                                    onClick={resetForm}
                                 >
                                     ×
                                 </button>
@@ -354,16 +394,23 @@ const Estimation = () => {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Statement ID <span className="text-blue-600">*</span>
+                                        Statement ID <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={statementId}
                                         onChange={(e) => setStatementId(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.statementId
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         placeholder="Enter statement ID"
                                         required
                                     />
+                                    {errors.statementId && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.statementId}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -372,7 +419,11 @@ const Estimation = () => {
                                     <select
                                         value={supplier}
                                         onChange={(e) => setSupplier(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.supplier
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         required
                                     >
                                         <option value="">Select Supplier</option>
@@ -381,27 +432,73 @@ const Estimation = () => {
                                         <option value="Tech Solutions">Tech Solutions</option>
                                         <option value="Global Supplies">Global Supplies</option>
                                     </select>
+                                    {errors.supplier && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                                    )}
                                 </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Item <span className="text-red-500">*</span>
-                                    </label>
-                                    <select
-                                        value={item}
-                                        onChange={(e) => setItem(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        required
-                                    >
-                                        <option value="">Select Item</option>
-                                        <option value="Laptop">Laptop</option>
-                                        <option value="Desktop">Desktop</option>
-                                        <option value="Printer">Printer</option>
-                                        <option value="Scanner">Scanner</option>
-                                        <option value="Projector">Projector</option>
-                                        <option value="Stationery">Stationery</option>
-                                    </select>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between gap-2 items-end">
+                                        <div className="flex-1">
+                                            <label className="block text-gray-700 font-medium mb-2">
+                                                Item Name <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                value={itemName}
+                                                onChange={(e) => setItemName(e.target.value)}
+                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                placeholder="Enter item name"
+                                            />
+                                        </div>
+                                        <div className="flex-1">
+                                            <label className="block text-gray-700 font-medium mb-2">
+                                                Item Quantity <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={itemQuantity}
+                                                onChange={(e) => setItemQuantity(e.target.value)}
+                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                placeholder="Enter item quantity"
+                                                min="1"
+                                            />
+                                        </div>
+                                        <div>
+                                            <button
+                                                type="button"
+                                                onClick={handleAddItem}
+                                                className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
+                                            >
+                                                + Add
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {errors.itemsList && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.itemsList}</p>
+                                    )}
+                                    {itemsList.length > 0 && (
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                                                <thead className="bg-gray-100 text-gray-600 text-sm">
+                                                    <tr>
+                                                        <th className="px-4 py-2 border-b">Sr #</th>
+                                                        <th className="px-4 py-2 border-b">Item Name</th>
+                                                        <th className="px-4 py-2 border-b">Quantity</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="text-gray-700 text-sm">
+                                                    {itemsList.map((item, idx) => (
+                                                        <tr key={idx} className="hover:bg-gray-50">
+                                                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
+                                                            <td className="px-4 py-2 border-b">{item.name}</td>
+                                                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
                                 </div>
-
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         For Demand <span className="text-red-500">*</span>
@@ -409,7 +506,11 @@ const Estimation = () => {
                                     <select
                                         value={forDemand}
                                         onChange={(e) => setForDemand(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.forDemand
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         required
                                     >
                                         <option value="">Select Item</option>
@@ -419,8 +520,10 @@ const Estimation = () => {
                                         <option value="Raw Materials">Raw Materials</option>
                                         <option value="Services">Services</option>
                                     </select>
+                                    {errors.forDemand && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.forDemand}</p>
+                                    )}
                                 </div>
-
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Rate <span className="text-red-500">*</span>
@@ -429,26 +532,19 @@ const Estimation = () => {
                                         type="number"
                                         value={rate}
                                         onChange={(e) => setRate(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.rate
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         placeholder="Enter rate"
                                         min="0"
                                         step="0.01"
                                         required
                                     />
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Quantity <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={quantity}
-                                        onChange={(e) => setQuantity(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        placeholder="Enter quantity"
-                                        min="1"
-                                        required
-                                    />
+                                    {errors.rate && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.rate}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -458,12 +554,19 @@ const Estimation = () => {
                                         type="number"
                                         value={total}
                                         onChange={(e) => setTotal(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.total
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         placeholder="Enter total"
                                         min="0"
                                         step="0.01"
                                         required
                                     />
+                                    {errors.total && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.total}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -473,9 +576,16 @@ const Estimation = () => {
                                         type="date"
                                         value={date}
                                         onChange={(e) => setDate(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.date
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         required
                                     />
+                                    {errors.date && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -484,13 +594,20 @@ const Estimation = () => {
                                     <select
                                         value={status}
                                         onChange={(e) => setStatus(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.status
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
                                         required
                                     >
                                         <option value="Pending">Pending</option>
                                         <option value="Active">Active</option>
                                         <option value="Inactive">Inactive</option>
                                     </select>
+                                    {errors.status && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.status}</p>
+                                    )}
                                 </div>
                                 <button
                                     type="submit"
@@ -505,21 +622,21 @@ const Estimation = () => {
                 )}
 
                 <style jsx>{`
-          .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-track {
-            background: #edf2f7;
-            border-radius: 4px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #a0aec0;
-            border-radius: 4px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #718096;
-          }
-        `}</style>
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-track {
+                        background: #edf2f7;
+                        border-radius: 4px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: #a0aec0;
+                        border-radius: 4px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #718096;
+                    }
+                `}</style>
             </div>
         </div>
     );

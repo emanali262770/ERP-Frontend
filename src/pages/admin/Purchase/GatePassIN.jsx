@@ -11,19 +11,20 @@ const GatepassIn = () => {
     const [gatepassId, setGatepassId] = useState("");
     const [toCompany, setToCompany] = useState("");
     const [poType, setPoType] = useState("withPO"); // Default to "With PO"
-    const [item, setItem] = useState("");
-    const [units, setUnits] = useState("");
-    const [quantity, setQuantity] = useState("");
+    const [itemsList, setItemsList] = useState([]);
+    const [itemName, setItemName] = useState("");
+    const [itemQuantity, setItemQuantity] = useState("");
+    const [itemUnits, setItemUnits] = useState("");
     const [category, setCategory] = useState("");
     const [againstPoNo, setAgainstPoNo] = useState("");
     const [supplier, setSupplier] = useState("");
     const [date, setDate] = useState("");
-    //   const [time, setTime] = useState("");
     const [status, setStatus] = useState("Pending");
     const [editingGatepass, setEditingGatepass] = useState(null);
+    const [errors, setErrors] = useState({});
     const sliderRef = useRef(null);
 
-    // Static data for gatepasses with new fields
+    // Static data for gatepasses with itemsList
     const staticData = [
         {
             _id: "1",
@@ -31,11 +32,8 @@ const GatepassIn = () => {
             driverName: "Ali Khan",
             itemsCategory: "Electronics",
             supplier: "ABC Corp",
-            units: "Units",
-            quantity: "5",
+            items: [{ name: "Laptop", qty: 5, units: "Units" }],
             date: "2025-09-01",
-            //   time: "14:30",
-
             status: true,
             createdAt: new Date().toISOString(),
         },
@@ -45,10 +43,8 @@ const GatepassIn = () => {
             driverName: "Ahmed Raza",
             itemsCategory: "Stationery",
             supplier: "XYZ Ltd",
-            units: "Packs",
-            quantity: "10",
+            items: [{ name: "Notebooks", qty: 10, units: "Packs" }],
             date: "2025-09-15",
-            //   time: "09:15",
             status: false,
             createdAt: new Date().toISOString(),
         },
@@ -58,10 +54,8 @@ const GatepassIn = () => {
             driverName: "Usman Ali",
             itemsCategory: "IT Equipment",
             supplier: "Tech Solutions",
-            units: "Units",
-            quantity: "3",
+            items: [{ name: "Monitor", qty: 3, units: "Units" }],
             date: "2025-09-20",
-            //   time: "16:45",
             status: true,
             createdAt: new Date().toISOString(),
         },
@@ -70,8 +64,13 @@ const GatepassIn = () => {
     // Format date for display
     const formatDate = (date) => {
         if (!date) return "";
-        return new Date(date).toISOString().split("T")[0];
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}-${month}-${year}`;
     };
+
 
     // Load static data on mount
     useEffect(() => {
@@ -80,21 +79,53 @@ const GatepassIn = () => {
         setTimeout(() => setLoading(false), 1000); // Simulate loading for 1 second
     }, []);
 
-    // Handlers for form and table actions
-    const handleAddClick = () => {
-        setEditingGatepass(null);
+    // Reset form fields
+    const resetForm = () => {
         setGatepassId("");
         setToCompany("");
         setPoType("withPO");
-        setItem("");
-        setUnits("");
-        setQuantity("");
+        setItemsList([]);
+        setItemName("");
+        setItemQuantity("");
+        setItemUnits("");
         setCategory("");
         setAgainstPoNo("");
         setSupplier("");
         setDate("");
-        // setTime("");
         setStatus("Pending");
+        setEditingGatepass(null);
+        setErrors({});
+        setIsSliderOpen(false);
+    };
+
+    // Validate form fields
+    const validateForm = () => {
+        const newErrors = {};
+        const trimmedGatepassId = gatepassId.trim();
+        const trimmedToCompany = toCompany.trim();
+        const trimmedAgainstPoNo = againstPoNo.trim();
+        const trimmedSupplier = supplier.trim();
+
+        if (!trimmedGatepassId) newErrors.gatepassId = "Gatepass ID is required";
+        if (!trimmedToCompany) newErrors.toCompany = "To Company is required";
+        if (!date) newErrors.date = "Date is required";
+        if (!status) newErrors.status = "Status is required";
+
+        if (poType === "withPO") {
+            if (itemsList.length === 0) newErrors.itemsList = "At least one item is required";
+            if (!category) newErrors.category = "Category is required";
+        } else if (poType === "withoutPO") {
+            if (!trimmedAgainstPoNo) newErrors.againstPoNo = "PO Number is required";
+            if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Handlers for form and table actions
+    const handleAddClick = () => {
+        resetForm();
         setIsSliderOpen(true);
     };
 
@@ -102,38 +133,52 @@ const GatepassIn = () => {
         setEditingGatepass(gatepass);
         setGatepassId(gatepass.gatepassId);
         setToCompany(gatepass.toCompany || "");
-        setPoType(gatepass.item ? "withPO" : "withoutPO"); // Determine PO type based on presence of item
-        setItem(gatepass.item || "");
-        setUnits(gatepass.units || "");
-        setQuantity(gatepass.quantity || "");
+        setPoType(gatepass.items && gatepass.items.length > 0 ? "withPO" : "withoutPO");
+        setItemsList(gatepass.items || []);
+        setItemName("");
+        setItemQuantity("");
+        setItemUnits("");
         setCategory(gatepass.itemsCategory || "");
         setAgainstPoNo(gatepass.againstPoNo || "");
         setSupplier(gatepass.supplier || "");
         setDate(formatDate(gatepass.date));
-        // setTime(gatepass.time || "");
         setStatus(gatepass.status ? "Active" : "Inactive");
+        setErrors({});
         setIsSliderOpen(true);
+    };
+
+    const handleAddItem = () => {
+        const trimmedItemName = itemName.trim();
+        const parsedItemQuantity = parseInt(itemQuantity, 10);
+        const trimmedItemUnits = itemUnits.trim();
+
+        if (!trimmedItemName || !itemQuantity || isNaN(parsedItemQuantity) || parsedItemQuantity <= 0 || !trimmedItemUnits) {
+            Swal.fire({
+                icon: "warning",
+                title: "Invalid Item",
+                text: "Please enter a valid item name, positive quantity, and select units.",
+                confirmButtonColor: "#d33",
+            });
+            return;
+        }
+
+        setItemsList([...itemsList, { name: trimmedItemName, qty: parsedItemQuantity, units: trimmedItemUnits }]);
+        setItemName("");
+        setItemQuantity("");
+        setItemUnits("");
+        setErrors((prev) => ({ ...prev, itemsList: null }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        const trimmedGatepassId = gatepassId.trim();
-        const trimmedToCompany = toCompany.trim();
-
-        if (
-            !trimmedGatepassId ||
-            !trimmedToCompany ||
-            !date ||
-            //   !time ||
-            !status ||
-            (poType === "withPO" && (!item || !units || !quantity || !category)) ||
-            (poType === "withoutPO" && (!againstPoNo || !supplier))
-        ) {
+        if (!validateForm()) {
             Swal.fire({
                 icon: "warning",
-                title: "Missing Fields",
-                text: "⚠️ Please fill in all required fields.",
+                title: "Missing or Invalid Fields",
+                html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(errors)
+                    .map((err) => `<li>${err}</li>`)
+                    .join("")}</ul>`,
                 confirmButtonColor: "#d33",
             });
             return;
@@ -141,17 +186,14 @@ const GatepassIn = () => {
 
         const newGatepass = {
             _id: editingGatepass ? editingGatepass._id : Date.now().toString(),
-            gatepassId: trimmedGatepassId,
-            toCompany: trimmedToCompany,
+            gatepassId: gatepassId.trim(),
+            toCompany: toCompany.trim(),
             driverName: "TBD", // Placeholder, can be dynamically set if needed
             itemsCategory: poType === "withPO" ? category : "",
             supplier: poType === "withoutPO" ? supplier : "",
-            units: poType === "withPO" ? units : "",
-            quantity: poType === "withPO" ? parseInt(quantity, 10) : "",
+            items: poType === "withPO" ? itemsList : [],
             againstPoNo: poType === "withoutPO" ? againstPoNo : "",
-            item: poType === "withPO" ? item : "",
             date,
-            //   time,
             status: status === "Active",
             createdAt: new Date().toISOString(),
         };
@@ -178,21 +220,7 @@ const GatepassIn = () => {
             });
         }
 
-        // Reset form state
-        setGatepassId("");
-        setToCompany("");
-        setPoType("withPO");
-        setItem("");
-        setUnits("");
-        setQuantity("");
-        setCategory("");
-        setAgainstPoNo("");
-        setSupplier("");
-        setDate("");
-        // setTime("");
-        setStatus("Pending");
-        setEditingGatepass(null);
-        setIsSliderOpen(false);
+        resetForm();
     };
 
     const handleDelete = (id) => {
@@ -257,15 +285,13 @@ const GatepassIn = () => {
                     <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
                         <div className="min-w-[1200px]">
                             {/* Table Header */}
-                            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                                 <div>GatePass ID</div>
                                 <div>Driver Name</div>
                                 <div>Items Category</div>
                                 <div>Supplier</div>
-                                <div>Units</div>
-                                <div>Quantity</div>
+                                <div>Items</div>
                                 <div>Date</div>
-                                {/* <div>Time</div> */}
                                 <div>Status</div>
                                 <div className="text-right">Actions</div>
                             </div>
@@ -275,8 +301,8 @@ const GatepassIn = () => {
                                 {loading ? (
                                     <TableSkeleton
                                         rows={3}
-                                        cols={10}
-                                        className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                                        cols={8}
+                                        className="lg:grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto]"
                                     />
                                 ) : gatepasses.length === 0 ? (
                                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -286,16 +312,43 @@ const GatepassIn = () => {
                                     gatepasses.map((gatepass) => (
                                         <div
                                             key={gatepass._id}
-                                            className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                                            className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                                         >
                                             <div className="font-medium text-gray-900">{gatepass.gatepassId}</div>
                                             <div className="text-gray-600">{gatepass.driverName}</div>
                                             <div className="text-gray-600">{gatepass.itemsCategory}</div>
                                             <div className="text-gray-600">{gatepass.supplier}</div>
-                                            <div className="text-gray-600">{gatepass.units}</div>
-                                            <div className="text-gray-600">{gatepass.quantity}</div>
+                                            <div className="text-gray-600">
+                                                <div className="flex flex-wrap gap-2">
+                                                    {gatepass.items && gatepass.items.length > 0 ? (
+                                                        gatepass.items.map((item, idx) => (
+                                                            <div key={idx} className="flex gap-2">
+                                                                <span
+                                                                    className="px-3 py-1 rounded-full text-xs font-medium"
+                                                                    style={{
+                                                                        backgroundColor: `hsl(${(idx * 70) % 360}, 80%, 85%)`,
+                                                                        color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
+                                                                    }}
+                                                                >
+                                                                    {item.name}
+                                                                </span>
+                                                                <span
+                                                                    className="px-3 py-1 rounded-full text-xs font-medium"
+                                                                    style={{
+                                                                        backgroundColor: `hsl(${(idx * 70 + 35) % 360}, 80%, 85%)`,
+                                                                        color: `hsl(${(idx * 70 + 35) % 360}, 40%, 25%)`,
+                                                                    }}
+                                                                >
+                                                                    Qty: {item.qty} {item.units}
+                                                                </span>
+                                                            </div>
+                                                        ))
+                                                    ) : (
+                                                        <span className="text-gray-500">No items</span>
+                                                    )}
+                                                </div>
+                                            </div>
                                             <div className="text-gray-500">{formatDate(gatepass.date)}</div>
-                                            {/* <div className="text-gray-600">{gatepass.time}</div> */}
                                             <div className="text-gray-600">
                                                 <span
                                                     className={`px-2 py-1 rounded-full text-xs ${gatepass.status
@@ -306,10 +359,10 @@ const GatepassIn = () => {
                                                     {gatepass.status ? "Active" : "Inactive"}
                                                 </span>
                                             </div>
-                                            <div className="flex justify-end gap-2">
+                                            <div>
                                                 <button
                                                     onClick={() => handleEditClick(gatepass)}
-                                                    className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
+                                                    className="py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
                                                     title="Edit"
                                                 >
                                                     <SquarePen size={18} />
@@ -342,22 +395,7 @@ const GatepassIn = () => {
                                 </h2>
                                 <button
                                     className="text-2xl text-gray-500 hover:text-gray-700"
-                                    onClick={() => {
-                                        setIsSliderOpen(false);
-                                        setGatepassId("");
-                                        setToCompany("");
-                                        setPoType("withPO");
-                                        setItem("");
-                                        setUnits("");
-                                        setQuantity("");
-                                        setCategory("");
-                                        setAgainstPoNo("");
-                                        setSupplier("");
-                                        setDate("");
-                                        // setTime("");
-                                        setStatus("Pending");
-                                        setEditingGatepass(null);
-                                    }}
+                                    onClick={resetForm}
                                 >
                                     ×
                                 </button>
@@ -366,16 +404,22 @@ const GatepassIn = () => {
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Gatepass ID <span className="text-blue-600">*</span>
+                                        Gatepass ID <span className="text-red-500">*</span>
                                     </label>
                                     <input
                                         type="text"
                                         value={gatepassId}
                                         onChange={(e) => setGatepassId(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.gatepassId
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                            }`}
                                         placeholder="Enter gatepass ID"
                                         required
                                     />
+                                    {errors.gatepassId && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.gatepassId}</p>
+                                    )}
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -384,7 +428,10 @@ const GatepassIn = () => {
                                     <select
                                         value={toCompany}
                                         onChange={(e) => setToCompany(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.toCompany
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                            }`}
                                         required
                                     >
                                         <option value="">Select Company</option>
@@ -393,6 +440,9 @@ const GatepassIn = () => {
                                         <option value="Tech Solutions">Tech Solutions</option>
                                         <option value="Global Supplies">Global Supplies</option>
                                     </select>
+                                    {errors.toCompany && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.toCompany}</p>
+                                    )}
                                 </div>
                                 <div className="flex items-center gap-4">
                                     <label className="block text-gray-700 font-medium">
@@ -420,91 +470,22 @@ const GatepassIn = () => {
                                     <>
                                         <div>
                                             <label className="block text-gray-700 font-medium mb-2">
-                                                Item <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                value={item}
-                                                onChange={(e) => setItem(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                required
-                                            >
-                                                <option value="">Select Item </option>
-                                                <option value="Laptop">Laptop</option>
-                                                <option value="Desktop">Desktop</option>
-                                                <option value="Printer">Printer</option>
-                                                <option value="Scanner">Scanner</option>
-                                                <option value="Projector">Projector</option>
-                                                <option value="Stationery">Stationery</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Units <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                value={units}
-                                                onChange={(e) => setUnits(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                required
-                                            >
-                                                <option value="">Select Unit</option>
-                                                <option value="Piece">Piece</option>
-                                                <option value="Box">Box</option>
-                                                <option value="Packet">Packet</option>
-                                                <option value="Kg">Kg</option>
-                                                <option value="Liters">Liters</option>
-                                                <option value="Dozen">Dozen</option>
-                                            </select>
-                                        </div>
-
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Quantity <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={quantity}
-                                                onChange={(e) => setQuantity(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter quantity"
-                                                min="1"
-                                                required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Category <span className="text-red-500">*</span>
-                                            </label>
-                                            <select
-                                                value={category}
-                                                onChange={(e) => setCategory(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                required
-                                            >
-                                                <option value="">Select Category</option>
-                                                <option value="Electronics">Electronics</option>
-                                                <option value="Stationery">Stationery</option>
-                                                <option value="IT Equipment">IT Equipment</option>
-                                                <option value="Furniture">Furniture</option>
-                                            </select>
-                                        </div>
-                                    </>
-                                )}
-                                {poType === "withoutPO" && (
-                                    <>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
                                                 Against PO No. <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="text"
                                                 value={againstPoNo}
                                                 onChange={(e) => setAgainstPoNo(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.againstPoNo
+                                                        ? "border-red-500 focus:ring-red-500"
+                                                        : "border-gray-300 focus:ring-newPrimary"
+                                                    }`}
                                                 placeholder="Enter PO number"
                                                 required
                                             />
+                                            {errors.againstPoNo && (
+                                                <p className="text-red-500 text-xs mt-1">{errors.againstPoNo}</p>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="block text-gray-700 font-medium mb-2">
@@ -513,7 +494,10 @@ const GatepassIn = () => {
                                             <select
                                                 value={supplier}
                                                 onChange={(e) => setSupplier(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.supplier
+                                                        ? "border-red-500 focus:ring-red-500"
+                                                        : "border-gray-300 focus:ring-newPrimary"
+                                                    }`}
                                                 required
                                             >
                                                 <option value="">Select Supplier</option>
@@ -522,6 +506,127 @@ const GatepassIn = () => {
                                                 <option value="Tech Solutions">Tech Solutions</option>
                                                 <option value="Global Supplies">Global Supplies</option>
                                             </select>
+                                            {errors.supplier && (
+                                                <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                                            )}
+                                        </div>
+                                    </>
+
+                                    
+                                )}
+                                {poType === "withoutPO" && (
+                                     <>
+                                        <div className="space-y-3">
+                                            <div className="flex justify-between gap-2 items-end">
+                                                <div className="flex-1">
+                                                    <label className="block text-gray-700 font-medium mb-2">
+                                                        Item Name <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <select
+                                                        value={itemName}
+                                                        onChange={(e) => setItemName(e.target.value)}
+                                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                    >
+                                                        <option value="">Select Item</option>
+                                                        <option value="Laptop">Laptop</option>
+                                                        <option value="Desktop">Desktop</option>
+                                                        <option value="Printer">Printer</option>
+                                                        <option value="Scanner">Scanner</option>
+                                                        <option value="Projector">Projector</option>
+                                                        <option value="Stationery">Stationery</option>
+                                                    </select>
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="block text-gray-700 font-medium mb-2">
+                                                        Quantity <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <input
+                                                        type="number"
+                                                        value={itemQuantity}
+                                                        onChange={(e) => setItemQuantity(e.target.value)}
+                                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                        placeholder="Enter quantity"
+                                                        min="1"
+                                                    />
+                                                </div>
+                                                <div className="flex-1">
+                                                    <label className="block text-gray-700 font-medium mb-2">
+                                                        Units <span className="text-red-500">*</span>
+                                                    </label>
+                                                    <select
+                                                        value={itemUnits}
+                                                        onChange={(e) => setItemUnits(e.target.value)}
+                                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                                    >
+                                                        <option value="">Select Unit</option>
+                                                        <option value="Piece">Piece</option>
+                                                        <option value="Box">Box</option>
+                                                        <option value="Packet">Packet</option>
+                                                        <option value="Kg">Kg</option>
+                                                        <option value="Liters">Liters</option>
+                                                        <option value="Dozen">Dozen</option>
+                                                    </select>
+                                                </div>
+                                                <div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={handleAddItem}
+                                                        className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
+                                                    >
+                                                        + Add
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            {errors.itemsList && (
+                                                <p className="text-red-500 text-xs mt-1">{errors.itemsList}</p>
+                                            )}
+                                            {itemsList.length > 0 && (
+                                                <div className="overflow-x-auto">
+                                                    <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                                                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                                                            <tr>
+                                                                <th className="px-4 py-2 border-b">Sr #</th>
+                                                                <th className="px-4 py-2 border-b">Item Name</th>
+                                                                <th className="px-4 py-2 border-b">Quantity</th>
+                                                                <th className="px-4 py-2 border-b">Units</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody className="text-gray-700 text-sm">
+                                                            {itemsList.map((item, idx) => (
+                                                                <tr key={idx} className="hover:bg-gray-50">
+                                                                    <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
+                                                                    <td className="px-4 py-2 border-b">{item.name}</td>
+                                                                    <td className="px-4 py-2 border-b text-center">{item.qty}</td>
+                                                                    <td className="px-4 py-2 border-b">{item.units}</td>
+                                                                </tr>
+                                                            ))}
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div>
+                                            <label className="block text-gray-700 font-medium mb-2">
+                                                Category <span className="text-red-500">*</span>
+                                            </label>
+                                            <select
+                                                value={category}
+                                                onChange={(e) => setCategory(e.target.value)}
+                                                className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.category
+                                                        ? "border-red-500 focus:ring-red-500"
+                                                        : "border-gray-300 focus:ring-newPrimary"
+                                                    }`}
+                                                required
+                                            >
+                                                <option value="">Select Category</option>
+                                                <option value="Electronics">Electronics</option>
+                                                <option value="Stationery">Stationery</option>
+                                                <option value="IT Equipment">IT Equipment</option>
+                                                <option value="Furniture">Furniture</option>
+                                            </select>
+                                            {errors.category && (
+                                                <p className="text-red-500 text-xs mt-1">{errors.category}</p>
+                                            )}
                                         </div>
                                     </>
                                 )}
@@ -533,22 +638,16 @@ const GatepassIn = () => {
                                         type="date"
                                         value={date}
                                         onChange={(e) => setDate(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.date
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                            }`}
                                         required
                                     />
+                                    {errors.date && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+                                    )}
                                 </div>
-                                {/* <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Time <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="time"
-                    value={time}
-                    onChange={(e) => setTime(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  />
-                </div> */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Status <span className="text-red-500">*</span>
@@ -556,13 +655,19 @@ const GatepassIn = () => {
                                     <select
                                         value={status}
                                         onChange={(e) => setStatus(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.status
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                            }`}
                                         required
                                     >
                                         <option value="Pending">Pending</option>
                                         <option value="Active">Active</option>
                                         <option value="Inactive">Inactive</option>
                                     </select>
+                                    {errors.status && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.status}</p>
+                                    )}
                                 </div>
                                 <button
                                     type="submit"
@@ -577,24 +682,25 @@ const GatepassIn = () => {
                 )}
 
                 <style jsx>{`
-          .custom-scrollbar::-webkit-scrollbar {
-            width: 6px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-track {
-            background: #edf2f7;
-            border-radius: 4px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #a0aec0;
-            border-radius: 4px;
-          }
-          .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #718096;
-          }
-        `}</style>
+                    .custom-scrollbar::-webkit-scrollbar {
+                        width: 6px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-track {
+                        background: #edf2f7;
+                        border-radius: 4px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb {
+                        background: #a0aec0;
+                        border-radius: 4px;
+                    }
+                    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                        background: #718096;
+                    }
+                `}</style>
             </div>
         </div>
     );
 };
+
 
 export default GatepassIn;

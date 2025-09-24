@@ -334,16 +334,6 @@ export default function PurchaseManager() {
       });
   };
 
-  //   // Show loading spinner
-  //   if (loading) {
-  //     return (
-  //       <div className="container mx-auto px-4 py-8 min-h-screen flex items-center justify-center">
-  //         <div className="text-center">
-  //           <HashLoader height="150" width="150" radius={1} color="#84CF16" />
-  //         </div>
-  //       </div>
-  //     );
-  //   }
 
   return (
     <div className="p-4 px-6 bg-gray-50 min-h-screen">
@@ -393,7 +383,7 @@ export default function PurchaseManager() {
                       <div>Total Qty</div>
                       <div>Discount</div>
                       <div>Payable</div>
-                      <div className="text-right">Actions</div>
+                      <div>Actions</div>
                     </div>
 
                     {/* Table Body */}
