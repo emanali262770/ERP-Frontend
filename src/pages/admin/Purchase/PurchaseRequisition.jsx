@@ -44,42 +44,6 @@ const PurchaseRequisition = () => {
 
 
 
-  // Static data to ensure rendering
-  const staticData = [
-    {
-      _id: "1",
-      requisitionId: "REQ001",
-      date: "2025-09-12",
-      department: "IT",
-      employee: "John Doe",
-      requirement: "Regular Purchase",
-      details: "High-performance laptops for development team",
-      items: [
-        { name: "Dell XPS 15", qty: 4 },
-        { name: "Mouse", qty: 10 },
-      ],
-      category: "Electronics",
-      isEnable: true,
-    },
-    {
-      _id: "2",
-      requisitionId: "REQ002",
-      date: "2025-09-16",
-      department: "HR",
-      employee: "Jane Smith",
-      requirement: "Monthly Purchase",
-      details: "Stationery for new hires",
-      items: [
-        { name: "Pens", qty: 4 },
-        { name: "Notebooks", qty: 5 },
-        { name: "Markers", qty: 3 },
-      ],
-      category: "Stationery",
-      isEnable: false,
-    },
-  ];
-
-
 
   const fetchRequistionList = useCallback(async () => {
     try {
@@ -101,14 +65,6 @@ const PurchaseRequisition = () => {
     fetchRequistionList();
   }, [fetchRequistionList]);
 
-
-
-  // Load static data on mount
-  useEffect(() => {
-    setLoading(true);
-    setRequisitions(staticData); // Use static data directly
-    setTimeout(() => setLoading(false), 1000); // Simulate loading for 1 second
-  }, []);
 
   // Handlers for form and table actions
   const handleAddClick = () => {
@@ -226,18 +182,18 @@ const PurchaseRequisition = () => {
     setIsSliderOpen(false);
   };
 
-const formatDate = (date) => {
-  if (!date) return "N/A";
+  const formatDate = (date) => {
+    if (!date) return "N/A";
 
-  const parsed = new Date(date);
-  if (isNaN(parsed.getTime())) return "Invalid Date";
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) return "Invalid Date";
 
-  const day = String(parsed.getDate()).padStart(2, "0");
-  const month = String(parsed.getMonth() + 1).padStart(2, "0");
-  const year = parsed.getFullYear();
+    const day = String(parsed.getDate()).padStart(2, "0");
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const year = parsed.getFullYear();
 
-  return `${day}-${month}-${year}`; // DD-MM-YYYY
-};
+    return `${day}-${month}-${year}`; // DD-MM-YYYY
+  };
 
 
 
@@ -368,11 +324,16 @@ const formatDate = (date) => {
                         <div className="font-medium text-gray-900">
                           {requisition.requisitionId}
                         </div>
-                        <div className="text-gray-600">{requisition.department}</div>
-                        <div className="text-gray-600">{requisition.employee}</div>
-                        <div className="text-gray-600">{requisition.requirement}</div>
+                        <div className="text-gray-600">
+                          {requisition?.department?.departmentName || "N/A"}
+                        </div>
+                        <div className="text-gray-600">
+                          {requisition?.employee?.employeeName || "N/A"}
+                        </div>
 
-                        <div className="text-gray-600">{requisition.category}</div>
+                        <div className="text-gray-600">{requisition?.requirements}</div>
+
+                        <div className="text-gray-600">{requisition?.category?.categoryName}</div>
 
                         {/* Items */}
                         <div className="text-gray-600">
@@ -386,7 +347,7 @@ const formatDate = (date) => {
                                     color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
                                   }}
                                 >
-                                  {item.name}
+                                  {item.itemName}
                                 </span>
                                 <span
                                   className="px-3 py-1 rounded-full text-xs font-medium"
@@ -468,7 +429,7 @@ const formatDate = (date) => {
                   </label>
                   <input
                     type="text"
-                    value={requisitionId} 
+                    value={requisitionId}
                     readOnly
                     onChange={(e) => setRequisitionId(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
