@@ -268,7 +268,11 @@ const Employee = () => {
                   cols={9}
                   className="lg:grid-cols-9"
                 />
-              )  : (
+              )  : employeeList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No employee found.
+                </div>
+              ) : (
                 employeeList.map((emp) => (
                   <div
                     key={emp._id}
@@ -281,12 +285,12 @@ const Employee = () => {
                     <div className="text-gray-600">
                       {emp?.departmentId?.departmentName}
                     </div>
-                    <div className="text-gray-600">{emp.mobile}</div>
-                    <div className="text-gray-600">{emp.nicNo}</div>
+                    <div className="text-gray-600">{emp?.mobile}</div>
+                    <div className="text-gray-600">{emp?.nicNo}</div>
                     <div className="text-gray-600">{formatDate(emp.dob)}</div>
-                    <div className="text-gray-600">{emp.qualification}</div>
+                    <div className="text-gray-600">{emp?.qualification}</div>
                     <div className=" font-semibold">
-                      {emp.isEnable ? (
+                      {emp?.isEnable ? (
                         <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Enabled</span>
                       ) : (
                         <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Disabled</span>
