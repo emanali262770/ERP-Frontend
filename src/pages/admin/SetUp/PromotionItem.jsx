@@ -5,8 +5,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import { Search, SquarePen, Trash2 } from "lucide-react";
-import CommanHeader from "../../components/CommanHeader";
-import TableSkeleton from "./Skeleton";
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
 
 const PromotionItem = () => {
   const [categoryList, setCategoryList] = useState([]);

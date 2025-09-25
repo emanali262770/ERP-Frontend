@@ -4,9 +4,9 @@ import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import CommanHeader from "../../components/CommanHeader";
+import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
+import TableSkeleton from "../Skeleton";
 
 const Manufacture = () => {
   const [manufacturerList, setManufacturerList] = useState([]);

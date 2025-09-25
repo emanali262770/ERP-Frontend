@@ -5,9 +5,9 @@ import axios from "axios";
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { FiSearch, FiPlus, FiEdit, FiTrash2 } from "react-icons/fi";
-import ModuleFunctionalities from "../../context/modulesConfig";
-import CommanHeader from "../../components/CommanHeader";
-import TableSkeleton from "./Skeleton";
+import ModuleFunctionalities from "../../../context/modulesConfig";
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
 import { SquarePen, Trash2 } from "lucide-react";
 
 const ModulesFunctionalities = () => {

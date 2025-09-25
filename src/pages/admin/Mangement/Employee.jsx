@@ -1,13 +1,11 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { HashLoader } from "react-spinners";
 import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
-import CommanHeader from "../../components/CommanHeader";
+import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
+import TableSkeleton from "../Skeleton";
 import axios from "axios";
-import { set } from "date-fns";
 
 const Employee = () => {
   const [employeeList, setEmployeeList] = useState([]);
@@ -55,7 +53,6 @@ const Employee = () => {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
-      
     }
   }, []);
   useEffect(() => {
@@ -158,6 +155,20 @@ const Employee = () => {
     setIsSliderOpen(true);
   };
 
+  // Date formating
+  const formatDate = (date) => {
+    if (!date) return "N/A";
+
+    const parsed = new Date(date);
+    if (isNaN(parsed.getTime())) return "Invalid Date";
+
+    const day = String(parsed.getDate()).padStart(2, "0");
+    const month = String(parsed.getMonth() + 1).padStart(2, "0");
+    const year = parsed.getFullYear();
+
+    return `${day}-${month}-${year}`; // DD-MM-YYYY
+  };
+
   const handleDelete = (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
@@ -251,11 +262,15 @@ const Employee = () => {
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
                 <TableSkeleton
-                  rows={employeeList.length > 0 ? employeeList.length : 5} 
+                  rows={employeeList.length > 0 ? employeeList.length : 5}
                   cols={9}
                   className="lg:grid-cols-9"
                 />
-              )  : (
+              ) : employeeList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No employee found.
+                </div>
+              ) : (
                 employeeList.map((emp) => (
                   <div
                     key={emp._id}
@@ -264,19 +279,23 @@ const Employee = () => {
                     <div className="font-medium text-gray-900">
                       {emp._id?.slice(0, 6)}
                     </div>
-                    <div className="text-gray-700">{emp.employeeName}</div>
+                    <div className="text-gray-700">{emp?.employeeName}</div>
                     <div className="text-gray-600">
-                      {emp.departmentId.departmentName}
+                      {emp?.departmentId?.departmentName}
                     </div>
-                    <div className="text-gray-600">{emp.mobile}</div>
-                    <div className="text-gray-600">{emp.nicNo}</div>
-                    <div className="text-gray-600">{emp.dob}</div>
-                    <div className="text-gray-600">{emp.qualification}</div>
+                    <div className="text-gray-600">{emp?.mobile}</div>
+                    <div className="text-gray-600">{emp?.nicNo}</div>
+                    <div className="text-gray-600">{formatDate(emp.dob)}</div>
+                    <div className="text-gray-600">{emp?.qualification}</div>
                     <div className=" font-semibold">
-                      {emp.isEnable ? (
-                        <span className="text-green-600">Enabled</span>
+                      {emp?.isEnable ? (
+                        <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">
+                          Enabled
+                        </span>
                       ) : (
-                        <span className="text-red-600">Disabled</span>
+                        <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">
+                          Disabled
+                        </span>
                       )}
                     </div>
 

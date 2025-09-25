@@ -5,10 +5,10 @@ import axios from "axios";
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { FiSearch, FiPlus, FiEdit, FiTrash2, FiKey } from "react-icons/fi";
-import CommanHeader from "../../components/CommanHeader";
+import { FiSearch, FiPlus, FiKey } from "react-icons/fi";
+import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
-import TableSkeleton from "./Skeleton";
+import TableSkeleton from "../Skeleton";
 
 const Users = () => {
   const [userList, setUserList] = useState([]);
