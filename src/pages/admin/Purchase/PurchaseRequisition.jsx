@@ -1,11 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Eye, SquarePen, Trash2 ,X } from "lucide-react";
+import { Eye, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton"; // Ensure this component exists
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
-
 
 const PurchaseRequisition = () => {
   const [requisitions, setRequisitions] = useState([]);
@@ -22,25 +21,22 @@ const PurchaseRequisition = () => {
   const [items, setItems] = useState("");
   const [category, setCategory] = useState("");
   const [isEnable, setIsEnable] = useState(true);
-  const [isView, setisView] = useState(false)
+  const [isView, setisView] = useState(false);
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
   const [departmentList, setDepartmentList] = useState([]);
   const [itemName, setItemName] = useState("");
-  const [quantity, setQuantity] = useState("");
+  const [quantity, setQuantity] = useState();
   const [itemsList, setItemsList] = useState([]);
-   const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [selectedRequisition, setSelectedRequisition] = useState(null);
 
-
-
- const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const handleAddItem = () => {
     if (!itemName || !quantity) return;
 
     const newItem = {
-    
-      name: itemName,
-      qty: quantity,
+      itemName,
+      quantity: parseInt(quantity, 10),
     };
 
     setItemsList([...itemsList, newItem]);
@@ -140,7 +136,7 @@ const PurchaseRequisition = () => {
     setEmployee("");
     setRequirement("");
     setDetails("");
-    setItems("");
+    setItemsList([]);
     setCategory("");
     setQuantity("");
     setIsEnable(true);
@@ -148,171 +144,92 @@ const PurchaseRequisition = () => {
   };
 
   const handleEditClick = (requisition) => {
+    console.log(requisition, "handle edit");
+
     setEditingRequisition(requisition);
     setRequisitionId(requisition.requisitionId);
     setDate(formatDate(requisition.date));
-    setDepartment(requisition.department);
-    setEmployee(requisition.employee);
-    setRequirement(requisition.requirement);
+
+    // ✅ store IDs instead of names
+    setDepartment(requisition.department?._id || "");
+    setEmployee(requisition.employee?._id || "");
+    setCategory(requisition.category?._id || "");
+
+    setRequirement(requisition.requirements || "");
     setDetails(requisition.details || "");
-    setItems(requisition.items);
-    setCategory(requisition.category);
-    setQuantity(requisition.quantity);
-    setIsEnable(requisition.isEnable);
+    setItemsList(requisition.items || []);
+    setIsEnable(requisition.isEnable ?? true);
+
     setIsSliderOpen(true);
   };
 
-  // const handleSubmit = async (e) => {
-  //   e.preventDefault();
-
-  //   const trimmedRequisitionId = requisitionId.trim();
-  //   const trimmedDepartment = department.trim();
-  //   const trimmedEmployee = employee.trim();
-  //   const trimmedRequirement = requirement.trim();
-  //   const trimmedDetails = details.trim();
-  //   const trimmedItems = items.trim();
-  //   const trimmedCategory = category.trim();
-
-  //   if (
-  //     !trimmedRequisitionId ||
-  //     !date ||
-  //     !trimmedDepartment ||
-  //     !trimmedEmployee ||
-  //     !trimmedRequirement ||
-  //     !trimmedDetails ||
-  //     !trimmedItems ||
-  //     !trimmedCategory ||
-  //     !quantity
-  //   ) {
-  //     Swal.fire({
-  //       icon: "warning",
-  //       title: "Missing Fields",
-  //       text: "⚠️ Please fill in all required fields.",
-  //       confirmButtonColor: "#d33",
-  //     });
-  //     return;
-  //   }
-  //   const { token } = userInfo || {};
-  //   const headers = {
-  //     Authorization: `Bearer ${token}`,
-  //     "Content-Type": "application/json",
-  //   };
-  //   const newRequisition = {
-  //     _id: editingRequisition ? editingRequisition._id : Date.now().toString(),
-  //     requisitionId: trimmedRequisitionId,
-  //     date,
-  //     department: trimmedDepartment,
-  //     employee: trimmedEmployee,
-  //     requirement: trimmedRequirement,
-  //     details: trimmedDetails,
-  //     items: trimmedItems,
-  //     category: trimmedCategory,
-  //     quantity: parseInt(quantity, 10),
-  //     isEnable,
-  //     createdAt: new Date().toISOString(),
-  //   };
-
-  //   if (editingRequisition) {
-  //     setRequisitions(
-  //       requisitions.map((r) =>
-  //         r._id === editingRequisition._id ? newRequisition : r
-  //       )
-  //     );
-
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Updated!",
-  //       text: "Requisition updated successfully.",
-  //       confirmButtonColor: "#3085d6",
-  //     });
-  //   } else {
-  //     let res = await axios.post(
-  //       `${import.meta.env.VITE_API_BASE_URL}/requisitions`,
-  //       newRequisition,
-  //       { headers }
-  //     );
-
-  //     Swal.fire({
-  //       icon: "success",
-  //       title: "Added!",
-  //       text: "Requisition added successfully.",
-  //       confirmButtonColor: "#3085d6",
-  //     });
-  //   }
-
-  //   fetchRequistionList();
-
-  //   // ✅ Reset form state
-  //   setRequisitionId("");
-  //   setDate("");
-  //   setDepartment("");
-  //   setEmployee("");
-  //   setRequirement("");
-  //   setDetails("");
-  //   setItems("");
-  //   setCategory("");
-  //   setQuantity("");
-  //   setIsEnable(true);
-  //   setEditingRequisition(null);
-  //   setIsSliderOpen(false);
-  // };
-
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!department || !employee || !requirement || !details || !category || itemsList.length === 0) {
-    Swal.fire({
-      icon: "warning",
-      title: "Missing Fields",
-      text: "⚠️ Please fill in all required fields and add at least one item.",
-      confirmButtonColor: "#d33",
-    });
-    return;
-  }
-
-  const { token } = userInfo || {};
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-
-  const newRequisition = {
-    department,
-    employee,
-    requirements: requirement,
-    details,
-    category,
-    items: itemsList, // ✅ correct structure
-  };
-
-  console.log({newRequisition});
-  
-
-  try {
-    if (editingRequisition) {
-      await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/requisitions/${editingRequisition._id}`,
-        newRequisition,
-        { headers }
-      );
-      Swal.fire("Updated!", "Requisition updated successfully.", "success");
-    } else {
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/requisitions`,
-        newRequisition,
-        { headers }
-      );
-      Swal.fire("Added!", "Requisition added successfully.", "success");
+    if (
+      !department ||
+      !employee ||
+      !requirement ||
+      !details ||
+      !category ||
+      itemsList.length === 0
+    ) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "⚠️ Please fill in all required fields and add at least one item.",
+        confirmButtonColor: "#d33",
+      });
+      return;
     }
 
-    fetchRequistionList();
-    setIsSliderOpen(false);
-    setItemsList([]);
-  } catch (error) {
-    console.error("Error saving requisition", error);
-    Swal.fire("Error!", "Something went wrong while saving.", "error");
-  }
-};
+    const { token } = userInfo || {};
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    const newRequisition = {
+      department,
+      employee,
+      requirements: requirement,
+      details,
+      category,
+      items: itemsList, // ✅ correct structure
+    };
+
+    console.log({ newRequisition });
+
+    try {
+      if (editingRequisition) {
+        await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
+            editingRequisition._id
+          }`,
+          newRequisition,
+          { headers }
+        );
+        Swal.fire("Updated!", "Requisition updated successfully.", "success");
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions`,
+          newRequisition,
+          { headers }
+        );
+        Swal.fire("Added!", "Requisition added successfully.", "success");
+      }
+
+      fetchRequistionList();
+      setIsSliderOpen(false);
+      setItemsList([]);
+    } catch (error) {
+      console.error("Error saving requisition", error);
+      Swal.fire(
+        "Error!",
+        error.response?.data?.message || "Failed to save requisition."
+      );
+    }
+  };
 
   const formatDate = (date) => {
     if (!date) return "N/A";
@@ -347,8 +264,9 @@ const PurchaseRequisition = () => {
     setSelectedRequisition(null);
   };
 
-
   const handleDelete = async (id) => {
+    console.log({ id });
+
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -380,10 +298,13 @@ const PurchaseRequisition = () => {
             };
 
             // ✅ Delete from backend
-            await axios.delete(`${API_URL}/${id}`, { headers });
+            await axios.delete(
+              `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}`,
+              { headers }
+            );
 
             // ✅ Update UI
-            setPromotions(promotions.filter((p) => p._id !== id));
+            setRequisitions(requisitions.filter((p) => p._id !== id));
 
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -407,6 +328,9 @@ const PurchaseRequisition = () => {
         }
       });
   };
+  function handleRemoveItem(index) {
+    setItemsList(itemsList.filter((_,i)=> i !== index));
+  }
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -447,8 +371,8 @@ const PurchaseRequisition = () => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={3}
-                      cols={10}
+                      rows={requisitions.length || 5}
+                      cols={7}
                       className="lg:grid-cols-7"
                     />
                   ) : requisitions.length === 0 ? (
@@ -575,7 +499,7 @@ const PurchaseRequisition = () => {
                     <option value="">Select Department</option>
 
                     {departmentList.map((dept) => (
-                      <option key={dept._id} value={dept.departmentName}>
+                      <option key={dept._id} value={dept._id}>
                         {dept.departmentName}
                       </option>
                     ))}
@@ -613,11 +537,7 @@ const PurchaseRequisition = () => {
                   >
                     <option value="">Select Requirement</option>
                     <option value="Regular Purchase">Regular Purchase</option>
-                    <option value="Emergency Purchase">
-                      Emergency Purchase
-                    </option>
-                    <option value="One-time Purchase">One-time Purchase</option>
-                    <option value="Bulk Purchase">Bulk Purchase</option>
+                    <option value="Monthly Purchase">Monthly Purchase</option>
                   </select>
                 </div>
 
@@ -703,6 +623,7 @@ const PurchaseRequisition = () => {
                             <th className="px-4 py-2 border-b">Sr #</th>
                             <th className="px-4 py-2 border-b">Item Name</th>
                             <th className="px-4 py-2 border-b">Quantity</th>
+                            <th className="px-4 py-2 border-b">remove</th>
                           </tr>
                         </thead>
                         <tbody className="text-gray-700 text-sm">
@@ -711,11 +632,16 @@ const PurchaseRequisition = () => {
                               <td className="px-4 py-2 border-b text-center">
                                 {idx + 1}
                               </td>
-                              <td className="px-4 py-2 border-b">
-                                {item.name}
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.itemName}
                               </td>
                               <td className="px-4 py-2 border-b text-center">
-                                {item.qty}
+                                {item.quantity}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                <button onClick={() => handleRemoveItem(idx)}>
+                                  <X size={18} className="text-red-600" />
+                                </button>
                               </td>
                             </tr>
                           ))}
@@ -725,31 +651,6 @@ const PurchaseRequisition = () => {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="text-gray-700 font-medium">Status</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setIsEnable(!isEnable)}
-                      className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
-                        isEnable ? "bg-newPrimary/80" : "bg-gray-300"
-                      }`}
-                    >
-                      <div
-                        className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                          isEnable ? "translate-x-6" : "translate-x-0"
-                        }`}
-                      />
-                    </button>
-                    <span
-                      className={`text-sm font-medium ${
-                        isEnable ? "text-newPrimary" : "text-gray-500"
-                      }`}
-                    >
-                      {isEnable ? "Enabled" : "Disabled"}
-                    </span>
-                  </div>
-                </div>
                 <button
                   type="submit"
                   disabled={loading}
@@ -766,14 +667,13 @@ const PurchaseRequisition = () => {
           </div>
         )}
 
-
-      {/* Show popup only if isView is true */}
-      {isView && selectedRequisition && (
-        <ViewModel
-          requisition={selectedRequisition} // ✅ pass as prop
-          onClose={() => setisView(false)}
-        />
-      )}
+        {/* Show popup only if isView is true */}
+        {isView && selectedRequisition && (
+          <ViewModel
+            requisition={selectedRequisition} // ✅ pass as prop
+            onClose={() => setisView(false)}
+          />
+        )}
 
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {

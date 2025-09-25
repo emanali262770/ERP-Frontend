@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useRef } from "react";
-import { SquarePen, Trash2 } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Eye, SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
+import axios from "axios";
+import ViewModel from "./ViewModel";
 
 const PurchaseApproval = () => {
   const [approvals, setApprovals] = useState([]);
@@ -14,40 +16,28 @@ const PurchaseApproval = () => {
   const [status, setStatus] = useState("Hold");
   const [editingApproval, setEditingApproval] = useState(null);
   const sliderRef = useRef(null);
-
-  // Static data for approvals
-  const staticData = [
-    {
-      _id: "1",
-      department: "IT",
-      employee: "John Doe",
-      items: [
-        { name: "Pens", qty: 4 },
-        { name: "Notebooks", qty: 5 },
-        { name: "Markers", qty: 3 },
-      ],
-      date: "2025-09-12",
-      createdAt: new Date().toISOString(),
-    },
-    {
-      _id: "2",
-      department: "HR",
-      employee: "Jane Smith",
-      items: [
-        { name: "Dell XPS 15", qty: 4 },
-        { name: "Mouse", qty: 10 },
-      ],
-      date: "2025-09-16",
-      createdAt: new Date().toISOString(),
-    },
-  ];
-
-  // Load static data on mount
-  useEffect(() => {
-    setLoading(true);
-    setApprovals(staticData);
-    setTimeout(() => setLoading(false), 1000); // Simulate loading for 1 second
+   const [isView, setisView] = useState(false);
+const [selectedRequisition, setSelectedRequisition] = useState(null);
+  // requistation api call
+  const fetchRequistionList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/requisitions`
+      );
+      setApprovals(res.data);
+      console.log("Approval  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Requistion", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
   }, []);
+  useEffect(() => {
+    fetchRequistionList();
+  }, [fetchRequistionList]);
 
   // Handlers for form and table actions
   const handleEditClick = (approval) => {
@@ -98,7 +88,10 @@ const PurchaseApproval = () => {
         }
       });
   };
-
+ const handleView = (req) => {
+    setSelectedRequisition(req);
+    setisView(true);
+  };
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -122,9 +115,7 @@ const PurchaseApproval = () => {
 
     if (editingApproval) {
       setApprovals(
-        approvals.map((a) =>
-          a._id === editingApproval._id ? newApproval : a
-        )
+        approvals.map((a) => (a._id === editingApproval._id ? newApproval : a))
       );
       Swal.fire("✅ Success", "Approval updated successfully!", "success");
     } else {
@@ -141,7 +132,6 @@ const PurchaseApproval = () => {
     setIsSliderOpen(false);
   };
 
-
   const formatDate = (date) => {
     if (!date) return "N/A";
 
@@ -154,7 +144,37 @@ const PurchaseApproval = () => {
 
     return `${day}-${month}-${year}`; // DD-MM-YYYY
   };
+  // status-change api call
 
+  async function handleStatusChangeApiCall(id, newStatus) {
+    console.log({ id, newStatus });
+
+    try {
+      const { token } = JSON.parse(localStorage.getItem("userInfo")) || {};
+
+      const res = await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}/status`,
+        { status: newStatus }, // sending new status in body
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      // ✅ Update state so UI reflects immediately
+      setApprovals((prev) =>
+        prev.map((a) => (a._id === id ? { ...a, status: newStatus } : a))
+      );
+
+      Swal.fire("✅ Success", `Status updated to ${newStatus}`, "success");
+      console.log("Status updated:", res.data);
+    } catch (error) {
+      console.error("Status update failed:", error);
+      Swal.fire("❌ Error", "Failed to update status", "error");
+    }
+  }
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -169,89 +189,121 @@ const PurchaseApproval = () => {
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-          <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
-            <div className="min-w-[1200px]">
-              {/* Table Header */}
-              <div className="grid grid-cols-[80px_1fr_1fr_2fr_150px_200px] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>Sr #</div>
-                <div>Department</div>
-                <div>Employee</div>
-                <div>Items with Quantity</div>
-                <div>Date</div>
-                <div className="text-right">Actions</div>
-              </div>
+          {/* Outer wrapper handles horizontal scroll */}
+          <div className="overflow-x-auto">
+            {/* Table wrapper with min-width only applied here */}
+            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+              <div className="inline-block min-w-[1200px] w-full align-middle">
+                {/* Table Header */}
+                <div className="hidden lg:grid grid-cols-6 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                  <div>Sr #</div>
+                  <div>Department</div>
+                  <div>Employee</div>
+                  <div>Date</div>
+                  <div className="text-right">Actions</div>
+                  <div className="text-right">View</div>
+                </div>
 
-              {/* Table Body */}
-              <div className="flex flex-col divide-y divide-gray-100">
-                {loading ? (
-                  <TableSkeleton rows={3} cols={6} className="grid-cols-[80px_1fr_1fr_2fr_150px_200px]" />
-                ) : approvals.length === 0 ? (
-                  <div className="text-center py-4 text-gray-500 bg-white">
-                    No approvals found.
-                  </div>
-                ) : (
-                  approvals.map((approval, idx) => (
-                    <div
-                      key={approval._id}
-                      className="grid grid-cols-[80px_1fr_1fr_2fr_150px_200px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      {/* Sr # */}
-                      <div className="text-gray-600">{idx + 1}</div>
+                {/* Table Body */}
+                <div className="flex flex-col divide-y divide-gray-100">
+                  {loading ? (
+                    <TableSkeleton
+                      rows={approvals.length || 5}
+                      cols={6}
+                      className="lg:grid-cols-6"
+                    />
+                  ) : approvals.length === 0 ? (
+                    <div className="text-center py-4 text-gray-500 bg-white">
+                      No approvals found.
+                    </div>
+                  ) : (
+                    approvals?.map((approval, idx) => (
+                      <div
+                        key={approval._id}
+                        className="grid grid-cols-1 lg:grid-cols-6 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      >
+                        {/* Sr # */}
+                        <div className="font-medium text-gray-900">
+                          {idx + 1}
+                        </div>
 
-                      {/* Department */}
-                      <div className="text-gray-600">{approval.department}</div>
+                        {/* Department */}
+                        <div className="text-gray-600">
+                          {approval?.department?.departmentName}
+                        </div>
 
-                      {/* Employee */}
-                      <div className="text-gray-600">{approval.employee}</div>
+                        {/* Employee */}
+                        <div className="text-gray-600">
+                          {approval?.employee?.employeeName}
+                        </div>
 
-                      {/* Items with Qty */}
-                      <div className="text-gray-600">
-                        <div className="flex flex-wrap gap-2">
-                          {approval.items.map((item, idx) => (
-                            <div key={idx} className="flex gap-2">
-                              <span
-                                className="px-3 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: `hsl(${(idx * 70) % 360}, 80%, 85%)`,
-                                  color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
-                                }}
+                        {/* Date */}
+                        <div className="text-gray-500">
+                          {formatDate(approval.date)}
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex justify-end relative left-8 gap-2">
+                          {approval.status === "Approved" && (
+                            <button
+                              disabled
+                              className="px-3 py-1 text-[16px] font-medium rounded-full bg-green-300 text-green-700 opacity-60 cursor-not-allowed"
+                            >
+                              Approved
+                            </button>
+                          )}
+
+                          {approval.status === "Pending" && (
+                            <>
+                              <button
+                                onClick={() =>
+                                  handleStatusChangeApiCall(
+                                    approval._id,
+                                    "Approved"
+                                  )
+                                }
+                                className="px-3 py-1 text-[16px] font-medium rounded-full bg-green-200 text-green-800 hover:bg-green-300"
                               >
-                                {item.name}
-                              </span>
-                              <span
-                                className="px-3 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: `hsl(${(idx * 70 + 35) % 360}, 80%, 85%)`,
-                                  color: `hsl(${(idx * 70 + 35) % 360}, 40%, 25%)`,
-                                }}
+                                Approved
+                              </button>
+                              <button
+                                onClick={() =>
+                                  handleStatusChangeApiCall(
+                                    approval._id,
+                                    "Hold"
+                                  )
+                                }
+                                className="px-3 py-1 text-[16px] font-medium rounded-full bg-red-100 text-red-800 hover:bg-red-200"
                               >
-                                Qty: {item.qty}
-                              </span>
-                            </div>
-                          ))}
+                                Hold
+                              </button>
+                            </>
+                          )}
+
+                          {approval.status === "Hold" && (
+                            <button
+                              onClick={() =>
+                                handleStatusChangeApiCall(
+                                  approval._id,
+                                  "Approved"
+                                )
+                              }
+                              className="px-3 py-1 text-[16px] font-medium rounded-full bg-green-200 text-green-800 hover:bg-green-300"
+                            >
+                              Approved
+                            </button>
+                          )}
+                        </div>
+
+                        {/* View */}
+                        <div onClick={() => handleView(approval)} className="flex cursor-pointer justify-end text-amber-600">
+                          <Eye size={18} />
                         </div>
                       </div>
-
-                      {/* Date */}
-                      <div className="text-gray-500">{formatDate(approval.date)}</div>
-
-                      {/* Actions */}
-                      <div className="flex justify-end gap-2">
-                        <button className="px-3 py-1 text-xs font-medium rounded-full bg-green-200 text-green-800 hover:bg-green-300">
-                          Approved
-                        </button>
-                        <button className="px-3 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800 hover:bg-yellow-200">
-                          Pending
-                        </button>
-                        <button className="px-3 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800 hover:bg-red-200">
-                          Hold
-                        </button>
-                      </div>
-                    </div>
-                  ))
-                )}
+                    ))
+                  )}
+                </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -310,7 +362,8 @@ const PurchaseApproval = () => {
                 </div>
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Items with Quantity <span className="text-newPrimary">*</span>
+                    Items with Quantity{" "}
+                    <span className="text-newPrimary">*</span>
                   </label>
                   <input
                     type="text"
@@ -339,11 +392,23 @@ const PurchaseApproval = () => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                 >
-                  {loading ? "Saving..." : editingApproval ? "Update Approval" : "Save Approval"}
+                  {loading
+                    ? "Saving..."
+                    : editingApproval
+                    ? "Update Approval"
+                    : "Save Approval"}
                 </button>
               </form>
             </div>
           </div>
+        )}
+
+        {/* Show popup only if isView is true */}
+        {isView && selectedRequisition && (
+          <ViewModel
+            requisition={selectedRequisition} // ✅ pass as prop
+            onClose={() => setisView(false)}
+          />
         )}
 
         <style jsx>{`
