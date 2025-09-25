@@ -18,16 +18,34 @@ const Departments = () => {
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/departments`;
-  // Slider animation
+
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
+
   // Fetch Department list
   const fetchDepartmentList = useCallback(async () => {
     try {
@@ -224,24 +242,24 @@ const Departments = () => {
 
       {/* Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full max-w-md bg-white p-6 h-full overflow-y-auto custom-scrollbar"
+            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
                 {isEdit ? "Update Department" : "Add a New Department"}
               </h2>
               <button
-                className="text-2xl text-gray-500 hover:text-gray-700"
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                 onClick={() => setIsSliderOpen(false)}
               >
                 ×
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 p-4 md:p-6">
               <div>
                 <label className="block text-gray-700 font-medium">
                   Department <span className="text-newPrimary">*</span>

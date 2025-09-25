@@ -362,7 +362,7 @@ const ItemType = () => {
               </button>
             </div>
 
-            <div className="p-6 bg-white rounded-xl shadow-md space-y-4">
+            <div className="p-4 md:p-6 bg-white rounded-xl shadow-md space-y-4">
               {/* Item Category */}
               <div>
                 <label className="block text-gray-700 font-medium">

@@ -419,12 +419,12 @@ const SupplierList = () => {
 
       {/* Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
                 {isEdit ? "Update Supplier" : "Add a New Supplier"}
               </h2>
@@ -452,7 +452,7 @@ const SupplierList = () => {
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-4 p-4 md:p-6">
               {/* Supplier Fields */}
               <div>
                 <label className="block text-gray-700 font-medium">

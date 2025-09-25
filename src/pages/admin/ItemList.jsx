@@ -45,18 +45,32 @@ const ItemList = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [itemTypeList, setItemTypeList] = useState([]);
 
-
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-
-  // Slider animation
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
 
@@ -101,12 +115,14 @@ const ItemList = () => {
   // Fetch itemTypes when category changes
   useEffect(() => {
     if (!itemCategory) return; // only call when category selected
-   console.log(itemCategory);
-   
+    console.log(itemCategory);
+
     const fetchItemTypes = async () => {
       try {
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/item-type/category/${itemCategory}`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/item-type/category/${itemCategory}`
         );
         setItemTypeList(res.data);
       } catch (error) {
@@ -116,9 +132,6 @@ const ItemList = () => {
 
     fetchItemTypes();
   }, [itemCategory]);
-
-
-
 
   // Item Unit List Fetch
   const fetchItemUnitList = useCallback(async () => {
@@ -228,7 +241,7 @@ const ItemList = () => {
     const formData = new FormData();
 
     formData.append("itemCategory", itemCategory); // ✅ ObjectId
-    formData.append("itemType", itemType);         // ✅ ObjectId
+    formData.append("itemType", itemType); // ✅ ObjectId
     formData.append("itemName", itemName);
     // formData.append("details", details);
     formData.append("manufacturer", manufacture);
@@ -419,7 +432,6 @@ const ItemList = () => {
   //   return str.charAt(0).toUpperCase() + str.slice(1);
   // }
 
-
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
@@ -427,7 +439,6 @@ const ItemList = () => {
       <div className="flex justify-between items-center mt-6 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Items List</h1>
-
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-primaryDark"
@@ -522,17 +533,17 @@ const ItemList = () => {
 
       {/* Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-1/3 bg-white p-6 h-full overflow-y-auto shadow-lg"
+            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
                 {isEdit ? "Update Item" : "Add a New Item"}
               </h2>
               <button
-                className="text-gray-500 hover:text-gray-800 text-2xl"
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                 onClick={() => {
                   setIsSliderOpen(false);
                   setIsEdit(false);
@@ -560,7 +571,7 @@ const ItemList = () => {
               </button>
             </div>
 
-            <div className="p-6 bg-white rounded-xl shadow-md space-y-4">
+            <div className="p-4 md:p-6 bg-white rounded-xl shadow-md space-y-4">
               {/* Item Category */}
               <div>
                 <label className="block text-gray-700 font-medium">
@@ -593,7 +604,6 @@ const ItemList = () => {
                   className={`w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200 
       ${!itemCategory ? "bg-gray-100 cursor-not-allowed" : ""}`}
                   onChange={(e) => setItemType(e.target.value)}
-
                 >
                   <option value="">Select Item Type</option>
                   {itemTypeList.map((type) => (
@@ -603,7 +613,6 @@ const ItemList = () => {
                   ))}
                 </select>
               </div>
-
 
               {/* Manufacture */}
               <div>
@@ -698,7 +707,6 @@ const ItemList = () => {
                   ))}
                 </select>
               </div>
-
 
               {/* Purchase */}
               <div>
@@ -823,7 +831,6 @@ const ItemList = () => {
               {/* Conditionally show expiry date field */}
               {expiryOption === "HasExpiry" && (
                 <div className="mt-3">
-
                   <input
                     type="number"
                     value={expiryDay}
@@ -909,12 +916,14 @@ const ItemList = () => {
                 <button
                   type="button"
                   onClick={() => setEnabled(!enabled)}
-                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${enabled ? "bg-green-500" : "bg-gray-300"
-                    }`}
+                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${
+                    enabled ? "bg-green-500" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${enabled ? "translate-x-7" : "translate-x-0"
-                      }`}
+                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                      enabled ? "translate-x-7" : "translate-x-0"
+                    }`}
                   />
                 </button>
               </div>
