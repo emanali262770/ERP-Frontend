@@ -28,6 +28,7 @@ const PromotionItem = () => {
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [itemSearch, setItemSearch] = useState("");
 
+
   const [isEnable, setIsEnable] = useState(true);
   const sliderRef = useRef(null);
 
@@ -49,6 +50,7 @@ const PromotionItem = () => {
       setLoading(true);
 
       // Fetch all necessary data first
+
       const [promotionsRes, categoriesRes, itemTypesRes, promotionItemsRes] =
         await Promise.all([
           axios.get(`${import.meta.env.VITE_API_BASE_URL}/promotion`),
@@ -57,10 +59,12 @@ const PromotionItem = () => {
           axios.get(API_URL),
         ]);
 
+
       setPromotionList(promotionsRes.data);
       setCategoryList(categoriesRes.data);
       setItemTypeList(itemTypesRes.data);
       // Map promotion items with proper names
+
       const itemsWithNames = promotionItemsRes.data.map((item) => {
         const promotion =
           promotionsRes.data.find((p) => p._id === item.promotion) || {};
@@ -68,6 +72,7 @@ const PromotionItem = () => {
           categoriesRes.data.find((c) => c._id === item.category) || {};
         const itemType =
           itemTypesRes.data.find((it) => it._id === item.itemType) || {};
+
 
         return {
           ...item,
@@ -80,7 +85,9 @@ const PromotionItem = () => {
         };
       });
 
+
       setPromotionItems(itemsWithNames);
+
     } catch (error) {
       console.error("Failed to fetch data", error);
       // Fallback to static data if API fails
@@ -119,6 +126,7 @@ const PromotionItem = () => {
     fetchAllData();
   }, [fetchAllData]);
 
+
   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
@@ -143,6 +151,7 @@ const PromotionItem = () => {
           }
         },
       });
+
     }
   }, [isSliderOpen]);
 
@@ -173,6 +182,7 @@ const PromotionItem = () => {
     { id: 7, itemName: "Samsung", price: "$1,000" },
   ];
 
+
   const filterdata = items.filter((item) => {
     return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
   });
@@ -191,6 +201,7 @@ const PromotionItem = () => {
     setIsSliderOpen(true);
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmedName = promotionName.trim();
@@ -200,6 +211,7 @@ const PromotionItem = () => {
       return;
     }
 
+
     setLoading(true);
 
     // 🔹 Full payload with new fields
@@ -208,14 +220,18 @@ const PromotionItem = () => {
       category: selectedCategory,
       itemType: selectedItemType,
       items: items
+
         .filter((i) => checkedItems.includes(i._id)) // ✅ filter by _id, not id
+
         .map((i) => ({ _id: i._id, itemName: i.itemName, price: i.price })),
       discountPercentage,
       details,
       startDate,
       endDate,
+
       isEnable,
     };
+
 
     try {
       let res;
@@ -333,6 +349,7 @@ const PromotionItem = () => {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
+
       <CommanHeader />
       <div className="px-6 mx-auto">
         {/* Top bar */}
@@ -366,6 +383,7 @@ const PromotionItem = () => {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
+
                 {loading ? (
                   // Skeleton shown while loading
                   <TableSkeleton
@@ -440,6 +458,7 @@ const PromotionItem = () => {
                     </div>
                   ))
                 )}
+
               </div>
             </div>
           </div>
@@ -447,7 +466,12 @@ const PromotionItem = () => {
 
         {/* Slider */}
         {isSliderOpen && (
+<<<<<<< HEAD
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+=======
+
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
             <div
               ref={sliderRef}
               className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
@@ -460,6 +484,7 @@ const PromotionItem = () => {
                 </h2>
                 <button
                   className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                   onClick={() => {
                     setIsSliderOpen(false);
                     setPromotionName("");
@@ -484,6 +509,21 @@ const PromotionItem = () => {
                   Promotion on Item
                 </h3>
 
+
+                {/* Promotion Name */}
+                {/* <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Promotion Name
+                  </label>
+                  <input
+                    type="text"
+                    value={promotionName}
+                    onChange={(e) => setPromotionName(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter promotion name"
+                  />
+                </div> */}
+
                 {/* Promotion Select */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
@@ -496,10 +536,12 @@ const PromotionItem = () => {
                   >
                     <option value="">-- Select Promotion --</option>
                     {promotionList.map((promo) => (
+
                       <option
                         key={promo._id || promo.id}
                         value={promo._id || promo.id}
                       >
+
                         {promo.promotionName || promo.name}
                       </option>
                     ))}
@@ -541,6 +583,7 @@ const PromotionItem = () => {
                         key={type._id || type.id}
                         value={type._id || type.id}
                       >
+
                         {type.itemTypeName || type.name}
                       </option>
                     ))}
@@ -570,6 +613,7 @@ const PromotionItem = () => {
                 </div>
 
                 {/* Item List */}
+
                 <div className="w-full border rounded-lg shadow p-4 max-h-60 overflow-y-auto">
                   <ul className="space-y-3">
                     {filterdata.map((item) => (
@@ -586,10 +630,12 @@ const PromotionItem = () => {
                           value={item._id}
                           className="h-5 w-5 accent-blue-600 rounded-sm"
                         />
+
                       </li>
                     ))}
                   </ul>
                 </div>
+
 
                 {/* Discount Percentage */}
                 <div>
@@ -605,6 +651,34 @@ const PromotionItem = () => {
                     placeholder="Enter discount percentage"
                   />
                 </div>
+
+
+                {/* Start Date
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Start Date
+                  </label>
+                  <input
+                    type="date"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                  />
+                </div> */}
+
+                {/* End Date */}
+                {/* <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    End Date
+                  </label>
+                  <input
+                    type="date"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                  />
+                </div> */}
+
 
                 {/* Status */}
                 <div>
@@ -627,11 +701,8 @@ const PromotionItem = () => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
                 >
-                  {loading
-                    ? "Saving..."
-                    : editingPromotionItem
-                    ? "Update Promotion Item"
-                    : "Save Promotion Item"}
+
+                  {loading ? "Saving..." : editingPromotionItem ? "Update Promotion Item" : "Save Promotion Item"}
                 </button>
               </form>
             </div>
@@ -640,6 +711,8 @@ const PromotionItem = () => {
       </div>
     </div>
   );
-};
+
+}
 
 export default PromotionItem;
+

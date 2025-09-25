@@ -57,6 +57,7 @@ const SupplierList = () => {
           }
         },
       });
+
     }
   }, [isSliderOpen]);
 
@@ -95,6 +96,8 @@ const SupplierList = () => {
     setNtn("");
     setGst("");
     setCreditLimit("");
+
+
     setStatus(true);
   };
 
@@ -149,12 +152,16 @@ const SupplierList = () => {
       if (isEdit && editId) {
         res = await axios.put(`${API_URL}/${editId}`, formData, { headers });
 
-        toast.success("✅ Supplier updated successfully");
+
+        toast.success(" Supplier updated successfully");
+
       } else {
         res = await axios.post(`${API_URL}`, formData, { headers });
 
         setSupplierList([...supplierList, res.data]);
-        toast.success("✅ Supplier added successfully");
+
+        toast.success("Supplier added successfully");
+
       }
       fetchSuppliersList();
       setSupplierName("");
@@ -168,13 +175,14 @@ const SupplierList = () => {
       setNtn("");
       setGst("");
       setCreditLimit("");
+      setCreditTime("")
       setStatus(true);
       setIsSliderOpen(false);
       setIsEdit(false);
       setEditId(null);
     } catch (error) {
       console.error(error);
-      toast.error(`❌ ${isEdit ? "Update" : "Add"} supplier failed`);
+      toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
 
@@ -341,9 +349,11 @@ const SupplierList = () => {
                       </div>
                       <div className=" font-semibold">
                         {s.status ? (
-                          <span className="text-green-600">Active</span>
+
+                          <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Active</span>
                         ) : (
-                          <span className="text-red-600">Inactive</span>
+                          <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Inactive</span>
+
                         )}
                       </div>
                       {userInfo?.isAdmin && (
@@ -419,17 +429,28 @@ const SupplierList = () => {
 
       {/* Slider */}
       {isSliderOpen && (
+<<<<<<< HEAD
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
             className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+=======
+
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+          <div
+            ref={sliderRef}
+            className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
                 {isEdit ? "Update Supplier" : "Add a New Supplier"}
               </h2>
               <button
+
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                 onClick={() => {
                   setIsSliderOpen(false);
                   setIsEdit(false);
@@ -465,8 +486,7 @@ const SupplierList = () => {
                   onChange={(e) => setSupplierName(e.target.value)}
                   className="w-full p-2 border rounded"
                 />
-              </div>
-
+              </div>n
               <div>
                 <label className="block text-gray-700 font-medium">
                   Phone Number <span className="text-newPrimary">*</span>
@@ -480,7 +500,6 @@ const SupplierList = () => {
                   placeholder="e.g. +1-212-555-1234"
                 />
               </div>
-
               <div>
                 <label className="block text-gray-700 font-medium">
                   Mobile Number <span className="text-newPrimary">*</span>
@@ -533,7 +552,7 @@ const SupplierList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-
+              
               <div>
                 <label className="block text-gray-700 font-medium">
                   Designation <span className="text-newPrimary">*</span>
@@ -577,6 +596,7 @@ const SupplierList = () => {
               </div>
 
               {/* Payment Terms */}
+
               <div>
                 <label className="block text-gray-700 font-medium">
                   Payment Terms <span className="text-newPrimary">*</span>
@@ -637,6 +657,7 @@ const SupplierList = () => {
               )}
 
               {/* Status */}
+
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button
@@ -655,7 +676,9 @@ const SupplierList = () => {
                 <span>{status ? "Active" : "Inactive"}</span>
               </div>
 
+
               {/* Save Button */}
+
               <button
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}

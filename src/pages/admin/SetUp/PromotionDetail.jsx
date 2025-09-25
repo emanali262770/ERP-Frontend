@@ -23,7 +23,9 @@ const Promotion = () => {
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/promotion`;
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
+
   const formatDate = (date) => {
+
     if (!date) return "";
     return new Date(date).toISOString().split("T")[0];
   };
@@ -63,6 +65,7 @@ const Promotion = () => {
   }, [API_URL]);
 
   useEffect(() => {
+
     fetchPromotionList();
   }, [fetchPromotionList]);
 
@@ -90,6 +93,7 @@ const Promotion = () => {
           }
         },
       });
+
     }
   }, [isSliderOpen]);
 
@@ -110,6 +114,7 @@ const Promotion = () => {
     setIsEnable(promotion.isEnable);
     setDetails(promotion.details || "");
     setStartDate(formatDate(promotion.startDate));
+
     setEndDate(formatDate(promotion.endDate));
     setIsSliderOpen(true);
   };
@@ -123,7 +128,7 @@ const Promotion = () => {
     // };
 
     if (!trimmedName) {
-      toast.error("❌ Promotion name cannot be empty.");
+      toast.error("Promotion name cannot be empty.");
       return;
     }
 
@@ -154,14 +159,14 @@ const Promotion = () => {
           promotions.map((p) => (p._id === editingPromotion._id ? res.data : p))
         );
 
-        toast.success("✅ Promotion updated successfully");
+        toast.success("Promotion updated successfully");
       } else {
         // ✅ Add new promotion
         res = await axios.post(API_URL, formData, { headers });
 
         setPromotions([...promotions, res.data]);
 
-        toast.success("✅ Promotion added successfully");
+        toast.success("Promotion added successfully");
       }
 
       // Reset form state
@@ -179,6 +184,7 @@ const Promotion = () => {
       );
     }
   };
+
 
   const handleToggleEnable = async (promotion) => {
     setPromotions(
@@ -251,6 +257,7 @@ const Promotion = () => {
       });
   };
 
+
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       {/* Common header */}
@@ -273,6 +280,7 @@ const Promotion = () => {
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[800px]">
+
               {/* ✅ Table Header */}
               <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>Promotion Name</div>
@@ -284,6 +292,7 @@ const Promotion = () => {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
+
                 {loading ? (
                   <TableSkeleton
                     rows={3}
@@ -351,13 +360,19 @@ const Promotion = () => {
                     </div>
                   ))
                 )}
+
               </div>
             </div>
           </div>
         </div>
 
         {isSliderOpen && (
+<<<<<<< HEAD
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+=======
+
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
             <div
               ref={sliderRef}
               className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
@@ -370,6 +385,7 @@ const Promotion = () => {
                 </h2>
                 <button
                   className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                   onClick={() => {
                     setIsSliderOpen(false);
                     setPromotionName("");
@@ -473,11 +489,13 @@ const Promotion = () => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
                 >
+
                   {loading
                     ? "Saving..."
                     : editingPromotion
                     ? "Update Promotion"
                     : "Save Promotion"}
+
                 </button>
               </form>
             </div>
@@ -505,4 +523,6 @@ const Promotion = () => {
   );
 };
 
+
 export default Promotion;
+

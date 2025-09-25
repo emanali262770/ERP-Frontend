@@ -5,7 +5,9 @@ import axios from "axios";
 import { HashLoader } from "react-spinners";
 import Swal from "sweetalert2";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+
 import { FiSearch, FiPlus, FiKey } from "react-icons/fi";
+
 import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "../Skeleton";
@@ -46,6 +48,7 @@ const Users = () => {
     setIsChangePassword(false);
     setIsSliderOpen(true);
   };
+
 
   // GSAP Animation for Modal
   useEffect(() => {
@@ -361,9 +364,9 @@ const Users = () => {
               {loading ? (
                 // Skeleton shown while loading
                 <TableSkeleton
-                  rows={
-                    filteredUserList.length > 0 ? filteredUserList.length : 5
-                  }
+
+                  rows={filteredUserList.length>0?filteredUserList.length:5}
+
                   cols={userInfo?.isAdmin ? 7 : 6}
                   className="lg:grid-cols-7"
                 />
@@ -481,6 +484,7 @@ const Users = () => {
         </div>
       </div>
 
+
       {isSliderOpen && (
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
@@ -493,6 +497,7 @@ const Users = () => {
               </h2>
               <button
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;

@@ -88,7 +88,9 @@ const Designation = () => {
         designationName: designation,
       };
 
-      if (isEdit && editId) {
+
+      if (isEdit&&editId) {
+
         const res = await axios.put(`${API_URL}/${editId}`, newDesg, {
           headers,
         });
@@ -114,7 +116,9 @@ const Designation = () => {
     setIsSliderOpen(true);
   };
 
-  const handleDelete = async (id) => {
+
+  const handleDelete =async (id) => {
+
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -136,7 +140,9 @@ const Designation = () => {
         cancelButtonText: "No, cancel!",
         reverseButtons: true,
       })
-      .then(async (result) => {
+
+      .then(async(result) => {
+
         if (result.isConfirmed) {
           try {
             await axios.delete(`${API_URL}/${id}`, {
@@ -159,6 +165,8 @@ const Designation = () => {
               "error"
             );
           }
+
+ 
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
             "Cancelled",
@@ -202,11 +210,9 @@ const Designation = () => {
             {/* Table Body */}
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
-                <TableSkeleton
-                  rows={designationList.length || 5}
-                  cols={3}
-                  className="lg:grid-cols-[80px_1fr_auto]"
-                />
+
+                <TableSkeleton rows={designationList.length || 5} cols={3} className="lg:grid-cols-[80px_1fr_auto]"/>
+
               ) : designationList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No designations found.

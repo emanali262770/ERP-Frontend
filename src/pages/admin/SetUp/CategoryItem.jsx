@@ -66,6 +66,7 @@ const Category = () => {
           }
         },
       });
+
     }
   }, [isSliderOpen]);
 
@@ -379,17 +380,24 @@ const Category = () => {
         </div>
 
         {isSliderOpen && (
+
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
               className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
+<<<<<<< HEAD
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
+=======
+              <div className="flex justify-between items-center mb-4 border-b pb-2">
+
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingCategory ? "Update Category" : "Add a New Category"}
                 </h2>
                 <button
                   className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                   onClick={() => {
                     setIsSliderOpen(false);
                     setCategoryName("");
@@ -401,16 +409,24 @@ const Category = () => {
                 </button>
               </div>
 
+<<<<<<< HEAD
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
+=======
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
+
                     Category Name <span className="text-newPrimary">*</span>
                   </label>
                   <input
                     type="text"
                     value={categoryName}
                     onChange={(e) => setCategoryName(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+
+                    className="w-full p-4 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+
                     placeholder="e.g. Electronics, Clothes"
                     required
                   />
@@ -442,10 +458,12 @@ const Category = () => {
                   </div>
                 </div>
 
+
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
+
                 >
                   {loading ? "Saving..." : "Save Category"}
                 </button>
