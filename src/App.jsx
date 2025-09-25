@@ -24,7 +24,7 @@ import SalesInvoice from "./pages/admin/SalesInvoice";
 import ExpiryTags from "./pages/admin/ExpiryTags";
 import BookingOrder from "./pages/admin/BookingOrder";
 
-import ItemUnit from './pages/admin/SetUp/ItemUnit.jsx';
+import ItemUnit from "./pages/admin/SetUp/ItemUnit.jsx";
 
 import Company from "./pages/admin/Company";
 import Users from "./pages/admin/Security/Users.jsx";

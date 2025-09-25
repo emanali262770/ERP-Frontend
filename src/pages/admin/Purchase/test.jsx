@@ -293,7 +293,7 @@ const Estimation = () => {
                     <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
                         <div className="min-w-[1200px]">
                             {/* Table Header */}
-                            <div className="hidden lg:grid grid-cols-9 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                            <div className="hidden lg:grid grid-cols-[1fr_1fr_3fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                                 <div>Estimation ID</div>
                                 <div>Supplier</div>
                                 <div>Items</div>
@@ -311,7 +311,7 @@ const Estimation = () => {
                                     <TableSkeleton
                                         rows={3}
                                         cols={9}
-                                        className="lg:grid-cols-9"
+                                        className="lg:grid-cols-[1fr_1fr_3fr_1fr_1fr_1fr_1fr_1fr_1fr]"
                                     />
                                 ) : estimations.length === 0 ? (
                                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -321,7 +321,7 @@ const Estimation = () => {
                                     estimations.map((estimation) => (
                                         <div
                                             key={estimation._id}
-                                            className="grid grid-cols-1 lg:grid-cols-9 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                                            className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_3fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                                         >
                                             <div className="font-medium text-gray-900">{estimation.estimationId}</div>
                                             <div className="text-gray-600">{estimation.supplier}</div>
@@ -430,21 +430,26 @@ const Estimation = () => {
                                 </div>
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Date <span className="text-red-500">*</span>
+                                        Supplier <span className="text-red-500">*</span>
                                     </label>
-                                    <input
-                                        type="date"
-                                        value={date}
-                                        onChange={(e) => setDate(e.target.value)}
+                                    <select
+                                        value={supplier}
+                                        onChange={(e) => setSupplier(e.target.value)}
                                         className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                                            errors.date
+                                            errors.supplier
                                                 ? "border-red-500 focus:ring-red-500"
                                                 : "border-gray-300 focus:ring-newPrimary"
                                         }`}
                                         required
-                                    />
-                                    {errors.date && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+                                    >
+                                        <option value="">Select Supplier</option>
+                                        <option value="ABC Corp">ABC Corp</option>
+                                        <option value="XYZ Ltd">XYZ Ltd</option>
+                                        <option value="Tech Solutions">Tech Solutions</option>
+                                        <option value="Global Supplies">Global Supplies</option>
+                                    </select>
+                                    {errors.supplier && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
                                     )}
                                 </div>
                                 <div>
@@ -500,29 +505,23 @@ const Estimation = () => {
                                 )}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Supplier <span className="text-red-500">*</span>
+                                        Date <span className="text-red-500">*</span>
                                     </label>
-                                    <select
-                                        value={supplier}
-                                        onChange={(e) => setSupplier(e.target.value)}
+                                    <input
+                                        type="date"
+                                        value={date}
+                                        onChange={(e) => setDate(e.target.value)}
                                         className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                                            errors.supplier
+                                            errors.date
                                                 ? "border-red-500 focus:ring-red-500"
                                                 : "border-gray-300 focus:ring-newPrimary"
                                         }`}
                                         required
-                                    >
-                                        <option value="">Select Supplier</option>
-                                        <option value="ABC Corp">ABC Corp</option>
-                                        <option value="XYZ Ltd">XYZ Ltd</option>
-                                        <option value="Tech Solutions">Tech Solutions</option>
-                                        <option value="Global Supplies">Global Supplies</option>
-                                    </select>
-                                    {errors.supplier && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                                    />
+                                    {errors.date && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.date}</p>
                                     )}
                                 </div>
-                                
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Status <span className="text-red-500">*</span>
