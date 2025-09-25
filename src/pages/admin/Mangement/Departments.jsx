@@ -51,14 +51,10 @@ const Departments = () => {
     }
   }, [isSliderOpen]);
 
-<<<<<<< HEAD
+
   // Fetch Department list
   const fetchDepartmentList = useCallback(async () => {
-=======
-// Fetch Department list
-   const fetchDepartmentList = useCallback(async () => {
 
->>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);

@@ -466,12 +466,9 @@ const PromotionItem = () => {
 
         {/* Slider */}
         {isSliderOpen && (
-<<<<<<< HEAD
-          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
-=======
 
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
->>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
+          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+
             <div
               ref={sliderRef}
               className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"

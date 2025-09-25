@@ -386,12 +386,8 @@ const Category = () => {
               ref={sliderRef}
               className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
-<<<<<<< HEAD
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
-=======
-              <div className="flex justify-between items-center mb-4 border-b pb-2">
 
->>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingCategory ? "Update Category" : "Add a New Category"}
                 </h2>
@@ -409,12 +405,8 @@ const Category = () => {
                 </button>
               </div>
 
-<<<<<<< HEAD
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-=======
 
-              <form onSubmit={handleSubmit} className="space-y-4">
->>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
 
