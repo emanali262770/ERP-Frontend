@@ -328,8 +328,12 @@ const ShelveLocation = () => {
                 &times;
               </button>
             </div>
+<<<<<<< HEAD
+            <div className="p-4 md:p-6 bg-white rounded-xl shadow-md space-y-4">
+=======
 
             <div className="p-6 bg-white rounded-xl shadow-md space-y-4">
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
               {/* Shelf Name / Code */}
               <div>
                 <label className="block text-gray-700 font-medium">

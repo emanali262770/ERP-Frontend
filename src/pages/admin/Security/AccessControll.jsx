@@ -411,7 +411,7 @@ const ModulesFunctionalities = () => {
                 &times;
               </button>
             </div>
-            <div className="p-6 space-y-4">
+            <div className="p-4 md:p-6 space-y-4">
               <div>
 
                 <label className="block text-sm font-medium text-gray-900 mb-1">Group</label>
