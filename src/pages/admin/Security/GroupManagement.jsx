@@ -71,27 +71,31 @@ const GroupManagement = () => {
     group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // GSAP Animation for Slider
+
+   // GSAP Animation for Modal
   useEffect(() => {
-    if (sliderRef.current) {
-      if (isSliderOpen) {
-        sliderRef.current.style.display = "block";
-        gsap.fromTo(
-          sliderRef.current,
-          { x: "100%", opacity: 0 },
-          { x: "0%", opacity: 1, duration: 0.5, ease: "power2.out" }
-        );
-      } else {
-        gsap.to(sliderRef.current, {
-          x: "100%",
-          opacity: 0,
-          duration: 0.5,
-          ease: "power2.in",
-          onComplete: () => {
-            sliderRef.current.style.display = "none";
-          },
-        });
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
       }
+      gsap.fromTo(
+        sliderRef.current,
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+      );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
     }
   }, [isSliderOpen]);
 
@@ -435,6 +439,7 @@ const GroupManagement = () => {
         </div>
       </div>
 
+
       {/* Right-Side Slider */}
       {isSliderOpen && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
@@ -453,6 +458,7 @@ const GroupManagement = () => {
                   setSelectedFunctionalities([]);
                   setEditId(null);
                 }}
+
               >
                 &times;
               </button>

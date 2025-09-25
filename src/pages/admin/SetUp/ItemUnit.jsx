@@ -25,14 +25,32 @@ const ItemUnit = () => {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-  // Slider animation
+
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
+
     }
   }, [isSliderOpen]);
 
@@ -278,26 +296,22 @@ const ItemUnit = () => {
         </div>
       </div>
 
-      {/* Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-1/3 bg-white p-6 h-full overflow-y-auto shadow-lg"
+            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
-                {isEdit ? "Update Item Unit" : "Add a New Item Unit"}
+                {isEdit ? "Edit Right" : "Add a New Item Unit"}
               </h2>
               <button
-                className="text-gray-500 hover:text-gray-700"
-                onClick={() => {
-                  setIsSliderOpen(false);
-                  setIsEdit(false);
-                  setEditId(null);
-                }}
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+                onClick={() => setIsSliderOpen(false)}
               >
-                ×
+                &times;
+
               </button>
             </div>
 

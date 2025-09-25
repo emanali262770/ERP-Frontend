@@ -110,8 +110,7 @@ const Manufacture = () => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       };
-
-
+      
       if (isEdit && editId) {
         // 🔄 Update existing category
         const res = await axios.put(`${API_URL}/${editId}`, formData, {
@@ -251,6 +250,7 @@ const Manufacture = () => {
       {/* Manufacturer Table */}
 
 
+
     <div className="rounded-xl border border-gray-200 overflow-hidden">
   <div className="overflow-x-auto">
     <div className="min-w-[900px]">
@@ -376,7 +376,9 @@ const Manufacture = () => {
                 {isEdit ? "Update Manufacturer" : "Add a New Manufacturer"}
               </h2>
               <button
-                className="text-2xl text-gray-500 hover:text-gray-700"
+
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                 onClick={() => {
                   setIsSliderOpen(false);
                   setIsEdit(false);
@@ -388,8 +390,7 @@ const Manufacture = () => {
                   setPersonName("");
                   setMobileNumber("");
                   setDesignation("");
-                  
-               
+
                   setEmail("");
                   setStatus(true);
                 }}
@@ -480,12 +481,16 @@ const Manufacture = () => {
                 <button
                   type="button"
                   onClick={() => setStatus(!status)}
-                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${status ? "bg-green-500" : "bg-gray-300"
-                    }`}
+
+                  className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${
+                    status ? "bg-green-500" : "bg-gray-300"
+                  }`}
                 >
                   <div
-                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${status ? "translate-x-7" : "translate-x-0"
-                      }`}
+                    className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
+                      status ? "translate-x-7" : "translate-x-0"
+                    }`}
+
                   />
                 </button>
                 <span>{status ? "Active" : "Inactive"}</span>
@@ -495,7 +500,7 @@ const Manufacture = () => {
                 onClick={handleSave}
               >
                 {isEdit ? "Update Manufacturer" : "Save Manufacturer"}
-                
+
               </button>
             </div>
           </div>
