@@ -24,7 +24,8 @@ const Promotion = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
 
-    const formatDate = (date) => {
+  const formatDate = (date) => {
+
     if (!date) return "";
     return new Date(date).toISOString().split("T")[0];
   };
@@ -64,18 +65,35 @@ const Promotion = () => {
   }, [API_URL]);
 
   useEffect(() => {
-  fetchPromotionList();
-}, [fetchPromotionList]);
 
+    fetchPromotionList();
+  }, [fetchPromotionList]);
 
-  // Slider animation
+  // GSAP Animation for Modal
   useEffect(() => {
-    if (isSliderOpen && sliderRef.current) {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
       gsap.fromTo(
         sliderRef.current,
-        { x: "100%", opacity: 0 },
-        { x: "0%", opacity: 1, duration: 1.2, ease: "expo.out" }
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
+
     }
   }, [isSliderOpen]);
 
@@ -96,73 +114,76 @@ const Promotion = () => {
     setIsEnable(promotion.isEnable);
     setDetails(promotion.details || "");
     setStartDate(formatDate(promotion.startDate));
-  setEndDate(formatDate(promotion.endDate));
+
+    setEndDate(formatDate(promotion.endDate));
     setIsSliderOpen(true);
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  const trimmedName = promotionName.trim();
-  // const formatDate = (date) => {
-  //   if (!date) return "";
-  //   return new Date(date).toISOString().split("T")[0];
-  // };
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const trimmedName = promotionName.trim();
+    // const formatDate = (date) => {
+    //   if (!date) return "";
+    //   return new Date(date).toISOString().split("T")[0];
+    // };
 
-  if (!trimmedName) {
-    toast.error("❌ Promotion name cannot be empty.");
-    return;
-  }
-
-  const formData = {
-    promotionName: trimmedName,
-    details,
-    startDate,
-    endDate,
-    isEnable,
-  };
-
-  try {
-    const { token } = userInfo || {};
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
-
-    let res;
-
-    if (editingPromotion) {
-      // ✅ Update existing promotion
-      res = await axios.put(`${API_URL}/${editingPromotion._id}`, formData, { headers });
-
-      setPromotions(
-        promotions.map((p) =>
-          p._id === editingPromotion._id ? res.data : p
-        )
-      );
-
-      toast.success("✅ Promotion updated successfully");
-    } else {
-      // ✅ Add new promotion
-      res = await axios.post(API_URL, formData, { headers });
-
-      setPromotions([...promotions, res.data]);
-
-      toast.success("✅ Promotion added successfully");
+    if (!trimmedName) {
+      toast.error("Promotion name cannot be empty.");
+      return;
     }
 
-    // Reset form state
-    setPromotionName("");
-    setDetails("");
-    setStartDate("");
-    setEndDate("");
-    setIsEnable(true);
-    setEditingPromotion(null);
-    setIsSliderOpen(false);
-  } catch (error) {
-    console.error("Save failed:", error);
-    toast.error(`❌ Failed to ${editingPromotion ? "update" : "add"} promotion`);
-  }
-};
+    const formData = {
+      promotionName: trimmedName,
+      details,
+      startDate,
+      endDate,
+      isEnable,
+    };
+
+    try {
+      const { token } = userInfo || {};
+      const headers = {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      };
+
+      let res;
+
+      if (editingPromotion) {
+        // ✅ Update existing promotion
+        res = await axios.put(`${API_URL}/${editingPromotion._id}`, formData, {
+          headers,
+        });
+
+        setPromotions(
+          promotions.map((p) => (p._id === editingPromotion._id ? res.data : p))
+        );
+
+        toast.success("Promotion updated successfully");
+      } else {
+        // ✅ Add new promotion
+        res = await axios.post(API_URL, formData, { headers });
+
+        setPromotions([...promotions, res.data]);
+
+        toast.success("Promotion added successfully");
+      }
+
+      // Reset form state
+      setPromotionName("");
+      setDetails("");
+      setStartDate("");
+      setEndDate("");
+      setIsEnable(true);
+      setEditingPromotion(null);
+      setIsSliderOpen(false);
+    } catch (error) {
+      console.error("Save failed:", error);
+      toast.error(
+        `❌ Failed to ${editingPromotion ? "update" : "add"} promotion`
+      );
+    }
+  };
 
 
   const handleToggleEnable = async (promotion) => {
@@ -176,67 +197,65 @@ const handleSubmit = async (e) => {
     );
   };
 
-const handleDelete = async (id) => {
-  const swalWithTailwindButtons = Swal.mixin({
-    customClass: {
-      actions: "space-x-2",
-      confirmButton:
-        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-      cancelButton:
-        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-    },
-    buttonsStyling: false,
-  });
+  const handleDelete = async (id) => {
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
+    });
 
-  swalWithTailwindButtons
-    .fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const { token } = userInfo || {};
-          const headers = {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          };
+    swalWithTailwindButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const { token } = userInfo || {};
+            const headers = {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            };
 
-          // ✅ Delete from backend
-          await axios.delete(`${API_URL}/${id}`, { headers });
+            // ✅ Delete from backend
+            await axios.delete(`${API_URL}/${id}`, { headers });
 
-          // ✅ Update UI
-          setPromotions(promotions.filter((p) => p._id !== id));
+            // ✅ Update UI
+            setPromotions(promotions.filter((p) => p._id !== id));
 
+            swalWithTailwindButtons.fire(
+              "Deleted!",
+              "Promotion deleted successfully.",
+              "success"
+            );
+          } catch (error) {
+            console.error("Delete error:", error);
+            swalWithTailwindButtons.fire(
+              "Error!",
+              "Failed to delete promotion.",
+              "error"
+            );
+          }
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
-            "Deleted!",
-            "Promotion deleted successfully.",
-            "success"
-          );
-        } catch (error) {
-          console.error("Delete error:", error);
-          swalWithTailwindButtons.fire(
-            "Error!",
-            "Failed to delete promotion.",
+            "Cancelled",
+            "Promotion is safe 🙂",
             "error"
           );
         }
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        swalWithTailwindButtons.fire(
-          "Cancelled",
-          "Promotion is safe 🙂",
-          "error"
-        );
-      }
-    });
-};
-
-
+      });
+  };
 
 
   return (
@@ -273,71 +292,74 @@ const handleDelete = async (id) => {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
-              {loading ? (
-  <TableSkeleton 
-    rows={3} 
-    cols={5} 
-    className="lg:grid-cols-[1fr_1fr_1fr_1fr_auto]"
-  />
-) : promotions.length === 0 ? (
-  <div className="text-center py-4 text-gray-500 bg-white">
-    No promotions found.
-  </div>
-) : (
-  promotions.map((promotion) => (
-    <div
-      key={promotion._id}
-      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-    >
-      {/* Promotion Name */}
-      <div className="font-medium text-gray-900">
-        {promotion.promotionName}
-      </div>
 
-      {/* Details */}
-      <div className="text-gray-600 truncate">{promotion.details}</div>
+                {loading ? (
+                  <TableSkeleton
+                    rows={3}
+                    cols={5}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_auto]"
+                  />
+                ) : promotions.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No promotions found.
+                  </div>
+                ) : (
+                  promotions.map((promotion) => (
+                    <div
+                      key={promotion._id}
+                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      {/* Promotion Name */}
+                      <div className="font-medium text-gray-900">
+                        {promotion.promotionName}
+                      </div>
 
-      {/* Start Date */}
-      <div className="text-gray-500 text-end max-w-32">
-        {formatDate(promotion.startDate)}
-      </div>
+                      {/* Details */}
+                      <div className="text-gray-600 truncate">
+                        {promotion.details}
+                      </div>
 
-      {/* End Date */}
-      <div className="text-gray-500 text-end max-w-40">
-        {formatDate(promotion.endDate)}
-      </div>
+                      {/* Start Date */}
+                      <div className="text-gray-500 text-end max-w-32">
+                        {formatDate(promotion.startDate)}
+                      </div>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-2">
-        <button
-          onClick={() => handleEditClick(promotion)}
-          className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
-          title="Edit"
-        >
-          <SquarePen size={18}/>
-        </button>
-        <button
-          onClick={() => handleToggleEnable(promotion)}
-          className={`px-3 py-1 text-sm rounded ${
-            promotion.isEnable
-              ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-              : "bg-green-100 text-green-600 hover:bg-green-200"
-          }`}
-          title={promotion.isEnable ? "Disable" : "Enable"}
-        >
-          {promotion.isEnable ? "Disable" : "Enable"}
-        </button>
-        <button
-          onClick={() => handleDelete(promotion._id)}
-          className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
-          title="Delete"
-        >
-          <Trash2 size={18}/>
-        </button>
-      </div>
-    </div>
-  ))
-)}
+                      {/* End Date */}
+                      <div className="text-gray-500 text-end max-w-40">
+                        {formatDate(promotion.endDate)}
+                      </div>
+
+                      {/* Actions */}
+                      <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleEditClick(promotion)}
+                          className="px-3 py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
+                          title="Edit"
+                        >
+                          <SquarePen size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleToggleEnable(promotion)}
+                          className={`px-3 py-1 text-sm rounded ${
+                            promotion.isEnable
+                              ? "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                              : "bg-green-100 text-green-600 hover:bg-green-200"
+                          }`}
+                          title={promotion.isEnable ? "Disable" : "Enable"}
+                        >
+                          {promotion.isEnable ? "Disable" : "Enable"}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(promotion._id)}
+                          className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                          title="Delete"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
 
               </div>
             </div>
@@ -345,17 +367,21 @@ const handleDelete = async (id) => {
         </div>
 
         {isSliderOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+
+          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-4 h-full overflow-y-auto custom-scrollbar"
+              className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingPromotion ? "Update Promotion" : "Add a New Promotion"}
+                  {editingPromotion
+                    ? "Update Promotion"
+                    : "Add a New Promotion"}
                 </h2>
                 <button
-                  className="text-2xl text-gray-500 hover:text-gray-700"
+                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+
                   onClick={() => {
                     setIsSliderOpen(false);
                     setPromotionName("");
@@ -459,7 +485,13 @@ const handleDelete = async (id) => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
                 >
-                  {loading ? "Saving..." : editingPromotion ? "Update Promotion" : "Save Promotion"}
+
+                  {loading
+                    ? "Saving..."
+                    : editingPromotion
+                    ? "Update Promotion"
+                    : "Save Promotion"}
+
                 </button>
               </form>
             </div>
@@ -487,4 +519,6 @@ const handleDelete = async (id) => {
   );
 };
 
+
 export default Promotion;
+

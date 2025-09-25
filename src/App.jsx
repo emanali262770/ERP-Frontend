@@ -20,10 +20,12 @@ import SupplierList from "./pages/admin/SetUp/Supplier.jsx";
 import Manufacture from "./pages/admin/SetUp/Manufacture.jsx";
 import ItemBarcode from "./pages/admin/ItemBarcode";
 import ItemPurchase from "./pages/admin/Purchase/ItemPurchase";
-import  SalesInvoice from './pages/admin/SalesInvoice';
+import SalesInvoice from "./pages/admin/SalesInvoice";
 import ExpiryTags from "./pages/admin/ExpiryTags";
 import BookingOrder from "./pages/admin/BookingOrder";
+
 import ItemUnit from './pages/admin/SetUp/ItemUnit.jsx';
+
 import Company from "./pages/admin/Company";
 import Users from "./pages/admin/Security/Users.jsx";
 import GroupManagement from "./pages/admin/Security/GroupManagement.jsx";
@@ -46,10 +48,10 @@ function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
       <main className="flex-1">
-         <ScrollToTop />
+        <ScrollToTop />
         <Routes>
           {/* Public Routes */}
-          
+
           <Route path="/" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
 
@@ -74,15 +76,18 @@ function AppContent() {
             <Route path="sales-invoice" element={<SalesInvoice />} />
             <Route path="item-purchase" element={<ItemPurchase />} />
             <Route path="expiry-tags" element={<ExpiryTags />} />
-             <Route path="item-unit" element={<ItemUnit />} />
-             <Route path="promotion" element={<Promotion />} />
+            <Route path="item-unit" element={<ItemUnit />} />
+            <Route path="promotion" element={<Promotion />} />
             <Route path="customers-booking" element={<BookingOrder />} />
             <Route path="company" element={<Company />} />
             <Route path="users" element={<Users />} />
             <Route path="groups" element={<GroupManagement />} />
             <Route path="access-rights" element={<AccessControll />} />
             <Route path="modules" element={<Modules />} />
-            <Route path="purchase-requisition" element={<PurchaseRequisition />} />
+            <Route
+              path="purchase-requisition"
+              element={<PurchaseRequisition />}
+            />
             <Route path="purchase-approval" element={<PurchaseApproval />} />
             <Route path="quotation" element={<Quotation />} />
             <Route path="estimation" element={<Estimation />} />
@@ -95,9 +100,9 @@ function AppContent() {
             <Route path="designation" element={<Designation />} />
             <Route path="employee" element={<Employee />} />
             <Route path="departments" element={<Departments />} />
-            
-            <Route path="promotion-item" element={<PromotionItem />}/>
-            <Route path='item-type' element={<ItemType/>}/>
+
+            <Route path="promotion-item" element={<PromotionItem />} />
+            <Route path="item-type" element={<ItemType />} />
           </Route>
         </Routes>
       </main>

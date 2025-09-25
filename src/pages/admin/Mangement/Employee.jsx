@@ -54,7 +54,7 @@ const Employee = () => {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
-      
+
     }
   }, []);
   useEffect(() => {
@@ -264,11 +264,13 @@ const Employee = () => {
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
                 <TableSkeleton
+
                   rows={employeeList.length > 0 ? employeeList.length : 5} 
                   cols={9}
                   className="lg:grid-cols-9"
                 />
               )  : employeeList.length === 0 ? (
+
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No employee found.
                 </div>
@@ -291,9 +293,11 @@ const Employee = () => {
                     <div className="text-gray-600">{emp?.qualification}</div>
                     <div className=" font-semibold">
                       {emp?.isEnable ? (
+
                         <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Enabled</span>
                       ) : (
                         <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Disabled</span>
+
                       )}
                     </div>
 

@@ -32,16 +32,19 @@ const ModulesFunctionalities = () => {
 
   // Populate modules from ModuleFunctionalities
   useEffect(() => {
+
     const moduleList = Object.keys(ModuleFunctionalities).map((name, index) => ({
       _id: `module-${index}`,
       moduleName: name,
     }));
+
     setModules(moduleList);
   }, []);
 
   // Filter functionality list based on search query
   const filteredFunctionalityList = functionalityList.filter((func) => {
     const moduleName = func?.moduleName?.toLowerCase() || "";
+
     const funcName = Array.isArray(func?.name) ? func.name.join(", ").toLowerCase() : "";
     return (
       moduleName.includes(searchQuery.toLowerCase()) ||
@@ -55,7 +58,10 @@ const ModulesFunctionalities = () => {
       setLoading(true);
 
       // Uncomment for real API call
-      const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/groups`);
+
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/groups`
+      );
 
       // setGroups(response);
       if (!response.ok) throw new Error("Failed to fetch groups");
@@ -70,12 +76,14 @@ const ModulesFunctionalities = () => {
         setLoading(false);
       }, 2000);
 
+
     }
   }, []);
 
 
   // Get available functionalities for selected module
   const availableFunctionalities = moduleName ? ModuleFunctionalities[moduleName] || [] : [];
+
 
   const handleAddFunctionality = () => {
     setIsSliderOpen(true);
@@ -113,12 +121,13 @@ const ModulesFunctionalities = () => {
   }, [isSliderOpen]);
 
 
-
   // Fetch Functionality Data
   const fetchFunctionalityData = useCallback(async () => {
     try {
       setLoading(true);
+
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/rights`, { headers });
+
       if (!response.ok) throw new Error("Failed to fetch functionalities");
       const result = await response.json();
 
@@ -130,6 +139,7 @@ const ModulesFunctionalities = () => {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
+
 
     }
   }, []);
@@ -166,6 +176,7 @@ const ModulesFunctionalities = () => {
       const payload = {
         group: groupId,
         module: moduleName,
+
         functionalities: selectedFunctionalities
       }
       console.log("payload", payload);
@@ -206,7 +217,9 @@ const ModulesFunctionalities = () => {
     setEditId(func._id);
     setGroupId(func?.group?._id || "");
     setModuleName(func.moduleName || "");
+
     setSelectedFunctionalities(Array.isArray(func.name) ? func.name : func.name.split(", "));
+
     setIsSliderOpen(true);
   };
 
@@ -214,8 +227,10 @@ const ModulesFunctionalities = () => {
   const handleDelete = async (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
+
         confirmButton: "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600",
         cancelButton: "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600",
+
       },
       buttonsStyling: false,
     });
@@ -232,7 +247,9 @@ const ModulesFunctionalities = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
+
             await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/rights/${id}`, { headers });
+
             setFunctionalityList(functionalityList.filter((p) => p._id !== id));
             toast.success("Functionality deleted successfully");
           } catch (error) {
@@ -256,8 +273,10 @@ const ModulesFunctionalities = () => {
       <CommanHeader />
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
         <div>
+
           <h1 className="text-xl md:text-2xl font-bold text-newPrimary">Assign Rights</h1>
           <p className="text-gray-500 text-sm">Manage group permissions and access rights</p>
+
         </div>
         <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
           <div className="relative w-full md:w-64">
@@ -295,7 +314,9 @@ const ModulesFunctionalities = () => {
             <div className="flex flex-col divide-y divide-gray-100">
               {loading ? (
                 <TableSkeleton
+
                   rows={filteredFunctionalityList.length > 0 ? filteredFunctionalityList.length : 5}
+
                   cols={userInfo?.isAdmin ? 3 : 2}
                 />
               ) : filteredFunctionalityList.length > 0 ? (
@@ -310,11 +331,13 @@ const ModulesFunctionalities = () => {
                     </div>
 
                     {/* Module */}
+
                     <div className="font-medium text-gray-900">{func?.module}</div>
 
                     {/* Functionalities */}
                     <div className="flex flex-wrap gap-2">
                       {Array.isArray(func.functionalities) && func.functionalities.length > 0 ? (
+
                         func.functionalities.map((f, idx) => {
                           const colors = [
                             "bg-blue-100 text-blue-800",
@@ -360,7 +383,9 @@ const ModulesFunctionalities = () => {
                 ))
               ) : (
                 <div className="text-center py-6 text-gray-500 bg-white">
+
                   No functionalities found {searchQuery && `matching "${searchQuery}"`}
+
                 </div>
               )}
             </div>
@@ -388,7 +413,9 @@ const ModulesFunctionalities = () => {
             </div>
             <div className="p-6 space-y-4">
               <div>
+
                 <label className="block text-sm font-medium text-gray-900 mb-1">Group</label>
+
                 <select
                   value={groupId}
                   onChange={(e) => setGroupId(e.target.value)}
@@ -404,8 +431,10 @@ const ModulesFunctionalities = () => {
               </div>
 
 
+
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">Module</label>
+
                 <select
                   value={moduleName}
                   onChange={(e) => {
@@ -423,7 +452,9 @@ const ModulesFunctionalities = () => {
                 </select>
               </div>
               <div>
+
                 <label className="block text-sm font-medium text-gray-900 mb-1">Functionalities</label>
+
                 <select
                   multiple
                   value={selectedFunctionalities}
@@ -441,7 +472,9 @@ const ModulesFunctionalities = () => {
                     <option disabled>No functionalities available</option>
                   )}
                 </select>
+
                 <p className="text-xs text-gray-500 mt-1">Hold Ctrl/Cmd to select multiple functionalities</p>
+
               </div>
               <div className="flex justify-end gap-3">
                 <button
@@ -465,4 +498,6 @@ const ModulesFunctionalities = () => {
   );
 };
 
+
 export default ModulesFunctionalities;
+
