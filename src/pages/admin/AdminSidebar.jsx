@@ -49,7 +49,7 @@ const links = [
     { to: "/admin/quotation", label: "Market Quotation", icon: <FaCommentsDollar /> },
     { to: "/admin/estimation", label: "Estimation", icon: <FaCalculator /> },
     { to: "/admin/shelve-location", label: "Approval of Estimation", icon: <FaClipboardCheck /> },
-    { to: "/admin/item-unit", label: "Purchase Order", icon: <FaFileInvoiceDollar />},
+    { to: "/admin/purchase-order", label: "Purchase Order", icon: <FaFileInvoiceDollar />},
     { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
     { to: "/admin/quality-checking", label: "Quality Checking", icon: <FaCheckDouble /> },
 { to: "/admin/goods-receipt-note", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
