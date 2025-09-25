@@ -50,6 +50,7 @@ const ItemType = () => {
           }
         },
       });
+
     }
   }, [isSliderOpen]);
 
@@ -359,6 +360,7 @@ const ItemType = () => {
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;
+
               </button>
             </div>
 

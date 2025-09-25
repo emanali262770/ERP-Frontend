@@ -71,7 +71,8 @@ const GroupManagement = () => {
     group.groupName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // GSAP Animation for Modal
+
+   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
       if (sliderRef.current) {
@@ -438,19 +439,26 @@ const GroupManagement = () => {
         </div>
       </div>
 
+
+      {/* Right-Side Slider */}
       {isSliderOpen && (
-        <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
           <div
             ref={sliderRef}
-            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="w-full md:w-1/2 lg:w-1/3 bg-white h-full overflow-y-auto shadow-lg"
           >
-            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
+            <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white z-10">
               <h2 className="text-xl font-bold text-newPrimary">
-                {isEdit ? "Edit Right" : "Add Group"}
+                {isEdit ? "Edit Group" : "Add Group"}
               </h2>
               <button
-                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
-                onClick={() => setIsSliderOpen(false)}
+                className="w-6 h-6 text-white rounded-full flex justify-center items-center hover:text-gray-400 text-xl bg-newPrimary"
+                onClick={() => {
+                  setIsSliderOpen(false);
+                  setSelectedFunctionalities([]);
+                  setEditId(null);
+                }}
+
               >
                 &times;
               </button>

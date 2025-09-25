@@ -25,6 +25,7 @@ const ItemUnit = () => {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+
   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
@@ -49,6 +50,7 @@ const ItemUnit = () => {
           }
         },
       });
+
     }
   }, [isSliderOpen]);
 
@@ -293,6 +295,7 @@ const ItemUnit = () => {
           </div>
         </div>
       </div>
+
       {isSliderOpen && (
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
@@ -308,6 +311,7 @@ const ItemUnit = () => {
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;
+
               </button>
             </div>
 
