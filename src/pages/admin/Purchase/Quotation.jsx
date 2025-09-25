@@ -9,6 +9,7 @@ const Quotation = () => {
     const [isSliderOpen, setIsSliderOpen] = useState(false);
     const [loading, setLoading] = useState(true);
     const [quotationNo, setQuotationNo] = useState("");
+    const [quotationDate, setQuotationDate] = useState("");
     const [supplier, setSupplier] = useState("");
     const [forDemand, setForDemand] = useState("");
     const [person, setPerson] = useState("");
@@ -28,6 +29,7 @@ const Quotation = () => {
         {
             _id: "1",
             quotationNo: "Q001",
+            quotationDate: "2025-09-25",
             supplier: "ABC Corp",
             forDemand: "Laptops (5)",
             person: "John Doe",
@@ -41,6 +43,7 @@ const Quotation = () => {
         {
             _id: "2",
             quotationNo: "Q002",
+            quotationDate: "2025-09-24",
             supplier: "XYZ Ltd",
             forDemand: "Printers (2)",
             person: "Alice Brown",
@@ -54,6 +57,7 @@ const Quotation = () => {
         {
             _id: "3",
             quotationNo: "Q003",
+            quotationDate: "2025-09-23",
             supplier: "Tech Solutions",
             forDemand: "Monitors (10)",
             person: "Henry Smith",
@@ -76,6 +80,7 @@ const Quotation = () => {
     // Reset form fields
     const resetForm = () => {
         setQuotationNo("");
+        setQuotationDate("");
         setSupplier("");
         setForDemand("");
         setPerson("");
@@ -95,6 +100,7 @@ const Quotation = () => {
     const validateForm = () => {
         const newErrors = {};
         const trimmedQuotationNo = quotationNo.trim();
+        const trimmedQuotationDate = quotationDate.trim();
         const trimmedSupplier = supplier.trim();
         const trimmedForDemand = forDemand.trim();
         const trimmedPerson = person.trim();
@@ -106,6 +112,7 @@ const Quotation = () => {
         const parsedTotal = parseFloat(total);
 
         if (!trimmedQuotationNo) newErrors.quotationNo = "Quotation No. is required";
+        if (!trimmedQuotationDate) newErrors.quotationDate = "Quotation Date is required";
         if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
         if (!trimmedForDemand) newErrors.forDemand = "For Demand is required";
         if (!trimmedPerson) newErrors.person = "Person is required";
@@ -132,6 +139,7 @@ const Quotation = () => {
     const handleEditClick = (quotation) => {
         setEditingQuotation(quotation);
         setQuotationNo(quotation.quotationNo);
+        setQuotationDate(quotation.quotationDate);
         setSupplier(quotation.supplier);
         setForDemand(quotation.forDemand);
         setPerson(quotation.person);
@@ -184,6 +192,7 @@ const Quotation = () => {
         const newQuotation = {
             _id: editingQuotation ? editingQuotation._id : Date.now().toString(),
             quotationNo: quotationNo.trim(),
+            quotationDate: quotationDate.trim(),
             supplier: supplier.trim(),
             forDemand: forDemand.trim(),
             person: person.trim(),
@@ -284,6 +293,7 @@ const Quotation = () => {
                             {/* Table Header */}
                             <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                                 <div>Quotation No.</div>
+                                <div>Date</div>
                                 <div>Supplier</div>
                                 <div>For Demand</div>
                                 <div>Person</div>
@@ -291,7 +301,7 @@ const Quotation = () => {
                                 <div>Designation</div>
                                 <div>Items</div>
                                 <div>Price</div>
-                                <div >Actions</div>
+                                <div>Actions</div>
                             </div>
 
                             {/* Table Body */}
@@ -299,7 +309,7 @@ const Quotation = () => {
                                 {loading ? (
                                     <TableSkeleton
                                         rows={3}
-                                        cols={9}
+                                        cols={10}
                                         className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr_1fr]"
                                     />
                                 ) : quotations.length === 0 ? (
@@ -313,6 +323,7 @@ const Quotation = () => {
                                             className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                                         >
                                             <div className="text-gray-600">{quotation.quotationNo}</div>
+                                            <div className="text-gray-600">{quotation.quotationDate}</div>
                                             <div className="text-gray-600">{quotation.supplier}</div>
                                             <div className="text-gray-600">{quotation.forDemand}</div>
                                             <div className="text-gray-600">{quotation.person}</div>
@@ -368,7 +379,6 @@ const Quotation = () => {
                         </div>
                     </div>
                 </div>
-
                 {isSliderOpen && (
                     <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
                         <div
@@ -388,6 +398,7 @@ const Quotation = () => {
                             </div>
 
                             <form onSubmit={handleSubmit} className="space-y-4">
+                                {/* Quotation No */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Quotation No. <span className="text-red-500">*</span>
@@ -405,9 +416,36 @@ const Quotation = () => {
                                         required
                                     />
                                     {errors.quotationNo && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.quotationNo}</p>
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {errors.quotationNo}
+                                        </p>
                                     )}
                                 </div>
+
+                                {/* Quotation Date */}
+                                <div>
+                                    <label className="block text-gray-700 font-medium mb-2">
+                                        Quotation Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        value={quotationDate}
+                                        onChange={(e) => setQuotationDate(e.target.value)}
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                                            errors.quotationDate
+                                                ? "border-red-500 focus:ring-red-500"
+                                                : "border-gray-300 focus:ring-newPrimary"
+                                        }`}
+                                        required
+                                    />
+                                    {errors.quotationDate && (
+                                        <p className="text-red-500 text-xs mt-1">
+                                            {errors.quotationDate}
+                                        </p>
+                                    )}
+                                </div>
+
+                                {/* Supplier */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Supplier <span className="text-red-500">*</span>
@@ -427,10 +465,9 @@ const Quotation = () => {
                                         <option value="supplier2">XYZ Enterprises</option>
                                         <option value="supplier3">Global Supplies</option>
                                     </select>
-                                    {errors.supplier && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
-                                    )}
                                 </div>
+
+                                {/* For Demand */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         For Demand <span className="text-red-500">*</span>
@@ -451,10 +488,9 @@ const Quotation = () => {
                                         <option value="Accessories">Accessories</option>
                                         <option value="Other">Other</option>
                                     </select>
-                                    {errors.forDemand && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.forDemand}</p>
-                                    )}
                                 </div>
+
+                                {/* Person */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Person <span className="text-red-500">*</span>
@@ -471,10 +507,9 @@ const Quotation = () => {
                                         placeholder="Enter person name"
                                         required
                                     />
-                                    {errors.person && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.person}</p>
-                                    )}
                                 </div>
+
+                                {/* Created By */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Created By <span className="text-red-500">*</span>
@@ -495,10 +530,9 @@ const Quotation = () => {
                                         <option value="employee3">Ali Khan</option>
                                         <option value="employee4">Ayesha Ahmed</option>
                                     </select>
-                                    {errors.createdBy && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.createdBy}</p>
-                                    )}
                                 </div>
+
+                                {/* Designation */}
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
                                         Designation <span className="text-red-500">*</span>
@@ -515,50 +549,83 @@ const Quotation = () => {
                                         placeholder="Enter designation"
                                         required
                                     />
-                                    {errors.designation && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.designation}</p>
-                                    )}
                                 </div>
+
+                                {/* Items Section */}
                                 <div className="space-y-3">
-                                    <div className="flex justify-between gap-2 items-end">
-                                        <div className="flex-1">
+                                    <div className="flex gap-2 flex-wrap items-end">
+                                        <div className="flex-1 min-w-[150px]">
                                             <label className="block text-gray-700 font-medium mb-2">
                                                 Item Name <span className="text-red-500">*</span>
                                             </label>
-                                            <input
-                                                type="text"
+                                            <select
                                                 value={itemName}
                                                 onChange={(e) => setItemName(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter item name"
-                                            />
+                                                className="w-full p-3 border rounded-md"
+                                            >
+                                                <option value="">Select Item</option>
+                                                <option value="Mobile">Mobile</option>
+                                                <option value="Laptop">Laptop</option>
+                                                <option value="Accessories">Accessories</option>
+                                                <option value="Other">Other</option>
+                                            </select>
                                         </div>
-                                        <div className="flex-1">
+
+                                        <div className="flex-1 min-w-[100px]">
                                             <label className="block text-gray-700 font-medium mb-2">
-                                                Item Quantity <span className="text-red-500">*</span>
+                                                Quantity <span className="text-red-500">*</span>
                                             </label>
                                             <input
                                                 type="number"
                                                 value={itemQuantity}
                                                 onChange={(e) => setItemQuantity(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter item quantity"
+                                                className="w-full p-3 border rounded-md"
+                                                placeholder="Qty"
                                                 min="1"
                                             />
                                         </div>
-                                        <div>
+
+                                        <div className="flex-1 min-w-[100px]">
+                                            <label className="block text-gray-700 font-medium mb-2">
+                                                Price <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={price}
+                                                onChange={(e) => setPrice(e.target.value)}
+                                                className="w-full p-3 border rounded-md"
+                                                placeholder="Price"
+                                                min="0"
+                                                step="0.01"
+                                            />
+                                        </div>
+
+                                        <div className="flex-1 min-w-[100px]">
+                                            <label className="block text-gray-700 font-medium mb-2">
+                                                Total
+                                            </label>
+                                            <input
+                                                type="number"
+                                                value={itemQuantity && price ? itemQuantity * price : ""}
+                                                readOnly
+                                                className="w-full p-3 border rounded-md bg-gray-100"
+                                                placeholder="Auto-calculated"
+                                            />
+                                        </div>
+
+                                        <div className="min-w-[100px]">
                                             <button
                                                 type="button"
                                                 onClick={handleAddItem}
-                                                className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
+                                                disabled={!itemName || !itemQuantity || !price}
+                                                className="h-12 px-4 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center"
                                             >
                                                 + Add
                                             </button>
                                         </div>
                                     </div>
-                                    {errors.itemsList && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.itemsList}</p>
-                                    )}
+
+                                    {/* Items Table */}
                                     {itemsList.length > 0 && (
                                         <div className="overflow-x-auto">
                                             <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -567,14 +634,26 @@ const Quotation = () => {
                                                         <th className="px-4 py-2 border-b">Sr #</th>
                                                         <th className="px-4 py-2 border-b">Item Name</th>
                                                         <th className="px-4 py-2 border-b">Quantity</th>
+                                                        <th className="px-4 py-2 border-b">Price</th>
+                                                        <th className="px-4 py-2 border-b">Total</th>
                                                     </tr>
                                                 </thead>
                                                 <tbody className="text-gray-700 text-sm">
                                                     {itemsList.map((item, idx) => (
                                                         <tr key={idx} className="hover:bg-gray-50">
-                                                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
+                                                            <td className="px-4 py-2 border-b text-center">
+                                                                {idx + 1}
+                                                            </td>
                                                             <td className="px-4 py-2 border-b">{item.name}</td>
-                                                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
+                                                            <td className="px-4 py-2 border-b text-center">
+                                                                {item.qty}
+                                                            </td>
+                                                            <td className="px-4 py-2 border-b text-center">
+                                                                ${item.price}
+                                                            </td>
+                                                            <td className="px-4 py-2 border-b text-center font-medium">
+                                                                ${item.total}
+                                                            </td>
                                                         </tr>
                                                     ))}
                                                 </tbody>
@@ -582,62 +661,23 @@ const Quotation = () => {
                                         </div>
                                     )}
                                 </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Price <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={price}
-                                        onChange={(e) => setPrice(e.target.value)}
-                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                                            errors.price
-                                                ? "border-red-500 focus:ring-red-500"
-                                                : "border-gray-300 focus:ring-newPrimary"
-                                        }`}
-                                        placeholder="Enter price"
-                                        min="0"
-                                        step="0.01"
-                                        required
-                                    />
-                                    {errors.price && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.price}</p>
-                                    )}
-                                </div>
-                                <div>
-                                    <label className="block text-gray-700 font-medium mb-2">
-                                        Total <span className="text-red-500">*</span>
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={total}
-                                        onChange={(e) => setTotal(e.target.value)}
-                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                                            errors.total
-                                                ? "border-red-500 focus:ring-red-500"
-                                                : "border-gray-300 focus:ring-newPrimary"
-                                        }`}
-                                        placeholder="Enter total"
-                                        min="0"
-                                        step="0.01"
-                                        required
-                                    />
-                                    {errors.total && (
-                                        <p className="text-red-500 text-xs mt-1">{errors.total}</p>
-                                    )}
-                                </div>
+
+                                {/* Submit Button */}
                                 <button
                                     type="submit"
                                     disabled={loading}
                                     className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                                 >
-                                    {loading ? "Saving..." : editingQuotation ? "Update Quotation" : "Save Quotation"}
+                                    {loading
+                                        ? "Saving..."
+                                        : editingQuotation
+                                        ? "Update Quotation"
+                                        : "Save Quotation"}
                                 </button>
                             </form>
                         </div>
                     </div>
                 )}
-
                 <style jsx>{`
                     .custom-scrollbar::-webkit-scrollbar {
                         width: 6px;
