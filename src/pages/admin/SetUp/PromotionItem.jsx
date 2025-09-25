@@ -466,13 +466,17 @@ const PromotionItem = () => {
 
         {/* Slider */}
         {isSliderOpen && (
+<<<<<<< HEAD
+          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
+=======
 
           <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center z-50">
+>>>>>>> ef14dd6822aad042533c11f4828ee24cc4b3990b
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-6 rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingPromotionItem
                     ? "Update Promotion Item"
@@ -499,9 +503,9 @@ const PromotionItem = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
                 {/* Promotion on Item */}
-                <h3 className="text-lg font-semibold text-newPrimary mt-6 mb-2">
+                <h3 className="text-lg font-semibold text-newPrimary mb-2">
                   Promotion on Item
                 </h3>
 
