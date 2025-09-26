@@ -22,6 +22,7 @@ const Estimation = () => {
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const [nextRequisitionId, setNextRequisitionId] = useState("001");
 
   // Fetch quotations
   const fetchQuotationList = useCallback(async () => {
@@ -96,6 +97,20 @@ const Estimation = () => {
     fetchEstimationList();
   }, [fetchEstimationList]);
 
+   useEffect(() => {
+      if (estimations.length > 0) {
+        const maxNo = Math.max(
+          ...estimations.map((r) => {
+            const match = r.estimationId?.match(/EST-(\d+)/);
+            return match ? parseInt(match[1], 10) : 0;
+          })
+        );
+        setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
+      } else {
+        setNextRequisitionId("001"); // first requisition
+      }
+    }, [estimations]);
+
   // Format date for display
   const formatDate = (date) => {
     if (!date) return "";
@@ -121,6 +136,8 @@ const Estimation = () => {
   const validateForm = () => {
     const newErrors = {};
     const trimmedEstimationId = estimationId.trim();
+    console.log({trimmedEstimationId});
+    
     const trimmedSupplier = supplier.trim();
     const trimmedForDemand = forDemand.trim();
     const trimmedTotal = total.trim();
@@ -143,6 +160,7 @@ const Estimation = () => {
   // Handlers for form and table actions
   const handleAddClick = () => {
     resetForm();
+    setEstimationId(`EST-${nextRequisitionId}`);
     setIsSliderOpen(true);
   };
 
@@ -194,6 +212,10 @@ const Estimation = () => {
     }
 
     const newEstimation = {
+      estimationId: editingEstimation
+        ? estimationId
+        : `EST-${nextRequisitionId}`,
+
       demandItem: forDemand,
       status,
       
@@ -306,6 +328,8 @@ console.log("Not ", forDemand);
     const quotation = quotations.find((q) => q._id === quotationId);
     return quotation ? quotation.quotationNo : quotationId;
   };
+
+console.log({nextRequisitionId});
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -423,7 +447,7 @@ console.log("Not ", forDemand);
                   </label>
                   <input
                     type="text"
-                    value={estimationId}
+                      value={estimationId}
                     onChange={(e) => setEstimationId(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.estimationId
                         ? "border-red-500 focus:ring-red-500"
@@ -491,10 +515,10 @@ console.log("Not ", forDemand);
                       <tbody>
                         {quotationItems.map((item) => (
                           <tr key={item._id}>
-                            <td className="px-4 py-2 border">{item.itemName}</td>
-                            <td className="px-4 py-2 border">{item.qty}</td>
-                            <td className="px-4 py-2 border">{item.price}</td>
-                            <td className="px-4 py-2 border">{item.total}</td>
+                            <td className="px-4 text-center py-2 border">{item.itemName}</td>
+                            <td className="px-4 text-center py-2 border">{item.qty}</td>
+                            <td className="px-4 text-center py-2 border">{item.price}</td>
+                            <td className="px-4 text-center py-2 border">{item.total}</td>
                           </tr>
                         ))}
                       </tbody>

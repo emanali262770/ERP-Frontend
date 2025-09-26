@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Eye, SquarePen, Trash2 } from "lucide-react";
+import { Eye, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
@@ -27,6 +27,7 @@ const Quotation = () => {
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [errors, setErrors] = useState({});
   const [supplierList, setSupplierList] = useState([]);
+  const [nextQuatation, setNextQuatation] = useState();
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   // fetch qutation List api
@@ -50,6 +51,22 @@ const Quotation = () => {
   useEffect(() => {
     fetchQuatationList();
   }, [fetchQuatationList]);
+  useEffect(() => {
+  if (quotations.length > 0) {
+    // Extract numeric part from the last quotationNo
+    const maxNo = Math.max(
+      ...quotations.map(q => {
+        const match = q.quotationNo?.match(/QuotNo-(\d+)/);
+        return match ? parseInt(match[1], 10) : 0;
+      })
+    );
+    setNextQuatation((maxNo + 1).toString().padStart(3, "0"));
+  } else {
+    setNextQuatation("001"); // first quotation
+  }
+}, [quotations]);
+
+  console.log("new quation", nextQuatation);
 
   // Supplier List Fetch
   const fetchSupplierList = useCallback(async () => {
@@ -147,23 +164,25 @@ const Quotation = () => {
     setIsSliderOpen(true);
   };
 
+  // Handel Edit
   const handleEditClick = (quotation) => {
+    console.log("editing quotation", quotation);
+
     setEditingQuotation(quotation);
-    setQuotationNo(quotation.quotationNo);
-    setSupplier(quotation.supplier);
-    setForDemand(quotation.forDemand);
-    setPerson(quotation.person);
-    setCreatedBy(quotation.createdBy);
-    setDesignation(quotation.designation);
-    setItemsList(quotation.items);
+    setQuotationNo(quotation.quotationNo || "");
+    setSupplier(quotation.supplier?._id || "");
+    setForDemand(quotation.demandItem?._id || "");
+    setPerson(quotation.person || "");
+    setCreatedBy(quotation.createdBy || "");
+    setDesignation(quotation.designation || "");
+    setItemsList(quotation.items || []);
     setItemName("");
     setItemQuantity("");
-    setPrice(quotation.price);
-    setTotal(quotation.total);
     setErrors({});
     setIsSliderOpen(true);
   };
 
+  console.log("for demand0", forDemand);
   const handleAddItem = () => {
     const selected = demandItems.find((i) => i._id === selectedItem);
 
@@ -206,6 +225,9 @@ const Quotation = () => {
     setErrors((prev) => ({ ...prev, itemsList: null }));
   };
 
+  console.log({itemsList});
+  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { token } = userInfo || {};
@@ -215,6 +237,7 @@ const Quotation = () => {
     };
 
     const newQuotation = {
+      quotationNo: editingQuotation ? quotationNo : `QuotNo-${nextQuatation}`,
       supplier: supplier.trim(),
       demandItem: forDemand.trim(),
       person: person.trim(),
@@ -222,14 +245,13 @@ const Quotation = () => {
       designation: designation.trim(),
       items: itemsList,
     };
+    
 
-    console.log("new quation", newQuotation);
-
-    if (editingQuotation) {
-      setQuotations(
-        quotations.map((q) =>
-          q._id === editingQuotation._id ? newQuotation : q
-        )
+    if (editingQuotation, editingQuotation?._id) {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/quotations/${editingQuotation._id}`,
+        newQuotation,
+        { headers }
       );
       Swal.fire({
         icon: "success",
@@ -276,14 +298,37 @@ const Quotation = () => {
         cancelButtonText: "No, cancel!",
         reverseButtons: true,
       })
-      .then((result) => {
+      .then(async(result) => {
         if (result.isConfirmed) {
-          setQuotations((prev) => prev.filter((q) => q._id !== id));
+          try {
+            const { token } = userInfo || {};
+            const headers = {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            };
+
+            // ✅ Delete from backend
+            await axios.delete(
+              `${import.meta.env.VITE_API_BASE_URL}/quotations/${id}`,
+              { headers }
+            );
+
+            // ✅ Update UI
+             setQuotations((prev) => prev.filter((q) => q._id !== id));
           swalWithTailwindButtons.fire(
             "Deleted!",
             "Quotation deleted successfully.",
             "success"
           );
+          } catch (error) {
+            console.error("Delete error:", error);
+            swalWithTailwindButtons.fire(
+              "Error!",
+              "Failed to delete promotion.",
+              "error"
+            );
+          }
+         
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
             "Cancelled",
@@ -303,15 +348,22 @@ const Quotation = () => {
     (sum, item) => sum + price * (item.quantity || 0),
     0
   );
+  const grandTotal = itemsList.reduce((sum, item) => sum + item.total, 0);
+
   useEffect(() => {
     if (selectedDemand) {
       setCreatedBy(selectedDemand.employee?.employeeName || "");
     }
   }, [selectedDemand]);
+  useEffect(() => {
+    if (editingQuotation && demandList.length > 0) {
+      setForDemand(editingQuotation.demandItem?._id || "");
+    }
+  }, [editingQuotation, demandList]);
 
-  console.log({ totalAmount });
-
-  function handleView(params) {}
+ function handleRemoveItem(index) {
+    setItemsList(itemsList.filter((_,i)=> i !== index));
+  }
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -332,7 +384,7 @@ const Quotation = () => {
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-          <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
+          <div className="overflow-y-auto lg:overflow-x-auto max-h-acreen">
             <div className="min-w-[1200px]">
               {/* Table Header */}
               <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
@@ -473,8 +525,13 @@ const Quotation = () => {
                   </label>
                   <input
                     type="text"
-                    value={quotationNo}
-                    onChange={(e) => setQuotationNo(e.target.value)}
+                    value={
+                      editingQuotation
+                        ? quotationNo // 
+                        : `QuotNo-${nextQuatation}` // ✅ use next number only when adding
+                    }
+                    readOnly
+                    // onChange={(e) => setQuotationNo(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                       errors.quotationNo
                         ? "border-red-500 focus:ring-red-500"
@@ -570,13 +627,7 @@ const Quotation = () => {
                   </label>
                   <input
                     type="text"
-                    value={
-                      forDemand.length > 0
-                        ? demandList?.map(
-                            (demand) => demand?.employee?.employeeName
-                          )
-                        : ""
-                    }
+                    value={createdBy}
                     readOnly
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                       errors.demandList
@@ -695,15 +746,16 @@ const Quotation = () => {
 
                   {/* Items Table */}
                   {itemsList.length > 0 && (
-                    <div className="overflow-x-auto">
+                    <div className="overflow-x-auto overflow-y-auto max-h-64 custom-scrollbar">
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                         <thead className="bg-gray-100 text-gray-600 text-sm">
                           <tr>
-                            <th className="px-4 py-2 border-b">Sr #</th>
-                            <th className="px-4 py-2 border-b">Item Name</th>
-                            <th className="px-4 py-2 border-b">Quantity</th>
-                            <th className="px-4 py-2 border-b">Price</th>
-                            <th className="px-4 py-2 border-b">Total</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Sr #</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Item Name</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Quantity</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Price</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Total</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Remove</th>
                           </tr>
                         </thead>
                         <tbody className="text-gray-700 text-sm">
@@ -723,6 +775,11 @@ const Quotation = () => {
                               </td>
                               <td className="px-4 py-2 border-b text-center">
                                 {item.total}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                <button onClick={() => handleRemoveItem(idx)}>
+                                  <X size={18} className="text-red-600" />
+                                </button>
                               </td>
                             </tr>
                           ))}

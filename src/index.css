@@ -12,3 +12,15 @@ body {
     display: none;
 }
 
+/* Enable scrollbars only for .custom-scrollbar */
+.custom-scrollbar::-webkit-scrollbar {
+  display: block;     /* Show scrollbar again */
+  height: 8px;        /* for horizontal */
+  width: 8px;         /* for vertical */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #a0aec0;
+  border-radius: 4px;
+}
+
