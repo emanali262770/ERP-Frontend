@@ -21,6 +21,7 @@ const Estimation = () => {
   const [editingEstimation, setEditingEstimation] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
+    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // Fetch quotations
   const fetchQuotationList = useCallback(async () => {
@@ -160,7 +161,11 @@ const handleEditClick = (estimation) => {
 
 const handleSubmit = async (e) => {
   e.preventDefault();
-
+const { token } = userInfo || {};
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
   if (!validateForm()) {
     Swal.fire({
       icon: "warning",
@@ -246,7 +251,106 @@ const handleSubmit = async (e) => {
       confirmButtonColor: "#d33",
     });
   }
+};const handleSubmit = async (e) => {
+  e.preventDefault();
+  const { token } = userInfo || {};
+
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
+  };
+
+  if (!validateForm()) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing or Invalid Fields",
+      html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
+        errors
+      )
+        .map((err) => `<li>${err}</li>`)
+        .join("")}</ul>`,
+      confirmButtonColor: "#d33",
+    });
+    return;
+  }
+
+  const selectedQuotation = quotations.find((q) => q._id === forDemand);
+
+  if (!selectedQuotation) {
+    Swal.fire({
+      icon: "error",
+      title: "Invalid Selection",
+      text: "Please select a valid quotation.",
+    });
+    return;
+  }
+
+  const newEstimation = {
+    supplier: selectedQuotation.supplier?._id,
+    demandItem: selectedQuotation.demandItem?._id,
+    items: selectedQuotation.items,
+    totalAmount: parseFloat(total),
+    date,
+    quotationNo: estimationId,
+    status: status === "Active",
+    person: editingEstimation ? editingEstimation.person : "Admin",
+    createdBy: editingEstimation ? editingEstimation.createdBy : "Ali",
+    designation: editingEstimation ? editingEstimation.designation : "Manager",
+  };
+
+  console.log("Payload being sent:", newEstimation);
+
+  try {
+    if (editingEstimation) {
+      // Update estimation
+      const res = await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/estimations/${editingEstimation._id}`,
+        newEstimation,
+        { headers }   // ✅ Pass headers here
+      );
+
+      setEstimations((prev) =>
+        prev.map((e) =>
+          e._id === editingEstimation._id ? { ...e, ...res.data } : e
+        )
+      );
+
+      Swal.fire({
+        icon: "success",
+        title: "Updated!",
+        text: "Estimation updated successfully.",
+        confirmButtonColor: "#3085d6",
+      });
+    } else {
+      // Create estimation
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/estimations`,
+        newEstimation,
+        { headers }   // ✅ Pass headers here
+      );
+
+      setEstimations([...estimations, res.data]);
+
+      Swal.fire({
+        icon: "success",
+        title: "Added!",
+        text: "Estimation added successfully.",
+        confirmButtonColor: "#3085d6",
+      });
+    }
+
+    resetForm();
+  } catch (error) {
+    console.error("Error saving estimation:", error.response?.data || error.message);
+    Swal.fire({
+      icon: "error",
+      title: "Error!",
+      text: error.response?.data?.message || "Failed to save estimation.",
+      confirmButtonColor: "#d33",
+    });
+  }
 };
+
 
 
 const handleDelete = async (id) => {
@@ -506,31 +610,32 @@ const handleDelete = async (id) => {
                   </div>
                 )}
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Supplier <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={supplier}
-                    onChange={(e) => setSupplier(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.supplier
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    disabled={!!forDemand} // Disable when a quotation is selected
-                    required
-                  >
-                    <option value="">Select Supplier</option>
-                    {uniqueSuppliers.map((supp) => (
-                      <option key={supp} value={supp}>
-                        {supp}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.supplier && (
-                    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
-                  )}
-                </div>
+  <label className="block text-gray-700 font-medium mb-2">
+    Supplier <span className="text-red-500">*</span>
+  </label>
+
+  <input
+    list="suppliers"
+    value={supplier}
+    onChange={(e) => setSupplier(e.target.value)}
+    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+      errors.supplier
+        ? "border-red-500 focus:ring-red-500"
+        : "border-gray-300 focus:ring-newPrimary"
+    }`}
+    disabled={!!forDemand} // Disable when a quotation is selected
+    required
+    readOnly={!!forDemand} // Make read-only when a quotation is selected
+  />
+
+  
+
+  {errors.supplier && (
+    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+  )}
+</div>
+
+
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Status <span className="text-red-500">*</span>
