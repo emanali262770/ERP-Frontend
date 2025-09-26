@@ -29,7 +29,7 @@ const PurchaseRequisition = () => {
   const [quantity, setQuantity] = useState();
   const [itemsList, setItemsList] = useState([]);
   const [selectedRequisition, setSelectedRequisition] = useState(null);
-
+  const [nextRequisitionId, setNextRequisitionId] = useState("001");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const handleAddItem = () => {
     if (!itemName || !quantity) return;
@@ -127,6 +127,20 @@ const PurchaseRequisition = () => {
     fetchRequistionList();
   }, [fetchRequistionList]);
 
+  useEffect(() => {
+    if (requisitions.length > 0) {
+      const maxNo = Math.max(
+        ...requisitions.map((r) => {
+          const match = r.requisitionId?.match(/REQ-(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setNextRequisitionId("001"); // first requisition
+    }
+  }, [requisitions]);
+
   // Handlers for form and table actions
   const handleAddClick = () => {
     setEditingRequisition(null);
@@ -190,6 +204,9 @@ const PurchaseRequisition = () => {
     };
 
     const newRequisition = {
+      requisitionId: editingRequisition
+        ? requisitionId
+        : `REQ-${nextRequisitionId}`,
       department,
       employee,
       requirements: requirement,
@@ -329,7 +346,7 @@ const PurchaseRequisition = () => {
       });
   };
   function handleRemoveItem(index) {
-    setItemsList(itemsList.filter((_,i)=> i !== index));
+    setItemsList(itemsList.filter((_, i) => i !== index));
   }
 
   return (
@@ -477,7 +494,11 @@ const PurchaseRequisition = () => {
                   </label>
                   <input
                     type="text"
-                    value={requisitionId}
+                    value={
+                      editingRequisition
+                        ? requisitionId
+                        : `REQ-${nextRequisitionId}` // 👈 auto-generated
+                    }
                     readOnly
                     onChange={(e) => setRequisitionId(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
