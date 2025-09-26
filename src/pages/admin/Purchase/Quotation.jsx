@@ -396,7 +396,7 @@ const Quotation = () => {
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1200px]">
               {/* Table Header */}
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>Quotation No.</div>
                 <div>Supplier</div>
                 <div>For Demand</div>
@@ -414,7 +414,7 @@ const Quotation = () => {
                   <TableSkeleton
                     rows={quotations.length || 5}
                     cols={8}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr]"
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]"
                   />
                 ) : quotations.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
@@ -424,7 +424,7 @@ const Quotation = () => {
                   quotations?.map((quotation) => (
                     <div
                       key={quotation._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
                       <div className="text-gray-600">
                         {quotation?.quotationNo}

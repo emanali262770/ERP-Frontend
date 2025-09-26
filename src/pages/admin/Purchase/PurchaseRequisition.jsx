@@ -374,14 +374,14 @@ const PurchaseRequisition = () => {
             <div className="max-h-screen overflow-y-auto custom-scrollbar">
               <div className="inline-block min-w-[1200px] w-full align-middle">
                 {/* Table Header */}
-                <div className="hidden lg:grid grid-cols-7 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                   <div>Requisition ID</div>
                   <div>Department</div>
                   <div>Employee</div>
                   <div>Requirement</div>
                   <div>Category</div>
                   <div>Date</div>
-                  <div className="text-right">Actions</div>
+                  <div className="">Actions</div>
                 </div>
 
                 {/* Table Body */}
@@ -390,7 +390,7 @@ const PurchaseRequisition = () => {
                     <TableSkeleton
                       rows={requisitions.length || 5}
                       cols={7}
-                      className="lg:grid-cols-7"
+                      className="lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto]"
                     />
                   ) : requisitions.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -400,7 +400,7 @@ const PurchaseRequisition = () => {
                     requisitions.map((requisition) => (
                       <div
                         key={requisition._id}
-                        className="grid grid-cols-1 lg:grid-cols-7 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         <div className="font-medium text-gray-900">
                           {requisition.requisitionId}
@@ -423,7 +423,7 @@ const PurchaseRequisition = () => {
                         <div className="text-gray-500">
                           {formatDate(requisition.date)}
                         </div>
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-start gap-3">
                           <button
                             onClick={() => handleEditClick(requisition)}
                             className=" py-1 text-sm rounded text-blue-600 "
