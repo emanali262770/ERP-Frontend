@@ -21,7 +21,7 @@ const Estimation = () => {
   const [editingEstimation, setEditingEstimation] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // Fetch quotations
   const fetchQuotationList = useCallback(async () => {
@@ -146,261 +146,161 @@ const Estimation = () => {
     setIsSliderOpen(true);
   };
 
-const handleEditClick = (estimation) => {
-  setEditingEstimation(estimation);
-  setEstimationId(estimation.quotationNo || ""); // Use quotationNo as estimationId for display
-  setSupplier(estimation.supplier?.supplierName || "");
-  setItemsList(estimation.items || []);
-  setForDemand(estimation.demandItem?._id || "");
-  setTotal(estimation.totalAmount?.toString() || "");
-  setDate(formatDate(estimation.date));
-  setStatus(estimation.status ? "Active" : "Inactive"); // Map boolean to string for form
-  setErrors({});
-  setIsSliderOpen(true);
-};
+  const handleEditClick = (estimation) => {
+    setEditingEstimation(estimation);
+    setEstimationId(estimation.quotationNo || ""); // Use quotationNo as estimationId for display
+    setSupplier(estimation.supplier?.supplierName || "");
+    setItemsList(estimation.items || []);
+    setForDemand(estimation.demandItem?._id || "");
+    setTotal(estimation.totalAmount?.toString() || "");
+    setDate(formatDate(estimation.date));
+    setStatus(estimation.status ? "Active" : "Inactive"); // Map boolean to string for form
+    setErrors({});
+    setIsSliderOpen(true);
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
-const { token } = userInfo || {};
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { token } = userInfo || {};
+
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
-  if (!validateForm()) {
-    Swal.fire({
-      icon: "warning",
-      title: "Missing or Invalid Fields",
-      html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
-        errors
-      )
-        .map((err) => `<li>${err}</li>`)
-        .join("")}</ul>`,
-      confirmButtonColor: "#d33",
-    });
-    return;
-  }
 
-  // Find selected quotation
-  const selectedQuotation = quotations.find((q) => q._id === forDemand);
-
-  if (!selectedQuotation) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Selection",
-      text: "Please select a valid quotation.",
-    });
-    return;
-  }
-
-  // Build payload for API
-  const newEstimation = {
-    supplier: selectedQuotation.supplier?._id, // Send supplier ID
-    demandItem: selectedQuotation.demandItem?._id, // Send demandItem ID
-    items: selectedQuotation.items, // Use items from selected quotation
-    totalAmount: parseFloat(total), // Ensure total is a number
-    date,
-    quotationNo: estimationId, // Use form's estimationId as quotationNo
-    status: status === "Active", // Convert string to boolean
-    person: editingEstimation ? editingEstimation.person : "Admin", // Preserve existing or default
-    createdBy: editingEstimation ? editingEstimation.createdBy : "Ali", // Preserve existing or default
-    designation: editingEstimation ? editingEstimation.designation : "Manager", // Preserve existing or default
-  };
-
-  console.log("Payload being sent:", newEstimation);
-
-  try {
-    if (editingEstimation) {
-      // Update existing estimation
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/estimations/${editingEstimation._id}`,
-        newEstimation
-      );
-      setEstimations((prev) =>
-        prev.map((e) =>
-          e._id === editingEstimation._id ? { ...e, ...res.data } : e
+    if (!validateForm()) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing or Invalid Fields",
+        html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
+          errors
         )
-      );
-      Swal.fire({
-        icon: "success",
-        title: "Updated!",
-        text: "Estimation updated successfully.",
-        confirmButtonColor: "#3085d6",
+          .map((err) => `<li>${err}</li>`)
+          .join("")}</ul>`,
+        confirmButtonColor: "#d33",
       });
-    } else {
-      // Create new estimation
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/estimations`,
-        newEstimation
-      );
-      setEstimations([...estimations, res.data]);
-      Swal.fire({
-        icon: "success",
-        title: "Added!",
-        text: "Estimation added successfully.",
-        confirmButtonColor: "#3085d6",
-      });
+      return;
     }
 
-    resetForm();
-  } catch (error) {
-    console.error("Error saving estimation:", error.response?.data || error.message);
-    Swal.fire({
-      icon: "error",
-      title: "Error!",
-      text: error.response?.data?.message || "Failed to save estimation.",
-      confirmButtonColor: "#d33",
-    });
-  }
-};const handleSubmit = async (e) => {
-  e.preventDefault();
-  const { token } = userInfo || {};
+    const selectedQuotation = quotations.find((q) => q._id === forDemand);
 
-  const headers = {
-    Authorization: `Bearer ${token}`,
-    "Content-Type": "application/json",
-  };
-
-  if (!validateForm()) {
-    Swal.fire({
-      icon: "warning",
-      title: "Missing or Invalid Fields",
-      html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
-        errors
-      )
-        .map((err) => `<li>${err}</li>`)
-        .join("")}</ul>`,
-      confirmButtonColor: "#d33",
-    });
-    return;
-  }
-
-  const selectedQuotation = quotations.find((q) => q._id === forDemand);
-
-  if (!selectedQuotation) {
-    Swal.fire({
-      icon: "error",
-      title: "Invalid Selection",
-      text: "Please select a valid quotation.",
-    });
-    return;
-  }
-
-  const newEstimation = {
-    supplier: selectedQuotation.supplier?._id,
-    demandItem: selectedQuotation.demandItem?._id,
-    items: selectedQuotation.items,
-    totalAmount: parseFloat(total),
-    date,
-    quotationNo: estimationId,
-    status: status === "Active",
-    person: editingEstimation ? editingEstimation.person : "Admin",
-    createdBy: editingEstimation ? editingEstimation.createdBy : "Ali",
-    designation: editingEstimation ? editingEstimation.designation : "Manager",
-  };
-
-  console.log("Payload being sent:", newEstimation);
-
-  try {
-    if (editingEstimation) {
-      // Update estimation
-      const res = await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/estimations/${editingEstimation._id}`,
-        newEstimation,
-        { headers }   // ✅ Pass headers here
-      );
-
-      setEstimations((prev) =>
-        prev.map((e) =>
-          e._id === editingEstimation._id ? { ...e, ...res.data } : e
-        )
-      );
-
+    if (!selectedQuotation) {
       Swal.fire({
-        icon: "success",
-        title: "Updated!",
-        text: "Estimation updated successfully.",
-        confirmButtonColor: "#3085d6",
+        icon: "error",
+        title: "Invalid Selection",
+        text: "Please select a valid quotation.",
       });
-    } else {
-      // Create estimation
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/estimations`,
-        newEstimation,
-        { headers }   // ✅ Pass headers here
-      );
-
-      setEstimations([...estimations, res.data]);
-
-      Swal.fire({
-        icon: "success",
-        title: "Added!",
-        text: "Estimation added successfully.",
-        confirmButtonColor: "#3085d6",
-      });
+      return;
     }
 
-    resetForm();
-  } catch (error) {
-    console.error("Error saving estimation:", error.response?.data || error.message);
-    Swal.fire({
-      icon: "error",
-      title: "Error!",
-      text: error.response?.data?.message || "Failed to save estimation.",
-      confirmButtonColor: "#d33",
+    const newEstimation = {
+      supplier: selectedQuotation.supplier?._id,
+      demandItem: forDemand,
+      status,
+      
+    };
+
+
+    console.log("Payload being sent:", newEstimation);
+
+    try {
+      if (editingEstimation) {
+        // Update estimation
+        const res = await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/${editingEstimation._id}`,
+          newEstimation,
+          { headers }   // ✅ Pass headers here
+        );
+
+        setEstimations((prev) =>
+          prev.map((e) =>
+            e._id === editingEstimation._id ? { ...e, ...res.data } : e
+          )
+        );
+
+        Swal.fire({
+          icon: "success",
+          title: "Updated!",
+          text: "Estimation updated successfully.",
+          confirmButtonColor: "#3085d6",
+        });
+      } else {
+        // Create estimation
+        const res = await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/estimations`,
+          newEstimation,
+          { headers }   // ✅ Pass headers here
+        );
+
+        setEstimations([...estimations, res.data]);
+
+        Swal.fire({
+          icon: "success",
+          title: "Added!",
+          text: "Estimation added successfully.",
+          confirmButtonColor: "#3085d6",
+        });
+      }
+
+      resetForm();
+    } catch (error) {
+      console.error("Error saving estimation:", error.response?.data || error.message);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: error.response?.data?.message || "Failed to save estimation.",
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
+console.log("Not ", forDemand);
+
+// Handle Delete
+  const handleDelete = async (id) => {
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
     });
-  }
-};
 
+    try {
+      const result = await swalWithTailwindButtons.fire({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      });
 
-
-const handleDelete = async (id) => {
-  const swalWithTailwindButtons = Swal.mixin({
-    customClass: {
-      actions: "space-x-2",
-      confirmButton:
-        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-      cancelButton:
-        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-    },
-    buttonsStyling: false,
-  });
-
-  try {
-    const result = await swalWithTailwindButtons.fire({
-      title: "Are you sure?",
-      text: "You won't be able to revert this!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    });
-
-    if (result.isConfirmed) {
-      await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/estimations/${id}`);
-      setEstimations(estimations.filter((e) => e._id !== id));
+      if (result.isConfirmed) {
+        await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/estimations/${id}`);
+        setEstimations(estimations.filter((e) => e._id !== id));
+        swalWithTailwindButtons.fire({
+          icon: "success",
+          title: "Deleted!",
+          text: "Estimation deleted successfully.",
+          confirmButtonColor: "#3085d6",
+        });
+      }
+    } catch (error) {
+      console.error("Error deleting estimation:", error.response?.data || error.message);
       swalWithTailwindButtons.fire({
-        icon: "success",
-        title: "Deleted!",
-        text: "Estimation deleted successfully.",
-        confirmButtonColor: "#3085d6",
+        icon: "error",
+        title: "Error!",
+        text: error.response?.data?.message || "Failed to delete estimation.",
+        confirmButtonColor: "#d33",
       });
     }
-  } catch (error) {
-    console.error("Error deleting estimation:", error.response?.data || error.message);
-    swalWithTailwindButtons.fire({
-      icon: "error",
-      title: "Error!",
-      text: error.response?.data?.message || "Failed to delete estimation.",
-      confirmButtonColor: "#d33",
-    });
-  }
-};
+  };
 
-  // Get unique suppliers from quotations
-  const uniqueSuppliers = Array.from(
-    new Set(quotations.map((q) => q.supplier?.supplierName))
-  ).filter(Boolean);
 
   // Map quotation _id to quotationNo for display
   const getQuotationNo = (quotationId) => {
@@ -459,19 +359,18 @@ const handleDelete = async (id) => {
                       className="grid grid-cols-1 lg:grid-cols-8 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
                       <div className="font-medium text-gray-900">{estimation.estimationId}</div>
-                                            <div className="text-gray-600">{estimation?.demandItem?.supplier}</div>
-                   <div className="text-gray-600">{estimation?.demandItem?.createdBy}</div>
-                                            <div className="text-gray-600">{estimation?.demandItem?.demandItem}</div>
-                                            {/* <div className="text-gray-600">{estimation.rate}</div> */}
-                                            <div className="text-gray-600">{estimation?.demandItem?.totalAmount}</div>
-                                            <div className="text-gray-500">{formatDate(estimation.date)}</div>
+                      <div className="text-gray-600">{estimation?.demandItem?.supplier?.supplierName}</div>
+                      <div className="text-gray-600">{estimation?.demandItem?.createdBy}</div>
+                       {estimation?.demandItem?.quotationNo}
+                      {/* <div className="text-gray-600">{estimation.rate}</div> */}
+                      <div className="text-gray-600">{estimation?.totalAmount}</div>
+                      <div className="text-gray-500">{formatDate(estimation.date)}</div>
                       <div className="text-gray-600">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            estimation.status
+                          className={`px-2 py-1 rounded-full text-xs ${estimation.status
                               ? "bg-green-100 text-green-800"
                               : "bg-red-100 text-red-800"
-                          }`}
+                            }`}
                         >
                           {estimation.status ? "Active" : "Inactive"}
                         </span>
@@ -527,11 +426,10 @@ const handleDelete = async (id) => {
                     type="text"
                     value={estimationId}
                     onChange={(e) => setEstimationId(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.estimationId
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.estimationId
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                    }`}
+                      }`}
                     placeholder="Enter estimation ID"
                     required
                   />
@@ -547,11 +445,10 @@ const handleDelete = async (id) => {
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.date
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.date
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                    }`}
+                      }`}
                     required
                   />
                   {errors.date && (
@@ -565,11 +462,10 @@ const handleDelete = async (id) => {
                   <select
                     value={forDemand}
                     onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.forDemand
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.forDemand
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                    }`}
+                      }`}
                   >
                     <option value="">Select Quotation</option>
                     {quotations.map((q) => (
@@ -610,30 +506,29 @@ const handleDelete = async (id) => {
                   </div>
                 )}
                 <div>
-  <label className="block text-gray-700 font-medium mb-2">
-    Supplier <span className="text-red-500">*</span>
-  </label>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Supplier <span className="text-red-500">*</span>
+                  </label>
 
-  <input
-    list="suppliers"
-    value={supplier}
-    onChange={(e) => setSupplier(e.target.value)}
-    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-      errors.supplier
-        ? "border-red-500 focus:ring-red-500"
-        : "border-gray-300 focus:ring-newPrimary"
-    }`}
-    disabled={!!forDemand} // Disable when a quotation is selected
-    required
-    readOnly={!!forDemand} // Make read-only when a quotation is selected
-  />
+                  <input
+                    list="suppliers"
+                    value={supplier}
+                    onChange={(e) => setSupplier(e.target.value)}
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.supplier
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                    disabled={!!forDemand} // Disable when a quotation is selected
+                    required
+                    readOnly={!!forDemand} // Make read-only when a quotation is selected
+                  />
 
-  
 
-  {errors.supplier && (
-    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
-  )}
-</div>
+
+                  {errors.supplier && (
+                    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                  )}
+                </div>
 
 
                 <div>
@@ -643,11 +538,10 @@ const handleDelete = async (id) => {
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.status
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.status
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                    }`}
+                      }`}
                     required
                   >
                     <option value="Pending">Pending</option>
@@ -666,8 +560,8 @@ const handleDelete = async (id) => {
                   {loading
                     ? "Saving..."
                     : editingEstimation
-                    ? "Update Estimation"
-                    : "Save Estimation"}
+                      ? "Update Estimation"
+                      : "Save Estimation"}
                 </button>
               </form>
             </div>
