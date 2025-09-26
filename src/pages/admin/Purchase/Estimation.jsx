@@ -194,7 +194,6 @@ const Estimation = () => {
     }
 
     const newEstimation = {
-      supplier: selectedQuotation.supplier?._id,
       demandItem: forDemand,
       status,
       
