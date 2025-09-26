@@ -16,8 +16,8 @@ const PurchaseApproval = () => {
   const [status, setStatus] = useState("Hold");
   const [editingApproval, setEditingApproval] = useState(null);
   const sliderRef = useRef(null);
-   const [isView, setisView] = useState(false);
-const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [isView, setisView] = useState(false);
+  const [selectedRequisition, setSelectedRequisition] = useState(null);
   // requistation api call
   const fetchRequistionList = useCallback(async () => {
     try {
@@ -88,7 +88,7 @@ const [selectedRequisition, setSelectedRequisition] = useState(null);
         }
       });
   };
- const handleView = (req) => {
+  const handleView = (req) => {
     setSelectedRequisition(req);
     setisView(true);
   };
@@ -192,16 +192,16 @@ const [selectedRequisition, setSelectedRequisition] = useState(null);
           {/* Outer wrapper handles horizontal scroll */}
           <div className="overflow-x-auto">
             {/* Table wrapper with min-width only applied here */}
-            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+            <div className="max-h-[900px] overflow-y-auto custom-scrollbar">
               <div className="inline-block min-w-[1200px] w-full align-middle">
                 {/* Table Header */}
-                <div className="hidden lg:grid grid-cols-6 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,300px,150px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                   <div>Sr #</div>
                   <div>Department</div>
                   <div>Employee</div>
                   <div>Date</div>
-                  <div className="text-right">Actions</div>
-                  <div className="text-right">View</div>
+                  <div className={ `${loading?"":"flex justify-end"}`}>Actions</div>
+<div className={ `${loading?"":"flex justify-end"}`} >View</div>
                 </div>
 
                 {/* Table Body */}
@@ -210,7 +210,7 @@ const [selectedRequisition, setSelectedRequisition] = useState(null);
                     <TableSkeleton
                       rows={approvals.length || 5}
                       cols={6}
-                      className="lg:grid-cols-6"
+                      className="lg:grid-cols-[200px,200px,200px,200px,300px,150px]"
                     />
                   ) : approvals.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -220,7 +220,7 @@ const [selectedRequisition, setSelectedRequisition] = useState(null);
                     approvals?.map((approval, idx) => (
                       <div
                         key={approval._id}
-                        className="grid grid-cols-1 lg:grid-cols-6 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,300px,150px] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         {/* Sr # */}
                         <div className="font-medium text-gray-900">
@@ -243,7 +243,7 @@ const [selectedRequisition, setSelectedRequisition] = useState(null);
                         </div>
 
                         {/* Actions */}
-                        <div className="flex justify-end relative left-8 gap-2">
+                        <div className="flex justify-end  gap-2">
                           {approval.status === "Approved" && (
                             <button
                               disabled
@@ -296,7 +296,10 @@ const [selectedRequisition, setSelectedRequisition] = useState(null);
                         </div>
 
                         {/* View */}
-                        <div onClick={() => handleView(approval)} className="flex cursor-pointer justify-end text-amber-600">
+                        <div
+                          onClick={() => handleView(approval)}
+                          className="flex cursor-pointer justify-end text-amber-600"
+                        >
                           <Eye size={18} />
                         </div>
                       </div>

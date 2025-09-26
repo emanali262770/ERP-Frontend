@@ -14,7 +14,7 @@ const TableSkeleton = ({ rows = 5, cols = 4, className = "" }) => {
             <div
               key={colIdx}
               className={`h-5 w-24 bg-gray-200 rounded ${
-                colIdx === cols - 1 ? "ml-auto" : ""
+                colIdx === cols - 1 ? "" : ""
               }`}
             ></div>
           ))}
