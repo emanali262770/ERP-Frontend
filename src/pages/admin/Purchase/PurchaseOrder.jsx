@@ -7,45 +7,16 @@ import axios from "axios";
 import ViewModel from "./ViewModel";
 
 const PurchaseOrder = () => {
-    const [purchaseOrders, setPurchaseOrders] = useState([
-        {
-            _id: "1",
-            poNo: "PO001",
-            employee: { _id: "emp1", employeeName: "John Doe" },
-            supplier: { _id: "sup1", supplierName: "ABC Supplies" },
-            totalAmount: "1500",
-            deliveryDate: "2025-10-15",
-            isEnable: true,
-            items: [
-                { category: "Electronics", name: "Laptop", rate: 1000, qty: 1, total: 1000 },
-                { category: "Office", name: "Printer", rate: 500, qty: 1, total: 500 },
-            ],
-        },
-        {
-            _id: "2",
-            poNo: "PO002",
-            employee: { _id: "emp2", employeeName: "Jane Smith" },
-            supplier: { _id: "sup2", supplierName: "XYZ Corp" },
-            totalAmount: "2500",
-            deliveryDate: "2025-10-20",
-            isEnable: true,
-            items: [
-                { category: "Furniture", name: "Desk", rate: 1200, qty: 2, total: 2400 },
-            ],
-        },
-    ]);
-    const [employeeName, setEmployeeName] = useState([
-        { _id: "emp1", employeeName: "John Doe" },
-        { _id: "emp2", employeeName: "Jane Smith" },
-    ]);
-    const [suppliers, setSuppliers] = useState([
-        { _id: "sup1", supplierName: "ABC Supplies" },
-        { _id: "sup2", supplierName: "XYZ Corp" },
-    ]);
+    const [purchaseOrders, setPurchaseOrders] = useState([]);
+
     const [demandItems, setDemandItems] = useState([
         { _id: "di1", itemName: "Laptop Order", supplier: { _id: "sup1", supplierName: "ABC Supplies" } },
         { _id: "di2", itemName: "Desk Order", supplier: { _id: "sup2", supplierName: "XYZ Corp" } },
     ]);
+    const [forDemand, setForDemand] = useState("");
+    const [estimationItems, setEstimationItems] = useState([]);
+  const [quotations, setQuotations] = useState([]);
+
     const [isSliderOpen, setIsSliderOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [poNo, setPoNo] = useState("");
@@ -65,6 +36,8 @@ const PurchaseOrder = () => {
     const [editingPurchaseOrder, setEditingPurchaseOrder] = useState(null);
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState(null);
     const sliderRef = useRef(null);
+      const [errors, setErrors] = useState({});
+    
 
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -87,39 +60,59 @@ const PurchaseOrder = () => {
         setItemQty("");
     };
 
-    // Fetch employee list
-    const fetchEmployeeList = useCallback(async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/employees`);
-            setEmployeeName(res?.data);
-        } catch (error) {
-            console.error("Failed to fetch employees", error);
-        } finally {
-            setTimeout(() => setLoading(false), 2000);
-        }
-    }, []);
 
-    useEffect(() => {
-        fetchEmployeeList();
-    }, [fetchEmployeeList]);
+      // Fetch quotations
+  const fetchEstimationList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/estimations`
+      );
+      setQuotations(res.data);
+    //   console.log("quotations", res.data);
+    } catch (error) {
+      console.error("Failed to fetch quotations", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
+    }
+  }, []);
 
-    // Fetch supplier list
-    const fetchSupplierList = useCallback(async () => {
-        try {
-            setLoading(true);
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/suppliers`);
-            setSuppliers(res.data);
-        } catch (error) {
-            console.error("Failed to fetch suppliers", error);
-        } finally {
-            setTimeout(() => setLoading(false), 2000);
-        }
-    }, []);
+  useEffect(() => {
+    fetchEstimationList();
+  }, [fetchEstimationList]);
 
-    useEffect(() => {
-        fetchSupplierList();
-    }, [fetchSupplierList]);
+    // Demand Item 
+   useEffect(() => {
+  const fetchQuotationItems = async () => {
+    if (!forDemand) {
+      setEstimationItems([]);
+      return;
+    }
+
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/estimations/${forDemand}`
+      );
+
+      // ✅ Fix: items are inside demandItem
+      setEstimationItems(res.data.demandItem?.items || []);
+
+      console.log("Fetched items: ", res.data.demandItem?.items);
+    } catch (error) {
+      console.error("Error fetching quotation items:", error);
+      setEstimationItems([]);
+    }
+  };
+
+  fetchQuotationItems();
+}, [forDemand]);
+
+    console.log("For ", forDemand);
+    console.log("estimationItems ", estimationItems);
+    
+
 
     // Fetch demand items
     const fetchDemandItems = useCallback(async () => {
@@ -142,8 +135,10 @@ const PurchaseOrder = () => {
     const fetchPurchaseOrders = useCallback(async () => {
         try {
             setLoading(true);
-            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchase-orders`);
+            const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`);
             setPurchaseOrders(res.data);
+            console.log("Purchase ", res.data);
+
         } catch (error) {
             console.error("Failed to fetch purchase orders", error);
         } finally {
@@ -376,11 +371,11 @@ const PurchaseOrder = () => {
                                                 key={order._id}
                                                 className="grid grid-cols-1 lg:grid-cols-6 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                                             >
-                                                <div className="font-medium text-gray-900">{order.poNo}</div>
-                                                <div className="text-gray-600">{order.employee?.employeeName || "N/A"}</div>
-                                                <div className="text-gray-600">{order.supplier?.supplierName || "N/A"}</div>
-                                                <div className="text-gray-600">{order.totalAmount}</div>
-                                                <div className="text-gray-500">{formatDate(order.deliveryDate)}</div>
+                                                <div className="font-medium text-gray-900">{order.purchaseOrderId}</div>
+                                                <div className="text-gray-600">{order.demandItem?.demandItem?.createdBy || "N/A"}</div>
+                                                <div className="text-gray-600">{order.demandItem?.demandItem?.supplier?.supplierName || "N/A"}</div>
+                                                <div className="text-gray-600">{order?.totalAmount}</div>
+                                                <div className="text-gray-500">{formatDate(order?.deliveryDate)}</div>
                                                 <div className="flex justify-end gap-3">
                                                     <button
                                                         onClick={() => handleEditClick(order)}
@@ -472,22 +467,54 @@ const PurchaseOrder = () => {
 
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
-                                        Demand Item <span className="text-red-500">*</span>
+                                        For Demand <span className="text-red-500">*</span>
                                     </label>
                                     <select
-                                        value={demandItem}
-                                        onChange={(e) => setDemandItem(e.target.value)}
-                                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                        required
+                                        value={forDemand}
+                                        onChange={(e) => setForDemand(e.target.value)}
+                                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.forDemand
+                                            ? "border-red-500 focus:ring-red-500"
+                                            : "border-gray-300 focus:ring-newPrimary"
+                                            }`}
                                     >
-                                        <option value="">Select Demand Item</option>
-                                        {demandItems.map((item) => (
-                                            <option key={item._id} value={item._id}>
-                                                {item.itemName}
+                                        <option value="">Select Quotation</option>
+                                        {quotations.map((q) => (
+                                            <option key={q._id} value={q._id}>
+                                                {q.estimationId} 
                                             </option>
                                         ))}
                                     </select>
+                                    {errors.forDemand && (
+                                        <p className="text-red-500 text-xs mt-1">{errors.forDemand}</p>
+                                    )}
                                 </div>
+                                {estimationItems.length > 0 && (
+                                    <div className="overflow-x-auto mt-4">
+                                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                                            <thead className="bg-gray-100">
+                                                <tr>
+                                                    <th className="px-4 py-2 border">Item Name</th>
+                                                    <th className="px-4 py-2 border">Quantity</th>
+                                                    <th className="px-4 py-2 border">Price</th>
+                                                    <th className="px-4 py-2 border">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {estimationItems.map((item) => (
+                                                    <tr key={item._id}>
+                                                        <td className="px-4 text-center py-2 border">{item.itemName}</td>
+                                                        <td className="px-4 text-center py-2 border">{item.qty}</td>
+                                                        <td className="px-4 text-center py-2 border">{item.price}</td>
+                                                        <td className="px-4 text-center py-2 border">{item.total}</td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                        {/* <div className="mt-2 text-right font-semibold">
+                                            Total Amount: {total}
+                                        </div> */}
+                                    </div>
+                                )}
 
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -517,7 +544,7 @@ const PurchaseOrder = () => {
                                                 onChange={(e) => setItemCategory(e.target.value)}
                                                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                                 placeholder="Enter category"
-                                                // required
+                                            // required
                                             />
                                         </div>
                                         <div>
@@ -530,8 +557,8 @@ const PurchaseOrder = () => {
                                                 onChange={(e) => setItemName(e.target.value)}
                                                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                                 placeholder="Enter item name"
-                                                // required
-                                                // disabled
+                                            // required
+                                            // disabled
                                             />
                                         </div>
                                     </div>
@@ -547,8 +574,8 @@ const PurchaseOrder = () => {
                                                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                                 placeholder="Enter rate"
                                                 min="0"
-                                                // required
-                                                // disabled
+                                            // required
+                                            // disabled
                                             />
                                         </div>
                                         <div>
@@ -562,8 +589,8 @@ const PurchaseOrder = () => {
                                                 className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                                                 placeholder="Enter quantity"
                                                 min="1"
-                                                // required
-                                                // disabled
+                                            // required
+                                            // disabled
                                             />
                                         </div>
                                     </div>
