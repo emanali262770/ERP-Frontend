@@ -52,19 +52,19 @@ const Quotation = () => {
     fetchQuatationList();
   }, [fetchQuatationList]);
   useEffect(() => {
-  if (quotations.length > 0) {
-    // Extract numeric part from the last quotationNo
-    const maxNo = Math.max(
-      ...quotations.map(q => {
-        const match = q.quotationNo?.match(/QuotNo-(\d+)/);
-        return match ? parseInt(match[1], 10) : 0;
-      })
-    );
-    setNextQuatation((maxNo + 1).toString().padStart(3, "0"));
-  } else {
-    setNextQuatation("001"); // first quotation
-  }
-}, [quotations]);
+    if (quotations.length > 0) {
+      // Extract numeric part from the last quotationNo
+      const maxNo = Math.max(
+        ...quotations.map((q) => {
+          const match = q.quotationNo?.match(/QuotNo-(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setNextQuatation((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setNextQuatation("001"); // first quotation
+    }
+  }, [quotations]);
 
   console.log("new quation", nextQuatation);
 
@@ -225,16 +225,25 @@ const Quotation = () => {
     setErrors((prev) => ({ ...prev, itemsList: null }));
   };
 
-  console.log({itemsList});
-  
+  console.log({ itemsList });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     const { token } = userInfo || {};
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
+    if (itemsList.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Invalid Item",
+        text: "First add an item",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
 
     const newQuotation = {
       quotationNo: editingQuotation ? quotationNo : `QuotNo-${nextQuatation}`,
@@ -245,11 +254,12 @@ const Quotation = () => {
       designation: designation.trim(),
       items: itemsList,
     };
-    
 
-    if (editingQuotation, editingQuotation?._id) {
+    if ((editingQuotation, editingQuotation?._id)) {
       await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/quotations/${editingQuotation._id}`,
+        `${import.meta.env.VITE_API_BASE_URL}/quotations/${
+          editingQuotation._id
+        }`,
         newQuotation,
         { headers }
       );
@@ -298,7 +308,7 @@ const Quotation = () => {
         cancelButtonText: "No, cancel!",
         reverseButtons: true,
       })
-      .then(async(result) => {
+      .then(async (result) => {
         if (result.isConfirmed) {
           try {
             const { token } = userInfo || {};
@@ -314,12 +324,12 @@ const Quotation = () => {
             );
 
             // ✅ Update UI
-             setQuotations((prev) => prev.filter((q) => q._id !== id));
-          swalWithTailwindButtons.fire(
-            "Deleted!",
-            "Quotation deleted successfully.",
-            "success"
-          );
+            setQuotations((prev) => prev.filter((q) => q._id !== id));
+            swalWithTailwindButtons.fire(
+              "Deleted!",
+              "Quotation deleted successfully.",
+              "success"
+            );
           } catch (error) {
             console.error("Delete error:", error);
             swalWithTailwindButtons.fire(
@@ -328,7 +338,6 @@ const Quotation = () => {
               "error"
             );
           }
-         
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
             "Cancelled",
@@ -361,8 +370,8 @@ const Quotation = () => {
     }
   }, [editingQuotation, demandList]);
 
- function handleRemoveItem(index) {
-    setItemsList(itemsList.filter((_,i)=> i !== index));
+  function handleRemoveItem(index) {
+    setItemsList(itemsList.filter((_, i) => i !== index));
   }
 
   return (
@@ -384,7 +393,7 @@ const Quotation = () => {
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-          <div className="overflow-y-auto lg:overflow-x-auto max-h-acreen">
+          <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1200px]">
               {/* Table Header */}
               <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_3fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
@@ -527,7 +536,7 @@ const Quotation = () => {
                     type="text"
                     value={
                       editingQuotation
-                        ? quotationNo // 
+                        ? quotationNo //
                         : `QuotNo-${nextQuatation}` // ✅ use next number only when adding
                     }
                     readOnly
@@ -750,12 +759,24 @@ const Quotation = () => {
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                         <thead className="bg-gray-100 text-gray-600 text-sm">
                           <tr>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Sr #</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Item Name</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Quantity</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Price</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Total</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Remove</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Sr #
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Item Name
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Quantity
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Price
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Total
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Remove
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="text-gray-700 text-sm">
