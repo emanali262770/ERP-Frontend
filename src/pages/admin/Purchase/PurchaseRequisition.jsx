@@ -371,7 +371,7 @@ const PurchaseRequisition = () => {
           {/* Outer wrapper handles horizontal scroll */}
           <div className="overflow-x-auto">
             {/* Table wrapper with min-width only applied here */}
-            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+            <div className="max-h-screen overflow-y-auto custom-scrollbar">
               <div className="inline-block min-w-[1200px] w-full align-middle">
                 {/* Table Header */}
                 <div className="hidden lg:grid grid-cols-7 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
