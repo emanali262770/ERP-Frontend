@@ -46,6 +46,7 @@ import Designation from "./pages/admin/Mangement/Designation.jsx";
 
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
+import PurchaseOrder from "./pages/admin/Purchase/PurchaseOrder.jsx";
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -91,6 +92,7 @@ function AppContent() {
               element={<PurchaseRequisition />}
             />
             <Route path="purchase-approval" element={<PurchaseApproval />} />
+            <Route path="purchase-order" element={<PurchaseOrder/>} />
             <Route path="quotation" element={<Quotation />} />
             <Route path="estimation" element={<Estimation />} />
             <Route path="gatepass-in" element={<GatePassIN />} />
