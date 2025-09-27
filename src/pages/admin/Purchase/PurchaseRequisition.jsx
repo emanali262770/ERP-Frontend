@@ -24,6 +24,7 @@ const PurchaseRequisition = () => {
   const [isView, setisView] = useState(false);
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [departmentList, setDepartmentList] = useState([]);
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState();
@@ -119,6 +120,34 @@ const PurchaseRequisition = () => {
     fetchRequistionList();
   }, [fetchRequistionList]);
 
+  // serach filter
+  
+useEffect(() => {
+  if (!searchTerm || !searchTerm.startsWith("REQ-")) {
+    // if search empty or not starting with REQ-, load all
+    fetchRequistionList();
+    return;
+  }
+
+  const delayDebounce = setTimeout(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/requisitions/search/${searchTerm}`
+      );
+      setRequisitions(Array.isArray(res.data) ? res.data : [res.data]); 
+    } catch (error) {
+      console.error("Search requisition failed:", error);
+      setRequisitions([]);
+    } finally {
+      setLoading(false);
+    }
+  }, 1000); 
+
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
+
+
   useEffect(() => {
     if (requisitions.length > 0) {
       const maxNo = Math.max(
@@ -161,6 +190,7 @@ const PurchaseRequisition = () => {
     setIsEnable(requisition.isEnable ?? true);
     setIsSliderOpen(true);
   };
+console.log({nextRequisitionId});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -353,12 +383,24 @@ const PurchaseRequisition = () => {
               Purchase Requisition Details
             </h1>
           </div>
-          <button
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-            onClick={handleAddClick}
-          >
-            + Add Requisition
-          </button>
+           <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter REQ No eg: REQ-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddClick}
+            >
+               + Add Requisition
+            </button>
+          </div>
+         
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">

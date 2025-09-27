@@ -20,6 +20,7 @@ const Estimation = () => {
   const [status, setStatus] = useState("Pending");
   const [editingEstimation, setEditingEstimation] = useState(null);
   const [errors, setErrors] = useState({});
+   const [searchTerm, setSearchTerm] = useState("");
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const [nextRequisitionId, setNextRequisitionId] = useState("001");
@@ -46,8 +47,35 @@ const Estimation = () => {
     fetchQuotationList();
   }, [fetchQuotationList]);
 
+   // serach filter
+  
+useEffect(() => {
+  if (!searchTerm || !searchTerm.startsWith("EST-")) {
+    // if search empty or not starting with REQ-, load all
+    fetchQuotationList();
+    return;
+  }
+
+  const delayDebounce = setTimeout(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
+      );
+      setQuotations(Array.isArray(res.data) ? res.data : [res.data]); 
+    } catch (error) {
+      console.error("Search estimations failed:", error);
+      setQuotations([]);
+    } finally {
+      setLoading(false);
+    }
+  }, 1000); 
+
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
   // Fetch quotation items and supplier when forDemand changes
   useEffect(() => {
+   setLoading(true)
     const fetchQuotationItems = async () => {
       if (!forDemand) {
         setQuotationItems([]);
@@ -70,6 +98,11 @@ const Estimation = () => {
         setItemsList([]);
         setTotal("");
         setSupplier("");
+      }
+      finally{
+        setTimeout(() => {
+        setLoading(false);
+      }, 2000);
       }
     };
     fetchQuotationItems();
@@ -166,13 +199,13 @@ const Estimation = () => {
 
   const handleEditClick = (estimation) => {
     setEditingEstimation(estimation);
-    setEstimationId(estimation.quotationNo || ""); // Use quotationNo as estimationId for display
+    setEstimationId(estimation.estimationId || ""); // Use quotationNo as estimationId for display
     setSupplier(estimation.supplier?.supplierName || "");
     setItemsList(estimation.items || []);
     setForDemand(estimation.demandItem?._id || "");
     setTotal(estimation.totalAmount?.toString() || "");
     setDate(formatDate(estimation.date));
-    setStatus(estimation.status ? "Active" : "Inactive"); // Map boolean to string for form
+    setStatus(estimation.status ); // Map boolean to string for form
     setErrors({});
     setIsSliderOpen(true);
   };
@@ -329,10 +362,12 @@ console.log("Not ", forDemand);
     return quotation ? quotation.quotationNo : quotationId;
   };
 
-console.log({nextRequisitionId});
+
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
+      {/* common Header */}
+      <CommanHeader />
       <div className="px-6 mx-auto">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -340,12 +375,24 @@ console.log({nextRequisitionId});
               Estimation Details
             </h1>
           </div>
-          <button
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-            onClick={handleAddClick}
-          >
-            + Add Estimation
-          </button>
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter EST No eg: EST-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddClick}
+            >
+                + Add Estimation
+            </button>
+          </div>
+         
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
@@ -367,7 +414,7 @@ console.log({nextRequisitionId});
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={3}
+                    rows={estimations.length || 5}
                     cols={8}
                     className="lg:grid-cols-8"
                   />
@@ -390,12 +437,12 @@ console.log({nextRequisitionId});
                       <div className="text-gray-500">{formatDate(estimation.date)}</div>
                       <div className="text-gray-600">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${estimation.status
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                          className={`px-2 py-1 rounded-full text-xs ${estimation.status==="Pending"
+                              ? "bg-orange-100 text-orange-800"
+                              : "bg-green-100 text-green-800"
                             }`}
                         >
-                          {estimation.status ? "Active" : "Inactive"}
+                          {estimation.status}
                         </span>
                       </div>
                       <div>

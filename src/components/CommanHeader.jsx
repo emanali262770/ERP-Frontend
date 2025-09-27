@@ -29,9 +29,9 @@ const [loading, setLoading] = useState(true);
       try {
         const [salesRes, revenueRes, pendingRes, notifRes] =
           await Promise.all([
-            axios.get(`${base}/saleInvoices/count`),
-            axios.get(`${base}/saleInvoices/total-revenue`),
-            axios.get(`${base}/bookings/pending`),
+            // axios.get(`${base}/saleInvoices/count`),
+            // axios.get(`${base}/saleInvoices/total-revenue`),
+            // axios.get(`${base}/bookings/pending`),
             axios.get(`${base}/notifications`, {
               headers: { Authorization: `Bearer ${userInfo?.token}` },
             }),
