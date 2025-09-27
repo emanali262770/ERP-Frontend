@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Eye, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
-import TableSkeleton from "../Skeleton"; // Ensure this component exists
+import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
@@ -24,13 +24,17 @@ const PurchaseRequisition = () => {
   const [isView, setisView] = useState(false);
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [departmentList, setDepartmentList] = useState([]);
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState();
   const [itemsList, setItemsList] = useState([]);
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [nextRequisitionId, setNextRequisitionId] = useState("001");
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
   const handleAddItem = () => {
     if (!itemName || !quantity) return;
 
@@ -40,12 +44,9 @@ const PurchaseRequisition = () => {
     };
 
     setItemsList([...itemsList, newItem]);
-
-    // clear inputs after save
     setItemName("");
     setQuantity("");
   };
-  // Department Fetch
 
   const fetchDepartmentList = useCallback(async () => {
     try {
@@ -54,18 +55,17 @@ const PurchaseRequisition = () => {
         `${import.meta.env.VITE_API_BASE_URL}/departments`
       );
       setDepartmentList(res.data);
-      console.log("Designation  ", res.data);
     } catch (error) {
-      console.error("Failed to fetch Supplier", error);
+      console.error("Failed to fetch Department", error);
     } finally {
       setTimeout(() => setLoading(false), 2000);
     }
   }, []);
+
   useEffect(() => {
     fetchDepartmentList();
   }, [fetchDepartmentList]);
 
-  // Fetch employe data
   const fetchEmployeList = useCallback(async () => {
     try {
       setLoading(true);
@@ -73,39 +73,34 @@ const PurchaseRequisition = () => {
         `${import.meta.env.VITE_API_BASE_URL}/employees`
       );
       setEmployeeName(res?.data);
-      console.log("EmployeeList  ", res.data);
     } catch (error) {
-      console.error("Failed to fetch Supplier", error);
+      console.error("Failed to fetch Employee", error);
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setTimeout(() => setLoading(false), 2000);
     }
   }, []);
+
   useEffect(() => {
     fetchEmployeList();
   }, [fetchEmployeList]);
 
-  // teching category list
   const fetchCategoryList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/categories/list`
       );
-      setCategoryList(res.data); // store actual categories array
-      console.log("Categories ", res.data);
+      setCategoryList(res.data);
     } catch (error) {
       console.error("Failed to fetch categories", error);
     } finally {
       setTimeout(() => setLoading(false), 2000);
     }
   }, []);
+
   useEffect(() => {
     fetchCategoryList();
   }, [fetchCategoryList]);
-
-  console.log(categoryList, "emplyee");
 
   const fetchRequistionList = useCallback(async () => {
     try {
@@ -114,18 +109,44 @@ const PurchaseRequisition = () => {
         `${import.meta.env.VITE_API_BASE_URL}/requisitions`
       );
       setRequisitions(res.data);
-      console.log("Requistion  ", res.data);
     } catch (error) {
-      console.error("Failed to fetch Requistion", error);
+      console.error("Failed to fetch Requisition", error);
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setTimeout(() => setLoading(false), 2000);
     }
   }, []);
+
   useEffect(() => {
     fetchRequistionList();
   }, [fetchRequistionList]);
+
+  // serach filter
+
+  useEffect(() => {
+    if (!searchTerm || !searchTerm.startsWith("REQ-")) {
+      // if search empty or not starting with REQ-, load all
+      fetchRequistionList();
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/search/${searchTerm}`
+        );
+        setRequisitions(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search requisition failed:", error);
+        setRequisitions([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
+
 
   useEffect(() => {
     if (requisitions.length > 0) {
@@ -137,11 +158,10 @@ const PurchaseRequisition = () => {
       );
       setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
     } else {
-      setNextRequisitionId("001"); // first requisition
+      setNextRequisitionId("001");
     }
   }, [requisitions]);
 
-  // Handlers for form and table actions
   const handleAddClick = () => {
     setEditingRequisition(null);
     setRequisitionId("");
@@ -158,24 +178,19 @@ const PurchaseRequisition = () => {
   };
 
   const handleEditClick = (requisition) => {
-    console.log(requisition, "handle edit");
-
     setEditingRequisition(requisition);
     setRequisitionId(requisition.requisitionId);
     setDate(formatDate(requisition.date));
-
-    // ✅ store IDs instead of names
     setDepartment(requisition.department?._id || "");
     setEmployee(requisition.employee?._id || "");
     setCategory(requisition.category?._id || "");
-
     setRequirement(requisition.requirements || "");
     setDetails(requisition.details || "");
     setItemsList(requisition.items || []);
     setIsEnable(requisition.isEnable ?? true);
-
     setIsSliderOpen(true);
   };
+  console.log({ nextRequisitionId });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -212,16 +227,13 @@ const PurchaseRequisition = () => {
       requirements: requirement,
       details,
       category,
-      items: itemsList, // ✅ correct structure
+      items: itemsList,
     };
-
-    console.log({ newRequisition });
 
     try {
       if (editingRequisition) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
-            editingRequisition._id
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${editingRequisition._id
           }`,
           newRequisition,
           { headers }
@@ -239,6 +251,7 @@ const PurchaseRequisition = () => {
       fetchRequistionList();
       setIsSliderOpen(false);
       setItemsList([]);
+      setCurrentPage(1); // Reset to first page after adding/updating
     } catch (error) {
       console.error("Error saving requisition", error);
       Swal.fire(
@@ -258,7 +271,7 @@ const PurchaseRequisition = () => {
     const month = String(parsed.getMonth() + 1).padStart(2, "0");
     const year = parsed.getFullYear();
 
-    return `${day}-${month}-${year}`; // DD-MM-YYYY
+    return `${day}-${month}-${year}`;
   };
 
   const handleToggleEnable = (requisition) => {
@@ -270,7 +283,6 @@ const PurchaseRequisition = () => {
     alert(`Requisition ${!requisition.isEnable ? "enabled" : "disabled"}.`);
   };
 
-  // Handle view button
   const handleView = (req) => {
     setSelectedRequisition(req);
     setisView(true);
@@ -282,8 +294,6 @@ const PurchaseRequisition = () => {
   };
 
   const handleDelete = async (id) => {
-    console.log({ id });
-
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -314,40 +324,53 @@ const PurchaseRequisition = () => {
               "Content-Type": "application/json",
             };
 
-            // ✅ Delete from backend
             await axios.delete(
               `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}`,
               { headers }
             );
 
-            // ✅ Update UI
             setRequisitions(requisitions.filter((p) => p._id !== id));
+            setCurrentPage(1); // Reset to first page after deletion
 
             swalWithTailwindButtons.fire(
               "Deleted!",
-              "Promotion deleted successfully.",
+              "Requisition deleted successfully.",
               "success"
             );
           } catch (error) {
             console.error("Delete error:", error);
             swalWithTailwindButtons.fire(
               "Error!",
-              "Failed to delete promotion.",
+              "Failed to delete requisition.",
               "error"
             );
           }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
             "Cancelled",
-            "Promotion is safe 🙂",
+            "Requisition is safe 🙂",
             "error"
           );
         }
       });
   };
+
   function handleRemoveItem(index) {
     setItemsList(itemsList.filter((_, i) => i !== index));
   }
+
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = requisitions.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.ceil(requisitions.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -359,22 +382,31 @@ const PurchaseRequisition = () => {
               Purchase Requisition Details
             </h1>
           </div>
-          <button
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-            onClick={handleAddClick}
-          >
-            + Add Requisition
-          </button>
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter REQ No eg: REQ-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddClick}
+            >
+              + Add Requisition
+            </button>
+          </div>
+
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-          {/* Outer wrapper handles horizontal scroll */}
           <div className="overflow-x-auto">
-            {/* Table wrapper with min-width only applied here */}
             <div className="max-h-screen overflow-y-auto custom-scrollbar">
-              <div className="inline-block min-w-[1200px] w-full align-middle">
-                {/* Table Header */}
-                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="inline-block w-full align-middle">
+                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,200px,100px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                   <div>Requisition ID</div>
                   <div>Department</div>
                   <div>Employee</div>
@@ -384,20 +416,19 @@ const PurchaseRequisition = () => {
                   <div className="">Actions</div>
                 </div>
 
-                {/* Table Body */}
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={requisitions.length || 5}
+                      rows={recordsPerPage}
                       cols={7}
-                      className="lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto]"
+                      className="lg:grid-cols-[200px,200px,200px,200px,200px,200px,200px]"
                     />
-                  ) : requisitions.length === 0 ? (
+                  ) : currentRecords.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
                       No requisitions found.
                     </div>
                   ) : (
-                    requisitions.map((requisition) => (
+                    currentRecords.map((requisition) => (
                       <div
                         key={requisition._id}
                         className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
@@ -411,29 +442,26 @@ const PurchaseRequisition = () => {
                         <div className="text-gray-600">
                           {requisition?.employee?.employeeName || "N/A"}
                         </div>
-
                         <div className="text-gray-600">
                           {requisition?.requirements}
                         </div>
-
                         <div className="text-gray-600">
                           {requisition?.category?.categoryName}
                         </div>
-
                         <div className="text-gray-500">
                           {formatDate(requisition.date)}
                         </div>
-                        <div className="flex justify-start gap-3">
+                        <div className="flex mr-7 justify-end gap-3">
                           <button
                             onClick={() => handleEditClick(requisition)}
-                            className=" py-1 text-sm rounded text-blue-600 "
+                            className="py-1 text-sm rounded text-blue-600"
                             title="Edit"
                           >
                             <SquarePen size={18} />
                           </button>
                           <button
                             onClick={() => handleDelete(requisition._id)}
-                            className=" py-1 text-sm  text-red-600 "
+                            className="py-1 text-sm text-red-600"
                             title="Delete"
                           >
                             <Trash2 size={18} />
@@ -452,6 +480,44 @@ const PurchaseRequisition = () => {
               </div>
             </div>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-between my-4 px-10">
+              {/* Records info */}
+              <div className="text-sm text-gray-600">
+                Showing {indexOfFirstRecord + 1} to{" "}
+                {Math.min(indexOfLastRecord, requisitions.length)} of{" "}
+                {requisitions.length} records
+              </div>
+
+              {/* Pagination buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
+                >
+                  Previous
+                </button>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
         </div>
 
         {isSliderOpen && (
@@ -497,7 +563,7 @@ const PurchaseRequisition = () => {
                     value={
                       editingRequisition
                         ? requisitionId
-                        : `REQ-${nextRequisitionId}` // 👈 auto-generated
+                        : `REQ-${nextRequisitionId}`
                     }
                     readOnly
                     onChange={(e) => setRequisitionId(e.target.value)}
@@ -518,7 +584,6 @@ const PurchaseRequisition = () => {
                     required
                   >
                     <option value="">Select Department</option>
-
                     {departmentList.map((dept) => (
                       <option key={dept._id} value={dept._id}>
                         {dept.departmentName}
@@ -595,7 +660,6 @@ const PurchaseRequisition = () => {
                 </div>
 
                 <div className="space-y-3">
-                  {/* Inputs with Save Button */}
                   <div className="flex justify-between gap-2 items-end">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
@@ -628,14 +692,13 @@ const PurchaseRequisition = () => {
                       <button
                         type="button"
                         onClick={handleAddItem}
-                        className="w-16 h-12 bg-newPrimary text-white  rounded-lg hover:bg-newPrimary/80 transition"
+                        className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
                       >
                         + Add
                       </button>
                     </div>
                   </div>
 
-                  {/* Items Table */}
                   {itemsList.length > 0 && (
                     <div className="overflow-x-auto">
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -644,7 +707,7 @@ const PurchaseRequisition = () => {
                             <th className="px-4 py-2 border-b">Sr #</th>
                             <th className="px-4 py-2 border-b">Item Name</th>
                             <th className="px-4 py-2 border-b">Quantity</th>
-                            <th className="px-4 py-2 border-b">remove</th>
+                            <th className="px-4 py-2 border-b">Remove</th>
                           </tr>
                         </thead>
                         <tbody className="text-gray-700 text-sm">
@@ -680,18 +743,17 @@ const PurchaseRequisition = () => {
                   {loading
                     ? "Saving..."
                     : editingRequisition
-                    ? "Update Requisition"
-                    : "Save Requisition"}
+                      ? "Update Requisition"
+                      : "Save Requisition"}
                 </button>
               </form>
             </div>
           </div>
         )}
 
-        {/* Show popup only if isView is true */}
         {isView && selectedRequisition && (
           <ViewModel
-            requisition={selectedRequisition} // ✅ pass as prop
+            requisition={selectedRequisition}
             onClose={() => setisView(false)}
           />
         )}

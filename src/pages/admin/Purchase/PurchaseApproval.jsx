@@ -17,6 +17,8 @@ const PurchaseApproval = () => {
   const [editingApproval, setEditingApproval] = useState(null);
   const sliderRef = useRef(null);
   const [isView, setisView] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   // requistation api call
   const fetchRequistionList = useCallback(async () => {
@@ -38,6 +40,33 @@ const PurchaseApproval = () => {
   useEffect(() => {
     fetchRequistionList();
   }, [fetchRequistionList]);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      // if search is empty, load all
+      fetchRequistionList();
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/requisitions/demandItem/${searchTerm}`
+        );
+        setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search approvals failed:", error);
+        setApprovals([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000); // debounce so it won't spam API
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
 
   // Handlers for form and table actions
   const handleEditClick = (approval) => {
@@ -175,6 +204,7 @@ const PurchaseApproval = () => {
       Swal.fire("❌ Error", "Failed to update status", "error");
     }
   }
+  console.log({ approvals });
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -186,6 +216,16 @@ const PurchaseApproval = () => {
               Purchase Approval Details
             </h1>
           </div>
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter Approval ID eg: PRA-Ali-0002"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+          </div>
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
@@ -196,12 +236,16 @@ const PurchaseApproval = () => {
               <div className="inline-block min-w-[1200px] w-full align-middle">
                 {/* Table Header */}
                 <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,300px,150px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                  <div>Sr #</div>
+                  <div>Approved Id</div>
                   <div>Department</div>
                   <div>Employee</div>
                   <div>Date</div>
-                  <div className={ `${loading?"":"flex justify-end"}`}>Actions</div>
-<div className={ `${loading?"":"flex justify-end"}`} >View</div>
+                  <div className={`${loading ? "" : "flex justify-end"}`}>
+                    Actions
+                  </div>
+                  <div className={`${loading ? "" : "flex justify-end"}`}>
+                    View
+                  </div>
                 </div>
 
                 {/* Table Body */}
@@ -224,7 +268,7 @@ const PurchaseApproval = () => {
                       >
                         {/* Sr # */}
                         <div className="font-medium text-gray-900">
-                          {idx + 1}
+                          {approval?.demandItem}
                         </div>
 
                         {/* Department */}

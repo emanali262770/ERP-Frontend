@@ -16,6 +16,7 @@ import Quotation from "./pages/admin/Purchase/Quotation.jsx";
 import Estimation from "./pages/admin/Purchase/Estimation";
 import GatePassIN from "./pages/admin/Purchase/GatePassIN.jsx";
 import QualityChecking from "./pages/admin/Purchase/QualityChecking.jsx";
+import GRN from "./pages/admin/Purchase/GRN.jsx";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierList from "./pages/admin/SetUp/Supplier.jsx";
 import Manufacture from "./pages/admin/SetUp/Manufacture.jsx";
@@ -24,7 +25,7 @@ import ItemPurchase from "./pages/admin/Purchase/ItemPurchase";
 import SalesInvoice from "./pages/admin/SalesInvoice";
 import ExpiryTags from "./pages/admin/ExpiryTags";
 import BookingOrder from "./pages/admin/BookingOrder";
-
+import GatePassOut from "./pages/admin/Purchase/GatePassOUT.jsx";
 import ItemUnit from "./pages/admin/SetUp/ItemUnit.jsx";
 
 import Company from "./pages/admin/Company";
@@ -93,7 +94,11 @@ function AppContent() {
             <Route path="quotation" element={<Quotation />} />
             <Route path="estimation" element={<Estimation />} />
             <Route path="gatepass-in" element={<GatePassIN />} />
+
             <Route path="quality-checking" element={<QualityChecking />} />
+            <Route path="grn" element={<GRN />} />
+            <Route path="gatepass-out" element={<GatePassOut />} />
+
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
