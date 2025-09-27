@@ -1,4 +1,4 @@
-jsx;
+
 import React, { useState, useEffect, useRef } from "react";
 import { SquarePen, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";

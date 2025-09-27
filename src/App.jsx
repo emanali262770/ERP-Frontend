@@ -15,7 +15,7 @@ import PurchaseApproval from "./pages/admin/Purchase/PurchaseApproval.jsx";
 import Quotation from "./pages/admin/Purchase/Quotation.jsx";
 import Estimation from "./pages/admin/Purchase/Estimation";
 import GatePassIN from "./pages/admin/Purchase/GatePassIN.jsx";
-import QualityChecking from "./pages/admin/Purchase/QualityChecking.jsx";
+import QualityCheck from "./pages/admin/Purchase/QualityChecking.jsx";
 import GRN from "./pages/admin/Purchase/GRN.jsx";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierList from "./pages/admin/SetUp/Supplier.jsx";
@@ -95,7 +95,7 @@ function AppContent() {
             <Route path="estimation" element={<Estimation />} />
             <Route path="gatepass-in" element={<GatePassIN />} />
 
-            <Route path="quality-checking" element={<QualityChecking />} />
+            <Route path="quality-checking" element={<QualityCheck />} />
             <Route path="grn" element={<GRN />} />
             <Route path="gatepass-out" element={<GatePassOut />} />
 
