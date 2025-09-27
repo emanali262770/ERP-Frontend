@@ -107,8 +107,7 @@ const PurchaseOrder = () => {
         // ✅ Fix: items are inside demandItem
         setEstimationItems(res.data.demandItem?.items || []);
 
-        console.log("Fetched items: ", res.data.demandItem?.items);
-        setDemandItem(res.data.demandItem?.demandItem);
+        setDemandItem(res.data._id);
       } catch (error) {
         console.error("Error fetching quotation items:", error);
         setEstimationItems([]);
@@ -231,19 +230,18 @@ const PurchaseOrder = () => {
     setIsEnable(order.isEnable);
     setIsSliderOpen(true);
   };
-  console.log({ nextRequisitionId });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if ( !demandItem ||  !deliveryDate || !tax) {
-        Swal.fire({
-            icon: "warning",
-            title: "Missing Fields",
-            text: "⚠️ Please fill in all the fields",
-            confirmButtonColor: "#d33",
-        });
-        return;
+    if (!demandItem || !deliveryDate || !tax) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "⚠️ Please fill in all the fields",
+        confirmButtonColor: "#d33",
+      });
+      return;
     }
 
     const { token } = userInfo || {};
@@ -263,7 +261,6 @@ const PurchaseOrder = () => {
       tax,
     };
     console.log({ newPurchaseOrder });
-    
 
     try {
       if (editingPurchaseOrder) {
@@ -380,7 +377,6 @@ const PurchaseOrder = () => {
     setIsView(false);
     setSelectedPurchaseOrder(null);
   };
-  console.log({ purchaseOrders });
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -418,7 +414,7 @@ const PurchaseOrder = () => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={3}
+                      rows={purchaseOrders.length || 5}
                       cols={6}
                       className="lg:grid-cols-6"
                     />
@@ -436,10 +432,10 @@ const PurchaseOrder = () => {
                           {order.purchaseOrderId}
                         </div>
                         <div className="text-gray-600">
-                          {order.demandItem?.demandItem?.createdBy || "N/A"}
+                          {order?.estimation?.demandItem?.createdBy || "N/A"}
                         </div>
                         <div className="text-gray-600">
-                          {order.demandItem?.demandItem?.supplier
+                          {order?.estimation?.demandItem?.supplier
                             ?.supplierName || "N/A"}
                         </div>
                         <div className="text-gray-600">
