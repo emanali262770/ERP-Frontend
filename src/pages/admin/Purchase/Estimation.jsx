@@ -20,6 +20,7 @@ const Estimation = () => {
   const [status, setStatus] = useState("Pending");
   const [editingEstimation, setEditingEstimation] = useState(null);
   const [errors, setErrors] = useState({});
+   const [searchTerm, setSearchTerm] = useState("");
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const [nextRequisitionId, setNextRequisitionId] = useState("001");
@@ -46,6 +47,32 @@ const Estimation = () => {
     fetchQuotationList();
   }, [fetchQuotationList]);
 
+   // serach filter
+  
+useEffect(() => {
+  if (!searchTerm || !searchTerm.startsWith("EST-")) {
+    // if search empty or not starting with REQ-, load all
+    fetchQuotationList();
+    return;
+  }
+
+  const delayDebounce = setTimeout(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
+      );
+      setQuotations(Array.isArray(res.data) ? res.data : [res.data]); 
+    } catch (error) {
+      console.error("Search estimations failed:", error);
+      setQuotations([]);
+    } finally {
+      setLoading(false);
+    }
+  }, 1000); 
+
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
   // Fetch quotation items and supplier when forDemand changes
   useEffect(() => {
    setLoading(true)
@@ -335,7 +362,7 @@ console.log("Not ", forDemand);
     return quotation ? quotation.quotationNo : quotationId;
   };
 
-console.log({estimations});
+
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -348,12 +375,24 @@ console.log({estimations});
               Estimation Details
             </h1>
           </div>
-          <button
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-            onClick={handleAddClick}
-          >
-            + Add Estimation
-          </button>
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter EST No eg: EST-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddClick}
+            >
+                + Add Estimation
+            </button>
+          </div>
+         
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">

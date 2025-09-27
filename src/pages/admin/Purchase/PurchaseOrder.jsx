@@ -46,6 +46,8 @@ const PurchaseOrder = () => {
   const [nextRequisitionId, setNextRequisitionId] = useState("001");
   const [purchaseOrderId, setPurchaseOrderId] = useState();
   const sliderRef = useRef(null);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [errors, setErrors] = useState({});
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
@@ -170,6 +172,32 @@ const PurchaseOrder = () => {
   useEffect(() => {
     fetchPurchaseOrders();
   }, [fetchPurchaseOrders]);
+
+// serach filter
+  useEffect(() => {
+  if (!searchTerm || !searchTerm.startsWith("PO-")) {
+    // if search empty or not starting with REQ-, load all
+    fetchPurchaseOrders();
+    return;
+  }
+
+  const delayDebounce = setTimeout(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
+      );
+      setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]); 
+    } catch (error) {
+      console.error("Search purchaseOrder failed:", error);
+      setPurchaseOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  }, 1000); 
+
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
 
   useEffect(() => {
     if (purchaseOrders.length > 0) {
@@ -388,12 +416,24 @@ const PurchaseOrder = () => {
               Purchase Order Details
             </h1>
           </div>
-          <button
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-            onClick={handleAddClick}
-          >
-            + Add Purchase Order
-          </button>
+
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter PO No eg: PO-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddClick}
+            >
+              + Add Purchase Order
+            </button>
+          </div>
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
