@@ -1,137 +1,189 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Eye, SquarePen, Trash2, X } from "lucide-react";
+import { Eye, Loader, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton"; // Ensure this component exists
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
 
-const PurchaseRequisition = () => {
-  const [requisitions, setRequisitions] = useState([]);
-  const [employeeName, setEmployeeName] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
+const PurchaseOrder = () => {
+  const [purchaseOrders, setPurchaseOrders] = useState([]);
+
+  const [demandItems, setDemandItems] = useState([
+    {
+      _id: "di1",
+      itemName: "Laptop Order",
+      supplier: { _id: "sup1", supplierName: "ABC Supplies" },
+    },
+    {
+      _id: "di2",
+      itemName: "Desk Order",
+      supplier: { _id: "sup2", supplierName: "XYZ Corp" },
+    },
+  ]);
+  const [forDemand, setForDemand] = useState("");
+  const [estimationItems, setEstimationItems] = useState([]);
+  const [quotations, setQuotations] = useState([]);
+const [searchTerm, setSearchTerm] = useState("");
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [requisitionId, setRequisitionId] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [poNo, setPoNo] = useState("");
   const [date, setDate] = useState("");
-  const [department, setDepartment] = useState("");
-  const [employee, setEmployee] = useState("");
-  const [requirement, setRequirement] = useState("");
-  const [details, setDetails] = useState("");
-  const [items, setItems] = useState("");
-  const [category, setCategory] = useState("");
-  const [isEnable, setIsEnable] = useState(true);
-  const [isView, setisView] = useState(false);
-  const [editingRequisition, setEditingRequisition] = useState(null);
-  const sliderRef = useRef(null);
-  const [departmentList, setDepartmentList] = useState([]);
-  const [itemName, setItemName] = useState("");
-  const [quantity, setQuantity] = useState();
+  const [demandItem, setDemandItem] = useState("");
+  const [supplier, setSupplier] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [tax, setTax] = useState("10%");
+  const [totalAmount, setTotalAmount] = useState("1000");
   const [itemsList, setItemsList] = useState([]);
-  const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [itemCategory, setItemCategory] = useState("");
+  const [itemName, setItemName] = useState("");
+  const [itemRate, setItemRate] = useState("");
+  const [itemQty, setItemQty] = useState("");
+  const [isEnable, setIsEnable] = useState(true);
+  const [isView, setIsView] = useState(false);
+  const [editingPurchaseOrder, setEditingPurchaseOrder] = useState(null);
+  const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState(null);
   const [nextRequisitionId, setNextRequisitionId] = useState("001");
+  const [purchaseOrderId, setPurchaseOrderId] = useState();
+  const sliderRef = useRef(null);
+  const [errors, setErrors] = useState({});
+
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  // Handle adding items to the table in the form
   const handleAddItem = () => {
-    if (!itemName || !quantity) return;
+    if (!itemCategory || !itemName || !itemRate || !itemQty) return;
 
     const newItem = {
-      itemName,
-      quantity: parseInt(quantity, 10),
+      category: itemCategory,
+      name: itemName,
+      rate: parseFloat(itemRate),
+      qty: parseInt(itemQty, 10),
+      total: parseFloat(itemRate) * parseInt(itemQty, 10),
     };
 
     setItemsList([...itemsList, newItem]);
-
-    // clear inputs after save
+    setItemCategory("");
     setItemName("");
-    setQuantity("");
+    setItemRate("");
+    setItemQty("");
   };
-  // Department Fetch
 
-  const fetchDepartmentList = useCallback(async () => {
+  // Fetch quotations
+  const fetchEstimationList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/departments`
+        `${import.meta.env.VITE_API_BASE_URL}/estimations`
       );
-      setDepartmentList(res.data);
-      console.log("Designation  ", res.data);
+      setQuotations(res.data);
     } catch (error) {
-      console.error("Failed to fetch Supplier", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-  useEffect(() => {
-    fetchDepartmentList();
-  }, [fetchDepartmentList]);
-
-  // Fetch employe data
-  const fetchEmployeList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/employees`
-      );
-      setEmployeeName(res?.data);
-      console.log("EmployeeList  ", res.data);
-    } catch (error) {
-      console.error("Failed to fetch Supplier", error);
+      console.error("Failed to fetch quotations", error);
     } finally {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
     }
   }, []);
-  useEffect(() => {
-    fetchEmployeList();
-  }, [fetchEmployeList]);
 
-  // teching category list
-  const fetchCategoryList = useCallback(async () => {
+  useEffect(() => {
+    fetchEstimationList();
+  }, [fetchEstimationList]);
+  console.log("forDemand ", forDemand);
+
+  // Demand Item
+  useEffect(() => {
+    const fetchQuotationItems = async () => {
+      if (!forDemand) {
+        setEstimationItems([]);
+        return;
+      }
+
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/${forDemand}`
+        );
+
+        // ✅ Fix: items are inside demandItem
+        setEstimationItems(res.data.demandItem?.items || []);
+
+        setDemandItem(res.data._id);
+      } catch (error) {
+        console.error("Error fetching quotation items:", error);
+        setEstimationItems([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuotationItems();
+  }, [forDemand]);
+
+  function totalCaulationWithTax() {
+    const Calculation =
+      estimationItems.reduce(
+        (acc, item) => acc + parseInt(item.total || 0),
+        0
+      ) + (parseInt(tax) || 0);
+    setTotalAmount(Calculation);
+  }
+
+  useEffect(() => {
+    totalCaulationWithTax();
+  }, [forDemand, estimationItems, tax]);
+
+  // Fetch purchase orders
+  const fetchPurchaseOrders = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/categories/list`
+        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`
       );
-      setCategoryList(res.data); // store actual categories array
-      console.log("Categories ", res.data);
+      setPurchaseOrders(res.data);
+      console.log("Purchase ", res.data);
     } catch (error) {
-      console.error("Failed to fetch categories", error);
+      console.error("Failed to fetch purchase orders", error);
     } finally {
       setTimeout(() => setLoading(false), 2000);
     }
   }, []);
+
   useEffect(() => {
-    fetchCategoryList();
-  }, [fetchCategoryList]);
+    fetchPurchaseOrders();
+  }, [fetchPurchaseOrders]);
 
-  console.log(categoryList, "emplyee");
+  useEffect(() => {
+  if (!searchTerm || !searchTerm.startsWith("PO-")) {
+    // if search empty or not starting with REQ-, load all
+    fetchPurchaseOrders();
+    return;
+  }
 
-  const fetchRequistionList = useCallback(async () => {
+  const delayDebounce = setTimeout(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/requisitions`
+        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
       );
-      setRequisitions(res.data);
-      console.log("Requistion  ", res.data);
+      setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]); 
     } catch (error) {
-      console.error("Failed to fetch Requistion", error);
+      console.error("Search purchaseOrder failed:", error);
+      setPurchaseOrders([]);
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setLoading(false);
     }
-  }, []);
-  useEffect(() => {
-    fetchRequistionList();
-  }, [fetchRequistionList]);
+  }, 1000); 
 
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
+
+  //   Next POId
   useEffect(() => {
-    if (requisitions.length > 0) {
+    if (purchaseOrders.length > 0) {
       const maxNo = Math.max(
-        ...requisitions.map((r) => {
-          const match = r.requisitionId?.match(/REQ-(\d+)/);
+        ...purchaseOrders.map((r) => {
+          const match = r.purchaseOrderId?.match(/PO-(\d+)/);
           return match ? parseInt(match[1], 10) : 0;
         })
       );
@@ -139,60 +191,66 @@ const PurchaseRequisition = () => {
     } else {
       setNextRequisitionId("001"); // first requisition
     }
-  }, [requisitions]);
+  }, [purchaseOrders]);
+
+  // Auto-fill supplier based on demand item
+  useEffect(() => {
+    if (demandItem) {
+      const selectedDemand = demandItems.find(
+        (item) => item._id === demandItem
+      );
+      if (selectedDemand && selectedDemand.supplier) {
+        setSupplier(selectedDemand.supplier._id);
+      }
+    }
+  }, [demandItem, demandItems]);
 
   // Handlers for form and table actions
   const handleAddClick = () => {
-    setEditingRequisition(null);
-    setRequisitionId("");
+    setEditingPurchaseOrder(null);
+    setPoNo(
+      editingPurchaseOrder
+        ? editingPurchaseOrder.poNo
+        : `PO-${nextRequisitionId}`
+    );
     setDate("");
-    setDepartment("");
-    setEmployee("");
-    setRequirement("");
-    setDetails("");
+    setDemandItem("");
+    setSupplier("");
+    setDeliveryDate("");
+    setTax("");
+    setTotalAmount("");
     setItemsList([]);
-    setCategory("");
-    setQuantity("");
     setIsEnable(true);
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (requisition) => {
-    console.log(requisition, "handle edit");
+  //   Handle edit
+  const handleEditClick = (order) => {
+    console.log("Edit ", order);
 
-    setEditingRequisition(requisition);
-    setRequisitionId(requisition.requisitionId);
-    setDate(formatDate(requisition.date));
-
-    // ✅ store IDs instead of names
-    setDepartment(requisition.department?._id || "");
-    setEmployee(requisition.employee?._id || "");
-    setCategory(requisition.category?._id || "");
-
-    setRequirement(requisition.requirements || "");
-    setDetails(requisition.details || "");
-    setItemsList(requisition.items || []);
-    setIsEnable(requisition.isEnable ?? true);
-
+    setEditingPurchaseOrder(order);
+    setPoNo(order.purchaseOrderId);
+    setPurchaseOrderId(order.purchaseOrderId);
+    setDate(formatDate(order.date));
+    setDemandItem(order.demandItem?._id || "");
+    setSupplier(order.supplier?._id || "");
+    setDeliveryDate(formatDate(order.deliveryDate));
+    setTax(order.tax);
+    setTotalAmount(order.totalAmount);
+    setItemsList(order.items || []);
+    setIsEnable(order.isEnable);
     setIsSliderOpen(true);
   };
-console.log({nextRequisitionId});
 
+  //   Handle Sumbit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (
-      !department ||
-      !employee ||
-      !requirement ||
-      !details ||
-      !category ||
-      itemsList.length === 0
-    ) {
+    if (!demandItem || !deliveryDate || tax === "") {
       Swal.fire({
         icon: "warning",
         title: "Missing Fields",
-        text: "⚠️ Please fill in all required fields and add at least one item.",
+        text: "⚠️ Please fill in all the fields",
         confirmButtonColor: "#d33",
       });
       return;
@@ -204,47 +262,59 @@ console.log({nextRequisitionId});
       "Content-Type": "application/json",
     };
 
-    const newRequisition = {
-      requisitionId: editingRequisition
-        ? requisitionId
-        : `REQ-${nextRequisitionId}`,
-      department,
-      employee,
-      requirements: requirement,
-      details,
-      category,
-      items: itemsList, // ✅ correct structure
+    const newPurchaseOrder = {
+      purchaseOrderId: editingPurchaseOrder
+        ? purchaseOrderId
+        : `PO-${nextRequisitionId}`, // ✅ Always padded "001"
+
+      estimation: demandItem, // ✅ must match backend schema
+      deliveryDate,
+      tax: Number(tax),
     };
 
-    console.log({ newRequisition });
-
     try {
-      if (editingRequisition) {
+      if (editingPurchaseOrder) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
-            editingRequisition._id
+          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/${
+            editingPurchaseOrder._id
           }`,
-          newRequisition,
+          newPurchaseOrder,
           { headers }
         );
-        Swal.fire("Updated!", "Requisition updated successfully.", "success");
+        Swal.fire(
+          "Updated!",
+          "Purchase order updated successfully.",
+          "success"
+        );
       } else {
         await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions`,
-          newRequisition,
+          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`,
+          newPurchaseOrder,
           { headers }
         );
-        Swal.fire("Added!", "Requisition added successfully.", "success");
+        Swal.fire("Added!", "Purchase order added successfully.", "success");
       }
 
-      fetchRequistionList();
+      // ✅ Reload everything after save
+      await fetchPurchaseOrders(); // refresh state
       setIsSliderOpen(false);
       setItemsList([]);
+      setPurchaseOrderId(""); // reset field
+      setDemandItem("");
+      setDeliveryDate("");
+      setTax("");
+
+      // ✅ Hard reload (last fallback if state doesn't refresh properly)
+      window.location.reload();
     } catch (error) {
-      console.error("Error saving requisition", error);
+      console.error(
+        "❌ Error saving purchase order",
+        error.response?.data || error
+      );
       Swal.fire(
         "Error!",
-        error.response?.data?.message || "Failed to save requisition."
+        error.response?.data?.error || "Something went wrong while saving.",
+        "error"
       );
     }
   };
@@ -262,28 +332,9 @@ console.log({nextRequisitionId});
     return `${day}-${month}-${year}`; // DD-MM-YYYY
   };
 
-  const handleToggleEnable = (requisition) => {
-    setRequisitions(
-      requisitions.map((r) =>
-        r._id === requisition._id ? { ...r, isEnable: !r.isEnable } : r
-      )
-    );
-    alert(`Requisition ${!requisition.isEnable ? "enabled" : "disabled"}.`);
-  };
-
-  // Handle view button
-  const handleView = (req) => {
-    setSelectedRequisition(req);
-    setisView(true);
-  };
-
-  const closeModal = () => {
-    setisView(false);
-    setSelectedRequisition(null);
-  };
-
+  //   Handle Delete
   const handleDelete = async (id) => {
-    console.log({ id });
+    console.log("Delete ", id);
 
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
@@ -315,40 +366,45 @@ console.log({nextRequisitionId});
               "Content-Type": "application/json",
             };
 
-            // ✅ Delete from backend
             await axios.delete(
-              `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}`,
+              `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/${id}`,
               { headers }
             );
 
-            // ✅ Update UI
-            setRequisitions(requisitions.filter((p) => p._id !== id));
+            setPurchaseOrders(purchaseOrders.filter((p) => p._id !== id));
 
             swalWithTailwindButtons.fire(
               "Deleted!",
-              "Promotion deleted successfully.",
+              "Purchase order deleted successfully.",
               "success"
             );
           } catch (error) {
             console.error("Delete error:", error);
             swalWithTailwindButtons.fire(
               "Error!",
-              "Failed to delete promotion.",
+              "Failed to delete purchase order.",
               "error"
             );
           }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
             "Cancelled",
-            "Promotion is safe 🙂",
+            "Purchase order is safe 🙂",
             "error"
           );
         }
       });
   };
-  function handleRemoveItem(index) {
-    setItemsList(itemsList.filter((_, i) => i !== index));
-  }
+
+  const handleView = (order) => {
+    setSelectedPurchaseOrder(order);
+    setIsView(true);
+  };
+
+  const closeModal = () => {
+    setIsView(false);
+    setSelectedPurchaseOrder(null);
+  };
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -357,90 +413,94 @@ console.log({nextRequisitionId});
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-2xl font-bold text-newPrimary">
-              Purchase Requisition Details
+              Purchase Order Details
             </h1>
           </div>
-          <button
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter PO No eg: PO-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
             className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
             onClick={handleAddClick}
           >
-            + Add Requisition
+            + Add Purchase Order
           </button>
+          </div>
+          
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-          {/* Outer wrapper handles horizontal scroll */}
           <div className="overflow-x-auto">
-            {/* Table wrapper with min-width only applied here */}
-            <div className="max-h-screen overflow-y-auto custom-scrollbar">
+            <div className="max-h-full overflow-y-auto custom-scrollbar">
               <div className="inline-block min-w-[1200px] w-full align-middle">
-                {/* Table Header */}
-                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                  <div>Requisition ID</div>
-                  <div>Department</div>
+                <div className="hidden lg:grid grid-cols-6 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                  <div>PO No.</div>
                   <div>Employee</div>
-                  <div>Requirement</div>
-                  <div>Category</div>
-                  <div>Date</div>
-                  <div className="">Actions</div>
+                  <div>Supplier</div>
+                  <div>Total Amount</div>
+                  <div>Delivery Date</div>
+                  <div className={`${loading ? "" : "text-right"}`}>
+                    Actions
+                  </div>
                 </div>
 
-                {/* Table Body */}
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={requisitions.length || 5}
-                      cols={7}
-                      className="lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto]"
+                      rows={purchaseOrders.length || 5}
+                      cols={6}
+                      className="lg:grid-cols-6"
                     />
-                  ) : requisitions.length === 0 ? (
+                  ) : purchaseOrders.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
-                      No requisitions found.
+                      No purchase orders found.
                     </div>
                   ) : (
-                    requisitions.map((requisition) => (
+                    purchaseOrders.map((order) => (
                       <div
-                        key={requisition._id}
-                        className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        key={order._id}
+                        className="grid grid-cols-1 lg:grid-cols-6 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         <div className="font-medium text-gray-900">
-                          {requisition.requisitionId}
+                          {order.purchaseOrderId}
                         </div>
                         <div className="text-gray-600">
-                          {requisition?.department?.departmentName || "N/A"}
+                          {order?.estimation?.demandItem?.createdBy || "N/A"}
                         </div>
                         <div className="text-gray-600">
-                          {requisition?.employee?.employeeName || "N/A"}
+                          {order?.estimation?.demandItem?.supplier
+                            ?.supplierName || "N/A"}
                         </div>
-
                         <div className="text-gray-600">
-                          {requisition?.requirements}
+                          {order?.totalAmount}
                         </div>
-
-                        <div className="text-gray-600">
-                          {requisition?.category?.categoryName}
-                        </div>
-
                         <div className="text-gray-500">
-                          {formatDate(requisition.date)}
+                          {formatDate(order?.deliveryDate)}
                         </div>
-                        <div className="flex justify-start gap-3">
+                        <div className="flex justify-end gap-3">
                           <button
-                            onClick={() => handleEditClick(requisition)}
-                            className=" py-1 text-sm rounded text-blue-600 "
+                            onClick={() => handleEditClick(order)}
+                            className="py-1 text-sm rounded text-blue-600"
                             title="Edit"
                           >
                             <SquarePen size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(requisition._id)}
-                            className=" py-1 text-sm  text-red-600 "
+                            onClick={() => handleDelete(order._id)}
+                            className="py-1 text-sm text-red-600"
                             title="Delete"
                           >
                             <Trash2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleView(requisition)}
+                            onClick={() => handleView(order)}
                             className="text-amber-600 hover:underline"
                           >
                             <Eye size={18} />
@@ -463,214 +523,174 @@ console.log({nextRequisitionId});
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingRequisition
-                    ? "Update Requisition"
-                    : "Add a New Requisition"}
+                  {editingPurchaseOrder
+                    ? "Update Purchase Order"
+                    : "Add a New Purchase Order"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
                   onClick={() => {
                     setIsSliderOpen(false);
-                    setRequisitionId("");
+                    setPoNo("");
                     setDate("");
-                    setDepartment("");
-                    setEmployee("");
-                    setRequirement("");
-                    setDetails("");
-                    setItems("");
-                    setCategory("");
-                    setQuantity("");
+                    setDemandItem("");
+                    setSupplier("");
+                    setDeliveryDate("");
+                    setTax("");
+                    setTotalAmount("");
+                    setItemsList([]);
                     setIsEnable(true);
-                    setEditingRequisition(null);
+                    setEditingPurchaseOrder(null);
                   }}
                 >
-                  ×
+                  <X />
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Requisition ID <span className="text-blue-600">*</span>
+                    PO No. <span className="text-blue-600">*</span>
                   </label>
                   <input
                     type="text"
-                    value={
-                      editingRequisition
-                        ? requisitionId
-                        : `REQ-${nextRequisitionId}` // 👈 auto-generated
-                    }
-                    readOnly
-                    onChange={(e) => setRequisitionId(e.target.value)}
+                    value={poNo}
+                    onChange={(e) => setPoNo(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    placeholder="Enter requisition ID"
+                    placeholder="Enter PO No."
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Department <span className="text-red-500">*</span>
+                    Date <span className="text-red-500">*</span>
                   </label>
-                  <select
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
+                  <input
+                    type="date"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                     required
-                  >
-                    <option value="">Select Department</option>
-
-                    {departmentList.map((dept) => (
-                      <option key={dept._id} value={dept._id}>
-                        {dept.departmentName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Employee <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={employee}
-                    onChange={(e) => setEmployee(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Employee</option>
-                    {employeeName.map((emp) => (
-                      <option key={emp._id} value={emp._id}>
-                        {emp.employeeName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Requirement <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={requirement}
-                    onChange={(e) => setRequirement(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Requirement</option>
-                    <option value="Regular Purchase">Regular Purchase</option>
-                    <option value="Monthly Purchase">Monthly Purchase</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Details
-                  </label>
-                  <textarea
-                    value={details}
-                    onChange={(e) => setDetails(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter requisition details"
-                    rows="3"
                   />
                 </div>
 
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Category <span className="text-red-500">*</span>
+                    For Demand <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
+                    value={forDemand}
+                    onChange={(e) => setForDemand(e.target.value)}
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.forDemand
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                    }`}
                   >
-                    <option value="">Select Category</option>
-                    {categoryList.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
-                        {cat.categoryName}
+                    <option value="">Select Quotation</option>
+                    {quotations.map((q) => (
+                      <option key={q._id} value={q._id}>
+                        {q.estimationId}
                       </option>
                     ))}
                   </select>
+                  {errors.forDemand && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.forDemand}
+                    </p>
+                  )}
                 </div>
-
-                <div className="space-y-3">
-                  {/* Inputs with Save Button */}
-                  <div className="flex justify-between gap-2 items-end">
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Item Name
-                      </label>
-                      <input
-                        type="text"
-                        value={itemName}
-                        onChange={(e) => setItemName(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter item name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter quantity"
-                        min="1"
-                      />
-                    </div>
-
-                    <div className="">
-                      <button
-                        type="button"
-                        onClick={handleAddItem}
-                        className="w-16 h-12 bg-newPrimary text-white  rounded-lg hover:bg-newPrimary/80 transition"
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Items Table */}
-                  {itemsList.length > 0 && (
-                    <div className="overflow-x-auto">
+                {loading ? (
+                  <span className="animate-spin flex justify-center">
+                    <Loader size={18} />
+                  </span>
+                ) : (
+                  estimationItems.length > 0 && (
+                    <div className="overflow-x-auto mt-4">
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                        <thead className="bg-gray-100">
                           <tr>
-                            <th className="px-4 py-2 border-b">Sr #</th>
-                            <th className="px-4 py-2 border-b">Item Name</th>
-                            <th className="px-4 py-2 border-b">Quantity</th>
-                            <th className="px-4 py-2 border-b">remove</th>
+                            <th className="px-4 py-2 border">Item Name</th>
+                            <th className="px-4 py-2 border">Quantity</th>
+                            <th className="px-4 py-2 border">Price</th>
+                            <th className="px-4 py-2 border">Total</th>
                           </tr>
                         </thead>
-                        <tbody className="text-gray-700 text-sm">
-                          {itemsList.map((item, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-4 py-2 border-b text-center">
-                                {idx + 1}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
+                        <tbody>
+                          {estimationItems.map((item) => (
+                            <tr key={item._id}>
+                              <td className="px-4 text-center py-2 border">
                                 {item.itemName}
                               </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.quantity}
+                              <td className="px-4 text-center py-2 border">
+                                {item.qty}
                               </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                <button onClick={() => handleRemoveItem(idx)}>
-                                  <X size={18} className="text-red-600" />
-                                </button>
+                              <td className="px-4 text-center py-2 border">
+                                {item.price}
+                              </td>
+                              <td className="px-4 text-center py-2 border">
+                                {item.total}
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
                     </div>
-                  )}
+                  )
+                )}
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Supplier <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={supplier?.supplierName || ""}
+                    disabled
+                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                    placeholder="Supplier"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Delivery Date <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={deliveryDate}
+                    onChange={(e) => setDeliveryDate(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Tax
+                  </label>
+                  <input
+                    type="number"
+                    value={tax}
+                    onChange={(e) => setTax(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter tax"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Total Amount
+                  </label>
+                  <input
+                    type="text"
+                    value={totalAmount}
+                    onChange={(e) => setTotalAmount(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter total amount"
+                  />
                 </div>
 
                 <button
@@ -680,20 +700,18 @@ console.log({nextRequisitionId});
                 >
                   {loading
                     ? "Saving..."
-                    : editingRequisition
-                    ? "Update Requisition"
-                    : "Save Requisition"}
+                    : editingPurchaseOrder
+                    ? "Update Purchase Order"
+                    : "Save Purchase Order"}
                 </button>
               </form>
             </div>
           </div>
         )}
-
-        {/* Show popup only if isView is true */}
-        {isView && selectedRequisition && (
+        {isView && selectedPurchaseOrder && (
           <ViewModel
-            requisition={selectedRequisition} // ✅ pass as prop
-            onClose={() => setisView(false)}
+            purchaseOrder={selectedPurchaseOrder}
+            onClose={() => setIsView(false)}
           />
         )}
 
@@ -718,4 +736,4 @@ console.log({nextRequisitionId});
   );
 };
 
-export default PurchaseRequisition;
+export default PurchaseOrder;
