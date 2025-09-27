@@ -89,6 +89,7 @@ const PurchaseOrder = () => {
   useEffect(() => {
     fetchEstimationList();
   }, [fetchEstimationList]);
+console.log("forDemand ", forDemand);
 
   // Demand Item
   useEffect(() => {
@@ -122,9 +123,9 @@ const PurchaseOrder = () => {
   function totalCaulationWithTax() {
     const Calculation =
       estimationItems.reduce(
-        (acc, item) => acc + parseFloat(item.total || 0),
+        (acc, item) => acc + parseInt(item.total || 0),
         0
-      ) + (parseFloat(tax) || 0);
+      ) + (parseInt(tax) || 0);
     setTotalAmount(Calculation);
   }
 
@@ -132,24 +133,6 @@ const PurchaseOrder = () => {
     totalCaulationWithTax();
   }, [forDemand, estimationItems, tax]);
 
-  // Fetch demand items
-  const fetchDemandItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/demand-items`
-      );
-      setDemandItems(res.data);
-    } catch (error) {
-      console.error("Failed to fetch demand items", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchDemandItems();
-  }, [fetchDemandItems]);
 
   // Fetch purchase orders
   const fetchPurchaseOrders = useCallback(async () => {
@@ -171,6 +154,8 @@ const PurchaseOrder = () => {
     fetchPurchaseOrders();
   }, [fetchPurchaseOrders]);
 
+
+//   Next POId
   useEffect(() => {
     if (purchaseOrders.length > 0) {
       const maxNo = Math.max(
@@ -216,9 +201,13 @@ const PurchaseOrder = () => {
     setIsSliderOpen(true);
   };
 
+//   Handle edit
   const handleEditClick = (order) => {
+
+    console.log("Edit ", order);
+    
     setEditingPurchaseOrder(order);
-    setPoNo(order.poNo);
+    setPoNo(order.purchaseOrderId);
     setPurchaseOrderId(order.purchaseOrderId);
     setDate(formatDate(order.date));
     setDemandItem(order.demandItem?._id || "");
@@ -231,6 +220,7 @@ const PurchaseOrder = () => {
     setIsSliderOpen(true);
   };
 
+//   Handle Sumbit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -255,7 +245,7 @@ const PurchaseOrder = () => {
         ? purchaseOrderId
         : `PO-${nextRequisitionId}`,
 
-      demandItem,
+      estimation:demandItem,
 
       deliveryDate,
       tax,
@@ -307,7 +297,10 @@ const PurchaseOrder = () => {
     return `${day}-${month}-${year}`; // DD-MM-YYYY
   };
 
+//   Handle Delete
   const handleDelete = async (id) => {
+    console.log("Delete ", id);
+    
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -339,7 +332,7 @@ const PurchaseOrder = () => {
             };
 
             await axios.delete(
-              `${import.meta.env.VITE_API_BASE_URL}/purchase-orders/${id}`,
+              `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/${id}`,
               { headers }
             );
 
@@ -596,9 +589,7 @@ const PurchaseOrder = () => {
                           ))}
                         </tbody>
                       </table>
-                      {/* <div className="mt-2 text-right font-semibold">
-                                            Total Amount: {total}
-                                        </div> */}
+                     
                     </div>
                   )
                 )}
@@ -617,109 +608,7 @@ const PurchaseOrder = () => {
                   />
                 </div>
 
-                {/* <div className="space-y-3">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Category
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={itemCategory}
-                                                // disabled
-                                                onChange={(e) => setItemCategory(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter category"
-                                            // required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Item Name
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={itemName}
-                                                onChange={(e) => setItemName(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter item name"
-                                            // required
-                                            // disabled
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Rate
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={itemRate}
-                                                onChange={(e) => setItemRate(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter rate"
-                                                min="0"
-                                            // required
-                                            // disabled
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Quantity
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={itemQty}
-                                                onChange={(e) => setItemQty(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter quantity"
-                                                min="1"
-                                            // required
-                                            // disabled
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <button
-                                            type="button"
-                                            onClick={handleAddItem}
-                                            className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
-                                        >
-                                            + Add
-                                        </button>
-                                    </div>
-
-                                    {itemsList.length > 0 && (
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                                                <thead className="bg-gray-100 text-gray-600 text-sm">
-                                                    <tr>
-                                                        <th className="px-4 py-2 border-b">Sr #</th>
-                                                        <th className="px-4 py-2 border-b">Category</th>
-                                                        <th className="px-4 py-2 border-b">Item</th>
-                                                        <th className="px-4 py-2 border-b">Rate</th>
-                                                        <th className="px-4 py-2 border-b">Qty</th>
-                                                        <th className="px-4 py-2 border-b">Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="text-gray-700 text-sm">
-                                                    {itemsList.map((item, idx) => (
-                                                        <tr key={idx} className="hover:bg-gray-50">
-                                                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
-                                                            <td className="px-4 py-2 border-b">{item.category}</td>
-                                                            <td className="px-4 py-2 border-b">{item.name}</td>
-                                                            <td className="px-4 py-2 border-b">{item.rate}</td>
-                                                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
-                                                            <td className="px-4 py-2 border-b">{item.total}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </div> */}
-
+                
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Delivery Date <span className="text-red-500">*</span>
@@ -738,7 +627,7 @@ const PurchaseOrder = () => {
                     Tax
                   </label>
                   <input
-                    type="text"
+                    type="number"
                     value={tax}
                     onChange={(e) => setTax(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
