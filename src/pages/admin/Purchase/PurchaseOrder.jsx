@@ -223,7 +223,7 @@ console.log("forDemand ", forDemand);
 //   Handle Sumbit
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+    
     if (!demandItem || !deliveryDate || !tax) {
       Swal.fire({
         icon: "warning",
@@ -250,7 +250,7 @@ console.log("forDemand ", forDemand);
       deliveryDate,
       tax,
     };
-    console.log({ newPurchaseOrder });
+    // console.log({ newPurchaseOrder });
 
     try {
       if (editingPurchaseOrder) {
