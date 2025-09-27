@@ -1,0 +1,39 @@
+name: Update Contributors Table
+
+on:
+  pull_request:
+    types: [opened, closed, reopened]
+
+jobs:
+  update-contributors:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install all-contributors-cli -g
+
+      - name: Fetch PR stats
+        run: |
+          echo "Fetching contributors..."
+          gh pr list --repo ${{ github.repository }} --state all --json author > pr_authors.json
+          jq -r '.[].author.login' pr_authors.json | sort | uniq -c | sort -nr > contributors.txt
+          cat contributors.txt
+
+      - name: Update README
+        run: |
+          node .github/scripts/update-readme.js
+
+      - name: Commit changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "chore: update contributors table [skip ci]" || echo "No changes to commit"
+          git push
