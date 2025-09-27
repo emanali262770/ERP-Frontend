@@ -121,31 +121,31 @@ const PurchaseRequisition = () => {
   }, [fetchRequistionList]);
 
   // serach filter
-  
-useEffect(() => {
-  if (!searchTerm || !searchTerm.startsWith("REQ-")) {
-    // if search empty or not starting with REQ-, load all
-    fetchRequistionList();
-    return;
-  }
 
-  const delayDebounce = setTimeout(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/requisitions/search/${searchTerm}`
-      );
-      setRequisitions(Array.isArray(res.data) ? res.data : [res.data]); 
-    } catch (error) {
-      console.error("Search requisition failed:", error);
-      setRequisitions([]);
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (!searchTerm || !searchTerm.startsWith("REQ-")) {
+      // if search empty or not starting with REQ-, load all
+      fetchRequistionList();
+      return;
     }
-  }, 1000); 
 
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/search/${searchTerm}`
+        );
+        setRequisitions(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search requisition failed:", error);
+        setRequisitions([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
 
 
   useEffect(() => {
@@ -190,7 +190,7 @@ useEffect(() => {
     setIsEnable(requisition.isEnable ?? true);
     setIsSliderOpen(true);
   };
-console.log({nextRequisitionId});
+  console.log({ nextRequisitionId });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -233,8 +233,7 @@ console.log({nextRequisitionId});
     try {
       if (editingRequisition) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
-            editingRequisition._id
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${editingRequisition._id
           }`,
           newRequisition,
           { headers }
@@ -383,7 +382,7 @@ console.log({nextRequisitionId});
               Purchase Requisition Details
             </h1>
           </div>
-           <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3">
             {/* ✅ Search Input */}
             <input
               type="text"
@@ -397,17 +396,17 @@ console.log({nextRequisitionId});
               className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
               onClick={handleAddClick}
             >
-               + Add Requisition
+              + Add Requisition
             </button>
           </div>
-         
+
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-x-auto">
             <div className="max-h-screen overflow-y-auto custom-scrollbar">
-              <div className="inline-block min-w-[1200px] w-full align-middle">
-                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="inline-block w-full align-middle">
+                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,200px,100px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                   <div>Requisition ID</div>
                   <div>Department</div>
                   <div>Employee</div>
@@ -422,7 +421,7 @@ console.log({nextRequisitionId});
                     <TableSkeleton
                       rows={recordsPerPage}
                       cols={7}
-                      className="lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto]"
+                      className="lg:grid-cols-[200px,200px,200px,200px,200px,200px,200px]"
                     />
                   ) : currentRecords.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -452,7 +451,7 @@ console.log({nextRequisitionId});
                         <div className="text-gray-500">
                           {formatDate(requisition.date)}
                         </div>
-                        <div className="flex justify-start gap-3">
+                        <div className="flex mr-7 justify-end gap-3">
                           <button
                             onClick={() => handleEditClick(requisition)}
                             className="py-1 text-sm rounded text-blue-600"
@@ -483,43 +482,41 @@ console.log({nextRequisitionId});
           </div>
 
           {/* Pagination Controls */}
-{totalPages > 1 && (
-  <div className="flex justify-between items-center mt-4 px-6">
-    {/* Records info */}
-    <div className="text-sm text-gray-600">
-      Showing {indexOfFirstRecord + 1} to{" "}
-      {Math.min(indexOfLastRecord, requisitions.length)} of{" "}
-      {requisitions.length} records
-    </div>
+          {totalPages > 1 && (
+            <div className="flex justify-between my-4 px-10">
+              {/* Records info */}
+              <div className="text-sm text-gray-600">
+                Showing {indexOfFirstRecord + 1} to{" "}
+                {Math.min(indexOfLastRecord, requisitions.length)} of{" "}
+                {requisitions.length} records
+              </div>
 
-    {/* Pagination buttons */}
-    <div className="flex gap-2">
-      <button
-        onClick={() => handlePageChange(currentPage - 1)}
-        disabled={currentPage === 1}
-        className={`px-3 py-1 rounded-md ${
-          currentPage === 1
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-newPrimary text-white hover:bg-newPrimary/80"
-        }`}
-      >
-        Previous
-      </button>
+              {/* Pagination buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
+                >
+                  Previous
+                </button>
 
-      <button
-        onClick={() => handlePageChange(currentPage + 1)}
-        disabled={currentPage === totalPages}
-        className={`px-3 py-1 rounded-md ${
-          currentPage === totalPages
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-newPrimary text-white hover:bg-newPrimary/80"
-        }`}
-      >
-        Next
-      </button>
-    </div>
-  </div>
-)}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
 
         </div>
 
@@ -746,8 +743,8 @@ console.log({nextRequisitionId});
                   {loading
                     ? "Saving..."
                     : editingRequisition
-                    ? "Update Requisition"
-                    : "Save Requisition"}
+                      ? "Update Requisition"
+                      : "Save Requisition"}
                 </button>
               </form>
             </div>
