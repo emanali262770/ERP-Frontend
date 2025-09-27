@@ -48,7 +48,7 @@ const links = [
     { to: "/admin/purchase-approval", label: "Purchase Approval", icon: <FaCheckCircle /> },
     { to: "/admin/quotation", label: "Market Quotation", icon: <FaCommentsDollar /> },
     { to: "/admin/estimation", label: "Estimation", icon: <FaCalculator /> },
-    { to: "/admin/shelve-location", label: "Approval of Estimation", icon: <FaClipboardCheck /> },
+    // { to: "/admin/shelve-location", label: "Approval of Estimation", icon: <FaClipboardCheck /> },
     { to: "/admin/purchase-order", label: "Purchase Order", icon: <FaFileInvoiceDollar />},
     { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
     { to: "/admin/quality-checking", label: "Quality Checking", icon: <FaCheckDouble /> },
