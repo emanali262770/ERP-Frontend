@@ -35,6 +35,8 @@ const PurchaseOrder = () => {
     const [isView, setIsView] = useState(false);
     const [editingPurchaseOrder, setEditingPurchaseOrder] = useState(null);
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState(null);
+     const [nextRequisitionId, setNextRequisitionId] = useState("001");
+     const [totalWithTax, setTotalWithTax] = useState();
     const sliderRef = useRef(null);
       const [errors, setErrors] = useState({});
     
@@ -69,7 +71,7 @@ const PurchaseOrder = () => {
         `${import.meta.env.VITE_API_BASE_URL}/estimations`
       );
       setQuotations(res.data);
-    //   console.log("quotations", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch quotations", error);
     } finally {
@@ -109,8 +111,15 @@ const PurchaseOrder = () => {
   fetchQuotationItems();
 }, [forDemand]);
 
-    console.log("For ", forDemand);
-    console.log("estimationItems ", estimationItems);
+   function totalCaulationWithTax(){
+   const Calculation=  estimationItems.reduce((acc, item)=> acc + parseInt(item.total)+tax,0);
+   setTotalWithTax(Calculation)
+   }
+   useEffect(() => {
+    totalCaulationWithTax()
+   }, [forDemand,estimationItems])
+   
+    console.log(totalWithTax);
     
 
 
@@ -149,6 +158,20 @@ const PurchaseOrder = () => {
     useEffect(() => {
         fetchPurchaseOrders();
     }, [fetchPurchaseOrders]);
+    
+     useEffect(() => {
+        if (purchaseOrders.length > 0) {
+          const maxNo = Math.max(
+            ...purchaseOrders.map((r) => {
+              const match = r.purchaseOrderId?.match(/PO-(\d+)/);
+              return match ? parseInt(match[1], 10) : 0;
+            })
+          );
+          setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
+        } else {
+          setNextRequisitionId("001"); // first requisition
+        }
+      }, [purchaseOrders]);
 
     // Auto-fill supplier based on demand item
     useEffect(() => {
@@ -163,7 +186,7 @@ const PurchaseOrder = () => {
     // Handlers for form and table actions
     const handleAddClick = () => {
         setEditingPurchaseOrder(null);
-        setPoNo("");
+        setPoNo(editingPurchaseOrder ? editingPurchaseOrder.poNo : `PO-${nextRequisitionId}`);
         setDate("");
         setDemandItem("");
         setSupplier("");
@@ -188,6 +211,7 @@ const PurchaseOrder = () => {
         setIsEnable(order.isEnable);
         setIsSliderOpen(true);
     };
+console.log({nextRequisitionId});
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -209,6 +233,9 @@ const PurchaseOrder = () => {
         };
 
         const newPurchaseOrder = {
+            purchaseOrderId: editingPurchaseOrder
+        ? purchaseOrderId
+        : `PO-${nextRequisitionId}`,
             poNo,
             date,
             demandItem,
@@ -326,6 +353,7 @@ const PurchaseOrder = () => {
         setIsView(false);
         setSelectedPurchaseOrder(null);
     };
+console.log({purchaseOrders});
 
     return (
         <div className="p-4 bg-gray-50 min-h-screen">
@@ -355,7 +383,7 @@ const PurchaseOrder = () => {
                                     <div>Supplier</div>
                                     <div>Total Amount</div>
                                     <div>Delivery Date</div>
-                                    <div className="text-right">Actions</div>
+                                    <div className={`${loading?"":"text-right"}`}>Actions</div>
                                 </div>
 
                                 <div className="flex flex-col divide-y divide-gray-100">
@@ -531,7 +559,7 @@ const PurchaseOrder = () => {
                                 </div>
 
 
-                                <div className="space-y-3">
+                                {/* <div className="space-y-3">
                                     <div className="grid grid-cols-2 gap-4">
                                         <div>
                                             <label className="block text-gray-700 font-medium mb-2">
@@ -632,7 +660,7 @@ const PurchaseOrder = () => {
                                             </table>
                                         </div>
                                     )}
-                                </div>
+                                </div> */}
 
                                 <div>
                                     <label className="block text-gray-700 font-medium mb-2">
@@ -669,28 +697,7 @@ const PurchaseOrder = () => {
                                     />
                                 </div>
 
-                                <div className="flex items-center justify-between">
-                                    <label className="text-gray-700 font-medium">Status</label>
-                                    <div className="flex items-center gap-3">
-                                        <button
-                                            type="button"
-                                            onClick={() => setIsEnable(!isEnable)}
-                                            className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${isEnable ? "bg-newPrimary/80" : "bg-gray-300"
-                                                }`}
-                                        >
-                                            <div
-                                                className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${isEnable ? "translate-x-6" : "translate-x-0"
-                                                    }`}
-                                            />
-                                        </button>
-                                        <span
-                                            className={`text-sm font-medium ${isEnable ? "text-newPrimary" : "text-gray-500"
-                                                }`}
-                                        >
-                                            {isEnable ? "Enabled" : "Disabled"}
-                                        </span>
-                                    </div>
-                                </div>
+                               
 
                                 <button
                                     type="submit"

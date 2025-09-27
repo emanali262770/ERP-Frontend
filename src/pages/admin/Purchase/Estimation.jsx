@@ -48,6 +48,7 @@ const Estimation = () => {
 
   // Fetch quotation items and supplier when forDemand changes
   useEffect(() => {
+   setLoading(true)
     const fetchQuotationItems = async () => {
       if (!forDemand) {
         setQuotationItems([]);
@@ -70,6 +71,11 @@ const Estimation = () => {
         setItemsList([]);
         setTotal("");
         setSupplier("");
+      }
+      finally{
+        setTimeout(() => {
+        setLoading(false);
+      }, 2000);
       }
     };
     fetchQuotationItems();
@@ -166,13 +172,13 @@ const Estimation = () => {
 
   const handleEditClick = (estimation) => {
     setEditingEstimation(estimation);
-    setEstimationId(estimation.quotationNo || ""); // Use quotationNo as estimationId for display
+    setEstimationId(estimation.estimationId || ""); // Use quotationNo as estimationId for display
     setSupplier(estimation.supplier?.supplierName || "");
     setItemsList(estimation.items || []);
     setForDemand(estimation.demandItem?._id || "");
     setTotal(estimation.totalAmount?.toString() || "");
     setDate(formatDate(estimation.date));
-    setStatus(estimation.status ? "Active" : "Inactive"); // Map boolean to string for form
+    setStatus(estimation.status ); // Map boolean to string for form
     setErrors({});
     setIsSliderOpen(true);
   };
@@ -329,10 +335,12 @@ console.log("Not ", forDemand);
     return quotation ? quotation.quotationNo : quotationId;
   };
 
-console.log({nextRequisitionId});
+console.log({estimations});
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
+      {/* common Header */}
+      <CommanHeader />
       <div className="px-6 mx-auto">
         <div className="flex justify-between items-center mb-4">
           <div>
@@ -367,7 +375,7 @@ console.log({nextRequisitionId});
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={3}
+                    rows={estimations.length || 5}
                     cols={8}
                     className="lg:grid-cols-8"
                   />
@@ -390,12 +398,12 @@ console.log({nextRequisitionId});
                       <div className="text-gray-500">{formatDate(estimation.date)}</div>
                       <div className="text-gray-600">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${estimation.status
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
+                          className={`px-2 py-1 rounded-full text-xs ${estimation.status==="Pending"
+                              ? "bg-orange-100 text-orange-800"
+                              : "bg-green-100 text-green-800"
                             }`}
                         >
-                          {estimation.status ? "Active" : "Inactive"}
+                          {estimation.status}
                         </span>
                       </div>
                       <div>
