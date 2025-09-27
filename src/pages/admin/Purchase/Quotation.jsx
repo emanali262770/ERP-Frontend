@@ -23,6 +23,7 @@ const Quotation = () => {
   const [itemQuantity, setItemQuantity] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [price, setPrice] = useState("");
+   const [searchTerm, setSearchTerm] = useState("");
   const [total, setTotal] = useState("");
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [errors, setErrors] = useState({});
@@ -39,7 +40,7 @@ const Quotation = () => {
         `${import.meta.env.VITE_API_BASE_URL}/quotations`
       );
       setQuotations(res.data);
-      console.log("quatation  ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Requistion", error);
     } finally {
@@ -51,6 +52,37 @@ const Quotation = () => {
   useEffect(() => {
     fetchQuatationList();
   }, [fetchQuatationList]);
+
+  // ✅ Quotation Search
+useEffect(() => {
+  if (!searchTerm || !searchTerm.startsWith("QuotNo-")) {
+    // If search is empty or not starting with QuotNo-, load all
+    fetchQuatationList();
+    return;
+  }
+  
+
+  const delayDebounce = setTimeout(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/quotations/search/${searchTerm}`
+      );
+      
+      
+      setQuotations(Array.isArray(res.data) ? res.data : [res.data]); 
+    } catch (error) {
+      console.error("Search quotation failed:", error);
+      setQuotations([]);
+    } finally {
+      setLoading(false);
+    }
+  }, 1000); // debounce
+
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm]);
+
+
   useEffect(() => {
     if (quotations.length > 0) {
       // Extract numeric part from the last quotationNo
@@ -66,7 +98,7 @@ const Quotation = () => {
     }
   }, [quotations]);
 
-  console.log("new quation", nextQuatation);
+
 
   // Supplier List Fetch
   const fetchSupplierList = useCallback(async () => {
@@ -182,7 +214,7 @@ const Quotation = () => {
     setIsSliderOpen(true);
   };
 
-  console.log("for demand0", forDemand);
+
   const handleAddItem = () => {
     const selected = demandItems.find((i) => i._id === selectedItem);
 
@@ -225,7 +257,7 @@ const Quotation = () => {
     setErrors((prev) => ({ ...prev, itemsList: null }));
   };
 
-  console.log({ itemsList });
+ 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -384,12 +416,24 @@ const Quotation = () => {
               Quotation Details
             </h1>
           </div>
-          <button
-            onClick={handleAddQuotation}
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 transition-colors"
-          >
-            Add Quotation
-          </button>
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter Quot No eg: QuotNo-001"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
+
+            <button
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddQuotation}
+            >
+               + Add Quotation
+            </button>
+          </div>
+         
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">

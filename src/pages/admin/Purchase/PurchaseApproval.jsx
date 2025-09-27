@@ -17,6 +17,8 @@ const PurchaseApproval = () => {
   const [editingApproval, setEditingApproval] = useState(null);
   const sliderRef = useRef(null);
   const [isView, setisView] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   // requistation api call
   const fetchRequistionList = useCallback(async () => {
@@ -38,6 +40,33 @@ const PurchaseApproval = () => {
   useEffect(() => {
     fetchRequistionList();
   }, [fetchRequistionList]);
+
+  useEffect(() => {
+    if (!searchTerm) {
+      // if search is empty, load all
+      fetchRequistionList();
+      return;
+    }
+
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/requisitions/demandItem/${searchTerm}`
+        );
+        setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search approvals failed:", error);
+        setApprovals([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000); // debounce so it won't spam API
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
 
   // Handlers for form and table actions
   const handleEditClick = (approval) => {
@@ -175,7 +204,7 @@ const PurchaseApproval = () => {
       Swal.fire("❌ Error", "Failed to update status", "error");
     }
   }
-console.log({approvals});
+  console.log({ approvals });
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -186,6 +215,16 @@ console.log({approvals});
             <h1 className="text-2xl font-bold text-newPrimary">
               Purchase Approval Details
             </h1>
+          </div>
+          <div className="flex items-center gap-3">
+            {/* ✅ Search Input */}
+            <input
+              type="text"
+              placeholder="Enter Approval ID eg: PRA-Ali-0002"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+            />
           </div>
         </div>
 
@@ -201,8 +240,12 @@ console.log({approvals});
                   <div>Department</div>
                   <div>Employee</div>
                   <div>Date</div>
-                  <div className={ `${loading?"":"flex justify-end"}`}>Actions</div>
-<div className={ `${loading?"":"flex justify-end"}`} >View</div>
+                  <div className={`${loading ? "" : "flex justify-end"}`}>
+                    Actions
+                  </div>
+                  <div className={`${loading ? "" : "flex justify-end"}`}>
+                    View
+                  </div>
                 </div>
 
                 {/* Table Body */}
