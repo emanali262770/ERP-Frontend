@@ -52,7 +52,7 @@ const links = [
     { to: "/admin/purchase-order", label: "Purchase Order", icon: <FaFileInvoiceDollar />},
     { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
     { to: "/admin/quality-checking", label: "Quality Checking", icon: <FaCheckDouble /> },
-{ to: "/admin/goods-receipt-note", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
+{ to: "/admin/grn", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
 { to: "/admin/purchase-return", label: "Purchase Return", icon: <FaUndoAlt /> },
 { to: "/admin/gatepass-out", label: "GatePass OUT", icon: <FaSignOutAlt /> },
 
