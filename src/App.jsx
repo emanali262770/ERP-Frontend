@@ -15,6 +15,7 @@ import PurchaseApproval from "./pages/admin/Purchase/PurchaseApproval.jsx";
 import Quotation from "./pages/admin/Purchase/Quotation.jsx";
 import Estimation from "./pages/admin/Purchase/Estimation";
 import GatePassIN from "./pages/admin/Purchase/GatePassIN.jsx";
+import QualityChecking from "./pages/admin/Purchase/QualityChecking.jsx";
 // import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierList from "./pages/admin/SetUp/Supplier.jsx";
 import Manufacture from "./pages/admin/SetUp/Manufacture.jsx";
@@ -41,7 +42,7 @@ import PromotionItem from "./pages/admin/SetUp/PromotionItem.jsx";
 import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
 import ScrollToTop from "./helper/ScrollToTop.jsx";
 import Designation from "./pages/admin/Mangement/Designation.jsx";
-import PurchaseOrder from "./pages/admin/Purchase/PurchaseOrder.jsx";
+
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
 function AppContent() {
@@ -92,6 +93,7 @@ function AppContent() {
             <Route path="quotation" element={<Quotation />} />
             <Route path="estimation" element={<Estimation />} />
             <Route path="gatepass-in" element={<GatePassIN />} />
+            <Route path="quality-checking" element={<QualityChecking />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
@@ -101,10 +103,8 @@ function AppContent() {
             <Route path="employee" element={<Employee />} />
             <Route path="departments" element={<Departments />} />
 
-            <Route path="purchase-order" element={<PurchaseOrder />} />
-            <Route path="promotion-item" element={<PromotionItem />}/>
-            <Route path='item-type' element={<ItemType/>}/>
-
+            <Route path="promotion-item" element={<PromotionItem />} />
+            <Route path="item-type" element={<ItemType />} />
           </Route>
         </Routes>
       </main>
