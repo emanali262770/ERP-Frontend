@@ -176,6 +176,7 @@ const PurchaseRequisition = () => {
 
     setIsSliderOpen(true);
   };
+console.log({nextRequisitionId});
 
   const handleSubmit = async (e) => {
     e.preventDefault();

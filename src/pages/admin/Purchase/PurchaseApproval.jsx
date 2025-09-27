@@ -175,6 +175,7 @@ const PurchaseApproval = () => {
       Swal.fire("❌ Error", "Failed to update status", "error");
     }
   }
+console.log({approvals});
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -196,7 +197,7 @@ const PurchaseApproval = () => {
               <div className="inline-block min-w-[1200px] w-full align-middle">
                 {/* Table Header */}
                 <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,300px,150px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                  <div>Sr #</div>
+                  <div>Approved Id</div>
                   <div>Department</div>
                   <div>Employee</div>
                   <div>Date</div>
@@ -224,7 +225,7 @@ const PurchaseApproval = () => {
                       >
                         {/* Sr # */}
                         <div className="font-medium text-gray-900">
-                          {idx + 1}
+                          {approval?.demandItem}
                         </div>
 
                         {/* Department */}
