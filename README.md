@@ -60,17 +60,12 @@ Employee who managed the sale gets commission calculated in HR/Payroll.
 
 All of this is tracked in one ERP system.
 
-## 👥 All Contributors
+## 👥 All Contributors  
 
-Thanks to these amazing people for their contributions:
+Thanks to these amazing people for their contributions:  
 
-| No. | Avatar                                                                           | Username                                                           | Contributions                                                                 |
-| --- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| 1   | <img src="https://github.com/AliGates915.png?size=50" width="50px;" />           | [@AliGates915](https://github.com/AliGates915)                     | 💻 Project Admin, 🛠️ Manage Project (10 PRs) 🥇                              |
-| 2   | <img src="https://github.com/haliarutab24.png?size=50" width="50px;" />          | [@haliarutab24](https://github.com/haliarutab24)                   | Frontend Developer (7 PRs) 🥈                                                 |
-| 3   | <img src="https://github.com/emanali262770.png?size=50" width="50px;" />         | [@emanali262770](https://github.com/emanali262770)                 | Frontend Developer (5 PRs) 🥉                                                 |
-| 4   | <img src="https://github.com/zainsultani333-glitch.png?size=50" width="50px;" /> | [@zainsultani333-glitch](https://github.com/zainsultani333-glitch) | Jr. Frontend Developer (2 PRs)                                                |
-| 5   | <img src="https://github.com/rajanarahul93.png?size=50" width="50px;" />         | [@rajanarahul93](https://github.com/rajanarahul93)                 | Fix Issue [#12](https://github.com/AliGates915/ERP-Frontend/issues/12) (1 PR) |
-
+<!-- CONTRIBUTORS_START -->
+<!-- Auto-generated table will be inserted here -->
+<!-- CONTRIBUTORS_END -->
 
 > Want to be featured here? Contribute to the project and submit a PR or join discussions in Issues!
