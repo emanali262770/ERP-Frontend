@@ -64,12 +64,13 @@ All of this is tracked in one ERP system.
 
 Thanks to these amazing people for their contributions:
 
-|  No. | Avatar | Username | Contributions |
-|------|--------|----------|---------------|
-|  1  | <img src="https://avatars.githubusercontent.com/u/128673394?s=96&v=4" width="50px;" /> | [@Ali Gates](https://github.com/AliGates915) | 💻 Project Admin, 🛠️ Manage Project |
-|  2  | <img src="https://avatars.githubusercontent.com/u/186957862?v=4" width="50px;" /> | [@haliarutab24](https://github.com/haliarutab24) | Frontend Developer |
-|  3  | <img src="https://avatars.githubusercontent.com/u/173554271?v=4" width="50px;" /> | [@emanali262770](https://github.com/emanali262770) | Frontend Developer |
-|  4  | <img src="https://avatars.githubusercontent.com/u/228199128?v=4" width="50px;" /> | [@zainsultani333-glitch](https://github.com/zainsultani333-glitch) |  Jr. Frontend Developer|
-|  5  | <img src="https://avatars.githubusercontent.com/u/123227543?v=4" width="50px;" /> | [@rajanarahul93](https://github.com/rajanarahul93) | Fix Issue https://github.com/AliGates915/ERP-Frontend/issues/12 |
+| No. | Avatar                                                                           | Username                                                           | Contributions                                                                 |
+| --- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| 1   | <img src="https://github.com/AliGates915.png?size=50" width="50px;" />           | [@AliGates915](https://github.com/AliGates915)                     | 💻 Project Admin, 🛠️ Manage Project (10 PRs) 🥇                              |
+| 2   | <img src="https://github.com/haliarutab24.png?size=50" width="50px;" />          | [@haliarutab24](https://github.com/haliarutab24)                   | Frontend Developer (7 PRs) 🥈                                                 |
+| 3   | <img src="https://github.com/emanali262770.png?size=50" width="50px;" />         | [@emanali262770](https://github.com/emanali262770)                 | Frontend Developer (5 PRs) 🥉                                                 |
+| 4   | <img src="https://github.com/zainsultani333-glitch.png?size=50" width="50px;" /> | [@zainsultani333-glitch](https://github.com/zainsultani333-glitch) | Jr. Frontend Developer (2 PRs)                                                |
+| 5   | <img src="https://github.com/rajanarahul93.png?size=50" width="50px;" />         | [@rajanarahul93](https://github.com/rajanarahul93)                 | Fix Issue [#12](https://github.com/AliGates915/ERP-Frontend/issues/12) (1 PR) |
+
 
 > Want to be featured here? Contribute to the project and submit a PR or join discussions in Issues!
