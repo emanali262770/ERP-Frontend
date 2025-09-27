@@ -109,7 +109,7 @@ const Estimation = () => {
   
 useEffect(() => {
   if (!searchTerm || !searchTerm.startsWith("EST-")) {
-    // if search empty or not starting with REQ-, load all
+    // ✅ Reload all estimations when input is empty
     fetchEstimationList();
     return;
   }
@@ -120,18 +120,17 @@ useEffect(() => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
       );
-      setEstimations(Array.isArray(res.data) ? res.data : [res.data]); 
-     
+      setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (error) {
       console.error("Search estimations failed:", error);
       setEstimations([]);
     } finally {
       setLoading(false);
     }
-  }, 1000); 
+  }, 500);
 
   return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
+}, [searchTerm, fetchEstimationList]);
 
    useEffect(() => {
       if (estimations.length > 0) {
