@@ -1,209 +1,137 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Eye, Loader, SquarePen, Trash2, X } from "lucide-react";
+import { Eye, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton"; // Ensure this component exists
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
 
-const PurchaseOrder = () => {
-  const [purchaseOrders, setPurchaseOrders] = useState([]);
-
-  const [demandItems, setDemandItems] = useState([
-    {
-      _id: "di1",
-      itemName: "Laptop Order",
-      supplier: { _id: "sup1", supplierName: "ABC Supplies" },
-    },
-    {
-      _id: "di2",
-      itemName: "Desk Order",
-      supplier: { _id: "sup2", supplierName: "XYZ Corp" },
-    },
-  ]);
-  const [forDemand, setForDemand] = useState("");
-  const [estimationItems, setEstimationItems] = useState([]);
-  const [quotations, setQuotations] = useState([]);
-
+const PurchaseRequisition = () => {
+  const [requisitions, setRequisitions] = useState([]);
+  const [employeeName, setEmployeeName] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [poNo, setPoNo] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [requisitionId, setRequisitionId] = useState("");
   const [date, setDate] = useState("");
-  const [demandItem, setDemandItem] = useState("");
-  const [supplier, setSupplier] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [tax, setTax] = useState("10%");
-  const [totalAmount, setTotalAmount] = useState("1000");
-  const [itemsList, setItemsList] = useState([]);
-  const [itemCategory, setItemCategory] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [itemRate, setItemRate] = useState("");
-  const [itemQty, setItemQty] = useState("");
+  const [department, setDepartment] = useState("");
+  const [employee, setEmployee] = useState("");
+  const [requirement, setRequirement] = useState("");
+  const [details, setDetails] = useState("");
+  const [items, setItems] = useState("");
+  const [category, setCategory] = useState("");
   const [isEnable, setIsEnable] = useState(true);
-  const [isView, setIsView] = useState(false);
-  const [editingPurchaseOrder, setEditingPurchaseOrder] = useState(null);
-  const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState(null);
-  const [nextRequisitionId, setNextRequisitionId] = useState("001");
-  const [purchaseOrderId, setPurchaseOrderId] = useState();
+  const [isView, setisView] = useState(false);
+  const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
-  const [searchTerm, setSearchTerm] = useState("");
-
-  const [errors, setErrors] = useState({});
-
+  const [departmentList, setDepartmentList] = useState([]);
+  const [itemName, setItemName] = useState("");
+  const [quantity, setQuantity] = useState();
+  const [itemsList, setItemsList] = useState([]);
+  const [selectedRequisition, setSelectedRequisition] = useState(null);
+  const [nextRequisitionId, setNextRequisitionId] = useState("001");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-
-  // Handle adding items to the table in the form
   const handleAddItem = () => {
-    if (!itemCategory || !itemName || !itemRate || !itemQty) return;
+    if (!itemName || !quantity) return;
 
     const newItem = {
-      category: itemCategory,
-      name: itemName,
-      rate: parseFloat(itemRate),
-      qty: parseInt(itemQty, 10),
-      total: parseFloat(itemRate) * parseInt(itemQty, 10),
+      itemName,
+      quantity: parseInt(quantity, 10),
     };
 
     setItemsList([...itemsList, newItem]);
-    setItemCategory("");
-    setItemName("");
-    setItemRate("");
-    setItemQty("");
-  };
 
-  // Fetch quotations
-  const fetchEstimationList = useCallback(async () => {
+    // clear inputs after save
+    setItemName("");
+    setQuantity("");
+  };
+  // Department Fetch
+
+  const fetchDepartmentList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/estimations`
+        `${import.meta.env.VITE_API_BASE_URL}/departments`
       );
-      setQuotations(res.data);
+      setDepartmentList(res.data);
+      console.log("Designation  ", res.data);
     } catch (error) {
-      console.error("Failed to fetch quotations", error);
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchDepartmentList();
+  }, [fetchDepartmentList]);
+
+  // Fetch employe data
+  const fetchEmployeList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/employees`
+      );
+      setEmployeeName(res?.data);
+      console.log("EmployeeList  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
     } finally {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
     }
   }, []);
-
   useEffect(() => {
-    fetchEstimationList();
-  }, [fetchEstimationList]);
+    fetchEmployeList();
+  }, [fetchEmployeList]);
 
-  // Demand Item
+  // teching category list
+  const fetchCategoryList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/categories/list`
+      );
+      setCategoryList(res.data); // store actual categories array
+      console.log("Categories ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch categories", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
   useEffect(() => {
-    const fetchQuotationItems = async () => {
-      if (!forDemand) {
-        setEstimationItems([]);
-        return;
-      }
+    fetchCategoryList();
+  }, [fetchCategoryList]);
 
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/estimations/${forDemand}`
-        );
+  console.log(categoryList, "emplyee");
 
-        // ✅ Fix: items are inside demandItem
-        setEstimationItems(res.data.demandItem?.items || []);
-
-        setDemandItem(res.data._id);
-      } catch (error) {
-        console.error("Error fetching quotation items:", error);
-        setEstimationItems([]);
-      } finally {
+  const fetchRequistionList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/requisitions`
+      );
+      setRequisitions(res.data);
+      console.log("Requistion  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Requistion", error);
+    } finally {
+      setTimeout(() => {
         setLoading(false);
-      }
-    };
-
-    fetchQuotationItems();
-  }, [forDemand]);
-
-  function totalCaulationWithTax() {
-    const Calculation =
-      estimationItems.reduce(
-        (acc, item) => acc + parseFloat(item.total || 0),
-        0
-      ) + (parseFloat(tax) || 0);
-    setTotalAmount(Calculation);
-  }
-
-  useEffect(() => {
-    totalCaulationWithTax();
-  }, [forDemand, estimationItems, tax]);
-
-  // Fetch demand items
-  const fetchDemandItems = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/demand-items`
-      );
-      setDemandItems(res.data);
-    } catch (error) {
-      console.error("Failed to fetch demand items", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
+      }, 2000);
     }
   }, []);
+  useEffect(() => {
+    fetchRequistionList();
+  }, [fetchRequistionList]);
 
   useEffect(() => {
-    fetchDemandItems();
-  }, [fetchDemandItems]);
-
-  // Fetch purchase orders
-  const fetchPurchaseOrders = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`
-      );
-      setPurchaseOrders(res.data);
-      console.log("Purchase ", res.data);
-    } catch (error) {
-      console.error("Failed to fetch purchase orders", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPurchaseOrders();
-  }, [fetchPurchaseOrders]);
-
-// serach filter
-  useEffect(() => {
-  if (!searchTerm || !searchTerm.startsWith("PO-")) {
-    // if search empty or not starting with REQ-, load all
-    fetchPurchaseOrders();
-    return;
-  }
-
-  const delayDebounce = setTimeout(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
-      );
-      setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]); 
-    } catch (error) {
-      console.error("Search purchaseOrder failed:", error);
-      setPurchaseOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  }, 1000); 
-
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
-
-  useEffect(() => {
-    if (purchaseOrders.length > 0) {
+    if (requisitions.length > 0) {
       const maxNo = Math.max(
-        ...purchaseOrders.map((r) => {
-          const match = r.purchaseOrderId?.match(/PO-(\d+)/);
+        ...requisitions.map((r) => {
+          const match = r.requisitionId?.match(/REQ-(\d+)/);
           return match ? parseInt(match[1], 10) : 0;
         })
       );
@@ -211,62 +139,60 @@ const PurchaseOrder = () => {
     } else {
       setNextRequisitionId("001"); // first requisition
     }
-  }, [purchaseOrders]);
-
-  // Auto-fill supplier based on demand item
-  useEffect(() => {
-    if (demandItem) {
-      const selectedDemand = demandItems.find(
-        (item) => item._id === demandItem
-      );
-      if (selectedDemand && selectedDemand.supplier) {
-        setSupplier(selectedDemand.supplier._id);
-      }
-    }
-  }, [demandItem, demandItems]);
+  }, [requisitions]);
 
   // Handlers for form and table actions
   const handleAddClick = () => {
-    setEditingPurchaseOrder(null);
-    setPoNo(
-      editingPurchaseOrder
-        ? editingPurchaseOrder.poNo
-        : `PO-${nextRequisitionId}`
-    );
+    setEditingRequisition(null);
+    setRequisitionId("");
     setDate("");
-    setDemandItem("");
-    setSupplier("");
-    setDeliveryDate("");
-    setTax("");
-    setTotalAmount("");
+    setDepartment("");
+    setEmployee("");
+    setRequirement("");
+    setDetails("");
     setItemsList([]);
+    setCategory("");
+    setQuantity("");
     setIsEnable(true);
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (order) => {
-    setEditingPurchaseOrder(order);
-    setPoNo(order.poNo);
-    setPurchaseOrderId(order.purchaseOrderId);
-    setDate(formatDate(order.date));
-    setDemandItem(order.demandItem?._id || "");
-    setSupplier(order.supplier?._id || "");
-    setDeliveryDate(formatDate(order.deliveryDate));
-    setTax(order.tax);
-    setTotalAmount(order.totalAmount);
-    setItemsList(order.items || []);
-    setIsEnable(order.isEnable);
+  const handleEditClick = (requisition) => {
+    console.log(requisition, "handle edit");
+
+    setEditingRequisition(requisition);
+    setRequisitionId(requisition.requisitionId);
+    setDate(formatDate(requisition.date));
+
+    // ✅ store IDs instead of names
+    setDepartment(requisition.department?._id || "");
+    setEmployee(requisition.employee?._id || "");
+    setCategory(requisition.category?._id || "");
+
+    setRequirement(requisition.requirements || "");
+    setDetails(requisition.details || "");
+    setItemsList(requisition.items || []);
+    setIsEnable(requisition.isEnable ?? true);
+
     setIsSliderOpen(true);
   };
+console.log({nextRequisitionId});
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!demandItem || !deliveryDate || !tax) {
+    if (
+      !department ||
+      !employee ||
+      !requirement ||
+      !details ||
+      !category ||
+      itemsList.length === 0
+    ) {
       Swal.fire({
         icon: "warning",
         title: "Missing Fields",
-        text: "⚠️ Please fill in all the fields",
+        text: "⚠️ Please fill in all required fields and add at least one item.",
         confirmButtonColor: "#d33",
       });
       return;
@@ -278,47 +204,48 @@ const PurchaseOrder = () => {
       "Content-Type": "application/json",
     };
 
-    const newPurchaseOrder = {
-      purchaseOrderId: editingPurchaseOrder
-        ? purchaseOrderId
-        : `PO-${nextRequisitionId}`,
-
-      demandItem,
-
-      deliveryDate,
-      tax,
+    const newRequisition = {
+      requisitionId: editingRequisition
+        ? requisitionId
+        : `REQ-${nextRequisitionId}`,
+      department,
+      employee,
+      requirements: requirement,
+      details,
+      category,
+      items: itemsList, // ✅ correct structure
     };
-    console.log({ newPurchaseOrder });
+
+    console.log({ newRequisition });
 
     try {
-      if (editingPurchaseOrder) {
+      if (editingRequisition) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/${
-            editingPurchaseOrder._id
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
+            editingRequisition._id
           }`,
-          newPurchaseOrder,
+          newRequisition,
           { headers }
         );
-        Swal.fire(
-          "Updated!",
-          "Purchase order updated successfully.",
-          "success"
-        );
+        Swal.fire("Updated!", "Requisition updated successfully.", "success");
       } else {
         await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`,
-          newPurchaseOrder,
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions`,
+          newRequisition,
           { headers }
         );
-        Swal.fire("Added!", "Purchase order added successfully.", "success");
+        Swal.fire("Added!", "Requisition added successfully.", "success");
       }
 
-      fetchPurchaseOrders();
+      fetchRequistionList();
       setIsSliderOpen(false);
       setItemsList([]);
     } catch (error) {
-      console.error("Error saving purchase order", error);
-      Swal.fire("Error!", "Something went wrong while saving.", "error");
+      console.error("Error saving requisition", error);
+      Swal.fire(
+        "Error!",
+        error.response?.data?.message || "Failed to save requisition."
+      );
     }
   };
 
@@ -335,7 +262,29 @@ const PurchaseOrder = () => {
     return `${day}-${month}-${year}`; // DD-MM-YYYY
   };
 
+  const handleToggleEnable = (requisition) => {
+    setRequisitions(
+      requisitions.map((r) =>
+        r._id === requisition._id ? { ...r, isEnable: !r.isEnable } : r
+      )
+    );
+    alert(`Requisition ${!requisition.isEnable ? "enabled" : "disabled"}.`);
+  };
+
+  // Handle view button
+  const handleView = (req) => {
+    setSelectedRequisition(req);
+    setisView(true);
+  };
+
+  const closeModal = () => {
+    setisView(false);
+    setSelectedRequisition(null);
+  };
+
   const handleDelete = async (id) => {
+    console.log({ id });
+
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -366,45 +315,40 @@ const PurchaseOrder = () => {
               "Content-Type": "application/json",
             };
 
+            // ✅ Delete from backend
             await axios.delete(
-              `${import.meta.env.VITE_API_BASE_URL}/purchase-orders/${id}`,
+              `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}`,
               { headers }
             );
 
-            setPurchaseOrders(purchaseOrders.filter((p) => p._id !== id));
+            // ✅ Update UI
+            setRequisitions(requisitions.filter((p) => p._id !== id));
 
             swalWithTailwindButtons.fire(
               "Deleted!",
-              "Purchase order deleted successfully.",
+              "Promotion deleted successfully.",
               "success"
             );
           } catch (error) {
             console.error("Delete error:", error);
             swalWithTailwindButtons.fire(
               "Error!",
-              "Failed to delete purchase order.",
+              "Failed to delete promotion.",
               "error"
             );
           }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
           swalWithTailwindButtons.fire(
             "Cancelled",
-            "Purchase order is safe 🙂",
+            "Promotion is safe 🙂",
             "error"
           );
         }
       });
   };
-
-  const handleView = (order) => {
-    setSelectedPurchaseOrder(order);
-    setIsView(true);
-  };
-
-  const closeModal = () => {
-    setIsView(false);
-    setSelectedPurchaseOrder(null);
-  };
+  function handleRemoveItem(index) {
+    setItemsList(itemsList.filter((_, i) => i !== index));
+  }
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -413,94 +357,90 @@ const PurchaseOrder = () => {
         <div className="flex justify-between items-center mb-4">
           <div>
             <h1 className="text-2xl font-bold text-newPrimary">
-              Purchase Order Details
+              Purchase Requisition Details
             </h1>
           </div>
-
-          <div className="flex items-center gap-3">
-            {/* ✅ Search Input */}
-            <input
-              type="text"
-              placeholder="Enter PO No eg: PO-001"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
-            />
-
-            <button
-              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-              onClick={handleAddClick}
-            >
-              + Add Purchase Order
-            </button>
-          </div>
+          <button
+            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+            onClick={handleAddClick}
+          >
+            + Add Requisition
+          </button>
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
+          {/* Outer wrapper handles horizontal scroll */}
           <div className="overflow-x-auto">
-            <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
+            {/* Table wrapper with min-width only applied here */}
+            <div className="max-h-screen overflow-y-auto custom-scrollbar">
               <div className="inline-block min-w-[1200px] w-full align-middle">
-                <div className="hidden lg:grid grid-cols-6 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                  <div>PO No.</div>
+                {/* Table Header */}
+                <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                  <div>Requisition ID</div>
+                  <div>Department</div>
                   <div>Employee</div>
-                  <div>Supplier</div>
-                  <div>Total Amount</div>
-                  <div>Delivery Date</div>
-                  <div className={`${loading ? "" : "text-right"}`}>
-                    Actions
-                  </div>
+                  <div>Requirement</div>
+                  <div>Category</div>
+                  <div>Date</div>
+                  <div className="">Actions</div>
                 </div>
 
+                {/* Table Body */}
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={purchaseOrders.length || 5}
-                      cols={6}
-                      className="lg:grid-cols-6"
+                      rows={requisitions.length || 5}
+                      cols={7}
+                      className="lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto]"
                     />
-                  ) : purchaseOrders.length === 0 ? (
+                  ) : requisitions.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
-                      No purchase orders found.
+                      No requisitions found.
                     </div>
                   ) : (
-                    purchaseOrders.map((order) => (
+                    requisitions.map((requisition) => (
                       <div
-                        key={order._id}
-                        className="grid grid-cols-1 lg:grid-cols-6 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        key={requisition._id}
+                        className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         <div className="font-medium text-gray-900">
-                          {order.purchaseOrderId}
+                          {requisition.requisitionId}
                         </div>
                         <div className="text-gray-600">
-                          {order?.estimation?.demandItem?.createdBy || "N/A"}
+                          {requisition?.department?.departmentName || "N/A"}
                         </div>
                         <div className="text-gray-600">
-                          {order?.estimation?.demandItem?.supplier
-                            ?.supplierName || "N/A"}
+                          {requisition?.employee?.employeeName || "N/A"}
                         </div>
+
                         <div className="text-gray-600">
-                          {order?.totalAmount}
+                          {requisition?.requirements}
                         </div>
+
+                        <div className="text-gray-600">
+                          {requisition?.category?.categoryName}
+                        </div>
+
                         <div className="text-gray-500">
-                          {formatDate(order?.deliveryDate)}
+                          {formatDate(requisition.date)}
                         </div>
-                        <div className="flex justify-end gap-3">
+                        <div className="flex justify-start gap-3">
                           <button
-                            onClick={() => handleEditClick(order)}
-                            className="py-1 text-sm rounded text-blue-600"
+                            onClick={() => handleEditClick(requisition)}
+                            className=" py-1 text-sm rounded text-blue-600 "
                             title="Edit"
                           >
                             <SquarePen size={18} />
                           </button>
                           <button
-                            onClick={() => handleDelete(order._id)}
-                            className="py-1 text-sm text-red-600"
+                            onClick={() => handleDelete(requisition._id)}
+                            className=" py-1 text-sm  text-red-600 "
                             title="Delete"
                           >
                             <Trash2 size={18} />
                           </button>
                           <button
-                            onClick={() => handleView(order)}
+                            onClick={() => handleView(requisition)}
                             className="text-amber-600 hover:underline"
                           >
                             <Eye size={18} />
@@ -523,280 +463,214 @@ const PurchaseOrder = () => {
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingPurchaseOrder
-                    ? "Update Purchase Order"
-                    : "Add a New Purchase Order"}
+                  {editingRequisition
+                    ? "Update Requisition"
+                    : "Add a New Requisition"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
                   onClick={() => {
                     setIsSliderOpen(false);
-                    setPoNo("");
+                    setRequisitionId("");
                     setDate("");
-                    setDemandItem("");
-                    setSupplier("");
-                    setDeliveryDate("");
-                    setTax("");
-                    setTotalAmount("");
-                    setItemsList([]);
+                    setDepartment("");
+                    setEmployee("");
+                    setRequirement("");
+                    setDetails("");
+                    setItems("");
+                    setCategory("");
+                    setQuantity("");
                     setIsEnable(true);
-                    setEditingPurchaseOrder(null);
+                    setEditingRequisition(null);
                   }}
                 >
-                  <X />
+                  ×
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    PO No. <span className="text-blue-600">*</span>
+                    Requisition ID <span className="text-blue-600">*</span>
                   </label>
                   <input
                     type="text"
-                    value={poNo}
-                    onChange={(e) => setPoNo(e.target.value)}
+                    value={
+                      editingRequisition
+                        ? requisitionId
+                        : `REQ-${nextRequisitionId}` // 👈 auto-generated
+                    }
+                    readOnly
+                    onChange={(e) => setRequisitionId(e.target.value)}
                     className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    placeholder="Enter PO No."
+                    placeholder="Enter requisition ID"
                     required
                   />
                 </div>
 
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    For Demand <span className="text-red-500">*</span>
+                    Department <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={forDemand}
-                    onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.forDemand
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    required
                   >
-                    <option value="">Select Quotation</option>
-                    {quotations.map((q) => (
-                      <option key={q._id} value={q._id}>
-                        {q.estimationId}
+                    <option value="">Select Department</option>
+
+                    {departmentList.map((dept) => (
+                      <option key={dept._id} value={dept._id}>
+                        {dept.departmentName}
                       </option>
                     ))}
                   </select>
-                  {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.forDemand}
-                    </p>
-                  )}
                 </div>
-                {loading ? (
-                  <span className="animate-spin flex justify-center">
-                    <Loader size={18} />
-                  </span>
-                ) : (
-                  estimationItems.length > 0 && (
-                    <div className="overflow-x-auto mt-4">
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Employee <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={employee}
+                    onChange={(e) => setEmployee(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    required
+                  >
+                    <option value="">Select Employee</option>
+                    {employeeName.map((emp) => (
+                      <option key={emp._id} value={emp._id}>
+                        {emp.employeeName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Requirement <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={requirement}
+                    onChange={(e) => setRequirement(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    required
+                  >
+                    <option value="">Select Requirement</option>
+                    <option value="Regular Purchase">Regular Purchase</option>
+                    <option value="Monthly Purchase">Monthly Purchase</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Details
+                  </label>
+                  <textarea
+                    value={details}
+                    onChange={(e) => setDetails(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter requisition details"
+                    rows="3"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    required
+                  >
+                    <option value="">Select Category</option>
+                    {categoryList.map((cat) => (
+                      <option key={cat._id} value={cat._id}>
+                        {cat.categoryName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="space-y-3">
+                  {/* Inputs with Save Button */}
+                  <div className="flex justify-between gap-2 items-end">
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Item Name
+                      </label>
+                      <input
+                        type="text"
+                        value={itemName}
+                        onChange={(e) => setItemName(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter item name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Quantity
+                      </label>
+                      <input
+                        type="number"
+                        value={quantity}
+                        onChange={(e) => setQuantity(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter quantity"
+                        min="1"
+                      />
+                    </div>
+
+                    <div className="">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="w-16 h-12 bg-newPrimary text-white  rounded-lg hover:bg-newPrimary/80 transition"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Items Table */}
+                  {itemsList.length > 0 && (
+                    <div className="overflow-x-auto">
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-100">
+                        <thead className="bg-gray-100 text-gray-600 text-sm">
                           <tr>
-                            <th className="px-4 py-2 border">Item Name</th>
-                            <th className="px-4 py-2 border">Quantity</th>
-                            <th className="px-4 py-2 border">Price</th>
-                            <th className="px-4 py-2 border">Total</th>
+                            <th className="px-4 py-2 border-b">Sr #</th>
+                            <th className="px-4 py-2 border-b">Item Name</th>
+                            <th className="px-4 py-2 border-b">Quantity</th>
+                            <th className="px-4 py-2 border-b">remove</th>
                           </tr>
                         </thead>
-                        <tbody>
-                          {estimationItems.map((item) => (
-                            <tr key={item._id}>
-                              <td className="px-4 text-center py-2 border">
+                        <tbody className="text-gray-700 text-sm">
+                          {itemsList.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 border-b text-center">
+                                {idx + 1}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
                                 {item.itemName}
                               </td>
-                              <td className="px-4 text-center py-2 border">
-                                {item.qty}
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.quantity}
                               </td>
-                              <td className="px-4 text-center py-2 border">
-                                {item.price}
-                              </td>
-                              <td className="px-4 text-center py-2 border">
-                                {item.total}
+                              <td className="px-4 py-2 border-b text-center">
+                                <button onClick={() => handleRemoveItem(idx)}>
+                                  <X size={18} className="text-red-600" />
+                                </button>
                               </td>
                             </tr>
                           ))}
                         </tbody>
                       </table>
-                      {/* <div className="mt-2 text-right font-semibold">
-                                            Total Amount: {total}
-                                        </div> */}
                     </div>
-                  )
-                )}
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Supplier <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={supplier?.supplierName || ""}
-                    disabled
-                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
-                    placeholder="Supplier"
-                    required
-                  />
-                </div>
-
-                {/* <div className="space-y-3">
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Category
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={itemCategory}
-                                                // disabled
-                                                onChange={(e) => setItemCategory(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter category"
-                                            // required
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Item Name
-                                            </label>
-                                            <input
-                                                type="text"
-                                                value={itemName}
-                                                onChange={(e) => setItemName(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter item name"
-                                            // required
-                                            // disabled
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Rate
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={itemRate}
-                                                onChange={(e) => setItemRate(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter rate"
-                                                min="0"
-                                            // required
-                                            // disabled
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-gray-700 font-medium mb-2">
-                                                Quantity
-                                            </label>
-                                            <input
-                                                type="number"
-                                                value={itemQty}
-                                                onChange={(e) => setItemQty(e.target.value)}
-                                                className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                                                placeholder="Enter quantity"
-                                                min="1"
-                                            // required
-                                            // disabled
-                                            />
-                                        </div>
-                                    </div>
-                                    <div className="flex justify-end">
-                                        <button
-                                            type="button"
-                                            onClick={handleAddItem}
-                                            className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
-                                        >
-                                            + Add
-                                        </button>
-                                    </div>
-
-                                    {itemsList.length > 0 && (
-                                        <div className="overflow-x-auto">
-                                            <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                                                <thead className="bg-gray-100 text-gray-600 text-sm">
-                                                    <tr>
-                                                        <th className="px-4 py-2 border-b">Sr #</th>
-                                                        <th className="px-4 py-2 border-b">Category</th>
-                                                        <th className="px-4 py-2 border-b">Item</th>
-                                                        <th className="px-4 py-2 border-b">Rate</th>
-                                                        <th className="px-4 py-2 border-b">Qty</th>
-                                                        <th className="px-4 py-2 border-b">Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="text-gray-700 text-sm">
-                                                    {itemsList.map((item, idx) => (
-                                                        <tr key={idx} className="hover:bg-gray-50">
-                                                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
-                                                            <td className="px-4 py-2 border-b">{item.category}</td>
-                                                            <td className="px-4 py-2 border-b">{item.name}</td>
-                                                            <td className="px-4 py-2 border-b">{item.rate}</td>
-                                                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
-                                                            <td className="px-4 py-2 border-b">{item.total}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    )}
-                                </div> */}
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Delivery Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={deliveryDate}
-                    onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Tax
-                  </label>
-                  <input
-                    type="text"
-                    value={tax}
-                    onChange={(e) => setTax(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter tax"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Total Amount
-                  </label>
-                  <input
-                    type="text"
-                    value={totalAmount}
-                    onChange={(e) => setTotalAmount(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter total amount"
-                  />
+                  )}
                 </div>
 
                 <button
@@ -806,18 +680,20 @@ const PurchaseOrder = () => {
                 >
                   {loading
                     ? "Saving..."
-                    : editingPurchaseOrder
-                    ? "Update Purchase Order"
-                    : "Save Purchase Order"}
+                    : editingRequisition
+                    ? "Update Requisition"
+                    : "Save Requisition"}
                 </button>
               </form>
             </div>
           </div>
         )}
-        {isView && selectedPurchaseOrder && (
+
+        {/* Show popup only if isView is true */}
+        {isView && selectedRequisition && (
           <ViewModel
-            purchaseOrder={selectedPurchaseOrder}
-            onClose={() => setIsView(false)}
+            requisition={selectedRequisition} // ✅ pass as prop
+            onClose={() => setisView(false)}
           />
         )}
 
@@ -842,4 +718,4 @@ const PurchaseOrder = () => {
   );
 };
 
-export default PurchaseOrder;
+export default PurchaseRequisition;
