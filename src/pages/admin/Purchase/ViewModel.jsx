@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
-import { X } from "lucide-react";
+import React, { useRef, useState } from "react";
+import { Mail, MessageCircle, X } from "lucide-react";
 
 const ViewModel = ({ data, type, onClose }) => {
   const printRef = useRef();
+ const [exportOpen, setExportOpen] = useState(false);
 
   // ✅ Handle print
   const handlePrint = () => {
@@ -101,13 +102,38 @@ const ViewModel = ({ data, type, onClose }) => {
         </div>
 
         {/* Actions */}
+        
         <div className="flex justify-end gap-3 mt-6">
-          <button
-            onClick={handlePDF}
-            className="px-4 py-2 bg-gray-600 text-white rounded-md"
-          >
-            PDF
-          </button>
+          {/* Export Button */}
+          <div className="relative">
+            <button
+              onClick={() => setExportOpen(!exportOpen)}
+              className="px-4 py-2 bg-green-600 text-white rounded-md"
+            >
+              Export
+            </button>
+
+            {/* Popup Menu */}
+            {exportOpen && (
+              <div className="absolute right-0 mt-2 w-40 bg-white shadow-lg border rounded-md z-50">
+                <button
+                  onClick={() => alert("Export via WhatsApp")}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-left"
+                >
+                  <MessageCircle size={18} className="text-green-600" />
+                  WhatsApp
+                </button>
+                <button
+                  onClick={() => alert("Export via Email")}
+                  className="flex items-center gap-2 w-full px-3 py-2 hover:bg-gray-100 text-left"
+                >
+                  <Mail size={18} className="text-blue-600" />
+                  Email
+                </button>
+              </div>
+            )}
+          </div>
+
           <button
             onClick={handlePrint}
             className="px-4 py-2 bg-blue-600 text-white rounded-md"
@@ -115,6 +141,7 @@ const ViewModel = ({ data, type, onClose }) => {
             Print
           </button>
         </div>
+      
       </div>
     </div>
   );

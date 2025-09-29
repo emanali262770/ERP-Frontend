@@ -420,61 +420,7 @@ useEffect(() => {
                   </table>
                 )}
 
-                <div className="flex gap-2 items-end">
-                  <div className="flex-1">
-                    <label className="block text-gray-700 font-medium mb-1">
-                      Item Name
-                    </label>
-                    <input
-                      type="text"
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      className="w-full p-3 border rounded-md"
-                    />
-                  </div>
-                  <div className="w-32">
-                    <label className="block text-gray-700 font-medium mb-1">
-                      Quantity
-                    </label>
-                    <input
-                      type="number"
-                      value={itemQuantity}
-                      onChange={(e) => setItemQuantity(e.target.value)}
-                      className="w-full p-3 border rounded-md"
-                      min="1"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={handleAddItem}
-                    className="h-12 px-4 bg-newPrimary text-white rounded-lg"
-                  >
-                    + Add
-                  </button>
-                </div>
-
-                {itemsList.length > 0 && (
-                  <table className="w-full border text-sm mt-2">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="px-2 py-1 border">#</th>
-                        <th className="px-2 py-1 border">Item</th>
-                        <th className="px-2 py-1 border">Qty</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itemsList.map((item, idx) => (
-                        <tr key={idx}>
-                          <td className="border px-2 py-1">{idx + 1}</td>
-                          <td className="border px-2 py-1">{item.name}</td>
-                          <td className="border px-2 py-1 text-center">
-                            {item.qty}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+              
 
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
