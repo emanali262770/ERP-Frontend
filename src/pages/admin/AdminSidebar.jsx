@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   FaChevronDown,
   FaChevronUp,
@@ -33,7 +33,7 @@ import {
 
 } from "react-icons/fa";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
 
 // 🔹 Link definitions with permission keys
@@ -106,7 +106,7 @@ const links = [
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const [openMenu, setOpenMenu] = useState(null);
-
+const location = useLocation();
   // 🔹 Get logged-in user info from localStorage
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
   console.log("user", userInfo);
@@ -115,6 +115,18 @@ const AdminSidebar = () => {
     localStorage.removeItem("userInfo");
     navigate("/");
   };
+  useEffect(() => {
+   links.forEach((link) => {
+     if (link.children) {
+       const isChildActive = link.children.some((child) =>
+         location.pathname.startsWith(child.to)
+       );
+       if (isChildActive) {
+         setOpenMenu(link.label);
+       }
+     }
+   });
+ }, [location.pathname]);
 
   // 🔹 Permission filter logic
   const filterWithPermissions = (link) => {
