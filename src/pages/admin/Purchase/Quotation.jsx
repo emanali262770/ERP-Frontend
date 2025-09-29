@@ -55,35 +55,35 @@ const Quotation = () => {
     fetchQuatationList();
   }, [fetchQuatationList]);
 
-
   // Quotation search
-  
 
-// ✅ Quotation Search
-useEffect(() => {
-  if (!searchTerm || !searchTerm.startsWith("quotno-")) {
-    // If search is empty or not starting with QuotNo-, load all
-    fetchQuatationList();
-    return;
-  }
-
-  const delayDebounce = setTimeout(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/quotations/search/${searchTerm.toUpperCase()}`
-      );
-      setQuotations(Array.isArray(res.data) ? res.data : [res.data]);
-    } catch (error) {
-      console.error("Search quotation failed:", error);
-      setQuotations([]);
-    } finally {
-      setLoading(false);
+  // ✅ Quotation Search
+  useEffect(() => {
+    if (!searchTerm || !searchTerm.startsWith("quotno-")) {
+      // If search is empty or not starting with QuotNo-, load all
+      fetchQuatationList();
+      return;
     }
-  }, 1000);
 
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm, fetchQuatationList]);
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/quotations/search/${searchTerm.toUpperCase()}`
+        );
+        setQuotations(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search quotation failed:", error);
+        setQuotations([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, fetchQuatationList]);
 
   // Generate next quotation number
   useEffect(() => {
@@ -170,13 +170,15 @@ useEffect(() => {
     const parsedPrice = parseFloat(price);
     const parsedTotal = parseFloat(total);
 
-    if (!trimmedQuotationNo) newErrors.quotationNo = "Quotation No. is required";
+    if (!trimmedQuotationNo)
+      newErrors.quotationNo = "Quotation No. is required";
     if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
     if (!trimmedForDemand) newErrors.forDemand = "For Demand is required";
     if (!trimmedPerson) newErrors.person = "Person is required";
     if (!trimmedCreatedBy) newErrors.createdBy = "Created By is required";
     if (!trimmedDesignation) newErrors.designation = "Designation is required";
-    if (itemsList.length === 0) newErrors.itemsList = "At least one item is required";
+    if (itemsList.length === 0)
+      newErrors.itemsList = "At least one item is required";
     if (!trimmedPrice || isNaN(parsedPrice) || parsedPrice <= 0) {
       newErrors.price = "Price must be a positive number";
     }
@@ -283,7 +285,9 @@ useEffect(() => {
     try {
       if (editingQuotation) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/quotations/${editingQuotation._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/quotations/${
+            editingQuotation._id
+          }`,
           newQuotation,
           { headers }
         );
@@ -476,13 +480,25 @@ useEffect(() => {
                       key={quotation._id}
                       className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{quotation?.quotationNo}</div>
-                      <div className="text-gray-600">{quotation?.supplier?.contactPerson}</div>
-                      <div className="text-gray-600">{quotation?.demandItem?.demandItem}</div>
+                      <div className="text-gray-600">
+                        {quotation?.quotationNo}
+                      </div>
+                      <div className="text-gray-600">
+                        {quotation?.supplier?.contactPerson}
+                      </div>
+                      <div className="text-gray-600">
+                        {quotation?.demandItem?.demandItem}
+                      </div>
                       <div className="text-gray-600">{quotation?.person}</div>
-                      <div className="text-gray-600">{quotation?.createdBy}</div>
-                      <div className="text-gray-600">{quotation?.designation}</div>
-                      <div className="text-gray-600">{quotation?.totalAmount}</div>
+                      <div className="text-gray-600">
+                        {quotation?.createdBy}
+                      </div>
+                      <div className="text-gray-600">
+                        {quotation?.designation}
+                      </div>
+                      <div className="text-gray-600">
+                        {quotation?.totalAmount}
+                      </div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(quotation)}
@@ -549,14 +565,16 @@ useEffect(() => {
         </div>
 
         {isSliderOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-4 h-full overflow-y-auto"
+              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingQuotation ? "Update Quotation" : "Add a New Quotation"}
+                  {editingQuotation
+                    ? "Update Quotation"
+                    : "Add a New Quotation"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -566,14 +584,16 @@ useEffect(() => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Quotation No. <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
-                    value={editingQuotation ? quotationNo : `QuotNo-${nextQuatation}`}
+                    value={
+                      editingQuotation ? quotationNo : `QuotNo-${nextQuatation}`
+                    }
                     readOnly
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                       errors.quotationNo
@@ -584,7 +604,9 @@ useEffect(() => {
                     required
                   />
                   {errors.quotationNo && (
-                    <p className="text-red-500 text-xs mt-1">{errors.quotationNo}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.quotationNo}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -609,7 +631,9 @@ useEffect(() => {
                     ))}
                   </select>
                   {errors.supplier && (
-                    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.supplier}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -634,7 +658,9 @@ useEffect(() => {
                     ))}
                   </select>
                   {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">{errors.forDemand}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.forDemand}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -674,7 +700,9 @@ useEffect(() => {
                     required
                   />
                   {errors.createdBy && (
-                    <p className="text-red-500 text-xs mt-1">{errors.createdBy}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.createdBy}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -694,7 +722,9 @@ useEffect(() => {
                     required
                   />
                   {errors.designation && (
-                    <p className="text-red-500 text-xs mt-1">{errors.designation}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.designation}
+                    </p>
                   )}
                 </div>
                 <div className="space-y-4">
@@ -771,22 +801,44 @@ useEffect(() => {
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                         <thead className="bg-gray-100 text-gray-600 text-sm">
                           <tr>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Sr #</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Item Name</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Quantity</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Price</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Total</th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">Remove</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Sr #
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Item Name
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Quantity
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Price
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Total
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Remove
+                            </th>
                           </tr>
                         </thead>
                         <tbody className="text-gray-700 text-sm">
                           {itemsList.map((item, idx) => (
                             <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
-                              <td className="px-4 py-2 text-center border-b">{item.itemName}</td>
-                              <td className="px-4 py-2 border-b text-center">{item.qty}</td>
-                              <td className="px-4 py-2 border-b text-center">{item.price}</td>
-                              <td className="px-4 py-2 border-b text-center">{item.total}</td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {idx + 1}
+                              </td>
+                              <td className="px-4 py-2 text-center border-b">
+                                {item.itemName}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.qty}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.price}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.total}
+                              </td>
                               <td className="px-4 py-2 border-b text-center">
                                 <button onClick={() => handleRemoveItem(idx)}>
                                   <X size={18} className="text-red-600" />
