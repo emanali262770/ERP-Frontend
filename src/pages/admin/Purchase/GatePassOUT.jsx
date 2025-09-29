@@ -69,9 +69,19 @@ const GatePassOut = () => {
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
 
-  const companyOptions = ["ABC Corp", "XYZ Ltd", "Tech Solutions", "Global Supplies"];
+  const companyOptions = [
+    "ABC Corp",
+    "XYZ Ltd",
+    "Tech Solutions",
+    "Global Supplies",
+  ];
   const poOptions = ["PO001", "PO002", "PO003"];
-  const categoryOptions = ["Electronics", "Stationery", "IT Equipment", "Furniture"];
+  const categoryOptions = [
+    "Electronics",
+    "Stationery",
+    "IT Equipment",
+    "Furniture",
+  ];
   const itemOptions = ["Laptop", "Desktop", "Printer", "Chair", "Pens"];
 
   const formatDate = (date) => {
@@ -137,7 +147,8 @@ const GatePassOut = () => {
       if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
     } else if (poType === "withoutPO") {
       if (!itemCategory) newErrors.itemCategory = "Item Category is required";
-      if (itemsList.length === 0) newErrors.itemsList = "At least one item is required";
+      if (itemsList.length === 0)
+        newErrors.itemsList = "At least one item is required";
     }
 
     setErrors(newErrors);
@@ -172,7 +183,12 @@ const GatePassOut = () => {
     const trimmedItemName = itemName.trim();
     const parsedItemQuantity = parseInt(itemQuantity, 10);
 
-    if (!trimmedItemName || !itemQuantity || isNaN(parsedItemQuantity) || parsedItemQuantity <= 0) {
+    if (
+      !trimmedItemName ||
+      !itemQuantity ||
+      isNaN(parsedItemQuantity) ||
+      parsedItemQuantity <= 0
+    ) {
       Swal.fire({
         icon: "warning",
         title: "Invalid Item",
@@ -182,7 +198,10 @@ const GatePassOut = () => {
       return;
     }
 
-    setItemsList([...itemsList, { name: trimmedItemName, qty: parsedItemQuantity, units: "Units" }]);
+    setItemsList([
+      ...itemsList,
+      { name: trimmedItemName, qty: parsedItemQuantity, units: "Units" },
+    ]);
     setItemName("");
     setItemQuantity("");
     setErrors((prev) => ({ ...prev, itemsList: null }));
@@ -195,7 +214,9 @@ const GatePassOut = () => {
       Swal.fire({
         icon: "warning",
         title: "Missing or Invalid Fields",
-        html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(errors)
+        html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
+          errors
+        )
           .map((err) => `<li>${err}</li>`)
           .join("")}</ul>`,
         confirmButtonColor: "#d33",
@@ -219,7 +240,9 @@ const GatePassOut = () => {
     };
 
     if (editingGatepass) {
-      setGatepasses(gatepasses.map((g) => (g._id === editingGatepass._id ? newGatepass : g)));
+      setGatepasses(
+        gatepasses.map((g) => (g._id === editingGatepass._id ? newGatepass : g))
+      );
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -264,9 +287,17 @@ const GatePassOut = () => {
       .then((result) => {
         if (result.isConfirmed) {
           setGatepasses(gatepasses.filter((g) => g._id !== id));
-          swalWithTailwindButtons.fire("Deleted!", "Gatepass deleted successfully.", "success");
+          swalWithTailwindButtons.fire(
+            "Deleted!",
+            "Gatepass deleted successfully.",
+            "success"
+          );
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithTailwindButtons.fire("Cancelled", "Gatepass is safe 🙂", "error");
+          swalWithTailwindButtons.fire(
+            "Cancelled",
+            "Gatepass is safe 🙂",
+            "error"
+          );
         }
       });
   };
@@ -277,7 +308,9 @@ const GatePassOut = () => {
       <div className="px-6 mx-auto">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-newPrimary">Gatepass Out Details</h1>
+            <h1 className="text-2xl font-bold text-newPrimary">
+              Gatepass Out Details
+            </h1>
           </div>
           <button
             className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
@@ -293,7 +326,7 @@ const GatePassOut = () => {
             <div className="min-w-[1200px]">
               {/* Table Header */}
               <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>GatePassOUT  ID</div>
+                <div>GatePassOUT ID</div>
                 <div>Driver Name</div>
                 <div>Items Category</div>
                 <div>Supplier</div>
@@ -320,9 +353,13 @@ const GatePassOut = () => {
                       key={gatepass._id}
                       className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="font-medium text-gray-900">{gatepass.gatepassId}</div>
+                      <div className="font-medium text-gray-900">
+                        {gatepass.gatepassId}
+                      </div>
                       <div className="text-gray-600">{gatepass.driverName}</div>
-                      <div className="text-gray-600">{gatepass.itemsCategory}</div>
+                      <div className="text-gray-600">
+                        {gatepass.itemsCategory}
+                      </div>
                       <div className="text-gray-600">{gatepass.supplier}</div>
                       <div className="text-gray-600">
                         <div className="flex flex-wrap gap-2">
@@ -332,7 +369,9 @@ const GatePassOut = () => {
                                 <span
                                   className="px-3 py-1 rounded-full text-xs font-medium"
                                   style={{
-                                    backgroundColor: `hsl(${(idx * 70) % 360}, 80%, 85%)`,
+                                    backgroundColor: `hsl(${
+                                      (idx * 70) % 360
+                                    }, 80%, 85%)`,
                                     color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
                                   }}
                                 >
@@ -341,8 +380,12 @@ const GatePassOut = () => {
                                 <span
                                   className="px-3 py-1 rounded-full text-xs font-medium"
                                   style={{
-                                    backgroundColor: `hsl(${(idx * 70 + 35) % 360}, 80%, 85%)`,
-                                    color: `hsl(${(idx * 70 + 35) % 360}, 40%, 25%)`,
+                                    backgroundColor: `hsl(${
+                                      (idx * 70 + 35) % 360
+                                    }, 80%, 85%)`,
+                                    color: `hsl(${
+                                      (idx * 70 + 35) % 360
+                                    }, 40%, 25%)`,
                                   }}
                                 >
                                   Qty: {item.qty} {item.units}
@@ -354,7 +397,9 @@ const GatePassOut = () => {
                           )}
                         </div>
                       </div>
-                      <div className="text-gray-500">{formatDate(gatepass.date)}</div>
+                      <div className="text-gray-500">
+                        {formatDate(gatepass.date)}
+                      </div>
                       <div className="text-gray-600">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${
@@ -393,14 +438,16 @@ const GatePassOut = () => {
         </div>
 
         {isSliderOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-4 h-full overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingGatepass ? "Update Gatepass" : "Add a New GatepassOut"}
+                  {editingGatepass
+                    ? "Update Gatepass"
+                    : "Add a New GatepassOut"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -411,7 +458,7 @@ const GatePassOut = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
                 <div className="flex items-center gap-4">
                   <label className="block text-gray-700 font-medium">
                     <input
@@ -444,14 +491,21 @@ const GatePassOut = () => {
                     value={gatepassId}
                     onChange={(e) => setGatepassId(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.gatepassId ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                      errors.gatepassId
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
                     }`}
                     placeholder="Enter gatepass ID"
                     required
-                    aria-describedby={errors.gatepassId ? "gatepassId-error" : undefined}
+                    aria-describedby={
+                      errors.gatepassId ? "gatepassId-error" : undefined
+                    }
                   />
                   {errors.gatepassId && (
-                    <p id="gatepassId-error" className="text-red-500 text-xs mt-1">
+                    <p
+                      id="gatepassId-error"
+                      className="text-red-500 text-xs mt-1"
+                    >
                       {errors.gatepassId}
                     </p>
                   )}
@@ -466,14 +520,21 @@ const GatePassOut = () => {
                     value={driverName}
                     onChange={(e) => setDriverName(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.driverName ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                      errors.driverName
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
                     }`}
                     placeholder="Enter driver name"
                     required
-                    aria-describedby={errors.driverName ? "driverName-error" : undefined}
+                    aria-describedby={
+                      errors.driverName ? "driverName-error" : undefined
+                    }
                   />
                   {errors.driverName && (
-                    <p id="driverName-error" className="text-red-500 text-xs mt-1">
+                    <p
+                      id="driverName-error"
+                      className="text-red-500 text-xs mt-1"
+                    >
                       {errors.driverName}
                     </p>
                   )}
@@ -488,13 +549,17 @@ const GatePassOut = () => {
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.date ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                      errors.date
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
                     }`}
                     required
                     aria-describedby={errors.date ? "date-error" : undefined}
                   />
                   {errors.date && (
-                    <p id="date-error" className="text-red-500 text-xs mt-1">{errors.date}</p>
+                    <p id="date-error" className="text-red-500 text-xs mt-1">
+                      {errors.date}
+                    </p>
                   )}
                 </div>
 
@@ -506,10 +571,14 @@ const GatePassOut = () => {
                     value={toCompany}
                     onChange={(e) => setToCompany(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.toCompany ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                      errors.toCompany
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
                     }`}
                     required
-                    aria-describedby={errors.toCompany ? "toCompany-error" : undefined}
+                    aria-describedby={
+                      errors.toCompany ? "toCompany-error" : undefined
+                    }
                   >
                     <option value="">Select Company</option>
                     {companyOptions.map((company) => (
@@ -519,7 +588,12 @@ const GatePassOut = () => {
                     ))}
                   </select>
                   {errors.toCompany && (
-                    <p id="toCompany-error" className="text-red-500 text-xs mt-1">{errors.toCompany}</p>
+                    <p
+                      id="toCompany-error"
+                      className="text-red-500 text-xs mt-1"
+                    >
+                      {errors.toCompany}
+                    </p>
                   )}
                 </div>
 
@@ -556,10 +630,14 @@ const GatePassOut = () => {
                         value={poNo}
                         onChange={(e) => setPoNo(e.target.value)}
                         className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.poNo ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                          errors.poNo
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
                         }`}
                         required
-                        aria-describedby={errors.poNo ? "poNo-error" : undefined}
+                        aria-describedby={
+                          errors.poNo ? "poNo-error" : undefined
+                        }
                       >
                         <option value="">Select PO Number</option>
                         {poOptions.map((po) => (
@@ -569,7 +647,12 @@ const GatePassOut = () => {
                         ))}
                       </select>
                       {errors.poNo && (
-                        <p id="poNo-error" className="text-red-500 text-xs mt-1">{errors.poNo}</p>
+                        <p
+                          id="poNo-error"
+                          className="text-red-500 text-xs mt-1"
+                        >
+                          {errors.poNo}
+                        </p>
                       )}
                     </div>
                     <div>
@@ -581,14 +664,23 @@ const GatePassOut = () => {
                         value={supplier}
                         onChange={(e) => setSupplier(e.target.value)}
                         className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.supplier ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                          errors.supplier
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
                         }`}
                         placeholder="Enter supplier"
                         required
-                        aria-describedby={errors.supplier ? "supplier-error" : undefined}
+                        aria-describedby={
+                          errors.supplier ? "supplier-error" : undefined
+                        }
                       />
                       {errors.supplier && (
-                        <p id="supplier-error" className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                        <p
+                          id="supplier-error"
+                          className="text-red-500 text-xs mt-1"
+                        >
+                          {errors.supplier}
+                        </p>
                       )}
                     </div>
                   </>
@@ -605,10 +697,16 @@ const GatePassOut = () => {
                           value={itemCategory}
                           onChange={(e) => setItemCategory(e.target.value)}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.itemCategory ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                            errors.itemCategory
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
                           }`}
                           required
-                          aria-describedby={errors.itemCategory ? "itemCategory-error" : undefined}
+                          aria-describedby={
+                            errors.itemCategory
+                              ? "itemCategory-error"
+                              : undefined
+                          }
                         >
                           <option value="">Select Category</option>
                           {categoryOptions.map((category) => (
@@ -618,7 +716,12 @@ const GatePassOut = () => {
                           ))}
                         </select>
                         {errors.itemCategory && (
-                          <p id="itemCategory-error" className="text-red-500 text-xs mt-1">{errors.itemCategory}</p>
+                          <p
+                            id="itemCategory-error"
+                            className="text-red-500 text-xs mt-1"
+                          >
+                            {errors.itemCategory}
+                          </p>
                         )}
                       </div>
                       <div>
@@ -665,7 +768,9 @@ const GatePassOut = () => {
                       </div>
                     </div>
                     {errors.itemsList && (
-                      <p className="text-red-500 text-xs mt-1">{errors.itemsList}</p>
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.itemsList}
+                      </p>
                     )}
                     {itemsList.length > 0 && (
                       <div className="overflow-x-auto">
@@ -681,10 +786,18 @@ const GatePassOut = () => {
                           <tbody className="text-gray-700 text-sm">
                             {itemsList.map((item, idx) => (
                               <tr key={idx} className="hover:bg-gray-50">
-                                <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
-                                <td className="px-4 py-2 border-b">{item.name}</td>
-                                <td className="px-4 py-2 border-b text-center">{item.qty}</td>
-                                <td className="px-4 py-2 border-b">{item.units}</td>
+                                <td className="px-4 py-2 border-b text-center">
+                                  {idx + 1}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.name}
+                                </td>
+                                <td className="px-4 py-2 border-b text-center">
+                                  {item.qty}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.units}
+                                </td>
                               </tr>
                             ))}
                           </tbody>
@@ -702,17 +815,23 @@ const GatePassOut = () => {
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.status ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
+                      errors.status
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
                     }`}
                     required
-                    aria-describedby={errors.status ? "status-error" : undefined}
+                    aria-describedby={
+                      errors.status ? "status-error" : undefined
+                    }
                   >
                     <option value="Pending">Pending</option>
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                   </select>
                   {errors.status && (
-                    <p id="status-error" className="text-red-500 text-xs mt-1">{errors.status}</p>
+                    <p id="status-error" className="text-red-500 text-xs mt-1">
+                      {errors.status}
+                    </p>
                   )}
                 </div>
 
@@ -720,9 +839,15 @@ const GatePassOut = () => {
                   type="submit"
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
-                  aria-label={editingGatepass ? "Update gatepass" : "Save gatepass"}
+                  aria-label={
+                    editingGatepass ? "Update gatepass" : "Save gatepass"
+                  }
                 >
-                  {loading ? "Saving..." : editingGatepass ? "Update Gatepass" : "Save GatepassOut"}
+                  {loading
+                    ? "Saving..."
+                    : editingGatepass
+                    ? "Update Gatepass"
+                    : "Save GatepassOut"}
                 </button>
               </form>
             </div>
