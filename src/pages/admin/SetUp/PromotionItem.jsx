@@ -28,7 +28,6 @@ const PromotionItem = () => {
   const [discountPercentage, setDiscountPercentage] = useState("");
   const [itemSearch, setItemSearch] = useState("");
 
-
   const [isEnable, setIsEnable] = useState(true);
   const sliderRef = useRef(null);
 
@@ -59,7 +58,6 @@ const PromotionItem = () => {
           axios.get(API_URL),
         ]);
 
-
       setPromotionList(promotionsRes.data);
       setCategoryList(categoriesRes.data);
       setItemTypeList(itemTypesRes.data);
@@ -73,7 +71,6 @@ const PromotionItem = () => {
         const itemType =
           itemTypesRes.data.find((it) => it._id === item.itemType) || {};
 
-
         return {
           ...item,
           promotionId: promotion._id || item.promotion,
@@ -85,9 +82,7 @@ const PromotionItem = () => {
         };
       });
 
-
       setPromotionItems(itemsWithNames);
-
     } catch (error) {
       console.error("Failed to fetch data", error);
       // Fallback to static data if API fails
@@ -126,7 +121,6 @@ const PromotionItem = () => {
     fetchAllData();
   }, [fetchAllData]);
 
-
   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
@@ -151,7 +145,6 @@ const PromotionItem = () => {
           }
         },
       });
-
     }
   }, [isSliderOpen]);
 
@@ -182,7 +175,6 @@ const PromotionItem = () => {
     { id: 7, itemName: "Samsung", price: "$1,000" },
   ];
 
-
   const filterdata = items.filter((item) => {
     return item.itemName.toLowerCase().includes(itemSearch.toLowerCase());
   });
@@ -201,7 +193,6 @@ const PromotionItem = () => {
     setIsSliderOpen(true);
   };
 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     const trimmedName = promotionName.trim();
@@ -210,7 +201,6 @@ const PromotionItem = () => {
       toast.error("❌ Please select a promotion.");
       return;
     }
-
 
     setLoading(true);
 
@@ -231,7 +221,6 @@ const PromotionItem = () => {
 
       isEnable,
     };
-
 
     try {
       let res;
@@ -349,7 +338,6 @@ const PromotionItem = () => {
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-
       <CommanHeader />
       <div className="px-6 mx-auto">
         {/* Top bar */}
@@ -383,7 +371,6 @@ const PromotionItem = () => {
 
               {/* ✅ Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
-
                 {loading ? (
                   // Skeleton shown while loading
                   <TableSkeleton
@@ -458,7 +445,6 @@ const PromotionItem = () => {
                     </div>
                   ))
                 )}
-
               </div>
             </div>
           </div>
@@ -466,12 +452,10 @@ const PromotionItem = () => {
 
         {/* Slider */}
         {isSliderOpen && (
-
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
-
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -481,7 +465,6 @@ const PromotionItem = () => {
                 </h2>
                 <button
                   className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
-
                   onClick={() => {
                     setIsSliderOpen(false);
                     setPromotionName("");
@@ -506,7 +489,6 @@ const PromotionItem = () => {
                   Promotion on Item
                 </h3>
 
-
                 {/* Promotion Name */}
                 {/* <div>
                   <label className="block text-gray-700 font-medium mb-2">
@@ -522,93 +504,95 @@ const PromotionItem = () => {
                 </div> */}
 
                 {/* Promotion Select */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Select Promotion
-                  </label>
-                  <select
-                    value={selectedPromotion}
-                    onChange={(e) => setSelectedPromotion(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                  >
-                    <option value="">-- Select Promotion --</option>
-                    {promotionList.map((promo) => (
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Select Promotion
+                    </label>
+                    <select
+                      value={selectedPromotion}
+                      onChange={(e) => setSelectedPromotion(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    >
+                      <option value="">-- Select Promotion --</option>
+                      {promotionList.map((promo) => (
+                        <option
+                          key={promo._id || promo.id}
+                          value={promo._id || promo.id}
+                        >
+                          {promo.promotionName || promo.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                      <option
-                        key={promo._id || promo.id}
-                        value={promo._id || promo.id}
-                      >
-
-                        {promo.promotionName || promo.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Category Select */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Select Category
-                  </label>
-                  <select
-                    value={selectedCategory}
-                    onChange={(e) => setSelectedCategory(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                  >
-                    <option value="">-- Select Category --</option>
-                    {categoryList.map((cat) => (
-                      <option key={cat._id || cat.id} value={cat._id || cat.id}>
-                        {cat.categoryName || cat.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Item Type Select */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Select Item Type
-                  </label>
-                  <select
-                    value={selectedItemType}
-                    onChange={(e) => setSelectedItemType(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                  >
-                    <option value="">-- Select Item Type --</option>
-                    {itemTypeList.map((type) => (
-                      <option
-                        key={type._id || type.id}
-                        value={type._id || type.id}
-                      >
-
-                        {type.itemTypeName || type.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Item Search */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Search Items
-                  </label>
-                  <div className="w-full relative">
-                    <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <Search size={18} className="text-gray-400" />
-                    </span>
-                    <input
-                      type="text"
-                      value={itemSearch}
-                      onChange={(e) => setItemSearch(e.target.value)}
-                      placeholder="Search Item..."
-                      aria-label="Search Item"
-                      className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
-                         focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
-                       placeholder:text-gray-400"
-                    />
+                  {/* Category Select */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Select Category
+                    </label>
+                    <select
+                      value={selectedCategory}
+                      onChange={(e) => setSelectedCategory(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    >
+                      <option value="">-- Select Category --</option>
+                      {categoryList.map((cat) => (
+                        <option
+                          key={cat._id || cat.id}
+                          value={cat._id || cat.id}
+                        >
+                          {cat.categoryName || cat.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
+                <div className="flex gap-4">
+                  {/* Item Type Select */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Select Item Type
+                    </label>
+                    <select
+                      value={selectedItemType}
+                      onChange={(e) => setSelectedItemType(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    >
+                      <option value="">-- Select Item Type --</option>
+                      {itemTypeList.map((type) => (
+                        <option
+                          key={type._id || type.id}
+                          value={type._id || type.id}
+                        >
+                          {type.itemTypeName || type.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
+                  {/* Item Search */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Search Items
+                    </label>
+                    <div className="w-full relative">
+                      <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <Search size={18} className="text-gray-400" />
+                      </span>
+                      <input
+                        type="text"
+                        value={itemSearch}
+                        onChange={(e) => setItemSearch(e.target.value)}
+                        placeholder="Search Item..."
+                        aria-label="Search Item"
+                        className="w-full h-10 pl-10 pr-3 border border-gray-300 rounded-lg
+                         focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400
+                       placeholder:text-gray-400"
+                      />
+                    </div>
+                  </div>
+                </div>
                 {/* Item List */}
 
                 <div className="w-full border rounded-lg shadow p-4 max-h-60 overflow-y-auto">
@@ -627,30 +611,27 @@ const PromotionItem = () => {
                           value={item._id}
                           className="h-5 w-5 accent-blue-600 rounded-sm"
                         />
-
                       </li>
                     ))}
                   </ul>
                 </div>
+                <div className="flex gap-4">
+                  {/* Discount Percentage */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Discount Percentage
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={discountPercentage}
+                      onChange={(e) => setDiscountPercentage(e.target.value)}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Enter discount percentage"
+                    />
+                  </div>
 
-
-                {/* Discount Percentage */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Discount Percentage
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={discountPercentage}
-                    onChange={(e) => setDiscountPercentage(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter discount percentage"
-                  />
-                </div>
-
-
-                {/* Start Date
+                  {/* Start Date
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Start Date
@@ -663,8 +644,8 @@ const PromotionItem = () => {
                   />
                 </div> */}
 
-                {/* End Date */}
-                {/* <div>
+                  {/* End Date */}
+                  {/* <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     End Date
                   </label>
@@ -676,30 +657,32 @@ const PromotionItem = () => {
                   />
                 </div> */}
 
-
-                {/* Status */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Status
-                  </label>
-                  <select
-                    value={isEnable}
-                    onChange={(e) => setIsEnable(e.target.value === "true")}
-                    className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                  >
-                    <option value={true}>Enabled</option>
-                    <option value={false}>Disabled</option>
-                  </select>
+                  {/* Status */}
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Status
+                    </label>
+                    <select
+                      value={isEnable}
+                      onChange={(e) => setIsEnable(e.target.value === "true")}
+                      className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    >
+                      <option value={true}>Enabled</option>
+                      <option value={false}>Disabled</option>
+                    </select>
+                  </div>
                 </div>
-
                 {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-newPrimary/50"
                 >
-
-                  {loading ? "Saving..." : editingPromotionItem ? "Update Promotion Item" : "Save Promotion Item"}
+                  {loading
+                    ? "Saving..."
+                    : editingPromotionItem
+                    ? "Update Promotion Item"
+                    : "Save Promotion Item"}
                 </button>
               </form>
             </div>
@@ -708,8 +691,6 @@ const PromotionItem = () => {
       </div>
     </div>
   );
-
-}
+};
 
 export default PromotionItem;
-
