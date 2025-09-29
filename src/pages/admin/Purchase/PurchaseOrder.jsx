@@ -24,7 +24,7 @@ const PurchaseOrder = () => {
   const [forDemand, setForDemand] = useState("");
   const [estimationItems, setEstimationItems] = useState([]);
   const [quotations, setQuotations] = useState([]);
-const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [poNo, setPoNo] = useState("");
@@ -154,29 +154,29 @@ const [searchTerm, setSearchTerm] = useState("");
   }, [fetchPurchaseOrders]);
 
   useEffect(() => {
-  if (!searchTerm || !searchTerm.startsWith("PO-")) {
-    // if search empty or not starting with REQ-, load all
-    fetchPurchaseOrders();
-    return;
-  }
-
-  const delayDebounce = setTimeout(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
-      );
-      setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]); 
-    } catch (error) {
-      console.error("Search purchaseOrder failed:", error);
-      setPurchaseOrders([]);
-    } finally {
-      setLoading(false);
+    if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
+      // if search empty or not starting with REQ-, load all
+      fetchPurchaseOrders();
+      return;
     }
-  }, 1000); 
 
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+         `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm.toUpperCase()}`
+        );
+        setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search purchaseOrder failed:", error);
+        setPurchaseOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
 
   //   Next POId
   useEffect(() => {
@@ -427,13 +427,12 @@ const [searchTerm, setSearchTerm] = useState("");
             />
 
             <button
-            className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
-            onClick={handleAddClick}
-          >
-            + Add Purchase Order
-          </button>
+              className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+              onClick={handleAddClick}
+            >
+              + Add Purchase Order
+            </button>
           </div>
-          
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
@@ -710,7 +709,8 @@ const [searchTerm, setSearchTerm] = useState("");
         )}
         {isView && selectedPurchaseOrder && (
           <ViewModel
-            purchaseOrder={selectedPurchaseOrder}
+            data={selectedPurchaseOrder}
+            type="purchaseOrder"
             onClose={() => setIsView(false)}
           />
         )}

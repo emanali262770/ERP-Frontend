@@ -54,7 +54,7 @@ const PurchaseApproval = () => {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_BASE_URL
-          }/requisitions/demandItem/${searchTerm}`
+          }/requisitions/demandItem/${searchTerm.toUpperCase()}`
         );
         setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
       } catch (error) {
@@ -453,7 +453,8 @@ const PurchaseApproval = () => {
         {/* Show popup only if isView is true */}
         {isView && selectedRequisition && (
           <ViewModel
-            requisition={selectedRequisition} // ✅ pass as prop
+            data={selectedRequisition}
+            type="requisition"
             onClose={() => setisView(false)}
           />
         )}
