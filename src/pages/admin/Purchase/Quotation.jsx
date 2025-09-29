@@ -23,16 +23,18 @@ const Quotation = () => {
   const [itemQuantity, setItemQuantity] = useState("");
   const [selectedItem, setSelectedItem] = useState("");
   const [price, setPrice] = useState("");
-   const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [total, setTotal] = useState("");
   const [editingQuotation, setEditingQuotation] = useState(null);
   const [errors, setErrors] = useState({});
   const [supplierList, setSupplierList] = useState([]);
-  const [nextQuatation, setNextQuatation] = useState();
+  const [nextQuatation, setNextQuatation] = useState("001");
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  // fetch qutation List api
 
+  // Fetch quotation list
   const fetchQuatationList = useCallback(async () => {
     try {
       setLoading(true);
@@ -40,52 +42,47 @@ const Quotation = () => {
         `${import.meta.env.VITE_API_BASE_URL}/quotations`
       );
       setQuotations(res.data);
-     
     } catch (error) {
-      console.error("Failed to fetch Requistion", error);
+      console.error("Failed to fetch quotations", error);
     } finally {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
     }
   }, []);
+
   useEffect(() => {
     fetchQuatationList();
   }, [fetchQuatationList]);
 
-  // ✅ Quotation Search
-useEffect(() => {
-  if (!searchTerm || !searchTerm.startsWith("QuotNo-")) {
-    // If search is empty or not starting with QuotNo-, load all
-    fetchQuatationList();
-    return;
-  }
-  
-
-  const delayDebounce = setTimeout(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/quotations/search/${searchTerm}`
-      );
-      
-      
-      setQuotations(Array.isArray(res.data) ? res.data : [res.data]); 
-    } catch (error) {
-      console.error("Search quotation failed:", error);
-      setQuotations([]);
-    } finally {
-      setLoading(false);
+  // Quotation search
+  useEffect(() => {
+    if (!searchTerm || !searchTerm.startsWith("QuotNo-")) {
+      fetchQuatationList();
+      return;
     }
-  }, 1000); // debounce
 
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/quotations/search/${searchTerm}`
+        );
+        setQuotations(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search quotation failed:", error);
+        setQuotations([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 1000);
 
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, fetchQuatationList]);
 
+  // Generate next quotation number
   useEffect(() => {
     if (quotations.length > 0) {
-      // Extract numeric part from the last quotationNo
       const maxNo = Math.max(
         ...quotations.map((q) => {
           const match = q.quotationNo?.match(/QuotNo-(\d+)/);
@@ -94,11 +91,9 @@ useEffect(() => {
       );
       setNextQuatation((maxNo + 1).toString().padStart(3, "0"));
     } else {
-      setNextQuatation("001"); // first quotation
+      setNextQuatation("001");
     }
   }, [quotations]);
-
-
 
   // Supplier List Fetch
   const fetchSupplierList = useCallback(async () => {
@@ -107,33 +102,33 @@ useEffect(() => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/suppliers`
       );
-      setSupplierList(res.data); // store actual categories array
-      console.log("Supplier ", res.data);
+      setSupplierList(res.data);
     } catch (error) {
-      console.error("Failed to fetch Supplier", error);
+      console.error("Failed to fetch suppliers", error);
     } finally {
       setTimeout(() => setLoading(false), 1000);
     }
   }, []);
+
   useEffect(() => {
     fetchSupplierList();
   }, [fetchSupplierList]);
 
-  // Supplier List Fetch
+  // Demand List Fetch
   const fetchDemandList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/requisitions/approved`
       );
-      setDemandList(res.data); // store actual categories array
-      console.log("Demand ", res.data);
+      setDemandList(res.data);
     } catch (error) {
-      console.error("Failed to fetch Supplier", error);
+      console.error("Failed to fetch demands", error);
     } finally {
       setTimeout(() => setLoading(false), 1000);
     }
   }, []);
+
   useEffect(() => {
     fetchDemandList();
   }, [fetchDemandList]);
@@ -170,15 +165,13 @@ useEffect(() => {
     const parsedPrice = parseFloat(price);
     const parsedTotal = parseFloat(total);
 
-    if (!trimmedQuotationNo)
-      newErrors.quotationNo = "Quotation No. is required";
+    if (!trimmedQuotationNo) newErrors.quotationNo = "Quotation No. is required";
     if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
     if (!trimmedForDemand) newErrors.forDemand = "For Demand is required";
     if (!trimmedPerson) newErrors.person = "Person is required";
     if (!trimmedCreatedBy) newErrors.createdBy = "Created By is required";
     if (!trimmedDesignation) newErrors.designation = "Designation is required";
-    if (itemsList.length === 0)
-      newErrors.itemsList = "At least one item is required";
+    if (itemsList.length === 0) newErrors.itemsList = "At least one item is required";
     if (!trimmedPrice || isNaN(parsedPrice) || parsedPrice <= 0) {
       newErrors.price = "Price must be a positive number";
     }
@@ -196,10 +189,7 @@ useEffect(() => {
     setIsSliderOpen(true);
   };
 
-  // Handel Edit
   const handleEditClick = (quotation) => {
-    console.log("editing quotation", quotation);
-
     setEditingQuotation(quotation);
     setQuotationNo(quotation.quotationNo || "");
     setSupplier(quotation.supplier?._id || "");
@@ -213,7 +203,6 @@ useEffect(() => {
     setErrors({});
     setIsSliderOpen(true);
   };
-
 
   const handleAddItem = () => {
     const selected = demandItems.find((i) => i._id === selectedItem);
@@ -250,14 +239,12 @@ useEffect(() => {
       },
     ]);
 
-    setSelectedItem(""); // reset dropdown
+    setSelectedItem("");
     setItemQuantity("");
-    setPrice(""); // ✅ clear price input
+    setPrice("");
     setTotal("");
     setErrors((prev) => ({ ...prev, itemsList: null }));
   };
-
- 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -267,6 +254,7 @@ useEffect(() => {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
     };
+
     if (itemsList.length === 0) {
       Swal.fire({
         icon: "warning",
@@ -287,35 +275,43 @@ useEffect(() => {
       items: itemsList,
     };
 
-    if ((editingQuotation, editingQuotation?._id)) {
-      await axios.put(
-        `${import.meta.env.VITE_API_BASE_URL}/quotations/${
-          editingQuotation._id
-        }`,
-        newQuotation,
-        { headers }
-      );
+    try {
+      if (editingQuotation) {
+        await axios.put(
+          `${import.meta.env.VITE_API_BASE_URL}/quotations/${editingQuotation._id}`,
+          newQuotation,
+          { headers }
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Updated!",
+          text: "Quotation updated successfully.",
+          confirmButtonColor: "#3085d6",
+        });
+      } else {
+        await axios.post(
+          `${import.meta.env.VITE_API_BASE_URL}/quotations`,
+          newQuotation,
+          { headers }
+        );
+        Swal.fire({
+          icon: "success",
+          title: "Added!",
+          text: "Quotation added successfully.",
+          confirmButtonColor: "#3085d6",
+        });
+      }
+      fetchQuatationList();
+      resetForm();
+    } catch (error) {
+      console.error("Error saving quotation:", error);
       Swal.fire({
-        icon: "success",
-        title: "Updated!",
-        text: "Quotation updated successfully.",
-        confirmButtonColor: "#3085d6",
-      });
-    } else {
-      await axios.post(
-        `${import.meta.env.VITE_API_BASE_URL}/quotations`,
-        newQuotation,
-        { headers }
-      );
-      Swal.fire({
-        icon: "success",
-        title: "Added!",
-        text: "Quotation added successfully.",
-        confirmButtonColor: "#3085d6",
+        icon: "error",
+        title: "Error!",
+        text: error.response?.data?.message || "Failed to save quotation.",
+        confirmButtonColor: "#d33",
       });
     }
-    fetchQuatationList();
-    resetForm();
   };
 
   const handleDelete = (id) => {
@@ -349,13 +345,11 @@ useEffect(() => {
               "Content-Type": "application/json",
             };
 
-            // ✅ Delete from backend
             await axios.delete(
               `${import.meta.env.VITE_API_BASE_URL}/quotations/${id}`,
               { headers }
             );
 
-            // ✅ Update UI
             setQuotations((prev) => prev.filter((q) => q._id !== id));
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -379,9 +373,8 @@ useEffect(() => {
         }
       });
   };
-  const selectedDemand = demandList.find((d) => d._id === forDemand);
 
-  // Get its items safely
+  const selectedDemand = demandList.find((d) => d._id === forDemand);
   const demandItems = selectedDemand ? selectedDemand.items : [];
   const demandItemQuantity =
     demandItems.find((item) => item._id === selectedItem)?.quantity || "";
@@ -396,6 +389,7 @@ useEffect(() => {
       setCreatedBy(selectedDemand.employee?.employeeName || "");
     }
   }, [selectedDemand]);
+
   useEffect(() => {
     if (editingQuotation && demandList.length > 0) {
       setForDemand(editingQuotation.demandItem?._id || "");
@@ -405,6 +399,19 @@ useEffect(() => {
   function handleRemoveItem(index) {
     setItemsList(itemsList.filter((_, i) => i !== index));
   }
+
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = quotations.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.ceil(quotations.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -417,7 +424,6 @@ useEffect(() => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* ✅ Search Input */}
             <input
               type="text"
               placeholder="Enter Quot No eg: QuotNo-001"
@@ -425,21 +431,18 @@ useEffect(() => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
             />
-
             <button
               className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
               onClick={handleAddQuotation}
             >
-               + Add Quotation
+              + Add Quotation
             </button>
           </div>
-         
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1200px]">
-              {/* Table Header */}
               <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>Quotation No.</div>
                 <div>Supplier</div>
@@ -447,80 +450,34 @@ useEffect(() => {
                 <div>Person</div>
                 <div>Created By</div>
                 <div>Designation</div>
-                {/* <div>Items</div> */}
                 <div>Price</div>
                 <div>Actions</div>
               </div>
 
-              {/* Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={quotations.length || 5}
+                    rows={recordsPerPage}
                     cols={8}
                     className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]"
                   />
-                ) : quotations.length === 0 ? (
+                ) : currentRecords.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No quotations found.
                   </div>
                 ) : (
-                  quotations?.map((quotation) => (
+                  currentRecords.map((quotation) => (
                     <div
                       key={quotation._id}
                       className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">
-                        {quotation?.quotationNo}
-                      </div>
-                      <div className="text-gray-600">
-                        {quotation?.supplier?.contactPerson}
-                      </div>
-                      <div className="text-gray-600">
-                        {quotation?.demandItem?.demandItem}
-                      </div>
+                      <div className="text-gray-600">{quotation?.quotationNo}</div>
+                      <div className="text-gray-600">{quotation?.supplier?.contactPerson}</div>
+                      <div className="text-gray-600">{quotation?.demandItem?.demandItem}</div>
                       <div className="text-gray-600">{quotation?.person}</div>
-                      <div className="text-gray-600">
-                        {quotation?.createdBy}
-                      </div>
-                      <div className="text-gray-600">
-                        {quotation?.designation}
-                      </div>
-                      {/* <div className="text-gray-600">
-                        <div className="flex flex-wrap gap-2">
-                          {quotation.items.map((item, idx) => (
-                            <div key={idx} className="flex gap-2">
-                              <span
-                                className="px-3 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: `hsl(${
-                                    (idx * 70) % 360
-                                  }, 80%, 85%)`,
-                                  color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
-                                }}
-                              >
-                                {item.name}
-                              </span>
-                              <span
-                                className="px-3 py-1 rounded-full text-xs font-medium"
-                                style={{
-                                  backgroundColor: `hsl(${
-                                    (idx * 70 + 35) % 360
-                                  }, 80%, 85%)`,
-                                  color: `hsl(${
-                                    (idx * 70 + 35) % 360
-                                  }, 40%, 25%)`,
-                                }}
-                              >
-                                Qty: {item.qty}
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      </div> */}
-                      <div className="text-gray-600">
-                        {quotation?.totalAmount}
-                      </div>
+                      <div className="text-gray-600">{quotation?.createdBy}</div>
+                      <div className="text-gray-600">{quotation?.designation}</div>
+                      <div className="text-gray-600">{quotation?.totalAmount}</div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(quotation)}
@@ -549,6 +506,41 @@ useEffect(() => {
               </div>
             </div>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-between my-4 px-10">
+              <div className="text-sm text-gray-600">
+                Showing {indexOfFirstRecord + 1} to{" "}
+                {Math.min(indexOfLastRecord, quotations.length)} of{" "}
+                {quotations.length} records
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {isSliderOpen && (
@@ -559,9 +551,7 @@ useEffect(() => {
             >
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingQuotation
-                    ? "Update Quotation"
-                    : "Add a New Quotation"}
+                  {editingQuotation ? "Update Quotation" : "Add a New Quotation"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -578,13 +568,8 @@ useEffect(() => {
                   </label>
                   <input
                     type="text"
-                    value={
-                      editingQuotation
-                        ? quotationNo //
-                        : `QuotNo-${nextQuatation}` // ✅ use next number only when adding
-                    }
+                    value={editingQuotation ? quotationNo : `QuotNo-${nextQuatation}`}
                     readOnly
-                    // onChange={(e) => setQuotationNo(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                       errors.quotationNo
                         ? "border-red-500 focus:ring-red-500"
@@ -594,9 +579,7 @@ useEffect(() => {
                     required
                   />
                   {errors.quotationNo && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.quotationNo}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.quotationNo}</p>
                   )}
                 </div>
                 <div>
@@ -621,9 +604,7 @@ useEffect(() => {
                     ))}
                   </select>
                   {errors.supplier && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.supplier}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
                   )}
                 </div>
                 <div>
@@ -641,7 +622,6 @@ useEffect(() => {
                     required
                   >
                     <option value="">Select Demand Item</option>
-
                     {demandList?.map((demand) => (
                       <option key={demand._id} value={demand._id}>
                         {demand?.demandItem}
@@ -649,9 +629,7 @@ useEffect(() => {
                     ))}
                   </select>
                   {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.forDemand}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.forDemand}</p>
                   )}
                 </div>
                 <div>
@@ -683,18 +661,15 @@ useEffect(() => {
                     value={createdBy}
                     readOnly
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.demandList
+                      errors.createdBy
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
                     }`}
-                    placeholder="Enter designation"
+                    placeholder="Enter created by"
                     required
                   />
-
                   {errors.createdBy && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.createdBy}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.createdBy}</p>
                   )}
                 </div>
                 <div>
@@ -714,13 +689,10 @@ useEffect(() => {
                     required
                   />
                   {errors.designation && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.designation}
-                    </p>
+                    <p className="text-red-500 text-xs mt-1">{errors.designation}</p>
                   )}
                 </div>
                 <div className="space-y-4">
-                  {/* Item & Quantity Row */}
                   <div className="flex gap-4 items-end">
                     <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -739,7 +711,6 @@ useEffect(() => {
                         ))}
                       </select>
                     </div>
-
                     <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
                         Item Quantity <span className="text-red-500">*</span>
@@ -749,13 +720,10 @@ useEffect(() => {
                         value={demandItemQuantity}
                         readOnly
                         placeholder="Quantity"
-                        className="w-full p-3 border border-gray-300 rounded-md "
+                        className="w-full p-3 border border-gray-300 rounded-md"
                       />
                     </div>
                   </div>
-
-                  {/* Price, Total, Add Button Row */}
-
                   <div className="flex gap-4 items-end">
                     <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -771,7 +739,6 @@ useEffect(() => {
                         step="0.01"
                       />
                     </div>
-
                     <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
                         Total <span className="text-red-500">*</span>
@@ -784,8 +751,6 @@ useEffect(() => {
                         className="w-full p-3 border border-gray-300 rounded-md"
                       />
                     </div>
-
-                    {/* ✅ Add Button placed after Price & Total */}
                   </div>
                   <div className="flex items-end justify-end">
                     <button
@@ -796,51 +761,27 @@ useEffect(() => {
                       + Add
                     </button>
                   </div>
-
-                  {/* Items Table */}
                   {itemsList.length > 0 && (
                     <div className="overflow-x-auto overflow-y-auto max-h-64 custom-scrollbar">
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                         <thead className="bg-gray-100 text-gray-600 text-sm">
                           <tr>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
-                              Sr #
-                            </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
-                              Item Name
-                            </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
-                              Quantity
-                            </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
-                              Price
-                            </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
-                              Total
-                            </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
-                              Remove
-                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Sr #</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Item Name</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Quantity</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Price</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Total</th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">Remove</th>
                           </tr>
                         </thead>
                         <tbody className="text-gray-700 text-sm">
                           {itemsList.map((item, idx) => (
                             <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-4 py-2 border-b text-center">
-                                {idx + 1}
-                              </td>
-                              <td className="px-4 py-2 text-center border-b">
-                                {item.itemName}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.qty}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.price}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.total}
-                              </td>
+                              <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
+                              <td className="px-4 py-2 text-center border-b">{item.itemName}</td>
+                              <td className="px-4 py-2 border-b text-center">{item.qty}</td>
+                              <td className="px-4 py-2 border-b text-center">{item.price}</td>
+                              <td className="px-4 py-2 border-b text-center">{item.total}</td>
                               <td className="px-4 py-2 border-b text-center">
                                 <button onClick={() => handleRemoveItem(idx)}>
                                   <X size={18} className="text-red-600" />
@@ -853,7 +794,6 @@ useEffect(() => {
                     </div>
                   )}
                 </div>
-
                 <button
                   type="submit"
                   disabled={loading}
@@ -870,7 +810,6 @@ useEffect(() => {
           </div>
         )}
 
-        {/* modal */}
         {viewingQuotation && (
           <ViewQuotation
             quotation={viewingQuotation}
