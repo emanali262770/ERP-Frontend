@@ -568,7 +568,7 @@ const Quotation = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -585,217 +585,230 @@ const Quotation = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Quotation No. <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      editingQuotation ? quotationNo : `QuotNo-${nextQuatation}`
-                    }
-                    readOnly
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.quotationNo
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    placeholder="Enter quotation number"
-                    required
-                  />
-                  {errors.quotationNo && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.quotationNo}
-                    </p>
-                  )}
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Quotation No. <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        editingQuotation
+                          ? quotationNo
+                          : `QuotNo-${nextQuatation}`
+                      }
+                      readOnly
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.quotationNo
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter quotation number"
+                      required
+                    />
+                    {errors.quotationNo && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.quotationNo}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Supplier <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.supplier
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="">Select Supplier</option>
+                      {supplierList?.map((supplier) => (
+                        <option key={supplier._id} value={supplier._id}>
+                          {supplier?.supplierName}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.supplier && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.supplier}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Supplier <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={supplier}
-                    onChange={(e) => setSupplier(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.supplier
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    required
-                  >
-                    <option value="">Select Supplier</option>
-                    {supplierList?.map((supplier) => (
-                      <option key={supplier._id} value={supplier._id}>
-                        {supplier?.supplierName}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.supplier && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.supplier}
-                    </p>
-                  )}
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      For Demand <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={forDemand}
+                      onChange={(e) => setForDemand(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.forDemand
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="">Select Demand Item</option>
+                      {demandList?.map((demand) => (
+                        <option key={demand._id} value={demand._id}>
+                          {demand?.demandItem}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.forDemand && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.forDemand}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Person <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={person}
+                      onChange={(e) => setPerson(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.person
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter person name"
+                      required
+                    />
+                    {errors.person && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.person}
+                      </p>
+                    )}
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    For Demand <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={forDemand}
-                    onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.forDemand
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    required
-                  >
-                    <option value="">Select Demand Item</option>
-                    {demandList?.map((demand) => (
-                      <option key={demand._id} value={demand._id}>
-                        {demand?.demandItem}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.forDemand}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Person <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={person}
-                    onChange={(e) => setPerson(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.person
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    placeholder="Enter person name"
-                    required
-                  />
-                  {errors.person && (
-                    <p className="text-red-500 text-xs mt-1">{errors.person}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Created By <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={createdBy}
-                    readOnly
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.createdBy
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    placeholder="Enter created by"
-                    required
-                  />
-                  {errors.createdBy && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.createdBy}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Designation <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={designation}
-                    onChange={(e) => setDesignation(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.designation
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    placeholder="Enter designation"
-                    required
-                  />
-                  {errors.designation && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.designation}
-                    </p>
-                  )}
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Created By <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={createdBy}
+                      readOnly
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.createdBy
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter created by"
+                      required
+                    />
+                    {errors.createdBy && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.createdBy}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Designation <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={designation}
+                      onChange={(e) => setDesignation(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.designation
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter designation"
+                      required
+                    />
+                    {errors.designation && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.designation}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="space-y-4">
-                  <div className="flex gap-4 items-end">
-                    <div className="flex-1">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Item Name <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={selectedItem}
-                        onChange={(e) => setSelectedItem(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                  <div className="flex gap-4 mb-4">
+                    <div className="flex gap-4 items-end">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Item Name <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={selectedItem}
+                          onChange={(e) => setSelectedItem(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        >
+                          <option value="">Select item</option>
+                          {demandItems.map((item) => (
+                            <option key={item._id} value={item._id}>
+                              {item.itemName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Item Quantity <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={demandItemQuantity}
+                          readOnly
+                          placeholder="Quantity"
+                          className="w-full p-3 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-4 items-end">
+                      <div className="flex-1">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Price <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                          placeholder="Enter price"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Total <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={totalAmount}
+                          readOnly
+                          placeholder="Total"
+                          className="w-full p-3 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-end justify-end">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="px-6 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex items-center justify-center gap-2"
                       >
-                        <option value="">Select item</option>
-                        {demandItems.map((item) => (
-                          <option key={item._id} value={item._id}>
-                            {item.itemName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Item Quantity <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={demandItemQuantity}
-                        readOnly
-                        placeholder="Quantity"
-                        className="w-full p-3 border border-gray-300 rounded-md"
-                      />
+                        <span>+</span> Add
+                      </button>
                     </div>
                   </div>
-                  <div className="flex gap-4 items-end">
-                    <div className="flex-1">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Price <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter price"
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Total <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="number"
-                        value={totalAmount}
-                        readOnly
-                        placeholder="Total"
-                        className="w-full p-3 border border-gray-300 rounded-md"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex items-end justify-end">
-                    <button
-                      type="button"
-                      onClick={handleAddItem}
-                      className="px-6 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
-                    >
-                      + Add
-                    </button>
-                  </div>
+
                   {itemsList.length > 0 && (
                     <div className="overflow-x-auto overflow-y-auto max-h-64 custom-scrollbar">
                       <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
