@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from "react";
 import { SquarePen, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
@@ -10,6 +9,7 @@ const QualityChecking = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [qcId, setQcId] = useState("");
+  const [gpId, setGpId] = useState("");
   const [date, setDate] = useState("");
   const [itemsList, setItemsList] = useState([]);
   const [itemName, setItemName] = useState("");
@@ -20,6 +20,52 @@ const QualityChecking = () => {
   const [editingQC, setEditingQC] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
+ // 🔹 QC Modal states
+  const [qcModalOpen, setQcModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [modalRemarks, setModalRemarks] = useState("");
+  const [modalResult, setModalResult] = useState("");
+
+  // 🔹 Open per-item QC Modal
+  const openQcModal = (item) => {
+    setSelectedItem(item);
+    setModalRemarks(item.remarks || "");
+    setModalResult(item.result || "");
+    setQcModalOpen(true);
+  };
+
+  // 🔹 Save per-item QC Modal
+  const saveQcModal = () => {
+    setItemsList((prev) =>
+      prev.map((i) =>
+        i.id === selectedItem.id
+          ? { ...i, remarks: modalRemarks, result: modalResult }
+          : i
+      )
+    );
+    setQcModalOpen(false);
+  };
+  // 🔹 Add this static mapping at the top of your component
+const gatePassItems = {
+  GP001: [
+    { id: 1, name: "Laptop", qty: 5, price: 50000 },
+    { id: 2, name: "Notebook", qty: 10, price: 200 },
+  ],
+  GP002: [
+    { id: 3, name: "Keyboard", qty: 15, price: 1500 },
+    { id: 4, name: "Mouse", qty: 20, price: 700 },
+  ],
+};
+
+// 🔹 Whenever gpId changes, load items
+useEffect(() => {
+  if (gpId && gatePassItems[gpId]) {
+    setItemsList(gatePassItems[gpId]);
+  } else {
+    setItemsList([]);
+  }
+}, [gpId]);
+
 
   // Static data
   const staticData = [
@@ -80,6 +126,7 @@ const QualityChecking = () => {
   const handleEditClick = (qc) => {
     setEditingQC(qc);
     setQcId(qc.qcId);
+    setQcId(qc.gpId);
     setDate(qc.date);
     setItemsList(qc.items);
     setDescription(qc.description);
@@ -124,6 +171,7 @@ const QualityChecking = () => {
   const validateForm = () => {
     const newErrors = {};
     if (!qcId.trim()) newErrors.qcId = "QC ID is required";
+    if (!gpId.trim()) newErrors.gpId = "Gate Pass ID is required";
     if (!date) newErrors.date = "Date is required";
     if (itemsList.length === 0)
       newErrors.itemsList = "At least one item is required";
@@ -274,35 +322,103 @@ const QualityChecking = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-6">
+                <div className="grid grid-cols-2 items-center gap-4">
+                  {/* QC ID */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      QC ID *
+                    </label>
+                    <input
+                      type="text"
+                      value={qcId}
+                      onChange={(e) => setQcId(e.target.value)}
+                      className="w-full p-3 border rounded-md"
+                    />
+                    {errors.qcId && (
+                      <p className="text-red-500 text-xs">{errors.qcId}</p>
+                    )}
+                  </div>
+
+                  {/* Date */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Date *
+                    </label>
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full p-3 border rounded-md"
+                    />
+                    {errors.date && (
+                      <p className="text-red-500 text-xs">{errors.date}</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* Gate Pass In ID */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
-                    QC ID *
+                    Gate Pass In Id *
                   </label>
-                  <input
-                    type="text"
-                    value={qcId}
-                    onChange={(e) => setQcId(e.target.value)}
+                  <select
+                    value={gpId}
+                    onChange={(e) => setGpId(e.target.value)}
                     className="w-full p-3 border rounded-md"
-                  />
-                  {errors.qcId && (
-                    <p className="text-red-500 text-xs">{errors.qcId}</p>
+                    required
+                  >
+                    <option value="">Select Gate Pass</option>
+                    <option value="GP001">GP001</option>
+                  </select>
+
+                  {errors.gpId && (
+                    <p className="text-red-500 text-xs">{errors.gpId}</p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-1">
-                    Date *
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full p-3 border rounded-md"
-                  />
-                  {errors.date && (
-                    <p className="text-red-500 text-xs">{errors.date}</p>
-                  )}
-                </div>
+                
+                {gpId && itemsList.length > 0 && (
+                  <table className="w-full border mt-4">
+                    <thead className="bg-gray-100">
+                      <tr>
+                        <th className="border p-2">Item</th>
+                        <th className="border p-2">Quantity</th>
+                        <th className="border p-2">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {itemsList.map((item) => (
+                        <tr key={item.id} className="text-center">
+                          <td className="border p-2">{item.name}</td>
+                          <td className="border p-2">{item.qty}</td>
+                          <td className="border p-2 text-center">
+                            {item.result === "uptoStandard" ? (
+                              <div
+                                className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
+                                onClick={() => openQcModal(item)}
+                              >
+                                ✓
+                              </div>
+                            ) : item.result === "damage" ||
+                              item.result === "rejected" ? (
+                              <div
+                                className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
+                                onClick={() => openQcModal(item)}
+                              >
+                                ✕
+                              </div>
+                            ) : (
+                              <div
+                                className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
+                                onClick={() => openQcModal(item)}
+                              />
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
 
                 <div className="flex gap-2 items-end">
                   <div className="flex-1">
@@ -371,7 +487,7 @@ const QualityChecking = () => {
                   />
                 </div>
 
-                <div>
+                {/* <div>
                   <label className="block text-gray-700 font-medium mb-1">
                     Remarks
                   </label>
@@ -413,7 +529,7 @@ const QualityChecking = () => {
                     />
                     Rejected
                   </label>
-                </div>
+                </div> */}
                 {errors.result && (
                   <p className="text-red-500 text-xs">{errors.result}</p>
                 )}
@@ -425,6 +541,84 @@ const QualityChecking = () => {
                   {editingQC ? "Update" : "Save"}
                 </button>
               </form>
+            </div>
+          </div>
+        )}
+
+           {/* QC Modal */}
+        {qcModalOpen && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+            <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
+              <div className="flex justify-between items-center border-b pb-2 mb-4">
+                <h2 className="text-lg font-semibold text-newPrimary">
+                  Quality Check
+                </h2>
+                <button
+                  onClick={() => setQcModalOpen(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-full bg-red-500 text-white"
+                >
+                  ×
+                </button>
+              </div>
+
+              <label className="block text-gray-700 font-medium mb-1">
+                Remarks
+              </label>
+              <input
+                type="text"
+                value={modalRemarks}
+                onChange={(e) => setModalRemarks(e.target.value)}
+                className="w-full p-3 border rounded-md mb-4"
+                placeholder="Enter remarks..."
+              />
+
+              <div className="flex gap-4 mb-6">
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="qcResult"
+                    value="uptoStandard"
+                    checked={modalResult === "uptoStandard"}
+                    onChange={(e) => setModalResult(e.target.value)}
+                  />
+                  Upto Standard
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="qcResult"
+                    value="damage"
+                    checked={modalResult === "damage"}
+                    onChange={(e) => setModalResult(e.target.value)}
+                  />
+                  Damage
+                </label>
+                <label className="flex items-center gap-2">
+                  <input
+                    type="radio"
+                    name="qcResult"
+                    value="rejected"
+                    checked={modalResult === "rejected"}
+                    onChange={(e) => setModalResult(e.target.value)}
+                  />
+                  Rejected
+                </label>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  onClick={() => setQcModalOpen(false)}
+                  className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={saveQcModal}
+                  className="px-4 py-2 rounded-lg bg-newPrimary text-white hover:bg-newPrimary/80"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         )}
