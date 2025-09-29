@@ -147,29 +147,6 @@ useEffect(() => {
     return () => clearTimeout(delayDebounce);
   }
 }, [searchTerm]);
-
-   useEffect(() => {
-      if (estimations.length > 0) {
-        const maxNo = Math.max(
-          ...estimations.map((r) => {
-            const match = r.estimationId?.match(/EST-(\d+)/);
-            return match ? parseInt(match[1], 10) : 0;
-          })
-
-        );
-        setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
-        setCurrentPage(1); // Reset to first page on search
-      } catch (error) {
-        console.error("Search estimations failed:", error);
-        setEstimations([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchEstimationList]);
-
   // Generate next estimation ID
   useEffect(() => {
     if (estimations.length > 0) {
