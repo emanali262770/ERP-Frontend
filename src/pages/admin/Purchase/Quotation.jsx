@@ -57,19 +57,15 @@ const Quotation = () => {
 
 
   // Quotation search
-  useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("QuotNo-")) {
-      fetchQuatationList();
-      return;
+  
 
-  // ✅ Quotation Search
+// ✅ Quotation Search
 useEffect(() => {
   if (!searchTerm || !searchTerm.startsWith("quotno-")) {
     // If search is empty or not starting with QuotNo-, load all
     fetchQuatationList();
     return;
   }
-  
 
   const delayDebounce = setTimeout(async () => {
     try {
@@ -77,34 +73,17 @@ useEffect(() => {
       const res = await axios.get(
         `${import.meta.env.VITE_API_BASE_URL}/quotations/search/${searchTerm.toUpperCase()}`
       );
-      
-      
-      setQuotations(Array.isArray(res.data) ? res.data : [res.data]); 
+      setQuotations(Array.isArray(res.data) ? res.data : [res.data]);
     } catch (error) {
       console.error("Search quotation failed:", error);
       setQuotations([]);
     } finally {
       setLoading(false);
-
     }
+  }, 1000);
 
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/quotations/search/${searchTerm}`
-        );
-        setQuotations(Array.isArray(res.data) ? res.data : [res.data]);
-      } catch (error) {
-        console.error("Search quotation failed:", error);
-        setQuotations([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 1000);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchQuatationList]);
+  return () => clearTimeout(delayDebounce);
+}, [searchTerm, fetchQuatationList]);
 
   // Generate next quotation number
   useEffect(() => {

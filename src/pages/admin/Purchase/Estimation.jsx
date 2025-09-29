@@ -107,15 +107,6 @@ const Estimation = () => {
 
 
   // Search filter
-  useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("EST-")) {
-      fetchEstimationList();
-      return;
-    }
-
-
-  // serach filter
-  
 useEffect(() => {
   // If searchTerm is empty, reload all estimations
   if (!searchTerm) {
@@ -130,9 +121,6 @@ useEffect(() => {
       try {
         setLoading(true);
         const res = await axios.get(
-
-          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
-
           `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm.toUpperCase()}`
         );
         setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
@@ -454,7 +442,7 @@ useEffect(() => {
                       <div className="text-gray-600">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${
-                            estimation.status === "Pending"
+                            estimation.status === "Pending"|| estimation.status === "Inactive"
                               ? "bg-orange-100 text-orange-800"
                               : "bg-green-100 text-green-800"
                           }`}
