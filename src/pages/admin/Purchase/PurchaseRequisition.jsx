@@ -123,7 +123,7 @@ const PurchaseRequisition = () => {
   // serach filter
 
   useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("REQ-")) {
+    if (!searchTerm || !searchTerm.startsWith("req-")) {
       // if search empty or not starting with REQ-, load all
       fetchRequistionList();
       return;
@@ -135,7 +135,7 @@ const PurchaseRequisition = () => {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_BASE_URL
-          }/requisitions/search/${searchTerm}`
+          }/requisitions/search/${searchTerm.toUpperCase()}`
         );
         setRequisitions(Array.isArray(res.data) ? res.data : [res.data]);
       } catch (error) {

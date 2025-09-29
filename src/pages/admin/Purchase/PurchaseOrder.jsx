@@ -154,7 +154,7 @@ const PurchaseOrder = () => {
   }, [fetchPurchaseOrders]);
 
   useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("PO-")) {
+    if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
       // if search empty or not starting with REQ-, load all
       fetchPurchaseOrders();
       return;
@@ -164,9 +164,7 @@ const PurchaseOrder = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_BASE_URL
-          }/purchaseOrder/search/${searchTerm}`
+         `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm.toUpperCase()}`
         );
         setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
       } catch (error) {

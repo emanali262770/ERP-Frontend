@@ -54,7 +54,7 @@ const PurchaseApproval = () => {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_BASE_URL
-          }/requisitions/demandItem/${searchTerm}`
+          }/requisitions/demandItem/${searchTerm.toUpperCase()}`
         );
         setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
       } catch (error) {

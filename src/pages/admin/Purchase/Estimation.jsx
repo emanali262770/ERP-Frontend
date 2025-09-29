@@ -115,12 +115,12 @@ useEffect(() => {
   }
 
   // If searchTerm starts with EST-, run search
-  if (searchTerm.startsWith("EST-")) {
+  if (searchTerm.startsWith("est-")) {
     const delayDebounce = setTimeout(async () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm.toUpperCase()}`
         );
         setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
       } catch (error) {
