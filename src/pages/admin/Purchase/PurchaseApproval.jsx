@@ -5,11 +5,11 @@ import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
+import { useApprovals } from "../../../context/hook/useApprovalApi";
 
 const PurchaseApproval = () => {
-  const [approvals, setApprovals] = useState([]);
+
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [department, setDepartment] = useState("");
   const [employee, setEmployee] = useState("");
   const [items, setItems] = useState("");
@@ -21,56 +21,8 @@ const PurchaseApproval = () => {
   const [selectedRequisition, setSelectedRequisition] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
+   const { approvals, setApprovals, loading, refetch } = useApprovals(searchTerm);
 
-  // Requisition API call
-  const fetchRequistionList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/requisitions`
-      );
-      setApprovals(res.data);
-      console.log("Approval  ", res.data);
-    } catch (error) {
-      console.error("Failed to fetch Requisition", error);
-    } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRequistionList();
-  }, [fetchRequistionList]);
-
-  useEffect(() => {
-    if (!searchTerm) {
-      // If search is empty, load all
-      fetchRequistionList();
-      return;
-    }
-
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_BASE_URL
-          }/requisitions/demandItem/${searchTerm.toUpperCase()}`
-        );
-        setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
-        setCurrentPage(1); // Reset to first page on search
-      } catch (error) {
-        console.error("Search approvals failed:", error);
-        setApprovals([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 1000); // Debounce to prevent API spam
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchRequistionList]);
 
   // Handlers for form and table actions
   const handleEditClick = (approval) => {
