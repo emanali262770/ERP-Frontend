@@ -6,20 +6,29 @@ import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
 import { api } from "../../../context/ApiService";
-import { useCategories, useDepartments, useEmployees, useRequisitions } from "../../../context/hook/useRequisitionApi";
-
+import {
+  useCategories,
+  useDepartments,
+  useEmployees,
+  useRequisitions,
+} from "../../../context/hook/useRequisitionApi";
 
 const PurchaseRequisition = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-    const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
   const [requisitionId, setRequisitionId] = useState("");
   const [date, setDate] = useState("");
   const [department, setDepartment] = useState("");
-  const [employee, setEmployee] = useState(""); 
- const { employees: employeeName, loading: empLoading } = useEmployees();
+  const [employee, setEmployee] = useState("");
+  const { employees: employeeName, loading: empLoading } = useEmployees();
   const [requirement, setRequirement] = useState("");
   const { categories: categoryList, loading: catLoading } = useCategories();
-  const { requisitions, loading: reqLoading, setRequisitions, refetch } = useRequisitions(searchTerm);
+  const {
+    requisitions,
+    loading: reqLoading,
+    setRequisitions,
+    refetch,
+  } = useRequisitions(searchTerm);
   const [details, setDetails] = useState("");
   const [items, setItems] = useState("");
   const [category, setCategory] = useState("");
@@ -27,7 +36,7 @@ const PurchaseRequisition = () => {
   const [isView, setisView] = useState(false);
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
-const { departments: departmentList, loading: depLoading } = useDepartments();
+  const { departments: departmentList, loading: depLoading } = useDepartments();
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState();
   const [itemsList, setItemsList] = useState([]);
@@ -36,7 +45,7 @@ const { departments: departmentList, loading: depLoading } = useDepartments();
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-   const loading = depLoading || empLoading || catLoading || reqLoading;
+  const loading = depLoading || empLoading || catLoading || reqLoading;
 
   const handleAddItem = () => {
     if (!itemName || !quantity) return;
@@ -134,14 +143,18 @@ const { departments: departmentList, loading: depLoading } = useDepartments();
 
     try {
       if (editingRequisition) {
-        await api.put(`/requisitions/${editingRequisition._id}`, newRequisition, { headers });
+        await api.put(
+          `/requisitions/${editingRequisition._id}`,
+          newRequisition,
+          { headers }
+        );
         Swal.fire("Updated!", "Requisition updated successfully.", "success");
       } else {
-       await api.post("/requisitions", newRequisition, { headers });
+        await api.post("/requisitions", newRequisition, { headers });
         Swal.fire("Added!", "Requisition added successfully.", "success");
       }
 
-       refetch();
+      refetch();
       setIsSliderOpen(false);
       setItemsList([]);
       setCurrentPage(1); // Reset to first page after adding/updating
@@ -216,7 +229,7 @@ const { departments: departmentList, loading: depLoading } = useDepartments();
               Authorization: `Bearer ${token}`,
             };
 
-          await api.delete(`/requisitions/${id}`, { headers });
+            await api.delete(`/requisitions/${id}`, { headers });
             setRequisitions(requisitions.filter((p) => p._id !== id));
             refetch();
             setCurrentPage(1); // Reset to first page after deletion
@@ -410,12 +423,12 @@ const { departments: departmentList, loading: depLoading } = useDepartments();
         </div>
 
         {isSliderOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-4 h-full overflow-y-auto"
+              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingRequisition
                     ? "Update Requisition"
@@ -442,80 +455,81 @@ const { departments: departmentList, loading: depLoading } = useDepartments();
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Requisition ID <span className="text-blue-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={
-                      editingRequisition
-                        ? requisitionId
-                        : `REQ-${nextRequisitionId}`
-                    }
-                    readOnly
-                    onChange={(e) => setRequisitionId(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    placeholder="Enter requisition ID"
-                    required
-                  />
+              <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Requisition ID <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        editingRequisition
+                          ? requisitionId
+                          : `REQ-${nextRequisitionId}`
+                      }
+                      readOnly
+                      onChange={(e) => setRequisitionId(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      placeholder="Enter requisition ID"
+                      required
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Department <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={department}
+                      onChange={(e) => setDepartment(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    >
+                      <option value="">Select Department</option>
+                      {departmentList.map((dept) => (
+                        <option key={dept._id} value={dept._id}>
+                          {dept.departmentName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Employee <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={employee}
+                      onChange={(e) => setEmployee(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    >
+                      <option value="">Select Employee</option>
+                      {employeeName.map((emp) => (
+                        <option key={emp._id} value={emp._id}>
+                          {emp.employeeName}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Department <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Department</option>
-                    {departmentList.map((dept) => (
-                      <option key={dept._id} value={dept._id}>
-                        {dept.departmentName}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Requirement <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={requirement}
+                      onChange={(e) => setRequirement(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    >
+                      <option value="">Select Requirement</option>
+                      <option value="Regular Purchase">Regular Purchase</option>
+                      <option value="Monthly Purchase">Monthly Purchase</option>
+                    </select>
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Employee <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={employee}
-                    onChange={(e) => setEmployee(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Employee</option>
-                    {employeeName.map((emp) => (
-                      <option key={emp._id} value={emp._id}>
-                        {emp.employeeName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Requirement <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={requirement}
-                    onChange={(e) => setRequirement(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Requirement</option>
-                    <option value="Regular Purchase">Regular Purchase</option>
-                    <option value="Monthly Purchase">Monthly Purchase</option>
-                  </select>
-                </div>
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Details
@@ -529,100 +543,100 @@ const { departments: departmentList, loading: depLoading } = useDepartments();
                   />
                 </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Category <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Category</option>
-                    {categoryList.map((cat) => (
-                      <option key={cat._id} value={cat._id}>
-                        {cat.categoryName}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="flex justify-between gap-2 items-end">
+                <div className="flex gap-4 mb-4">
+                  <div className="flex gap-2 items-end mb-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
-                        Item Name
+                        Category <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
-                        value={itemName}
-                        onChange={(e) => setItemName(e.target.value)}
+                      <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
                         className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter item name"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={quantity}
-                        onChange={(e) => setQuantity(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter quantity"
-                        min="1"
-                      />
-                    </div>
-
-                    <div className="">
-                      <button
-                        type="button"
-                        onClick={handleAddItem}
-                        className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
+                        required
                       >
-                        + Add
-                      </button>
+                        <option value="">Select Category</option>
+                        {categoryList.map((cat) => (
+                          <option key={cat._id} value={cat._id}>
+                            {cat.categoryName}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex justify-between gap-2 items-end">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Item Name
+                        </label>
+                        <input
+                          type="text"
+                          value={itemName}
+                          onChange={(e) => setItemName(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                          placeholder="Enter item name"
+                        />
+                      </div>
+
+                      <div>
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Quantity
+                        </label>
+                        <input
+                          type="number"
+                          value={quantity}
+                          onChange={(e) => setQuantity(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                          placeholder="Enter quantity"
+                          min="1"
+                        />
+                      </div>
+
+                      <div className="">
+                        <button
+                          type="button"
+                          onClick={handleAddItem}
+                          className="w-20 h-12 px-20 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
+                        >
+                          <span>+</span> Add
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  {itemsList.length > 0 && (
-                    <div className="overflow-x-auto">
-                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-100 text-gray-600 text-sm">
-                          <tr>
-                            <th className="px-4 py-2 border-b">Sr #</th>
-                            <th className="px-4 py-2 border-b">Item Name</th>
-                            <th className="px-4 py-2 border-b">Quantity</th>
-                            <th className="px-4 py-2 border-b">Remove</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-gray-700 text-sm">
-                          {itemsList.map((item, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-4 py-2 border-b text-center">
-                                {idx + 1}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.itemName}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.quantity}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                <button onClick={() => handleRemoveItem(idx)}>
-                                  <X size={18} className="text-red-600" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
                 </div>
+                {itemsList.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                      <thead className="bg-gray-100 text-gray-600 text-sm">
+                        <tr>
+                          <th className="px-4 py-2 border-b">Sr #</th>
+                          <th className="px-4 py-2 border-b">Item Name</th>
+                          <th className="px-4 py-2 border-b">Quantity</th>
+                          <th className="px-4 py-2 border-b">Remove</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-gray-700 text-sm">
+                        {itemsList.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50">
+                            <td className="px-4 py-2 border-b text-center">
+                              {idx + 1}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.itemName}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.quantity}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              <button onClick={() => handleRemoveItem(idx)}>
+                                <X size={18} className="text-red-600" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
 
                 <button
                   type="submit"
