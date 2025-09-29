@@ -1,14 +1,13 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { Eye, Loader, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
-import TableSkeleton from "../Skeleton"; // Ensure this component exists
+import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
 
 const PurchaseOrder = () => {
   const [purchaseOrders, setPurchaseOrders] = useState([]);
-
   const [demandItems, setDemandItems] = useState([
     {
       _id: "di1",
@@ -47,7 +46,8 @@ const PurchaseOrder = () => {
   const [purchaseOrderId, setPurchaseOrderId] = useState();
   const sliderRef = useRef(null);
   const [errors, setErrors] = useState({});
-
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // Handle adding items to the table in the form
@@ -89,7 +89,6 @@ const PurchaseOrder = () => {
   useEffect(() => {
     fetchEstimationList();
   }, [fetchEstimationList]);
-  console.log("forDemand ", forDemand);
 
   // Demand Item
   useEffect(() => {
@@ -104,10 +103,7 @@ const PurchaseOrder = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/estimations/${forDemand}`
         );
-
-        // ✅ Fix: items are inside demandItem
         setEstimationItems(res.data.demandItem?.items || []);
-
         setDemandItem(res.data._id);
       } catch (error) {
         console.error("Error fetching quotation items:", error);
@@ -154,8 +150,11 @@ const PurchaseOrder = () => {
   }, [fetchPurchaseOrders]);
 
   useEffect(() => {
-    if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
+
+    if (!searchTerm || !searchTerm.startsWith("PO-")) {
+  if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
       // if search empty or not starting with REQ-, load all
+
       fetchPurchaseOrders();
       return;
     }
@@ -164,9 +163,16 @@ const PurchaseOrder = () => {
       try {
         setLoading(true);
         const res = await axios.get(
+
+          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
+        );
+        setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
+        setCurrentPage(1); // Reset to first page on search
+
          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm.toUpperCase()}`
         );
         setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
+
       } catch (error) {
         console.error("Search purchaseOrder failed:", error);
         setPurchaseOrders([]);
@@ -176,9 +182,13 @@ const PurchaseOrder = () => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
+
+  }, [searchTerm, fetchPurchaseOrders]);
+
   }, [searchTerm]);
 
-  //   Next POId
+
+  // Next POId
   useEffect(() => {
     if (purchaseOrders.length > 0) {
       const maxNo = Math.max(
@@ -189,7 +199,7 @@ const PurchaseOrder = () => {
       );
       setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
     } else {
-      setNextRequisitionId("001"); // first requisition
+      setNextRequisitionId("001");
     }
   }, [purchaseOrders]);
 
@@ -224,10 +234,8 @@ const PurchaseOrder = () => {
     setIsSliderOpen(true);
   };
 
-  //   Handle edit
   const handleEditClick = (order) => {
     console.log("Edit ", order);
-
     setEditingPurchaseOrder(order);
     setPoNo(order.purchaseOrderId);
     setPurchaseOrderId(order.purchaseOrderId);
@@ -242,7 +250,6 @@ const PurchaseOrder = () => {
     setIsSliderOpen(true);
   };
 
-  //   Handle Sumbit
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -265,9 +272,8 @@ const PurchaseOrder = () => {
     const newPurchaseOrder = {
       purchaseOrderId: editingPurchaseOrder
         ? purchaseOrderId
-        : `PO-${nextRequisitionId}`, // ✅ Always padded "001"
-
-      estimation: demandItem, // ✅ must match backend schema
+        : `PO-${nextRequisitionId}`,
+      estimation: demandItem,
       deliveryDate,
       tax: Number(tax),
     };
@@ -295,16 +301,14 @@ const PurchaseOrder = () => {
         Swal.fire("Added!", "Purchase order added successfully.", "success");
       }
 
-      // ✅ Reload everything after save
-      await fetchPurchaseOrders(); // refresh state
+      await fetchPurchaseOrders();
       setIsSliderOpen(false);
       setItemsList([]);
-      setPurchaseOrderId(""); // reset field
+      setPurchaseOrderId("");
       setDemandItem("");
       setDeliveryDate("");
       setTax("");
-
-      // ✅ Hard reload (last fallback if state doesn't refresh properly)
+      setCurrentPage(1); // Reset to first page after adding/updating
       window.location.reload();
     } catch (error) {
       console.error(
@@ -329,10 +333,9 @@ const PurchaseOrder = () => {
     const month = String(parsed.getMonth() + 1).padStart(2, "0");
     const year = parsed.getFullYear();
 
-    return `${day}-${month}-${year}`; // DD-MM-YYYY
+    return `${day}-${month}-${year}`;
   };
 
-  //   Handle Delete
   const handleDelete = async (id) => {
     console.log("Delete ", id);
 
@@ -372,6 +375,7 @@ const PurchaseOrder = () => {
             );
 
             setPurchaseOrders(purchaseOrders.filter((p) => p._id !== id));
+            setCurrentPage(1); // Reset to first page after deletion
 
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -406,6 +410,19 @@ const PurchaseOrder = () => {
     setSelectedPurchaseOrder(null);
   };
 
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = purchaseOrders.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.ceil(purchaseOrders.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <CommanHeader />
@@ -417,7 +434,6 @@ const PurchaseOrder = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* ✅ Search Input */}
             <input
               type="text"
               placeholder="Enter PO No eg: PO-001"
@@ -425,7 +441,6 @@ const PurchaseOrder = () => {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
             />
-
             <button
               className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
               onClick={handleAddClick}
@@ -453,16 +468,16 @@ const PurchaseOrder = () => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={purchaseOrders.length || 5}
+                      rows={recordsPerPage}
                       cols={6}
                       className="lg:grid-cols-6"
                     />
-                  ) : purchaseOrders.length === 0 ? (
+                  ) : currentRecords.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
                       No purchase orders found.
                     </div>
                   ) : (
-                    purchaseOrders.map((order) => (
+                    currentRecords.map((order) => (
                       <div
                         key={order._id}
                         className="grid grid-cols-1 lg:grid-cols-6 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
@@ -512,6 +527,41 @@ const PurchaseOrder = () => {
               </div>
             </div>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-between my-4 px-10">
+              <div className="text-sm text-gray-600">
+                Showing {indexOfFirstRecord + 1} to{" "}
+                {Math.min(indexOfLastRecord, purchaseOrders.length)} of{" "}
+                {purchaseOrders.length} records
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {isSliderOpen && (
@@ -560,7 +610,6 @@ const PurchaseOrder = () => {
                     required
                   />
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Date <span className="text-red-500">*</span>
@@ -573,7 +622,6 @@ const PurchaseOrder = () => {
                     required
                   />
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     For Demand <span className="text-red-500">*</span>
@@ -638,7 +686,6 @@ const PurchaseOrder = () => {
                     </div>
                   )
                 )}
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Supplier <span className="text-red-500">*</span>
@@ -652,7 +699,6 @@ const PurchaseOrder = () => {
                     required
                   />
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Delivery Date <span className="text-red-500">*</span>
@@ -665,7 +711,6 @@ const PurchaseOrder = () => {
                     required
                   />
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Tax
@@ -678,7 +723,6 @@ const PurchaseOrder = () => {
                     placeholder="Enter tax"
                   />
                 </div>
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Total Amount
@@ -691,7 +735,6 @@ const PurchaseOrder = () => {
                     placeholder="Enter total amount"
                   />
                 </div>
-
                 <button
                   type="submit"
                   disabled={loading}

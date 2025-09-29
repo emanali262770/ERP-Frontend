@@ -18,9 +18,11 @@ const PurchaseApproval = () => {
   const sliderRef = useRef(null);
   const [isView, setisView] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-
   const [selectedRequisition, setSelectedRequisition] = useState(null);
-  // requistation api call
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
+
+  // Requisition API call
   const fetchRequistionList = useCallback(async () => {
     try {
       setLoading(true);
@@ -30,20 +32,21 @@ const PurchaseApproval = () => {
       setApprovals(res.data);
       console.log("Approval  ", res.data);
     } catch (error) {
-      console.error("Failed to fetch Requistion", error);
+      console.error("Failed to fetch Requisition", error);
     } finally {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
     }
   }, []);
+
   useEffect(() => {
     fetchRequistionList();
   }, [fetchRequistionList]);
 
   useEffect(() => {
     if (!searchTerm) {
-      // if search is empty, load all
+      // If search is empty, load all
       fetchRequistionList();
       return;
     }
@@ -57,16 +60,17 @@ const PurchaseApproval = () => {
           }/requisitions/demandItem/${searchTerm.toUpperCase()}`
         );
         setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
+        setCurrentPage(1); // Reset to first page on search
       } catch (error) {
         console.error("Search approvals failed:", error);
         setApprovals([]);
       } finally {
         setLoading(false);
       }
-    }, 1000); // debounce so it won't spam API
+    }, 1000); // Debounce to prevent API spam
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm]);
+  }, [searchTerm, fetchRequistionList]);
 
   // Handlers for form and table actions
   const handleEditClick = (approval) => {
@@ -77,6 +81,7 @@ const PurchaseApproval = () => {
     setStatus(approval.status);
     setIsSliderOpen(true);
   };
+
   const handleDelete = (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
@@ -102,7 +107,7 @@ const PurchaseApproval = () => {
       .then((result) => {
         if (result.isConfirmed) {
           setApprovals((prev) => prev.filter((a) => a._id !== id));
-
+          setCurrentPage(1); // Reset to first page after deletion
           swalWithTailwindButtons.fire(
             "Deleted!",
             "Approval deleted successfully.",
@@ -117,10 +122,12 @@ const PurchaseApproval = () => {
         }
       });
   };
+
   const handleView = (req) => {
     setSelectedRequisition(req);
     setisView(true);
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -159,6 +166,7 @@ const PurchaseApproval = () => {
     setStatus("Hold");
     setEditingApproval(null);
     setIsSliderOpen(false);
+    setCurrentPage(1); // Reset to first page after adding/updating
   };
 
   const formatDate = (date) => {
@@ -173,8 +181,8 @@ const PurchaseApproval = () => {
 
     return `${day}-${month}-${year}`; // DD-MM-YYYY
   };
-  // status-change api call
 
+  // Status change API call
   async function handleStatusChangeApiCall(id, newStatus) {
     console.log({ id, newStatus });
 
@@ -183,7 +191,7 @@ const PurchaseApproval = () => {
 
       const res = await axios.patch(
         `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}/status`,
-        { status: newStatus }, // sending new status in body
+        { status: newStatus },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -192,11 +200,11 @@ const PurchaseApproval = () => {
         }
       );
 
-      // ✅ Update state so UI reflects immediately
+      // Update state to reflect status change
       setApprovals((prev) =>
         prev.map((a) => (a._id === id ? { ...a, status: newStatus } : a))
       );
-
+      setCurrentPage(1); // Reset to first page after status change
       Swal.fire("✅ Success", `Status updated to ${newStatus}`, "success");
       console.log("Status updated:", res.data);
     } catch (error) {
@@ -204,7 +212,16 @@ const PurchaseApproval = () => {
       Swal.fire("❌ Error", "Failed to update status", "error");
     }
   }
-  console.log({ approvals });
+
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = approvals.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(approvals.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -217,7 +234,7 @@ const PurchaseApproval = () => {
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* ✅ Search Input */}
+            {/* Search Input */}
             <input
               type="text"
               placeholder="Enter Approval ID eg: PRA-Ali-0002"
@@ -252,16 +269,16 @@ const PurchaseApproval = () => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={approvals.length || 5}
+                      rows={recordsPerPage}
                       cols={6}
                       className="lg:grid-cols-[200px,200px,200px,200px,300px,150px]"
                     />
-                  ) : approvals.length === 0 ? (
+                  ) : currentRecords.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
                       No approvals found.
                     </div>
                   ) : (
-                    approvals?.map((approval, idx) => (
+                    currentRecords.map((approval, idx) => (
                       <div
                         key={approval._id}
                         className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,300px,150px] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
@@ -287,7 +304,7 @@ const PurchaseApproval = () => {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex justify-end  gap-2">
+                        <div className="flex justify-end gap-2">
                           {approval.status === "Approved" && (
                             <button
                               disabled
@@ -353,6 +370,45 @@ const PurchaseApproval = () => {
               </div>
             </div>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-between my-4 px-10">
+              {/* Records info */}
+              <div className="text-sm text-gray-600">
+                Showing {indexOfFirstRecord + 1} to{" "}
+                {Math.min(indexOfLastRecord, approvals.length)} of{" "}
+                {approvals.length} records
+              </div>
+
+              {/* Pagination buttons */}
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Previous
+                </button>
+
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {isSliderOpen && (
@@ -453,8 +509,12 @@ const PurchaseApproval = () => {
         {/* Show popup only if isView is true */}
         {isView && selectedRequisition && (
           <ViewModel
+
+            requisition={selectedRequisition}
+
             data={selectedRequisition}
             type="requisition"
+
             onClose={() => setisView(false)}
           />
         )}

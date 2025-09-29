@@ -20,7 +20,9 @@ const Estimation = () => {
   const [status, setStatus] = useState("Pending");
   const [editingEstimation, setEditingEstimation] = useState(null);
   const [errors, setErrors] = useState({});
-   const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10;
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const [nextRequisitionId, setNextRequisitionId] = useState("001");
@@ -47,10 +49,9 @@ const Estimation = () => {
     fetchQuotationList();
   }, [fetchQuotationList]);
 
-   
   // Fetch quotation items and supplier when forDemand changes
   useEffect(() => {
-   setLoading(true)
+    setLoading(true);
     const fetchQuotationItems = async () => {
       if (!forDemand) {
         setQuotationItems([]);
@@ -73,11 +74,10 @@ const Estimation = () => {
         setItemsList([]);
         setTotal("");
         setSupplier("");
-      }
-      finally{
+      } finally {
         setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+          setLoading(false);
+        }, 2000);
       }
     };
     fetchQuotationItems();
@@ -105,6 +105,15 @@ const Estimation = () => {
     fetchEstimationList();
   }, [fetchEstimationList]);
 
+
+  // Search filter
+  useEffect(() => {
+    if (!searchTerm || !searchTerm.startsWith("EST-")) {
+      fetchEstimationList();
+      return;
+    }
+
+
   // serach filter
   
 useEffect(() => {
@@ -116,10 +125,14 @@ useEffect(() => {
 
   // If searchTerm starts with EST-, run search
   if (searchTerm.startsWith("est-")) {
+
     const delayDebounce = setTimeout(async () => {
       try {
         setLoading(true);
         const res = await axios.get(
+
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
+
           `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm.toUpperCase()}`
         );
         setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
@@ -142,12 +155,35 @@ useEffect(() => {
             const match = r.estimationId?.match(/EST-(\d+)/);
             return match ? parseInt(match[1], 10) : 0;
           })
+
         );
-        setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
-      } else {
-        setNextRequisitionId("001"); // first requisition
+        setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
+        setCurrentPage(1); // Reset to first page on search
+      } catch (error) {
+        console.error("Search estimations failed:", error);
+        setEstimations([]);
+      } finally {
+        setLoading(false);
       }
-    }, [estimations]);
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm, fetchEstimationList]);
+
+  // Generate next estimation ID
+  useEffect(() => {
+    if (estimations.length > 0) {
+      const maxNo = Math.max(
+        ...estimations.map((r) => {
+          const match = r.estimationId?.match(/EST-(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setNextRequisitionId((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setNextRequisitionId("001");
+    }
+  }, [estimations]);
 
   // Format date for display
   const formatDate = (date) => {
@@ -174,8 +210,6 @@ useEffect(() => {
   const validateForm = () => {
     const newErrors = {};
     const trimmedEstimationId = estimationId.trim();
-    console.log({trimmedEstimationId});
-    
     const trimmedSupplier = supplier.trim();
     const trimmedForDemand = forDemand.trim();
     const trimmedTotal = total.trim();
@@ -204,13 +238,13 @@ useEffect(() => {
 
   const handleEditClick = (estimation) => {
     setEditingEstimation(estimation);
-    setEstimationId(estimation.estimationId || ""); // Use quotationNo as estimationId for display
+    setEstimationId(estimation.estimationId || "");
     setSupplier(estimation.supplier?.supplierName || "");
     setItemsList(estimation.items || []);
     setForDemand(estimation.demandItem?._id || "");
     setTotal(estimation.totalAmount?.toString() || "");
     setDate(formatDate(estimation.date));
-    setStatus(estimation.status ); // Map boolean to string for form
+    setStatus(estimation.status);
     setErrors({});
     setIsSliderOpen(true);
   };
@@ -253,30 +287,22 @@ useEffect(() => {
       estimationId: editingEstimation
         ? estimationId
         : `EST-${nextRequisitionId}`,
-
       demandItem: forDemand,
       status,
-      
     };
-
-
-    console.log("Payload being sent:", newEstimation);
 
     try {
       if (editingEstimation) {
-        // Update estimation
         const res = await axios.put(
           `${import.meta.env.VITE_API_BASE_URL}/estimations/${editingEstimation._id}`,
           newEstimation,
-          { headers }   // ✅ Pass headers here
+          { headers }
         );
-
         setEstimations((prev) =>
           prev.map((e) =>
             e._id === editingEstimation._id ? { ...e, ...res.data } : e
           )
         );
-
         Swal.fire({
           icon: "success",
           title: "Updated!",
@@ -284,15 +310,12 @@ useEffect(() => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        // Create estimation
         const res = await axios.post(
           `${import.meta.env.VITE_API_BASE_URL}/estimations`,
           newEstimation,
-          { headers }   // ✅ Pass headers here
+          { headers }
         );
-
         setEstimations([...estimations, res.data]);
-
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -300,8 +323,8 @@ useEffect(() => {
           confirmButtonColor: "#3085d6",
         });
       }
-
       resetForm();
+      setCurrentPage(1); // Reset to first page after adding/updating
     } catch (error) {
       console.error("Error saving estimation:", error.response?.data || error.message);
       Swal.fire({
@@ -313,9 +336,7 @@ useEffect(() => {
     }
   };
 
-console.log("Not ", forDemand);
-
-// Handle Delete
+  // Handle Delete
   const handleDelete = async (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
@@ -340,8 +361,18 @@ console.log("Not ", forDemand);
       });
 
       if (result.isConfirmed) {
-        await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/estimations/${id}`);
+        const { token } = userInfo || {};
+        const headers = {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        };
+
+        await axios.delete(
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/${id}`,
+          { headers }
+        );
         setEstimations(estimations.filter((e) => e._id !== id));
+        setCurrentPage(1); // Reset to first page after deletion
         swalWithTailwindButtons.fire({
           icon: "success",
           title: "Deleted!",
@@ -360,18 +391,27 @@ console.log("Not ", forDemand);
     }
   };
 
-
   // Map quotation _id to quotationNo for display
   const getQuotationNo = (quotationId) => {
     const quotation = quotations.find((q) => q._id === quotationId);
     return quotation ? quotation.quotationNo : quotationId;
   };
 
+  // Pagination logic
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = estimations.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
+  const totalPages = Math.ceil(estimations.length / recordsPerPage);
 
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
-      {/* common Header */}
       <CommanHeader />
       <div className="px-6 mx-auto">
         <div className="flex justify-between items-center mb-4">
@@ -381,7 +421,6 @@ console.log("Not ", forDemand);
             </h1>
           </div>
           <div className="flex items-center gap-3">
-            {/* ✅ Search Input */}
             <input
               type="text"
               placeholder="Enter EST No eg: EST-001"
@@ -389,21 +428,18 @@ console.log("Not ", forDemand);
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
             />
-
             <button
               className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
               onClick={handleAddClick}
             >
-                + Add Estimation
+              + Add Estimation
             </button>
           </div>
-         
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[1200px]">
-              {/* Table Header */}
               <div className="hidden lg:grid grid-cols-8 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>Estimation ID</div>
                 <div>Supplier</div>
@@ -415,20 +451,19 @@ console.log("Not ", forDemand);
                 <div>Actions</div>
               </div>
 
-              {/* Table Body */}
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={estimations.length || 5}
+                    rows={recordsPerPage}
                     cols={8}
                     className="lg:grid-cols-8"
                   />
-                ) : estimations.length === 0 ? (
+                ) : currentRecords.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No estimations found.
                   </div>
                 ) : (
-                  estimations.map((estimation) => (
+                  currentRecords.map((estimation) => (
                     <div
                       key={estimation._id}
                       className="grid grid-cols-1 lg:grid-cols-8 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
@@ -436,16 +471,16 @@ console.log("Not ", forDemand);
                       <div className="font-medium text-gray-900">{estimation.estimationId}</div>
                       <div className="text-gray-600">{estimation?.demandItem?.supplier?.supplierName}</div>
                       <div className="text-gray-600">{estimation?.demandItem?.createdBy}</div>
-                       {estimation?.demandItem?.quotationNo}
-                      {/* <div className="text-gray-600">{estimation.rate}</div> */}
+                      <div className="text-gray-600">{getQuotationNo(estimation?.demandItem?._id)}</div>
                       <div className="text-gray-600">{estimation?.totalAmount}</div>
                       <div className="text-gray-500">{formatDate(estimation.date)}</div>
                       <div className="text-gray-600">
                         <span
-                          className={`px-2 py-1 rounded-full text-xs ${estimation.status==="Pending"
+                          className={`px-2 py-1 rounded-full text-xs ${
+                            estimation.status === "Pending"
                               ? "bg-orange-100 text-orange-800"
                               : "bg-green-100 text-green-800"
-                            }`}
+                          }`}
                         >
                           {estimation.status}
                         </span>
@@ -472,6 +507,41 @@ console.log("Not ", forDemand);
               </div>
             </div>
           </div>
+
+          {/* Pagination Controls */}
+          {totalPages > 1 && (
+            <div className="flex justify-between my-4 px-10">
+              <div className="text-sm text-gray-600">
+                Showing {indexOfFirstRecord + 1} to{" "}
+                {Math.min(indexOfLastRecord, estimations.length)} of{" "}
+                {estimations.length} records
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Previous
+                </button>
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {isSliderOpen && (
@@ -499,12 +569,13 @@ console.log("Not ", forDemand);
                   </label>
                   <input
                     type="text"
-                      value={estimationId}
+                    value={estimationId}
                     onChange={(e) => setEstimationId(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.estimationId
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.estimationId
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                    }`}
                     placeholder="Enter estimation ID"
                     required
                   />
@@ -520,10 +591,11 @@ console.log("Not ", forDemand);
                     type="date"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.date
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.date
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                    }`}
                     required
                   />
                   {errors.date && (
@@ -537,10 +609,11 @@ console.log("Not ", forDemand);
                   <select
                     value={forDemand}
                     onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.forDemand
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.forDemand
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                    }`}
                   >
                     <option value="">Select Quotation</option>
                     {quotations.map((q) => (
@@ -584,28 +657,23 @@ console.log("Not ", forDemand);
                   <label className="block text-gray-700 font-medium mb-2">
                     Supplier <span className="text-red-500">*</span>
                   </label>
-
                   <input
                     list="suppliers"
                     value={supplier}
                     onChange={(e) => setSupplier(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.supplier
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.supplier
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                    disabled={!!forDemand} // Disable when a quotation is selected
+                    }`}
+                    disabled={!!forDemand}
                     required
-                    readOnly={!!forDemand} // Make read-only when a quotation is selected
+                    readOnly={!!forDemand}
                   />
-
-
-
                   {errors.supplier && (
                     <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
                   )}
                 </div>
-
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Status <span className="text-red-500">*</span>
@@ -613,10 +681,11 @@ console.log("Not ", forDemand);
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.status
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.status
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                    }`}
                     required
                   >
                     <option value="Pending">Pending</option>
