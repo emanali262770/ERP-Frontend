@@ -5,18 +5,21 @@ import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 import axios from "axios";
 import ViewModel from "./ViewModel";
+import { api } from "../../../context/ApiService";
+import { useCategories, useDepartments, useEmployees, useRequisitions } from "../../../context/hook/useRequisitionApi";
+
 
 const PurchaseRequisition = () => {
-  const [requisitions, setRequisitions] = useState([]);
-  const [employeeName, setEmployeeName] = useState([]);
-  const [categoryList, setCategoryList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState("");
   const [requisitionId, setRequisitionId] = useState("");
   const [date, setDate] = useState("");
   const [department, setDepartment] = useState("");
-  const [employee, setEmployee] = useState("");
+  const [employee, setEmployee] = useState(""); 
+ const { employees: employeeName, loading: empLoading } = useEmployees();
   const [requirement, setRequirement] = useState("");
+  const { categories: categoryList, loading: catLoading } = useCategories();
+  const { requisitions, loading: reqLoading, setRequisitions, refetch } = useRequisitions(searchTerm);
   const [details, setDetails] = useState("");
   const [items, setItems] = useState("");
   const [category, setCategory] = useState("");
@@ -24,8 +27,7 @@ const PurchaseRequisition = () => {
   const [isView, setisView] = useState(false);
   const [editingRequisition, setEditingRequisition] = useState(null);
   const sliderRef = useRef(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [departmentList, setDepartmentList] = useState([]);
+const { departments: departmentList, loading: depLoading } = useDepartments();
   const [itemName, setItemName] = useState("");
   const [quantity, setQuantity] = useState();
   const [itemsList, setItemsList] = useState([]);
@@ -34,6 +36,7 @@ const PurchaseRequisition = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+   const loading = depLoading || empLoading || catLoading || reqLoading;
 
   const handleAddItem = () => {
     if (!itemName || !quantity) return;
@@ -47,107 +50,6 @@ const PurchaseRequisition = () => {
     setItemName("");
     setQuantity("");
   };
-
-  const fetchDepartmentList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/departments`
-      );
-      setDepartmentList(res.data);
-    } catch (error) {
-      console.error("Failed to fetch Department", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchDepartmentList();
-  }, [fetchDepartmentList]);
-
-  const fetchEmployeList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/employees`
-      );
-      setEmployeeName(res?.data);
-    } catch (error) {
-      console.error("Failed to fetch Employee", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchEmployeList();
-  }, [fetchEmployeList]);
-
-  const fetchCategoryList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/categories/list`
-      );
-      setCategoryList(res.data);
-    } catch (error) {
-      console.error("Failed to fetch categories", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchCategoryList();
-  }, [fetchCategoryList]);
-
-  const fetchRequistionList = useCallback(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/requisitions`
-      );
-      setRequisitions(res.data);
-    } catch (error) {
-      console.error("Failed to fetch Requisition", error);
-    } finally {
-      setTimeout(() => setLoading(false), 2000);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchRequistionList();
-  }, [fetchRequistionList]);
-
-  // serach filter
-
-  useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("req-")) {
-      // if search empty or not starting with REQ-, load all
-      fetchRequistionList();
-      return;
-    }
-
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_BASE_URL
-          }/requisitions/search/${searchTerm.toUpperCase()}`
-        );
-        setRequisitions(Array.isArray(res.data) ? res.data : [res.data]);
-      } catch (error) {
-        console.error("Search requisition failed:", error);
-        setRequisitions([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 1000);
-
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm]);
 
   useEffect(() => {
     if (requisitions.length > 0) {
@@ -191,7 +93,6 @@ const PurchaseRequisition = () => {
     setIsEnable(requisition.isEnable ?? true);
     setIsSliderOpen(true);
   };
-  console.log({ nextRequisitionId });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -233,24 +134,14 @@ const PurchaseRequisition = () => {
 
     try {
       if (editingRequisition) {
-        await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
-            editingRequisition._id
-          }`,
-          newRequisition,
-          { headers }
-        );
+        await api.put(`/requisitions/${editingRequisition._id}`, newRequisition, { headers });
         Swal.fire("Updated!", "Requisition updated successfully.", "success");
       } else {
-        await axios.post(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions`,
-          newRequisition,
-          { headers }
-        );
+       await api.post("/requisitions", newRequisition, { headers });
         Swal.fire("Added!", "Requisition added successfully.", "success");
       }
 
-      fetchRequistionList();
+       refetch();
       setIsSliderOpen(false);
       setItemsList([]);
       setCurrentPage(1); // Reset to first page after adding/updating
@@ -323,15 +214,11 @@ const PurchaseRequisition = () => {
             const { token } = userInfo || {};
             const headers = {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
             };
 
-            await axios.delete(
-              `${import.meta.env.VITE_API_BASE_URL}/requisitions/${id}`,
-              { headers }
-            );
-
+          await api.delete(`/requisitions/${id}`, { headers });
             setRequisitions(requisitions.filter((p) => p._id !== id));
+            refetch();
             setCurrentPage(1); // Reset to first page after deletion
 
             swalWithTailwindButtons.fire(
