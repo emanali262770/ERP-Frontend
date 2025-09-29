@@ -45,7 +45,7 @@ const ItemList = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [itemTypeList, setItemTypeList] = useState([]);
-  
+
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // GSAP Animation for Modal
@@ -121,9 +121,9 @@ const ItemList = () => {
     const fetchItemTypes = async () => {
       try {
         const res = await axios.get(
-          `${
-            import.meta.env.VITE_API_BASE_URL
-          }/item-type/category/${itemCategory.name}`
+          `${import.meta.env.VITE_API_BASE_URL}/item-type/category/${
+            itemCategory.name
+          }`
         );
         setItemTypeList(res.data);
       } catch (error) {
@@ -426,15 +426,13 @@ const ItemList = () => {
     setImagePreview("");
   };
   const handleCategoryChange = (e) => {
-  const selectedId = e.target.value;
-  const categoryObj = categoryList.find((c) => c._id === selectedId);
-  setItemCategory({
-    id: selectedId,
-    name: categoryObj?.categoryName || "",
-  });
-};
-
- 
+    const selectedId = e.target.value;
+    const categoryObj = categoryList.find((c) => c._id === selectedId);
+    setItemCategory({
+      id: selectedId,
+      name: categoryObj?.categoryName || "",
+    });
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -540,7 +538,7 @@ const ItemList = () => {
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
@@ -576,299 +574,312 @@ const ItemList = () => {
             </div>
 
             <div className="p-4 md:p-6 bg-white rounded-xl shadow-md space-y-4">
-              {/* Item Category */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Item Category <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={itemCategory}
-                  required
-                  onChange={handleCategoryChange}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Category</option>
-                  {categoryList.map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.categoryName}
-                    </option>
-                  ))}
-                </select>
-              </div>
+              <div className="flex gap-4">
+                {/* Item Category */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Item Category <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={itemCategory}
+                    required
+                    onChange={handleCategoryChange}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Category</option>
+                    {categoryList.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.categoryName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-              {/* Item Type */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Item Type <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={itemType}
-                  required
-                  disabled={!itemCategory}
-                  className={`w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200 
-      ${!itemCategory ? "bg-gray-100 cursor-not-allowed" : ""}`}
-                  onChange={(e) => setItemType(e.target.value)}
-                >
-                  <option value="">Select Item Type</option>
-                  {itemTypeList.map((type) => (
-                    <option key={type._id} value={type._id}>
-                      {type.itemTypeName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+                {/* Item Type */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Item Type <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={itemType}
+                    required
+                    disabled={!itemCategory}
+                    className={`w-full border rounded-lg p-2 focus:outline-none focus:ring focus:ring-blue-200 
+                    ${!itemCategory ? "bg-gray-100 cursor-not-allowed" : ""}`}
+                    onChange={(e) => setItemType(e.target.value)}
+                  >
+                    <option value="">Select Item Type</option>
+                    {itemTypeList.map((type) => (
+                      <option key={type._id} value={type._id}>
+                        {type.itemTypeName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 {/* Item Kind */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Item Kind <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={itemKind}
-                  required
-                  onChange={(e) => setItemKind(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Item kind</option>
-                 <option value="">Raw Material</option>
-                 <option value="">Finished Goods</option>
-                 <option value="">Ready to Ship</option>
-                 <option value="">Services</option>
-                </select>
-              </div>
-
-              {/* Manufacture */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Manufacture <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={manufacture}
-                  required
-                  onChange={(e) => setManufacture(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Manufacture</option>
-                  {manufacturerList.map((manufacture) => (
-                    <option key={manufacture._id} value={manufacture._id}>
-                      {manufacture.manufacturerName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Supplier */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Supplier <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={supplier}
-                  required
-                  onChange={(e) => setSupplier(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Supplier</option>
-                  {supplierList.map((supplier) => (
-                    <option key={supplier._id} value={supplier._id}>
-                      {supplier.supplierName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Shelve Location */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Shelve Location <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={shelveLocation}
-                  required
-                  onChange={(e) => setShelveLocation(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Location</option>
-                  {shelvesList.map((shelves) => (
-                    <option key={shelves._id} value={shelves._id}>
-                      {shelves.shelfNameCode}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Item Name */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Item Name <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={itemName}
-                  required
-                  onChange={(e) => setItemName(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Item Unit */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Item Unit <span className="text-newPrimary">*</span>
-                </label>
-                <select
-                  value={itemUnit}
-                  required
-                  onChange={(e) => setItemUnit(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Unit</option>
-                  {itemUnitList.map((item) => (
-                    <option key={item._id} value={item._id}>
-                      {item.unitName}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Purchase */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Purchase <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="number"
-                  value={purchase}
-                  required
-                  onChange={(e) => setPurchase(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Sales */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Sales <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="number"
-                  value={sales}
-                  required
-                  onChange={(e) => setSales(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Per Unit */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Per Unit
-                </label>
-                <input
-                  type="number"
-                  value={perUnit}
-                  onChange={(e) => setPerUnit(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              {/* Stock */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Stock <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="number"
-                  value={stock}
-                  required
-                  onChange={(e) => setStock(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Reorder */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Reorder
-                </label>
-                <input
-                  type="number"
-                  value={reorder}
-                  onChange={(e) => setReorder(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
-              {/* Secandory Barcode */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Secondary Barcode
-                </label>
-                <input
-                  type="text"
-                  value={barcode}
-                  required
-                  onChange={(e) => setBarcode(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. BAR1234567890"
-                  minLength={5}
-                  maxLength={20}
-                  onBlur={(e) => setBarcode(e.target.value)} // update on blur
-                />
-
-                {/* Show barcode only if input is not empty */}
-                {barcode && (
-                  <div className="mt-3">
-                    <Barcode value={barcode} height={60} />
-                  </div>
-                )}
-              </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Expiry Day
-                </label>
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      value="NoExpiry"
-                      checked={expiryOption === "NoExpiry"}
-                      onChange={(e) => setExpiryOption(e.target.value)}
-                      className="form-radio"
-                    />
-                    No Expiry days
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Item Kind <span className="text-red-500">*</span>
                   </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      value="HasExpiry"
-                      checked={expiryOption === "HasExpiry"}
-                      onChange={(e) => setExpiryOption(e.target.value)}
-                      className="form-radio"
-                    />
-                    Has Expiry days
-                  </label>
+                  <select
+                    value={itemKind}
+                    required
+                    onChange={(e) => setItemKind(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Item kind</option>
+                    <option value="">Raw Material</option>
+                    <option value="">Finished Goods</option>
+                    <option value="">Ready to Ship</option>
+                    <option value="">Services</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Conditionally show expiry date field */}
-              {expiryOption === "HasExpiry" && (
-                <div className="mt-3">
-                  <input
-                    type="number"
-                    value={expiryDay}
+              <div className="flex gap-4">
+                {/* Manufacture */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Manufacture <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={manufacture}
                     required
-                    onChange={(e) => setExpiryDay(e.target.value)}
-                    placeholder="Enter Expiry Days"
+                    onChange={(e) => setManufacture(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Manufacture</option>
+                    {manufacturerList.map((manufacture) => (
+                      <option key={manufacture._id} value={manufacture._id}>
+                        {manufacture.manufacturerName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Supplier */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Supplier <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={supplier}
+                    required
+                    onChange={(e) => setSupplier(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Supplier</option>
+                    {supplierList.map((supplier) => (
+                      <option key={supplier._id} value={supplier._id}>
+                        {supplier.supplierName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Shelve Location */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Shelve Location <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={shelveLocation}
+                    required
+                    onChange={(e) => setShelveLocation(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Location</option>
+                    {shelvesList.map((shelves) => (
+                      <option key={shelves._id} value={shelves._id}>
+                        {shelves.shelfNameCode}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              {/* Item Name */}
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Item Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={itemName}
+                    required
+                    onChange={(e) => setItemName(e.target.value)}
                     className="w-full p-2 border rounded"
                   />
                 </div>
-              )}
 
+                {/* Item Unit */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Item Unit <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={itemUnit}
+                    required
+                    onChange={(e) => setItemUnit(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Unit</option>
+                    {itemUnitList.map((item) => (
+                      <option key={item._id} value={item._id}>
+                        {item.unitName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* Purchase */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Purchase <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={purchase}
+                    required
+                    onChange={(e) => setPurchase(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                {/* Sales */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Sales <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={sales}
+                    required
+                    onChange={(e) => setSales(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                {/* Per Unit */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Per Unit
+                  </label>
+                  <input
+                    type="number"
+                    value={perUnit}
+                    onChange={(e) => setPerUnit(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                {/* Stock */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Stock <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={stock}
+                    required
+                    onChange={(e) => setStock(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-4">
+                {/* Reorder */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Reorder
+                  </label>
+                  <input
+                    type="number"
+                    value={reorder}
+                    onChange={(e) => setReorder(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+
+                {/* Secandory Barcode */}
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Secondary Barcode
+                  </label>
+                  <input
+                    type="text"
+                    value={barcode}
+                    required
+                    onChange={(e) => setBarcode(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="e.g. BAR1234567890"
+                    minLength={5}
+                    maxLength={20}
+                    onBlur={(e) => setBarcode(e.target.value)} // update on blur
+                  />
+
+                  {/* Show barcode only if input is not empty */}
+                  {barcode && (
+                    <div className="mt-3">
+                      <Barcode value={barcode} height={60} />
+                    </div>
+                  )}
+                </div>
+              </div>
+              <div className="flex gap-20">
+                <div>
+                  <label className="block text-gray-700 font-medium">
+                    Expiry Day
+                  </label>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        value="NoExpiry"
+                        checked={expiryOption === "NoExpiry"}
+                        onChange={(e) => setExpiryOption(e.target.value)}
+                        className="form-radio"
+                      />
+                      No Expiry days
+                    </label>
+                    {expiryOption === "HasExpiry" ? (
+                      <div className="flex-1 min-w-0">
+                        {expiryOption === "HasExpiry" && (
+                          <fieldset className="relative mt-1 border-2 border-blue-600 rounded-md px-3">
+                            <legend className="px-1 text-sm text-blue-700">
+                              Has Expiry Days{" "}
+                              <span className="text-red-500">*</span>
+                            </legend>
+                            <input
+                              type="number"
+                              id="expiryDays"
+                              value={expiryDay}
+                              required
+                              onChange={(e) => setExpiryDay(e.target.value)}
+                              placeholder="Enter expiry days"
+                              className="w-full p-2 focus:outline-none focus:ring-0 py-2"
+                            />
+                          </fieldset>
+                        )}
+                      </div>
+                    ) : (
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          value="HasExpiry"
+                          checked={expiryOption === "HasExpiry"}
+                          onChange={(e) => setExpiryOption(e.target.value)}
+                          className="form-radio"
+                        />
+                        Has Expiry days
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </div>
               {/* Image Upload */}
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">
-                  Product Images <span className="text-newPrimary">*</span>
+                  Product Images <span className="text-red-500">*</span>
                 </label>
                 <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md">
                   <div className="space-y-1 text-center">
@@ -953,7 +964,7 @@ const ItemList = () => {
 
               {/* Save Button */}
               <button
-                className="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-900 w-full"
+                className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                 onClick={handleSave}
               >
                 Save Item
