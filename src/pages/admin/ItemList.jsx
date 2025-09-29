@@ -21,7 +21,8 @@ const ItemList = () => {
 
   const [itemList, setItemList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [itemCategory, setItemCategory] = useState("");
+  const [itemCategory, setItemCategory] = useState({ id: "", name: "" });
+  const [itemKind, setItemKind] = useState("");
   const [itemType, setItemType] = useState("");
   const [itemName, setItemName] = useState("");
   const [details, setDetails] = useState("");
@@ -44,7 +45,7 @@ const ItemList = () => {
   const [image, setImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [itemTypeList, setItemTypeList] = useState([]);
-
+  
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // GSAP Animation for Modal
@@ -122,7 +123,7 @@ const ItemList = () => {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_BASE_URL
-          }/item-type/category/${itemCategory}`
+          }/item-type/category/${itemCategory.name}`
         );
         setItemTypeList(res.data);
       } catch (error) {
@@ -240,7 +241,7 @@ const ItemList = () => {
 
     const formData = new FormData();
 
-    formData.append("itemCategory", itemCategory); // ✅ ObjectId
+    formData.append("itemCategory", itemCategory.id); // ✅ ObjectId
     formData.append("itemType", itemType); // ✅ ObjectId
     formData.append("itemName", itemName);
     // formData.append("details", details);
@@ -424,13 +425,16 @@ const ItemList = () => {
     setImage(null);
     setImagePreview("");
   };
+  const handleCategoryChange = (e) => {
+  const selectedId = e.target.value;
+  const categoryObj = categoryList.find((c) => c._id === selectedId);
+  setItemCategory({
+    id: selectedId,
+    name: categoryObj?.categoryName || "",
+  });
+};
 
-  // // Capitalize First Letter
-  // function capitalizeFirstLetter(value) {
-  //   if (!value) return "";
-  //   const str = String(value); // ensure it's a string
-  //   return str.charAt(0).toUpperCase() + str.slice(1);
-  // }
+ 
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -580,7 +584,7 @@ const ItemList = () => {
                 <select
                   value={itemCategory}
                   required
-                  onChange={(e) => setItemCategory(e.target.value)}
+                  onChange={handleCategoryChange}
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select Category</option>
@@ -611,6 +615,25 @@ const ItemList = () => {
                       {type.itemTypeName}
                     </option>
                   ))}
+                </select>
+              </div>
+
+                {/* Item Kind */}
+              <div>
+                <label className="block text-gray-700 font-medium">
+                  Item Kind <span className="text-newPrimary">*</span>
+                </label>
+                <select
+                  value={itemKind}
+                  required
+                  onChange={(e) => setItemKind(e.target.value)}
+                  className="w-full p-2 border rounded"
+                >
+                  <option value="">Select Item kind</option>
+                 <option value="">Raw Material</option>
+                 <option value="">Finished Goods</option>
+                 <option value="">Ready to Ship</option>
+                 <option value="">Services</option>
                 </select>
               </div>
 
