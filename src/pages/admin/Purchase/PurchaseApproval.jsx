@@ -453,7 +453,8 @@ const PurchaseApproval = () => {
         {/* Show popup only if isView is true */}
         {isView && selectedRequisition && (
           <ViewModel
-            requisition={selectedRequisition} // ✅ pass as prop
+            data={selectedRequisition}
+            type="requisition"
             onClose={() => setisView(false)}
           />
         )}

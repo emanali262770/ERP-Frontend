@@ -133,7 +133,9 @@ const PurchaseRequisition = () => {
       try {
         setLoading(true);
         const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions/search/${searchTerm}`
+          `${
+            import.meta.env.VITE_API_BASE_URL
+          }/requisitions/search/${searchTerm}`
         );
         setRequisitions(Array.isArray(res.data) ? res.data : [res.data]);
       } catch (error) {
@@ -146,7 +148,6 @@ const PurchaseRequisition = () => {
 
     return () => clearTimeout(delayDebounce);
   }, [searchTerm]);
-
 
   useEffect(() => {
     if (requisitions.length > 0) {
@@ -233,7 +234,8 @@ const PurchaseRequisition = () => {
     try {
       if (editingRequisition) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${editingRequisition._id
+          `${import.meta.env.VITE_API_BASE_URL}/requisitions/${
+            editingRequisition._id
           }`,
           newRequisition,
           { headers }
@@ -399,7 +401,6 @@ const PurchaseRequisition = () => {
               + Add Requisition
             </button>
           </div>
-
         </div>
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
@@ -496,10 +497,11 @@ const PurchaseRequisition = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                    }`}
+                  }`}
                 >
                   Previous
                 </button>
@@ -507,17 +509,17 @@ const PurchaseRequisition = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                    }`}
+                  }`}
                 >
                   Next
                 </button>
               </div>
             </div>
           )}
-
         </div>
 
         {isSliderOpen && (
@@ -743,8 +745,8 @@ const PurchaseRequisition = () => {
                   {loading
                     ? "Saving..."
                     : editingRequisition
-                      ? "Update Requisition"
-                      : "Save Requisition"}
+                    ? "Update Requisition"
+                    : "Save Requisition"}
                 </button>
               </form>
             </div>
@@ -753,7 +755,8 @@ const PurchaseRequisition = () => {
 
         {isView && selectedRequisition && (
           <ViewModel
-            requisition={selectedRequisition}
+            data={selectedRequisition}
+            type="requisition"
             onClose={() => setisView(false)}
           />
         )}

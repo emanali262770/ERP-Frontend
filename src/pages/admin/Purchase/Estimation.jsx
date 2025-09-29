@@ -108,29 +108,32 @@ const Estimation = () => {
   // serach filter
   
 useEffect(() => {
-  if (!searchTerm || !searchTerm.startsWith("EST-")) {
-    // ✅ Reload all estimations when input is empty
+  // If searchTerm is empty, reload all estimations
+  if (!searchTerm) {
     fetchEstimationList();
     return;
   }
 
-  const delayDebounce = setTimeout(async () => {
-    try {
-      setLoading(true);
-      const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
-      );
-      setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
-    } catch (error) {
-      console.error("Search estimations failed:", error);
-      setEstimations([]);
-    } finally {
-      setLoading(false);
-    }
-  }, 500);
+  // If searchTerm starts with EST-, run search
+  if (searchTerm.startsWith("EST-")) {
+    const delayDebounce = setTimeout(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
+        );
+        setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search estimations failed:", error);
+        setEstimations([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
 
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm, fetchEstimationList]);
+    return () => clearTimeout(delayDebounce);
+  }
+}, [searchTerm]);
 
    useEffect(() => {
       if (estimations.length > 0) {
