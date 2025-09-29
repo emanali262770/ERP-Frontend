@@ -105,36 +105,36 @@ const Estimation = () => {
     fetchEstimationList();
   }, [fetchEstimationList]);
 
-
   // Search filter
-useEffect(() => {
-  // If searchTerm is empty, reload all estimations
-  if (!searchTerm) {
-    fetchEstimationList();
-    return;
-  }
+  useEffect(() => {
+    // If searchTerm is empty, reload all estimations
+    if (!searchTerm) {
+      fetchEstimationList();
+      return;
+    }
 
-  // If searchTerm starts with EST-, run search
-  if (searchTerm.startsWith("est-")) {
+    // If searchTerm starts with EST-, run search
+    if (searchTerm.startsWith("est-")) {
+      const delayDebounce = setTimeout(async () => {
+        try {
+          setLoading(true);
+          const res = await axios.get(
+            `${
+              import.meta.env.VITE_API_BASE_URL
+            }/estimations/search/${searchTerm.toUpperCase()}`
+          );
+          setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
+        } catch (error) {
+          console.error("Search estimations failed:", error);
+          setEstimations([]);
+        } finally {
+          setLoading(false);
+        }
+      }, 500);
 
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm.toUpperCase()}`
-        );
-        setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
-      } catch (error) {
-        console.error("Search estimations failed:", error);
-        setEstimations([]);
-      } finally {
-        setLoading(false);
-      }
-    }, 500);
-
-    return () => clearTimeout(delayDebounce);
-  }
-}, [searchTerm]);
+      return () => clearTimeout(delayDebounce);
+    }
+  }, [searchTerm]);
   // Generate next estimation ID
   useEffect(() => {
     if (estimations.length > 0) {
@@ -180,10 +180,12 @@ useEffect(() => {
     const trimmedTotal = total.trim();
     const parsedTotal = parseFloat(total);
 
-    if (!trimmedEstimationId) newErrors.estimationId = "Estimation ID is required";
+    if (!trimmedEstimationId)
+      newErrors.estimationId = "Estimation ID is required";
     if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
     if (!trimmedForDemand) newErrors.forDemand = "For Demand is required";
-    if (itemsList.length === 0) newErrors.itemsList = "At least one item is required";
+    if (itemsList.length === 0)
+      newErrors.itemsList = "At least one item is required";
     if (!trimmedTotal || isNaN(parsedTotal) || parsedTotal <= 0) {
       newErrors.total = "Total must be a positive number";
     }
@@ -259,7 +261,9 @@ useEffect(() => {
     try {
       if (editingEstimation) {
         const res = await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/estimations/${editingEstimation._id}`,
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/${
+            editingEstimation._id
+          }`,
           newEstimation,
           { headers }
         );
@@ -291,7 +295,10 @@ useEffect(() => {
       resetForm();
       setCurrentPage(1); // Reset to first page after adding/updating
     } catch (error) {
-      console.error("Error saving estimation:", error.response?.data || error.message);
+      console.error(
+        "Error saving estimation:",
+        error.response?.data || error.message
+      );
       Swal.fire({
         icon: "error",
         title: "Error!",
@@ -346,7 +353,10 @@ useEffect(() => {
         });
       }
     } catch (error) {
-      console.error("Error deleting estimation:", error.response?.data || error.message);
+      console.error(
+        "Error deleting estimation:",
+        error.response?.data || error.message
+      );
       swalWithTailwindButtons.fire({
         icon: "error",
         title: "Error!",
@@ -433,16 +443,29 @@ useEffect(() => {
                       key={estimation._id}
                       className="grid grid-cols-1 lg:grid-cols-8 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="font-medium text-gray-900">{estimation.estimationId}</div>
-                      <div className="text-gray-600">{estimation?.demandItem?.supplier?.supplierName}</div>
-                      <div className="text-gray-600">{estimation?.demandItem?.createdBy}</div>
-                      <div className="text-gray-600">{getQuotationNo(estimation?.demandItem?._id)}</div>
-                      <div className="text-gray-600">{estimation?.totalAmount}</div>
-                      <div className="text-gray-500">{formatDate(estimation.date)}</div>
+                      <div className="font-medium text-gray-900">
+                        {estimation.estimationId}
+                      </div>
+                      <div className="text-gray-600">
+                        {estimation?.demandItem?.supplier?.supplierName}
+                      </div>
+                      <div className="text-gray-600">
+                        {estimation?.demandItem?.createdBy}
+                      </div>
+                      <div className="text-gray-600">
+                        {getQuotationNo(estimation?.demandItem?._id)}
+                      </div>
+                      <div className="text-gray-600">
+                        {estimation?.totalAmount}
+                      </div>
+                      <div className="text-gray-500">
+                        {formatDate(estimation.date)}
+                      </div>
                       <div className="text-gray-600">
                         <span
                           className={`px-2 py-1 rounded-full text-xs ${
-                            estimation.status === "Pending"|| estimation.status === "Inactive"
+                            estimation.status === "Pending" ||
+                            estimation.status === "Inactive"
                               ? "bg-orange-100 text-orange-800"
                               : "bg-green-100 text-green-800"
                           }`}
@@ -510,14 +533,16 @@ useEffect(() => {
         </div>
 
         {isSliderOpen && (
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-end z-50">
+          <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-md bg-white p-4 h-full overflow-y-auto"
+              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingEstimation ? "Update Estimation" : "Add a New Estimation"}
+                  {editingEstimation
+                    ? "Update Estimation"
+                    : "Add a New Estimation"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -527,7 +552,7 @@ useEffect(() => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Estimation ID <span className="text-red-500">*</span>
@@ -545,7 +570,9 @@ useEffect(() => {
                     required
                   />
                   {errors.estimationId && (
-                    <p className="text-red-500 text-xs mt-1">{errors.estimationId}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.estimationId}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -588,7 +615,9 @@ useEffect(() => {
                     ))}
                   </select>
                   {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">{errors.forDemand}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.forDemand}
+                    </p>
                   )}
                 </div>
                 {quotationItems.length > 0 && (
@@ -605,10 +634,18 @@ useEffect(() => {
                       <tbody>
                         {quotationItems.map((item) => (
                           <tr key={item._id}>
-                            <td className="px-4 text-center py-2 border">{item.itemName}</td>
-                            <td className="px-4 text-center py-2 border">{item.qty}</td>
-                            <td className="px-4 text-center py-2 border">{item.price}</td>
-                            <td className="px-4 text-center py-2 border">{item.total}</td>
+                            <td className="px-4 text-center py-2 border">
+                              {item.itemName}
+                            </td>
+                            <td className="px-4 text-center py-2 border">
+                              {item.qty}
+                            </td>
+                            <td className="px-4 text-center py-2 border">
+                              {item.price}
+                            </td>
+                            <td className="px-4 text-center py-2 border">
+                              {item.total}
+                            </td>
                           </tr>
                         ))}
                       </tbody>
@@ -636,7 +673,9 @@ useEffect(() => {
                     readOnly={!!forDemand}
                   />
                   {errors.supplier && (
-                    <p className="text-red-500 text-xs mt-1">{errors.supplier}</p>
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.supplier}
+                    </p>
                   )}
                 </div>
                 <div>
@@ -669,8 +708,8 @@ useEffect(() => {
                   {loading
                     ? "Saving..."
                     : editingEstimation
-                      ? "Update Estimation"
-                      : "Save Estimation"}
+                    ? "Update Estimation"
+                    : "Save Estimation"}
                 </button>
               </form>
             </div>
