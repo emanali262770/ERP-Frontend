@@ -464,7 +464,7 @@ const SupplierList = () => {
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    Supplier Name <span className="text-newPrimary">*</span>
+                    Supplier Name <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -476,7 +476,7 @@ const SupplierList = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    Phone Number <span className="text-newPrimary">*</span>
+                    Phone Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -491,7 +491,7 @@ const SupplierList = () => {
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    Mobile Number <span className="text-newPrimary">*</span>
+                    Mobile Number <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -505,7 +505,7 @@ const SupplierList = () => {
 
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    Email Address <span className="text-newPrimary">*</span>
+                    Email Address <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="email"
@@ -519,7 +519,7 @@ const SupplierList = () => {
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    Contact Person <span className="text-newPrimary">*</span>
+                    Contact Person <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -532,7 +532,7 @@ const SupplierList = () => {
 
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    Designation <span className="text-newPrimary">*</span>
+                    Designation <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -546,7 +546,7 @@ const SupplierList = () => {
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Address <span className="text-newPrimary">*</span>
+                  Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -559,7 +559,7 @@ const SupplierList = () => {
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    NTN <span className="text-newPrimary">*</span>
+                    NTN <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -573,7 +573,7 @@ const SupplierList = () => {
 
                 <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
-                    GST <span className="text-newPrimary">*</span>
+                    GST <span className="text-red-500">*</span>
                   </label>
                   <input
                     type="text"
@@ -589,7 +589,7 @@ const SupplierList = () => {
 
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Payment Terms <span className="text-newPrimary">*</span>
+                  Payment Terms <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
