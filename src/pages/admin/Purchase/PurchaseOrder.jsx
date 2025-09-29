@@ -152,40 +152,39 @@ const PurchaseOrder = () => {
   useEffect(() => {
 
     if (!searchTerm || !searchTerm.startsWith("PO-")) {
-  if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
-      // if search empty or not starting with REQ-, load all
+      if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
+        // if search empty or not starting with REQ-, load all
 
-      fetchPurchaseOrders();
-      return;
-    }
-
-    const delayDebounce = setTimeout(async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(
-
-          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
-        );
-        setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
-        setCurrentPage(1); // Reset to first page on search
-
-         `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm.toUpperCase()}`
-        );
-        setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
-
-      } catch (error) {
-        console.error("Search purchaseOrder failed:", error);
-        setPurchaseOrders([]);
-      } finally {
-        setLoading(false);
+        fetchPurchaseOrders();
+        return;
       }
-    }, 1000);
 
-    return () => clearTimeout(delayDebounce);
+      const delayDebounce = setTimeout(async () => {
+        try {
+          setLoading(true);
+          const res = await axios.get(
 
+            `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
+          );
+          setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
+          setCurrentPage(1); // Reset to first page on search
+
+          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm.toUpperCase()}`
+          setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
+
+        } catch (error) {
+          console.error("Search purchaseOrder failed:", error);
+          setPurchaseOrders([]);
+        } finally {
+          setLoading(false);
+        }
+      }, 1000);
+
+      return () => clearTimeout(delayDebounce);
+
+    }
   }, [searchTerm, fetchPurchaseOrders]);
 
-  }, [searchTerm]);
 
 
   // Next POId
@@ -281,8 +280,7 @@ const PurchaseOrder = () => {
     try {
       if (editingPurchaseOrder) {
         await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/${
-            editingPurchaseOrder._id
+          `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/${editingPurchaseOrder._id
           }`,
           newPurchaseOrder,
           { headers }
@@ -540,22 +538,20 @@ const PurchaseOrder = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                    }`}
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
                       ? "bg-gray-400 cursor-not-allowed"
                       : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                    }`}
                 >
                   Next
                 </button>
@@ -629,11 +625,10 @@ const PurchaseOrder = () => {
                   <select
                     value={forDemand}
                     onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.forDemand
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.forDemand
                         ? "border-red-500 focus:ring-red-500"
                         : "border-gray-300 focus:ring-newPrimary"
-                    }`}
+                      }`}
                   >
                     <option value="">Select Quotation</option>
                     {quotations.map((q) => (
@@ -743,8 +738,8 @@ const PurchaseOrder = () => {
                   {loading
                     ? "Saving..."
                     : editingPurchaseOrder
-                    ? "Update Purchase Order"
-                    : "Save Purchase Order"}
+                      ? "Update Purchase Order"
+                      : "Save Purchase Order"}
                 </button>
               </form>
             </div>
