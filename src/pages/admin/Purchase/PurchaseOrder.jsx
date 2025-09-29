@@ -150,7 +150,11 @@ const PurchaseOrder = () => {
   }, [fetchPurchaseOrders]);
 
   useEffect(() => {
+
     if (!searchTerm || !searchTerm.startsWith("PO-")) {
+  if (!searchTerm || !searchTerm.toLowerCase().startsWith("po-")) {
+      // if search empty or not starting with REQ-, load all
+
       fetchPurchaseOrders();
       return;
     }
@@ -159,10 +163,16 @@ const PurchaseOrder = () => {
       try {
         setLoading(true);
         const res = await axios.get(
+
           `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm}`
         );
         setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
         setCurrentPage(1); // Reset to first page on search
+
+         `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder/search/${searchTerm.toUpperCase()}`
+        );
+        setPurchaseOrders(Array.isArray(res.data) ? res.data : [res.data]);
+
       } catch (error) {
         console.error("Search purchaseOrder failed:", error);
         setPurchaseOrders([]);
@@ -172,7 +182,11 @@ const PurchaseOrder = () => {
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
+
   }, [searchTerm, fetchPurchaseOrders]);
+
+  }, [searchTerm]);
+
 
   // Next POId
   useEffect(() => {
@@ -738,7 +752,8 @@ const PurchaseOrder = () => {
         )}
         {isView && selectedPurchaseOrder && (
           <ViewModel
-            purchaseOrder={selectedPurchaseOrder}
+            data={selectedPurchaseOrder}
+            type="purchaseOrder"
             onClose={() => setIsView(false)}
           />
         )}

@@ -105,6 +105,7 @@ const Estimation = () => {
     fetchEstimationList();
   }, [fetchEstimationList]);
 
+
   // Search filter
   useEffect(() => {
     if (!searchTerm || !searchTerm.startsWith("EST-")) {
@@ -112,11 +113,49 @@ const Estimation = () => {
       return;
     }
 
+
+  // serach filter
+  
+useEffect(() => {
+  // If searchTerm is empty, reload all estimations
+  if (!searchTerm) {
+    fetchEstimationList();
+    return;
+  }
+
+  // If searchTerm starts with EST-, run search
+  if (searchTerm.startsWith("est-")) {
+
     const delayDebounce = setTimeout(async () => {
       try {
         setLoading(true);
         const res = await axios.get(
+
           `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm}`
+
+          `${import.meta.env.VITE_API_BASE_URL}/estimations/search/${searchTerm.toUpperCase()}`
+        );
+        setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
+      } catch (error) {
+        console.error("Search estimations failed:", error);
+        setEstimations([]);
+      } finally {
+        setLoading(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }
+}, [searchTerm]);
+
+   useEffect(() => {
+      if (estimations.length > 0) {
+        const maxNo = Math.max(
+          ...estimations.map((r) => {
+            const match = r.estimationId?.match(/EST-(\d+)/);
+            return match ? parseInt(match[1], 10) : 0;
+          })
+
         );
         setEstimations(Array.isArray(res.data) ? res.data : [res.data]);
         setCurrentPage(1); // Reset to first page on search

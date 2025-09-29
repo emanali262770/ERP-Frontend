@@ -2,6 +2,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { SquarePen, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
+import CommanHeader from "../../../components/CommanHeader";
+import TableSkeleton from "../Skeleton";
 
 const QualityChecking = () => {
   const [qualityChecks, setQualityChecks] = useState([]);

@@ -57,7 +57,7 @@ const PurchaseApproval = () => {
         const res = await axios.get(
           `${
             import.meta.env.VITE_API_BASE_URL
-          }/requisitions/demandItem/${searchTerm}`
+          }/requisitions/demandItem/${searchTerm.toUpperCase()}`
         );
         setApprovals(Array.isArray(res.data) ? res.data : [res.data]);
         setCurrentPage(1); // Reset to first page on search
@@ -509,7 +509,12 @@ const PurchaseApproval = () => {
         {/* Show popup only if isView is true */}
         {isView && selectedRequisition && (
           <ViewModel
+
             requisition={selectedRequisition}
+
+            data={selectedRequisition}
+            type="requisition"
+
             onClose={() => setisView(false)}
           />
         )}
