@@ -73,6 +73,11 @@ const links = [
         label: "Purchase Order",
         icon: <FaFileInvoiceDollar />,
       },
+       {
+        to: "/admin/purchase-order",
+        label: "I love Order",
+        icon: <FaFileInvoiceDollar />,
+      },
       { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
       {
         to: "/admin/quality-checking",
