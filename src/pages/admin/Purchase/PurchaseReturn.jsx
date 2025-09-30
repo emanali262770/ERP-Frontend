@@ -277,13 +277,9 @@ const PurchaseReturn = () => {
               <div>
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
                 <div className="flex gap-3 mb-3">
-                  <input
-                    type="text"
-                    placeholder="Item Name"
-                    value={itemName}
-                    onChange={(e) => setItemName(e.target.value)}
-                    className="flex-1 p-2 border rounded"
-                  />
+                  <select onClick={itemName} name="" id="" className="w-full p-2 border rounded">
+                    <option value="">Select Item Name</option>
+                  </select>
                   <input
                     type="number"
                     placeholder="Qty"
