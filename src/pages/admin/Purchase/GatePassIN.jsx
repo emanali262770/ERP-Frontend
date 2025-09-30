@@ -453,33 +453,8 @@ const GatepassIn = () => {
                       </p>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      To <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={toCompany}
-                      onChange={(e) => setToCompany(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.toCompany
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Company</option>
-                      <option value="ABC Corp">ABC Corp</option>
-                      <option value="XYZ Ltd">XYZ Ltd</option>
-                      <option value="Tech Solutions">Tech Solutions</option>
-                      <option value="Global Supplies">Global Supplies</option>
-                    </select>
-                    {errors.toCompany && (
-                      <p className="text-red-500 text-xs mt-1">
-                        {errors.toCompany}
-                      </p>
-                    )}
-                  </div>
                 </div>
+                
                 <div className="flex items-center gap-4">
                   <label className="block text-gray-700 font-medium">
                     <input
