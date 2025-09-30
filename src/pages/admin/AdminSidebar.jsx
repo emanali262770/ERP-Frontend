@@ -19,7 +19,7 @@ import {
   FaUsersCog,
   FaBalanceScale,
   FaUserCog,
-    FaShoppingCart,
+  FaShoppingCart,
   FaFileAlt,
   FaCheckCircle,
   FaCommentsDollar,
@@ -30,63 +30,207 @@ import {
   FaFileInvoice,
   FaUndoAlt,
   FaSignOutAlt,
-
+  FaDoorOpen,
+  FaListAlt, // Added missing import
+  FaExchangeAlt, // Added missing import
+  FaMoneyBillWave, // Added missing import
+  FaAddressBook, // Added missing import
 } from "react-icons/fa";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
-
 // 🔹 Link definitions with permission keys
 const links = [
   { to: "/admin", label: "Dashboard", icon: <RiDashboardFill /> },
-  { to: "/admin/item-details", label: "Item Details", icon: <FaBox />, key: "isItemDetails" },
   {
-     label: "Purchase",
-  icon: <FaShoppingCart />,
-  children: [
-    { to: "/admin/purchase-requisition", label: "Purchase Requisition", icon: <FaFileAlt />},
-    { to: "/admin/purchase-approval", label: "Purchase Approval", icon: <FaCheckCircle /> },
-    { to: "/admin/quotation", label: "Market Quotation", icon: <FaCommentsDollar /> },
-    { to: "/admin/estimation", label: "Estimation", icon: <FaCalculator /> },
-    // { to: "/admin/shelve-location", label: "Approval of Estimation", icon: <FaClipboardCheck /> },
-    { to: "/admin/purchase-order", label: "Purchase Order", icon: <FaFileInvoiceDollar />},
-    { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
-    { to: "/admin/quality-checking", label: "Quality Checking", icon: <FaCheckDouble /> },
-{ to: "/admin/grn", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
-{ to: "/admin/purchase-return", label: "Purchase Return", icon: <FaUndoAlt /> },
-{ to: "/admin/gatepass-out", label: "GatePass OUT", icon: <FaSignOutAlt /> },
-
-  ],
+    to: "/admin/item-details",
+    label: "Item Details",
+    icon: <FaBox />,
+    key: "isItemDetails",
   },
- 
-  { to: "/admin/sales-invoice", label: "Sales", icon: <FaReceipt />, key: "isSales" },
-  { to: "/admin/customers", label: "Customers", icon: <FaUsers />, key: "isCustomer" },
-  { to: "/admin/customers-booking", label: "Booking Customer", icon: <FaUsers />, key: "isBookingCustomer" },
-  { to: "/admin/item-barcode", label: "Item Barcode", icon: <FaBarcode />, key: "isInventory" }, // map barcode under inventory
-  { to: "/admin/open-balance", label: "Opening Balance", icon: <FaBarcode />, },
-  { to: "/admin/expiry-tags", label: "Expiry Tags", icon: <FaTags />, key: "isSettings" },       // or add new field if backend supports
+  {
+    label: "Purchase",
+    icon: <FaShoppingCart />,
+    children: [
+      {
+        to: "/admin/purchase-requisition",
+        label: "Purchase Requisition",
+        icon: <FaFileAlt />,
+      },
+      {
+        to: "/admin/purchase-approval",
+        label: "Purchase Approval",
+        icon: <FaCheckCircle />,
+      },
+      {
+        to: "/admin/quotation",
+        label: "Market Quotation",
+        icon: <FaCommentsDollar />,
+      },
+      { to: "/admin/estimation", label: "Estimation", icon: <FaCalculator /> },
+      {
+        to: "/admin/purchase-order",
+        label: "Purchase Order",
+        icon: <FaFileInvoiceDollar />,
+      },
+      { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
+      {
+        to: "/admin/quality-checking",
+        label: "Quality Checking",
+        icon: <FaCheckDouble />,
+      },
+      { to: "/admin/grn", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
+      {
+        to: "/admin/purchase-return",
+        label: "Purchase Return",
+        icon: <FaUndoAlt />,
+      },
+      {
+        to: "/admin/gatepass-out",
+        label: "GatePass OUT",
+        icon: <FaSignOutAlt />,
+      },
+    ],
+  },
+    {
+    label: "Sales ",
+    icon: <FaShoppingCart />,
+    children: [
+      { to: "/admin/rate-list", label: "Rate List", icon: <FaListAlt /> },
+      {
+        to: "/admin/distribution-rate-list",
+        label: "Distribution Rate List",
+        icon: <FaExchangeAlt />,
+      },
+      {
+        to: "/admin/booking-orders",
+        label: "Booking Order",
+        icon: <FaShoppingCart />,
+      },
+      {
+        to: "/admin/delivery-challan",
+        label: "Delivery Challan",
+        icon: <FaTruck />,
+      },
+      {
+        to: "/admin/sales-invoices",
+        label: "Sales Invoice",
+        icon: <FaFileInvoiceDollar />,
+      },
+      {
+        to: "/admin/gatepass-out",
+        label: "Gatepass Out",
+        icon: <FaDoorOpen />,
+      },
+      {
+        to: "/admin/delivery-challan-acknowledgement",
+        label: "Delivery Challan Acknowledgement",
+        icon: <FaClipboardCheck />,
+      },
+      {
+        to: "/admin/payment-receipt-voucher",
+        label: "Payment Receipt Voucher",
+        icon: <FaReceipt />,
+      },
+      {
+        to: "/admin/customer-ledger",
+        label: "Customer Ledger",
+        icon: <FaAddressBook />,
+      },
+      {
+        to: "/admin/receivable",
+        label: "Receivable",
+        icon: <FaMoneyBillWave />,
+      },
+      {
+        to: "/admin/sales-return",
+        label: "Sales Return",
+        icon: <FaUndoAlt />,
+      },
+    ],
+  },
+  {
+    to: "/admin/sales-invoice",
+    label: "Sales Invoice",
+    icon: <FaReceipt />,
+    key: "isSales",
+  },
+  {
+    to: "/admin/customers",
+    label: "Customers",
+    icon: <FaUsers />,
+    key: "isCustomer",
+  },
+  {
+    to: "/admin/customers-booking",
+    label: "Booking Customer",
+    icon: <FaUsers />,
+    key: "isBookingCustomer",
+  },
+  {
+    to: "/admin/item-barcode",
+    label: "Item Barcode",
+    icon: <FaBarcode />,
+    key: "isInventory",
+  },
+  { to: "/admin/open-balance", label: "Opening Balance", icon: <FaBarcode /> },
+  {
+    to: "/admin/expiry-tags",
+    label: "Expiry Tags",
+    icon: <FaTags />,
+    key: "isSettings",
+  },
   { to: "/admin/report", label: "Report", icon: <FaChartBar />, key: "isReports" },
-
   {
     label: "Setup",
     icon: <FaCogs />,
     children: [
-      { to: "/admin/category-item", label: "Item Categories", icon: <FaTags />, key: "isItemCategory" },
-      { to: "/admin/item-type", label: "Item Type", icon: <FaTags />, },
-      { to: "/admin/manufacture", label: "Manufacturer", icon: <FaIndustry />, key: "isItemManufacturer" },
-      { to: "/admin/supplier", label: "Supplier", icon: <FaTruck />, key: "isItemSupplier" },
-      { to: "/admin/shelve-location", label: "Shelve Location", icon: <FaWarehouse />, key: "isItemLocation" },
-      { to: "/admin/item-unit", label: "Item Unit", icon: <FaBalanceScale />, key: "isItemUnit" },
+      {
+        to: "/admin/category-item",
+        label: "Item Categories",
+        icon: <FaTags />,
+        key: "isItemCategory",
+      },
+      { to: "/admin/item-type", label: "Item Type", icon: <FaTags /> },
+      {
+        to: "/admin/manufacture",
+        label: "Manufacturer",
+        icon: <FaIndustry />,
+        key: "isItemManufacturer",
+      },
+      {
+        to: "/admin/supplier",
+        label: "Supplier",
+        icon: <FaTruck />,
+        key: "isItemSupplier",
+      },
+      {
+        to: "/admin/shelve-location",
+        label: "Shelve Location",
+        icon: <FaWarehouse />,
+        key: "isItemLocation",
+      },
+      {
+        to: "/admin/item-unit",
+        label: "Item Unit",
+        icon: <FaBalanceScale />,
+        key: "isItemUnit",
+      },
       { to: "/admin/promotion", label: "Promotion", icon: <FaBalanceScale /> },
-      { to: "/admin/promotion-item", label: "Promotion Item", icon: <FaBalanceScale /> },
+      {
+        to: "/admin/promotion-item",
+        label: "Promotion Item",
+        icon: <FaBalanceScale />,
+      },
+      { to: "/admin/tax", label: "Tax", icon: <FaBalanceScale /> },
     ],
   },
-   {
+  {
     label: "Management",
-    icon: <FaUserShield/>,
+    icon: <FaUserShield />,
     children: [
-      { to: "/admin/designation", label: "Designation", icon: <FaUsersCog />,  },
-      { to: "/admin/employee", label: "Employee", icon: <FaUserCog />},
+      { to: "/admin/designation", label: "Designation", icon: <FaUsersCog /> },
+      { to: "/admin/employee", label: "Employee", icon: <FaUserCog /> },
       { to: "/admin/departments", label: "Departments", icon: <FaUserShield /> },
     ],
   },
@@ -95,44 +239,55 @@ const links = [
     key: "isSecurity",
     icon: <FaUserShield />,
     children: [
-      { to: "/admin/groups", label: "Group Management", icon: <FaUsersCog />, key: "isGroupManagement" },
+      {
+        to: "/admin/groups",
+        label: "Group Management",
+        icon: <FaUsersCog />,
+        key: "isGroupManagement",
+      },
       { to: "/admin/users", label: "Users", icon: <FaUserCog />, key: "isUsers" },
-      { to: "/admin/access-rights", label: "Access Control", icon: <FaUserShield />, key: "isAccessControl" },
+      {
+        to: "/admin/access-rights",
+        label: "Access Control",
+        icon: <FaUserShield />,
+        key: "isAccessControl",
+      },
     ],
   },
-];
 
+];
 
 const AdminSidebar = () => {
   const navigate = useNavigate();
   const [openMenu, setOpenMenu] = useState(null);
-const location = useLocation();
-  // 🔹 Get logged-in user info from localStorage
+  const location = useLocation();
+
+  // 🔹 Get logged-in user info from localStorage with fallback
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
-  console.log("user", userInfo);
 
   const handleLogout = () => {
     localStorage.removeItem("userInfo");
     navigate("/");
   };
-  useEffect(() => {
-   links.forEach((link) => {
-     if (link.children) {
-       const isChildActive = link.children.some((child) =>
-         location.pathname.startsWith(child.to)
-       );
-       if (isChildActive) {
-         setOpenMenu(link.label);
-       }
-     }
-   });
- }, [location.pathname]);
 
-  // 🔹 Permission filter logic
+  useEffect(() => {
+    links.forEach((link) => {
+      if (link.children) {
+        const isChildActive = link.children.some((child) =>
+          location.pathname.startsWith(child.to)
+        );
+        if (isChildActive) {
+          setOpenMenu(link.label);
+        }
+      }
+    });
+  }, [location.pathname]);
+
+  // 🔹 Permission filter logic with safer property access
   const filterWithPermissions = (link) => {
-    if (userInfo.isAdmin) return true; // admin sees everything
-    if (!link.key) return true; // links without key always show
-    return userInfo[link.key] === true;
+    if (userInfo.isAdmin === true) return true; // Admin sees everything
+    if (!link.key) return true; // Links without key always show
+    return userInfo[link.key] === true; // Check permission key
   };
 
   const filteredLinks = links
@@ -140,9 +295,9 @@ const location = useLocation();
     .map((link) =>
       link.children
         ? {
-          ...link,
-          children: link.children.filter(filterWithPermissions),
-        }
+            ...link,
+            children: link.children.filter(filterWithPermissions),
+          }
         : link
     );
 
@@ -167,8 +322,9 @@ const location = useLocation();
               <div key={link.label}>
                 <button
                   onClick={() => toggleMenu(link.label)}
-                  className={`w-full flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30 ${openMenu === link.label ? "bg-newPrimary/20" : ""
-                    }`}
+                  className={`w-full flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30 ${
+                    openMenu === link.label ? "bg-newPrimary/20" : ""
+                  }`}
                 >
                   {link.icon}
                   <span className="hidden sm:inline">{link.label}</span>
@@ -186,9 +342,10 @@ const location = useLocation();
                         key={sub.to}
                         to={sub.to}
                         className={({ isActive }) =>
-                          `flex items-center gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${isActive
-                            ? "bg-newPrimary/80 text-white"
-                            : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
+                          `flex items-center gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${
+                            isActive
+                              ? "bg-newPrimary/80 text-white"
+                              : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
                           }`
                         }
                       >
@@ -204,9 +361,10 @@ const location = useLocation();
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${isActive
-                    ? "bg-newPrimary/80 text-white"
-                    : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
+                  `flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${
+                    isActive
+                      ? "bg-newPrimary/80 text-white"
+                      : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
                   }`
                 }
                 end={link.to === "/admin"}

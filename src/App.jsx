@@ -47,8 +47,20 @@ import Designation from "./pages/admin/Mangement/Designation.jsx";
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
 import PurchaseOrder from "./pages/admin/Purchase/PurchaseOrder.jsx";
+
+import RateList from "./pages/admin/Sales/RateList.jsx";
+import DistributionRateList from "./pages/admin/Sales/DistributionRateList.jsx";
+import BookingOrders from "./pages/admin/Sales/BookingOrders.jsx";
+import DeliveryChallan from "./pages/admin/Sales/DeliveryChallan.jsx";
+import SalesInvoices from "./pages/admin/Sales/SalesInvoices.jsx";
+import PaymentReceiptVoucher from "./pages/admin/Sales/PaymentReceiptVoucher.jsx";
+import CustomerLedger from "./pages/admin/Sales/CustomerLedger.jsx";
+import Receivable from "./pages/admin/Sales/Receivable.jsx";
+import SalesReturn from "./pages/admin/Sales/SalesReturn.jsx";
+import DeliveryChallanAcknowledgement from "./pages/admin/Sales/DeliveryChallanAcknowledgement.jsx";
 import Profile from "./components/Profile.jsx";
 import PurchaseReturn from "./pages/admin/Purchase/PurchaseReturn.jsx";
+
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -104,7 +116,16 @@ function AppContent() {
             <Route path="quality-checking" element={<QualityCheck />} />
             <Route path="grn" element={<GRN />} />
             <Route path="gatepass-out" element={<GatePassOut />} />
-
+            <Route path="rate-list" element={<RateList />} />
+            <Route path="distribution-rate-list" element={<DistributionRateList />} />
+            <Route path="booking-orders" element={<BookingOrders />} />
+            <Route path="delivery-challan" element={<DeliveryChallan />} />
+            <Route path="delivery-challan-acknowledgement" element={<DeliveryChallanAcknowledgement />} />
+            <Route path="sales-invoices" element={<SalesInvoices />} />
+            <Route path="payment-receipt-voucher" element={<PaymentReceiptVoucher />} />
+            <Route path="customer-ledger" element={<CustomerLedger />} />
+            <Route path="receivable" element={<Receivable />} />
+            <Route path="sales-return" element={<SalesReturn />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
