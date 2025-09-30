@@ -23,7 +23,6 @@ const ShelveLocation = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/shelves`;
 
-
   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
@@ -48,7 +47,6 @@ const ShelveLocation = () => {
           }
         },
       });
-
     }
   }, [isSliderOpen]);
 
@@ -329,11 +327,10 @@ const ShelveLocation = () => {
               </button>
             </div>
             <div className="p-4 md:p-6 bg-white rounded-xl shadow-md space-y-4">
-
               {/* Shelf Name / Code */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Shelf Name / Code <span className="text-newPrimary">*</span>
+                  Shelf Name / Code <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -375,7 +372,7 @@ const ShelveLocation = () => {
               {/* Description */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Description <span className="text-newPrimary">*</span>
+                  Description <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"

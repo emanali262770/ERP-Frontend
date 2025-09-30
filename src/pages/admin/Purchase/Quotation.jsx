@@ -577,7 +577,7 @@ const Quotation = () => {
                     : "Add a New Quotation"}
                 </h2>
                 <button
-                  className="text-2xl text-gray-500 hover:text-gray-700"
+                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                   onClick={resetForm}
                 >
                   ×

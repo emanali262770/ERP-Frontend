@@ -463,7 +463,7 @@ const GroupManagement = () => {
             <div className="p-4 md:p-6 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-1">
-                  Group Name <span className="text-newPrimary">*</span>
+                  Group Name <span className="text-red-500">*</span>
                 </label>
                 <div className="relative">
                   <FiUsers className="absolute left-3 top-3 text-gray-400" />
@@ -518,7 +518,7 @@ const GroupManagement = () => {
                 </div>
               </div>
 
-              <div className="flex justify-end gap-3 pt-4">
+              <div className="flex justify-end gap-3">
                 <button
                   className="px-4 md:px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                   onClick={() => {

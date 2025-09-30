@@ -233,33 +233,74 @@ const ItemList = () => {
     setEnabled(true);
     setImage(null);
     setImagePreview(null);
+    setExpiryOption("NoExpiry");
+    setExpiryDay("");
+  };
+  // form validation
+  const validateForm = () => {
+    let errors = [];
+
+    if (!itemCategory.id) errors.push("Item Category is required");
+    if (!itemType) errors.push("Item Type is required");
+    if (!itemKind) errors.push("Item Kind is required");
+    if (!manufacture) errors.push("Manufacturer is required");
+    if (!supplier) errors.push("Supplier is required");
+    if (!shelveLocation) errors.push("Shelf Location is required");
+    if (!itemName) errors.push("Item Name is required");
+    if (!itemUnit) errors.push("Item Unit is required");
+    if (!purchase) errors.push("Purchase is required");
+    if (!sales) errors.push("Sales is required");
+    if (!stock) errors.push("Stock is required");
+    if (!barcode) errors.push("Barcode is required");
+    if (!image && !imagePreview) errors.push("Product image is required");
+
+    // expiry ke liye special case
+    if (expiryOption === "HasExpiry" && !expiryDay) {
+      errors.push("Expiry day is required when Has Expiry is selected");
+    }
+
+    return errors;
   };
 
   // Save or Update Item
   const handleSave = async () => {
     // console.log("Item ", itemCategory);
+    const errors = validateForm();
+    if (errors.length > 0) {
+      Swal.fire({
+        icon: "error",
+        title: "Validation Error",
+        html: errors.join("<br/>"),
+      });
+      return;
+    }
 
     const formData = new FormData();
 
-    formData.append("itemCategory", itemCategory.id); // ✅ ObjectId
-    formData.append("itemType", itemType); // ✅ ObjectId
     formData.append("itemName", itemName);
-    // formData.append("details", details);
+    formData.append("itemCategory", itemCategory.id);
     formData.append("manufacturer", manufacture);
     formData.append("supplier", supplier);
+    formData.append("purchase", parseFloat(purchase) || 0);
+    formData.append("itemType", itemType);
+    formData.append("stock", parseInt(stock) || 0);
+    formData.append("price", parseFloat(sales) || 0);
     formData.append("shelveLocation", shelveLocation);
     formData.append("itemUnit", itemUnit);
     formData.append("perUnit", parseInt(perUnit) || 0);
-    formData.append("purchase", parseFloat(purchase) || 0);
-    formData.append("price", parseFloat(sales) || 0);
-    formData.append("stock", parseInt(stock) || 0);
-    formData.append("secondaryBarcode", barcode);
     formData.append("reorder", parseInt(reorder) || 0);
-    formData.append("hasExpiray", parseInt(expiryDay) || 0);
     formData.append("isEnable", enabled);
-
+    formData.append("secondaryBarcode", barcode);
+    formData.append("itemKind", itemKind);
+    // ✅ expiry logic
+    if (expiryOption === "HasExpiry") {
+      formData.append("hasExpiry", parseInt(expiryDay) || 0);
+      formData.append("noHasExpiray", false); // explicit
+    } else {
+      formData.append("noHasExpiray", true); // no expiry case
+    }
     if (image) {
-      formData.append("itemImage", image); // ✅ append actual file, not preview
+      formData.append("itemImage", image);
     }
 
     console.log("Form Data", [...formData.entries()]);
@@ -317,31 +358,50 @@ const ItemList = () => {
     setEnabled(false);
     setImagePreview("");
     setImage(null);
+    setExpiryOption("NoExpiry");
+    setExpiryDay("");
   };
   // Edit Item
   const handleEdit = (item) => {
-    console.log("Item", item);
-
+    console.log("Item", item.hasExpiray);
     setIsEdit(true);
     setEditId(item._id);
 
-    // Dropdowns ke liye _id set karo
-    setItemCategory(item?.itemCategory?._id || "");
+    // Dropdowns
+    setItemCategory({
+      id: item?.itemCategory?._id || "",
+      name: item?.itemCategory?.categoryName || "",
+    });
     setManufacture(item?.manufacturer?._id || "");
     setSupplier(item?.supplier?._id || "");
     setShelveLocation(item?.shelveLocation?._id || "");
     setItemUnit(item?.itemUnit?._id || "");
+    setItemType(item?.itemType?._id || "");
 
     // Normal fields
     setItemName(item.itemName || "");
-    setDetails(item.details || "");
     setPerUnit(item.perUnit ? item.perUnit.toString() : "");
     setPurchase(item.purchase ? item.purchase.toString() : "");
-    setSales(item.sales ? item.sales.toString() : "");
+    setSales(item.price ? item.price.toString() : "");
     setStock(item.stock ? item.stock.toString() : "");
-    setPrice(item.price ? item.price.toString() : "");
-    setBarcode(item.labelBarcode || "");
+    setBarcode(item.secondaryBarcode || "");
     setReorder(item.reorder ? item.reorder.toString() : "");
+    setItemKind(item.itemKind || "");
+
+    // ✅ Expiry fields
+    if (item.noHasExpiray) {
+      // case: No Expiry
+      setExpiryOption("NoExpiry");
+      setExpiryDay("");
+    } else if (item.hasExpiray && item.hasExpiray > 0) {
+      // case: Has Expiry
+      setExpiryOption("HasExpiry");
+      setExpiryDay(item.hasExpiray.toString());
+    } else {
+      // default safe fallback
+      setExpiryOption("NoExpiry");
+      setExpiryDay("");
+    }
 
     // Enable/Disable
     setEnabled(item.isEnable !== undefined ? item.isEnable : true);
@@ -466,13 +526,17 @@ const ItemList = () => {
             </div>
 
             {/* Body */}
-            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
               {loading ? (
                 <TableSkeleton
                   rows={itemList.length || 5}
                   cols={userInfo?.isAdmin ? 7 : 6}
                   className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
                 />
+              ) : itemList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No Items found.
+                </div>
               ) : (
                 itemList.map((item, index) => (
                   <div
@@ -517,10 +581,16 @@ const ItemList = () => {
                     {/* Actions */}
                     {userInfo?.isAdmin && (
                       <div className="flex justify-end gap-3">
-                        <button className="text-blue-500 hover:underline">
+                        <button
+                          onClick={() => handleEdit(item)}
+                          className="text-blue-500 hover:underline"
+                        >
                           <SquarePen size={18} />
                         </button>
-                        <button className="text-red-500 hover:underline">
+                        <button
+                          onClick={() => handleDelete(item._id)}
+                          className="text-red-500 hover:underline"
+                        >
                           <Trash2 size={18} />
                         </button>
                       </div>
@@ -581,7 +651,7 @@ const ItemList = () => {
                     Item Category <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={itemCategory}
+                    value={itemCategory.id}
                     required
                     onChange={handleCategoryChange}
                     className="w-full p-2 border rounded"
@@ -628,10 +698,10 @@ const ItemList = () => {
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Select Item kind</option>
-                    <option value="">Raw Material</option>
-                    <option value="">Finished Goods</option>
-                    <option value="">Ready to Ship</option>
-                    <option value="">Services</option>
+                    <option value="Raw Material">Raw Material</option>
+                    <option value="Finished Goods">Finished Goods</option>
+                    <option value="Ready to Ship">Ready to Ship</option>
+                    <option value="Services">Services</option>
                   </select>
                 </div>
               </div>
@@ -967,7 +1037,7 @@ const ItemList = () => {
                 className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                 onClick={handleSave}
               >
-                Save Item
+                {isEdit ? "Update Item" : "Save Item"}
               </button>
             </div>
           </div>

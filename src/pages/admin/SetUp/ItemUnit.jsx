@@ -25,7 +25,6 @@ const ItemUnit = () => {
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
-
   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
@@ -50,7 +49,6 @@ const ItemUnit = () => {
           }
         },
       });
-
     }
   }, [isSliderOpen]);
 
@@ -311,7 +309,6 @@ const ItemUnit = () => {
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;
-
               </button>
             </div>
 
@@ -319,7 +316,7 @@ const ItemUnit = () => {
               {/* Unit Name */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Unit Name <span className="text-newPrimary">*</span>
+                  Unit Name
                 </label>
                 <input
                   type="text"
@@ -333,7 +330,7 @@ const ItemUnit = () => {
               {/* Description */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Description <span className="text-newPrimary">*</span>
+                  Description
                 </label>
                 <input
                   type="text"

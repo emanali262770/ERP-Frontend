@@ -20,7 +20,7 @@ const QualityChecking = () => {
   const [editingQC, setEditingQC] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
- // 🔹 QC Modal states
+  // 🔹 QC Modal states
   const [qcModalOpen, setQcModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [modalRemarks, setModalRemarks] = useState("");
@@ -46,26 +46,25 @@ const QualityChecking = () => {
     setQcModalOpen(false);
   };
   // 🔹 Add this static mapping at the top of your component
-const gatePassItems = {
-  GP001: [
-    { id: 1, name: "Laptop", qty: 5, price: 50000 },
-    { id: 2, name: "Notebook", qty: 10, price: 200 },
-  ],
-  GP002: [
-    { id: 3, name: "Keyboard", qty: 15, price: 1500 },
-    { id: 4, name: "Mouse", qty: 20, price: 700 },
-  ],
-};
+  const gatePassItems = {
+    GP001: [
+      { id: 1, name: "Laptop", qty: 5, price: 50000 },
+      { id: 2, name: "Notebook", qty: 10, price: 200 },
+    ],
+    GP002: [
+      { id: 3, name: "Keyboard", qty: 15, price: 1500 },
+      { id: 4, name: "Mouse", qty: 20, price: 700 },
+    ],
+  };
 
-// 🔹 Whenever gpId changes, load items
-useEffect(() => {
-  if (gpId && gatePassItems[gpId]) {
-    setItemsList(gatePassItems[gpId]);
-  } else {
-    setItemsList([]);
-  }
-}, [gpId]);
-
+  // 🔹 Whenever gpId changes, load items
+  useEffect(() => {
+    if (gpId && gatePassItems[gpId]) {
+      setItemsList(gatePassItems[gpId]);
+    } else {
+      setItemsList([]);
+    }
+  }, [gpId]);
 
   // Static data
   const staticData = [
@@ -314,7 +313,7 @@ useEffect(() => {
                   {editingQC ? "Update Quality Check" : "Add Quality Check"}
                 </h2>
                 <button
-                  className="w-8 h-8 bg-newPrimary text-white rounded-full"
+                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                   onClick={resetForm}
                 >
                   ×
@@ -326,7 +325,7 @@ useEffect(() => {
                   {/* QC ID */}
                   <div>
                     <label className="block text-gray-700 font-medium mb-1">
-                      QC ID *
+                      QC ID <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -342,7 +341,7 @@ useEffect(() => {
                   {/* Date */}
                   <div>
                     <label className="block text-gray-700 font-medium mb-1">
-                      Date *
+                      Date <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="date"
@@ -359,7 +358,7 @@ useEffect(() => {
                 {/* Gate Pass In ID */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
-                    Gate Pass In Id *
+                    Gate Pass In Id <span className="text-red-500">*</span>
                   </label>
                   <select
                     value={gpId}
@@ -376,7 +375,6 @@ useEffect(() => {
                   )}
                 </div>
 
-                
                 {gpId && itemsList.length > 0 && (
                   <table className="w-full border mt-4">
                     <thead className="bg-gray-100">
@@ -419,9 +417,6 @@ useEffect(() => {
                     </tbody>
                   </table>
                 )}
-
-              
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
                     Description
@@ -491,7 +486,7 @@ useEffect(() => {
           </div>
         )}
 
-           {/* QC Modal */}
+        {/* QC Modal */}
         {qcModalOpen && (
           <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
             <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-6">
