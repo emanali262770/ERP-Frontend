@@ -124,6 +124,9 @@ const PurchaseReturn = () => {
       }
     });
   };
+   function handleRemoveItem(index) {
+    setItems(items.filter((_, i) => i !== index));
+  }
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -273,39 +276,34 @@ const PurchaseReturn = () => {
               <div>
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
                 <div className="flex gap-3 mb-3">
-                  <input
-                    type="text"
-                    placeholder="Item Name"
-                    value={itemName}
-                    onChange={(e) => setItemName(e.target.value)}
-                    readOnly
-                    className="flex-1 p-2 border rounded"
-                  />
+                <select onClick={itemName} name="" id="" className="w-full p-2 border rounded">
+                    <option value="">Select Item Name</option>
+                  </select>
                   <input
                     type="number"
                     placeholder="Qty"
                     value={qty}
                     onChange={(e) => setQty(e.target.value)}
-                    className="w-24 p-2 border rounded"
+                    className="w-full p-2 border rounded"
                   />
                   <input
                     type="number"
                     placeholder="Damage"
                     value={damageQty}
                     onChange={(e) => setDamageQty(e.target.value)}
-                    className="w-24 p-2 border rounded"
+                    className="w-full p-2 border rounded"
                   />
                   <input
                     type="number"
                     placeholder="Good"
                     value={goodQty}
                     onChange={(e) => setGoodQty(e.target.value)}
-                    className="w-24 p-2 border rounded"
+                    className="w-full p-2 border rounded"
                   />
                   <button
                     type="button"
                     onClick={handleAddItem}
-                    className="px-3 bg-newPrimary text-white rounded"
+                    className="px-3 flex-shrink-0 bg-newPrimary text-white rounded"
                   >
                     + Add
                   </button>
@@ -320,15 +318,21 @@ const PurchaseReturn = () => {
                         <th className="border px-2 py-1">Qty</th>
                         <th className="border px-2 py-1">Damage</th>
                         <th className="border px-2 py-1">Good</th>
+                        <th className="border px-2 py-1">Remove</th>
                       </tr>
                     </thead>
                     <tbody>
                       {items.map((it) => (
                         <tr key={it.id}>
-                          <td className="border px-2 py-1">{it.name}</td>
-                          <td className="border px-2 py-1">{it.qty}</td>
-                          <td className="border px-2 py-1">{it.damage}</td>
-                          <td className="border px-2 py-1">{it.good}</td>
+                          <td className="border text-center px-2 py-1">{it.name}</td>
+                          <td className="border text-center px-2 py-1">{it.qty}</td>
+                          <td className="border text-center px-2 py-1">{it.damage}</td>
+                          <td className="border text-center px-2 py-1">{it.good}</td>
+                           <td className="px-4 py-2 border-b text-center">
+                              <button onClick={() => handleRemoveItem(idx)}>
+                                <X size={18} className="text-red-600" />
+                              </button>
+                            </td>
                         </tr>
                       ))}
                     </tbody>
