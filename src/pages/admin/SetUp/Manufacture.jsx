@@ -28,7 +28,6 @@ const Manufacture = () => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/manufacturers`;
 
-
   // GSAP Animation for Modal
   useEffect(() => {
     if (isSliderOpen) {
@@ -91,7 +90,6 @@ const Manufacture = () => {
 
   const handleSave = async () => {
     const formData = {
-
       manufacturerName: manufacturerName,
 
       address,
@@ -110,7 +108,7 @@ const Manufacture = () => {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       };
-      
+
       if (isEdit && editId) {
         // 🔄 Update existing category
         const res = await axios.put(`${API_URL}/${editId}`, formData, {
@@ -118,7 +116,6 @@ const Manufacture = () => {
         });
 
         toast.success(" Manufacturer updated successfully");
-
       } else {
         const res = await axios.post(API_URL, formData, {
           headers,
@@ -126,7 +123,6 @@ const Manufacture = () => {
 
         toast.success(" Manufacturer added successfully");
       }
-
 
       setManufacturerId("");
       setManufacturerName("");
@@ -249,120 +245,120 @@ const Manufacture = () => {
 
       {/* Manufacturer Table */}
 
+      <div className="rounded-xl border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="min-w-[900px]">
+            {/* ✅ Table Header (desktop only) */}
+            <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div>Name</div>
+              <div>Contact</div>
+              <div>Email</div>
+              <div>Address</div>
+              <div>Phone</div>
+              <div>Status</div>
+              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
+            </div>
 
+            {/* ✅ Table Body */}
+            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={
+                    manufacturerList.length > 0 ? manufacturerList.length : 5
+                  }
+                  cols={userInfo?.isAdmin ? 7 : 6}
+                  className="lg:grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto]"
+                />
+              ) : manufacturerList.length === 0 ? (
+                <div className="text-center py-4 text-gray-500 bg-white">
+                  No manufacturers found.
+                </div>
+              ) : (
+                manufacturerList.map((m) => (
+                  <>
+                    {/* ✅ Desktop Row */}
+                    <div
+                      key={m._id}
+                      className="hidden lg:grid grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      <div className="font-medium text-gray-900">
+                        {m.manufacturerName}
+                      </div>
+                      <div className="text-gray-600">{m.personName}</div>
+                      <div className="text-gray-600">{m.email || "—"}</div>
+                      <div className="text-gray-600 truncate">{m.address}</div>
+                      <div className="text-gray-600">{m.phoneNumber}</div>
+                      <div className="font-semibold">
+                        {m.status ? (
+                          <span className="text-green-600">Active</span>
+                        ) : (
+                          <span className="text-red-600">Inactive</span>
+                        )}
+                      </div>
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => handleEdit(m)}
+                            className="text-blue-600 hover:underline"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(m._id)}
+                            className="text-red-600 hover:underline"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
-    <div className="rounded-xl border border-gray-200 overflow-hidden">
-  <div className="overflow-x-auto">
-    <div className="min-w-[900px]">
-      {/* ✅ Table Header (desktop only) */}
-      <div className="hidden lg:grid grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-        <div>Name</div>
-        <div>Contact</div>
-        <div>Email</div>
-        <div>Address</div>
-        <div>Phone</div>
-        <div>Status</div>
-        {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-      </div>
+                    {/* ✅ Mobile Card */}
+                    <div
+                      key={`mobile-${m._id}`}
+                      className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
+                    >
+                      <h3 className="font-semibold text-gray-800">
+                        {m.manufacturerName}
+                      </h3>
+                      <p className="text-sm text-gray-600">{m.personName}</p>
+                      <p className="text-sm text-gray-600">{m.email || "—"}</p>
+                      <p className="text-sm text-gray-600 truncate">
+                        {m.address}
+                      </p>
+                      <p className="text-sm text-gray-600">{m.phoneNumber}</p>
+                      <p
+                        className={`text-sm font-semibold ${
+                          m.status ? "text-green-600" : "text-red-600"
+                        }`}
+                      >
+                        {m.status ? "Active" : "Inactive"}
+                      </p>
 
-      {/* ✅ Table Body */}
-      <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-        {loading ? (
-          <TableSkeleton
-            rows={manufacturerList.length > 0 ? manufacturerList.length : 5}
-            cols={userInfo?.isAdmin ? 7 : 6}
-            className="lg:grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto]"
-          />
-        ) : manufacturerList.length === 0 ? (
-          <div className="text-center py-4 text-gray-500 bg-white">
-            No manufacturers found.
+                      {userInfo?.isAdmin && (
+                        <div className="mt-3 flex justify-end gap-3">
+                          <button
+                            className="text-blue-500"
+                            onClick={() => handleEdit(m)}
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            className="text-red-500"
+                            onClick={() => handleDelete(m._id)}
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  </>
+                ))
+              )}
+            </div>
           </div>
-        ) : (
-          manufacturerList.map((m) => (
-            <>
-              {/* ✅ Desktop Row */}
-              <div
-                key={m._id}
-                className="hidden lg:grid grid-cols-[1.5fr_1fr_1.5fr_2fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-              >
-                <div className="font-medium text-gray-900">
-                  {m.manufacturerName}
-                </div>
-                <div className="text-gray-600">{m.personName}</div>
-                <div className="text-gray-600">{m.email || "—"}</div>
-                <div className="text-gray-600 truncate">{m.address}</div>
-                <div className="text-gray-600">{m.phoneNumber}</div>
-                <div className="font-semibold">
-                  {m.status ? (
-                    <span className="text-green-600">Active</span>
-                  ) : (
-                    <span className="text-red-600">Inactive</span>
-                  )}
-                </div>
-                {userInfo?.isAdmin && (
-                  <div className="flex justify-end gap-3">
-                    <button
-                      onClick={() => handleEdit(m)}
-                      className="text-blue-600 hover:underline"
-                    >
-                      <SquarePen size={18} />
-                    </button>
-                    <button
-                      onClick={() => handleDelete(m._id)}
-                      className="text-red-600 hover:underline"
-                    >
-
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* ✅ Mobile Card */}
-              <div
-                key={`mobile-${m._id}`}
-                className="lg:hidden bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-4"
-              >
-                <h3 className="font-semibold text-gray-800">
-                  {m.manufacturerName}
-                </h3>
-                <p className="text-sm text-gray-600">{m.personName}</p>
-                <p className="text-sm text-gray-600">{m.email || "—"}</p>
-                <p className="text-sm text-gray-600 truncate">{m.address}</p>
-                <p className="text-sm text-gray-600">{m.phoneNumber}</p>
-                <p
-                  className={`text-sm font-semibold ${
-                    m.status ? "text-green-600" : "text-red-600"
-                  }`}
-                >
-                  {m.status ? "Active" : "Inactive"}
-                </p>
-
-                {userInfo?.isAdmin && (
-                  <div className="mt-3 flex justify-end gap-3">
-                    <button
-                      className="text-blue-500"
-                      onClick={() => handleEdit(m)}
-                    >
-                      <SquarePen size={18} />
-                    </button>
-                    <button
-                      className="text-red-500"
-                      onClick={() => handleDelete(m._id)}
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  </div>
-                )}
-              </div>
-            </>
-          ))
-        )}
+        </div>
       </div>
-    </div>
-  </div>
-</div>
-
 
       {/* Slider */}
       {isSliderOpen && (
@@ -376,9 +372,7 @@ const Manufacture = () => {
                 {isEdit ? "Update Manufacturer" : "Add a New Manufacturer"}
               </h2>
               <button
-
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
-
                 onClick={() => {
                   setIsSliderOpen(false);
                   setIsEdit(false);
@@ -401,7 +395,7 @@ const Manufacture = () => {
             <div className="space-y-4 p-4 md:p-6">
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Manufacturer Name <span className="text-newPrimary">*</span>
+                  Manufacturer Name <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -413,7 +407,7 @@ const Manufacture = () => {
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Address <span className="text-newPrimary">*</span>
+                  Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -425,7 +419,7 @@ const Manufacture = () => {
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Phone Number <span className="text-newPrimary">*</span>
+                  Phone Number <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -438,7 +432,7 @@ const Manufacture = () => {
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Email Address <span className="text-newPrimary">*</span>
+                  Email Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="email"
@@ -451,7 +445,7 @@ const Manufacture = () => {
 
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Contact Person<span className="text-newPrimary">*</span>
+                  Contact Person <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -461,27 +455,12 @@ const Manufacture = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Mobile Number <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={mobileNumber}
-                  required
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. +82-10-9876-5432"
-                />
-              </div>
-
 
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Status</label>
                 <button
                   type="button"
                   onClick={() => setStatus(!status)}
-
                   className={`w-14 h-7 flex items-center rounded-full p-1 transition-colors duration-300 ${
                     status ? "bg-green-500" : "bg-gray-300"
                   }`}
@@ -490,7 +469,6 @@ const Manufacture = () => {
                     className={`w-5 h-5 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
                       status ? "translate-x-7" : "translate-x-0"
                     }`}
-
                   />
                 </button>
                 <span>{status ? "Active" : "Inactive"}</span>
@@ -500,7 +478,6 @@ const Manufacture = () => {
                 onClick={handleSave}
               >
                 {isEdit ? "Update Manufacturer" : "Save Manufacturer"}
-
               </button>
             </div>
           </div>

@@ -619,8 +619,7 @@ const SupplierList = () => {
                 <div className="flex gap-4">
                   <div className="w-1/2">
                     <label className="block text-gray-700 font-medium">
-                      Credit Time Limit{" "}
-                      <span className="text-newPrimary">*</span>
+                      Credit Time Limit <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"
@@ -632,8 +631,7 @@ const SupplierList = () => {
                   </div>
                   <div className="w-1/2">
                     <label className="block text-gray-700 font-medium">
-                      Credit Cash Limit{" "}
-                      <span className="text-newPrimary">*</span>
+                      Credit Cash Limit <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="number"

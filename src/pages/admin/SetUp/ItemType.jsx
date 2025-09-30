@@ -50,7 +50,6 @@ const ItemType = () => {
           }
         },
       });
-
     }
   }, [isSliderOpen]);
 
@@ -360,7 +359,6 @@ const ItemType = () => {
                 onClick={() => setIsSliderOpen(false)}
               >
                 &times;
-
               </button>
             </div>
 
@@ -368,7 +366,7 @@ const ItemType = () => {
               {/* Item Category */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Item Category Id <span className="text-newPrimary">*</span>
+                  Item Category Id <span className="text-red-500">*</span>
                 </label>
                 <select
                   value={itemCategory}
@@ -388,7 +386,7 @@ const ItemType = () => {
               {/* Unit Name */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Item Type<span className="text-newPrimary">*</span>
+                  Item Type <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
