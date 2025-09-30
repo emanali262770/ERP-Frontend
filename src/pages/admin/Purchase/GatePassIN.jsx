@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const GatepassIn = () => {
   const [gatepasses, setGatepasses] = useState([]);
@@ -24,42 +25,25 @@ const GatepassIn = () => {
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
 
-  // Static data for gatepasses with itemsList
-  const staticData = [
-    {
-      _id: "1",
-      gatepassId: "GP001",
-      driverName: "Ali Khan",
-      itemsCategory: "Electronics",
-      supplier: "ABC Corp",
-      items: [{ name: "Laptop", qty: 5, units: "Units" }],
-      date: "2025-09-01",
-      status: true,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      _id: "2",
-      gatepassId: "GP002",
-      driverName: "Ahmed Raza",
-      itemsCategory: "Stationery",
-      supplier: "XYZ Ltd",
-      items: [{ name: "Notebooks", qty: 10, units: "Packs" }],
-      date: "2025-09-15",
-      status: false,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      _id: "3",
-      gatepassId: "GP003",
-      driverName: "Usman Ali",
-      itemsCategory: "IT Equipment",
-      supplier: "Tech Solutions",
-      items: [{ name: "Monitor", qty: 3, units: "Units" }],
-      date: "2025-09-20",
-      status: true,
-      createdAt: new Date().toISOString(),
-    },
-  ];
+ 
+
+    const API_URL = `${import.meta.env.VITE_API_BASE_URL}/gatePassIn`;
+  // gate pass inn fetch
+    const fetchGatePassInn = useCallback(async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`${API_URL}`);
+        setGatepasses(res.data); // store actual categories array
+        console.log("gate pass Inn  ", res.data);
+      } catch (error) {
+        console.error("Failed to fetch Supplier", error);
+      } finally {
+        setTimeout(() => setLoading(false), 1000);
+      }
+    }, []);
+    useEffect(() => {
+      fetchGatePassInn();
+    }, [fetchGatePassInn]);
 
   // Format date for display
   const formatDate = (date) => {
@@ -71,12 +55,7 @@ const GatepassIn = () => {
     return `${day}-${month}-${year}`;
   };
 
-  // Load static data on mount
-  useEffect(() => {
-    setLoading(true);
-    setGatepasses(staticData);
-    setTimeout(() => setLoading(false), 1000); // Simulate loading for 1 second
-  }, []);
+ 
 
   // Reset form fields
   const resetForm = () => {
