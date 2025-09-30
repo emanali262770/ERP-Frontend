@@ -57,7 +57,6 @@ const SupplierList = () => {
           }
         },
       });
-
     }
   }, [isSliderOpen]);
 
@@ -96,7 +95,6 @@ const SupplierList = () => {
     setNtn("");
     setGst("");
     setCreditLimit("");
-
 
     setStatus(true);
   };
@@ -152,16 +150,13 @@ const SupplierList = () => {
       if (isEdit && editId) {
         res = await axios.put(`${API_URL}/${editId}`, formData, { headers });
 
-
         toast.success(" Supplier updated successfully");
-
       } else {
         res = await axios.post(`${API_URL}`, formData, { headers });
 
         setSupplierList([...supplierList, res.data]);
 
         toast.success("Supplier added successfully");
-
       }
       fetchSuppliersList();
       setSupplierName("");
@@ -175,7 +170,7 @@ const SupplierList = () => {
       setNtn("");
       setGst("");
       setCreditLimit("");
-      setCreditTime("")
+      setCreditTime("");
       setStatus(true);
       setIsSliderOpen(false);
       setIsEdit(false);
@@ -349,11 +344,13 @@ const SupplierList = () => {
                       </div>
                       <div className=" font-semibold">
                         {s.status ? (
-
-                          <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Active</span>
+                          <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">
+                            Active
+                          </span>
                         ) : (
-                          <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Inactive</span>
-
+                          <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">
+                            Inactive
+                          </span>
                         )}
                       </div>
                       {userInfo?.isAdmin && (
@@ -429,21 +426,17 @@ const SupplierList = () => {
 
       {/* Slider */}
       {isSliderOpen && (
-
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
-
+            className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
                 {isEdit ? "Update Supplier" : "Add a New Supplier"}
               </h2>
               <button
-
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
-
                 onClick={() => {
                   setIsSliderOpen(false);
                   setIsEdit(false);
@@ -468,74 +461,92 @@ const SupplierList = () => {
 
             <div className="space-y-4 p-4 md:p-6">
               {/* Supplier Fields */}
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Supplier Name <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={supplierName}
-                  required
-                  onChange={(e) => setSupplierName(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>n
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Phone Number <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={phoneNumber}
-                  required
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. +1-212-555-1234"
-                />
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Supplier Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={supplierName}
+                    required
+                    onChange={(e) => setSupplierName(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={phoneNumber}
+                    required
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="e.g. +1-212-555-1234"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Mobile Number <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={mobileNumber}
-                  required
-                  onChange={(e) => setMobileNumber(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. 03001234567"
-                />
-              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Mobile Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={mobileNumber}
+                    required
+                    onChange={(e) => setMobileNumber(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="e.g. 03001234567"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Email Address <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="email"
-                  value={email}
-                  required
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Email Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    required
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
               </div>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Contact Person <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={contactPerson}
+                    required
+                    onChange={(e) => setContactPerson(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Contact Person <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={contactPerson}
-                  required
-                  onChange={(e) => setContactPerson(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Designation <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={designation}
+                    required
+                    onChange={(e) => setDesignation(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="e.g. Sales Manager"
+                  />
+                </div>
               </div>
-
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Address <span className="text-newPrimary">*</span>
+                  Address <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -545,54 +556,40 @@ const SupplierList = () => {
                   className="w-full p-2 border rounded"
                 />
               </div>
-              
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Designation <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={designation}
-                  required
-                  onChange={(e) => setDesignation(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. Sales Manager"
-                />
-              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    NTN <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={ntn}
+                    required
+                    onChange={(e) => setNtn(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="e.g. NTN123456789"
+                  />
+                </div>
 
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  NTN <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={ntn}
-                  required
-                  onChange={(e) => setNtn(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. NTN123456789"
-                />
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    GST <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={gst}
+                    required
+                    onChange={(e) => setGst(e.target.value)}
+                    className="w-full p-2 border rounded"
+                    placeholder="e.g. 27ABCDE1234F1Z5"
+                  />
+                </div>
               </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  GST <span className="text-newPrimary">*</span>
-                </label>
-                <input
-                  type="text"
-                  value={gst}
-                  required
-                  onChange={(e) => setGst(e.target.value)}
-                  className="w-full p-2 border rounded"
-                  placeholder="e.g. 27ABCDE1234F1Z5"
-                />
-              </div>
-
               {/* Payment Terms */}
 
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Payment Terms <span className="text-newPrimary">*</span>
+                  Payment Terms <span className="text-red-500">*</span>
                 </label>
                 <div className="flex gap-4">
                   <label className="flex items-center gap-2">
@@ -668,7 +665,6 @@ const SupplierList = () => {
                 </button>
                 <span>{status ? "Active" : "Inactive"}</span>
               </div>
-
 
               {/* Save Button */}
 

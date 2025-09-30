@@ -7,7 +7,6 @@ import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "../Skeleton";
 import axios from "axios";
 
-
 const Employee = () => {
   const [employeeList, setEmployeeList] = useState([]);
 
@@ -72,7 +71,6 @@ const Employee = () => {
       setTimeout(() => {
         setLoading(false);
       }, 2000);
-
     }
   }, []);
   useEffect(() => {
@@ -282,13 +280,11 @@ const Employee = () => {
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
                 <TableSkeleton
-
-                  rows={employeeList.length > 0 ? employeeList.length : 5} 
+                  rows={employeeList.length > 0 ? employeeList.length : 5}
                   cols={9}
                   className="lg:grid-cols-9"
                 />
-              )  : employeeList.length === 0 ? (
-
+              ) : employeeList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No employee found.
                 </div>
@@ -311,11 +307,13 @@ const Employee = () => {
                     <div className="text-gray-600">{emp?.qualification}</div>
                     <div className=" font-semibold">
                       {emp?.isEnable ? (
-
-                        <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">Enabled</span>
+                        <span className="text-green-600 bg-green-50 px-3 py-1 rounded-[5px]">
+                          Enabled
+                        </span>
                       ) : (
-                        <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">Disabled</span>
-
+                        <span className="text-red-600 bg-red-50 px-3 py-1 rounded-[5px]">
+                          Disabled
+                        </span>
                       )}
                     </div>
 
@@ -346,7 +344,7 @@ const Employee = () => {
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
           <div
             ref={sliderRef}
-            className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+            className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
@@ -376,122 +374,136 @@ const Employee = () => {
             </div>
 
             <div className="space-y-4 p-4 md:p-6">
-              <div>
-                <label className="block text-gray-700 font-medium">Name</label>
-                <input
-                  type="text"
-                  value={employeeName}
-                  onChange={(e) => setEmployeeName(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Name <span className="text-red-500">*</span>{" "}
+                  </label>
+                  <input
+                    type="text"
+                    value={employeeName}
+                    onChange={(e) => setEmployeeName(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Department <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Department</option>
+                    {departmentList.map((dept) => (
+                      <option key={dept._id} value={dept.departmentName}>
+                        {dept.departmentName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Department
-                </label>
-                <select
-                  value={department}
-                  onChange={(e) => setDepartment(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Department</option>
-                  {departmentList.map((dept) => (
-                    <option key={dept._id} value={dept.departmentName}>
-                      {dept.departmentName}
-                    </option>
-                  ))}
-                </select>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Address <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={address}
+                    onChange={(e) => setAddress(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    City <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
               </div>
-
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Address
-                </label>
-                <input
-                  type="text"
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Gender <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    value={gender}
+                    onChange={(e) => setGender(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  >
+                    <option value="">Select Gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Phone Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={phoneNumber}
+                    onChange={(e) => setPhoneNumber(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">City</label>
-                <input
-                  type="text"
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    NIC <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={nic}
+                    onChange={(e) => setNic(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Date of Birth <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="date"
+                    value={dob}
+                    onChange={(e) => setDob(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Gender
-                </label>
-                <select
-                  value={gender}
-                  onChange={(e) => setGender(e.target.value)}
-                  className="w-full p-2 border rounded"
-                >
-                  <option value="">Select Gender</option>
-                  <option value="Male">Male</option>
-                  <option value="Female">Female</option>
-                  <option value="Other">Other</option>
-                </select>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Qualification <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={qualification}
+                    onChange={(e) => setQualification(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium">
+                    Blood Group <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={bloodGroup}
+                    onChange={(e) => setBloodGroup(e.target.value)}
+                    className="w-full p-2 border rounded"
+                  />
+                </div>
               </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Phone Number
-                </label>
-                <input
-                  type="text"
-                  value={phoneNumber}
-                  onChange={(e) => setPhoneNumber(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">NIC</label>
-                <input
-                  type="text"
-                  value={nic}
-                  onChange={(e) => setNic(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Date of Birth
-                </label>
-                <input
-                  type="date"
-                  value={dob}
-                  onChange={(e) => setDob(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Qualification
-                </label>
-                <input
-                  type="text"
-                  value={qualification}
-                  onChange={(e) => setQualification(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-              <div>
-                <label className="block text-gray-700 font-medium">
-                  Blood Group
-                </label>
-                <input
-                  type="text"
-                  value={bloodGroup}
-                  onChange={(e) => setBloodGroup(e.target.value)}
-                  className="w-full p-2 border rounded"
-                />
-              </div>
-
               {/* Enable Toggle */}
               <div className="flex items-center gap-3">
                 <label className="text-gray-700 font-medium">Enable</label>

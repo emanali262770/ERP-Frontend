@@ -47,6 +47,7 @@ import Designation from "./pages/admin/Mangement/Designation.jsx";
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
 import PurchaseOrder from "./pages/admin/Purchase/PurchaseOrder.jsx";
+
 import RateList from "./pages/admin/Sales/RateList.jsx";
 import DistributionRateList from "./pages/admin/Sales/DistributionRateList.jsx";
 import BookingOrders from "./pages/admin/Sales/BookingOrders.jsx";
@@ -57,6 +58,9 @@ import CustomerLedger from "./pages/admin/Sales/CustomerLedger.jsx";
 import Receivable from "./pages/admin/Sales/Receivable.jsx";
 import SalesReturn from "./pages/admin/Sales/SalesReturn.jsx";
 import DeliveryChallanAcknowledgement from "./pages/admin/Sales/DeliveryChallanAcknowledgement.jsx";
+import Profile from "./components/Profile.jsx";
+import PurchaseReturn from "./pages/admin/Purchase/PurchaseReturn.jsx";
+
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -79,6 +83,7 @@ function AppContent() {
           >
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="item-details" element={<ItemList />} />
             <Route path="customers" element={<CustomerData />} />
             <Route path="shelve-location" element={<ShelveLocation />} />
@@ -102,6 +107,7 @@ function AppContent() {
               element={<PurchaseRequisition />}
             />
             <Route path="purchase-approval" element={<PurchaseApproval />} />
+            <Route path="purchase-return" element={<PurchaseReturn />} />
             <Route path="purchase-order" element={<PurchaseOrder/>} />
             <Route path="quotation" element={<Quotation />} />
             <Route path="estimation" element={<Estimation />} />
