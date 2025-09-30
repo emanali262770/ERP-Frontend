@@ -124,6 +124,9 @@ const PurchaseReturn = () => {
       }
     });
   };
+   function handleRemoveItem(index) {
+    setItems(items.filter((_, i) => i !== index));
+  }
 
   function handleRemoveItem(idx) {
     const updatedItems = items.filter((_, index) => index !== idx);
@@ -295,6 +298,7 @@ const PurchaseReturn = () => {
               {/* Items Section Inputs*/}
               <div>
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
+
                 <div className="flex gap-4 mb-3">
                   <div className="flex-1 min-w-0">
                     <input
@@ -332,6 +336,7 @@ const PurchaseReturn = () => {
                       + Add
                     </button>
                   </div>
+
                 </div>
 
                 {/* Items Table */}
@@ -349,6 +354,7 @@ const PurchaseReturn = () => {
                     <tbody>
                       {items.map((it, idx) => (
                         <tr key={it.id}>
+
                           <td className="border text-center px-2 py-1">
                             {it.name}
                           </td>
@@ -366,6 +372,7 @@ const PurchaseReturn = () => {
                               <X size={18} className="text-red-600" />
                             </button>
                           </td>
+
                         </tr>
                       ))}
                     </tbody>
