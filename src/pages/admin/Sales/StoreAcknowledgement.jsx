@@ -8,7 +8,7 @@ const StoreAcknowledgement = () => {
   const [acknowledgements, setAcknowledgements] = useState([
     {
       _id: "1",
-      ackId: "ACK-001",
+      storeId: "ACK-001",
       date: "2025-10-02",
       bookingOrderNo: "ORD-001",
       customer: "cust1",
@@ -16,7 +16,7 @@ const StoreAcknowledgement = () => {
     },
     {
       _id: "2",
-      ackId: "ACK-002",
+      storeId: "ACK-002",
       date: "2025-10-03",
       bookingOrderNo: "ORD-002",
       customer: "cust2",
@@ -93,7 +93,7 @@ const StoreAcknowledgement = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [ackId, setAckId] = useState("");
+  const [storeId, setStoreId] = useState("");
   const [date, setDate] = useState("");
   const [bookingOrderNo, setBookingOrderNo] = useState("");
   const [customer, setCustomer] = useState("");
@@ -110,7 +110,7 @@ const StoreAcknowledgement = () => {
   const [acknowledgedQty, setAcknowledgedQty] = useState("");
   const [editingAcknowledgement, setEditingAcknowledgement] = useState(null);
   const [errors, setErrors] = useState({});
-  const [nextAckId, setNextAckId] = useState("003");
+  const [nextStoreId, setNextStoreId] = useState("003");
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
@@ -143,7 +143,7 @@ const StoreAcknowledgement = () => {
       try {
         setLoading(true);
         const filtered = acknowledgements.filter((ack) =>
-          ack.ackId.toUpperCase().includes(searchTerm.toUpperCase())
+          ack.storeId.toUpperCase().includes(searchTerm.toUpperCase())
         );
         setAcknowledgements(filtered);
       } catch (error) {
@@ -161,13 +161,13 @@ const StoreAcknowledgement = () => {
     if (acknowledgements.length > 0) {
       const maxNo = Math.max(
         ...acknowledgements.map((ack) => {
-          const match = ack.ackId?.match(/ACK-(\d+)/);
+          const match = ack.storeId?.match(/ACK-(\d+)/);
           return match ? parseInt(match[1], 10) : 0;
         })
       );
-      setNextAckId((maxNo + 1).toString().padStart(3, "0"));
+      setNextStoreId((maxNo + 1).toString().padStart(3, "0"));
     } else {
-      setNextAckId("001");
+      setNextStoreId("001");
     }
   }, [acknowledgements]);
 
@@ -191,7 +191,7 @@ const StoreAcknowledgement = () => {
   }, [bookingOrderNo, bookingOrders]);
 
   const resetForm = () => {
-    setAckId("");
+    setStoreId("");
     setDate("");
     setBookingOrderNo("");
     setCustomer("");
@@ -213,7 +213,7 @@ const StoreAcknowledgement = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!ackId && !editingAcknowledgement) newErrors.ackId = "ID is required";
+    if (!storeId && !editingAcknowledgement) newErrors.storeId = "ID is required";
     if (!date) newErrors.date = "Date is required";
     if (!bookingOrderNo) newErrors.bookingOrderNo = "Booking Order # is required";
     if (!acknowledgedQty || isNaN(parseInt(acknowledgedQty)) || parseInt(acknowledgedQty) <= 0) {
@@ -232,7 +232,7 @@ const StoreAcknowledgement = () => {
 
   const handleEditClick = (acknowledgement) => {
     setEditingAcknowledgement(acknowledgement);
-    setAckId(acknowledgement.ackId || "");
+    setStoreId(acknowledgement.storeId || "");
     setDate(acknowledgement.date || "");
     setBookingOrderNo(acknowledgement.bookingOrderNo || "");
     setAcknowledgedQty(acknowledgement.acknowledgedQty || "");
@@ -262,7 +262,7 @@ const StoreAcknowledgement = () => {
     }
 
     const newAcknowledgement = {
-      ackId: editingAcknowledgement ? ackId : `ACK-${nextAckId}`,
+      storeId: editingAcknowledgement ? storeId : `ACK-${nextStoreId}`,
       date,
       bookingOrderNo,
       customer,
@@ -373,7 +373,7 @@ const StoreAcknowledgement = () => {
           <div className="flex items-center gap-3">
             <input
               type="text"
-              placeholder="Enter Ack ID eg: ACK-001"
+              placeholder="Enter Store ID eg: ACK-001"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
@@ -391,7 +391,7 @@ const StoreAcknowledgement = () => {
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1000px]">
               <div className="hidden lg:grid grid-cols-[150px,150px,200px,150px,100px] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>Ack ID</div>
+                <div>Store ID</div>
                 <div>Date</div>
                 <div>Booking Order #</div>
                 <div>Acknowledged Qty</div>
@@ -415,7 +415,7 @@ const StoreAcknowledgement = () => {
                       key={ack._id}
                       className="grid grid-cols-1 lg:grid-cols-[150px,150px,200px,150px,100px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{ack.ackId}</div>
+                      <div className="text-gray-600">{ack.storeId}</div>
                       <div className="text-gray-600">{ack.date}</div>
                       <div className="text-gray-600">{ack.bookingOrderNo}</div>
                       <div className="text-gray-600">{ack.acknowledgedQty}</div>
@@ -481,7 +481,7 @@ const StoreAcknowledgement = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-[600px] mx-auto bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh]"
+              className="w-full max-w-[800px] mx-auto bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh]"
             >
               <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -503,18 +503,18 @@ const StoreAcknowledgement = () => {
                     </label>
                     <input
                       type="text"
-                      value={editingAcknowledgement ? ackId : `ACK-${nextAckId}`}
+                      value={editingAcknowledgement ? storeId : `ACK-${nextStoreId}`}
                       readOnly
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.ackId
+                        errors.storeId
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter acknowledgement ID"
+                      placeholder="Enter store ID"
                       required
                     />
-                    {errors.ackId && (
-                      <p className="text-red-500 text-xs mt-1">{errors.ackId}</p>
+                    {errors.storeId && (
+                      <p className="text-red-500 text-xs mt-1">{errors.storeId}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -590,9 +590,6 @@ const StoreAcknowledgement = () => {
                       placeholder="Contact person"
                     />
                   </div>
-                  
-                </div>
-                <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Phone
@@ -605,6 +602,10 @@ const StoreAcknowledgement = () => {
                       placeholder="Phone number"
                     />
                   </div>
+                  
+                </div>
+                <div className="flex gap-4">
+                  
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Address
@@ -644,9 +645,6 @@ const StoreAcknowledgement = () => {
                       placeholder="Delivery Address"
                     />
                   </div>
-                 
-                </div>
-                <div className="flex gap-4">
                    <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Order Type
@@ -659,6 +657,9 @@ const StoreAcknowledgement = () => {
                       placeholder="Order Type"
                     />
                   </div>
+                </div>
+                <div className="flex gap-4">
+                 
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Delivery Date
@@ -671,10 +672,7 @@ const StoreAcknowledgement = () => {
                       placeholder="Delivery Date"
                     />
                   </div>
-                  
-                </div>
-                <div className="flex gap-4 mb-4">
-                  <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Mode
                     </label>
@@ -686,7 +684,7 @@ const StoreAcknowledgement = () => {
                       placeholder="Mode"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
+                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Payment Method
                     </label>
@@ -698,8 +696,8 @@ const StoreAcknowledgement = () => {
                       placeholder="Payment Method"
                     />
                   </div>
-                
                 </div>
+
                 {itemsList.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full border border-gray-200 rounded-lg overflow-hidden">

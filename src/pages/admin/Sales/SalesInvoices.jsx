@@ -758,7 +758,7 @@ const SalesInvoices = () => {
                       placeholder="Total price"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  {/* <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Discount %age
                     </label>
@@ -772,10 +772,8 @@ const SalesInvoices = () => {
                       max="100"
                       step="0.01"
                     />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+                  </div> */}
+                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Discount Amount
                     </label>
@@ -787,32 +785,40 @@ const SalesInvoices = () => {
                       placeholder="Discount amount"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Sales Tax
-                    </label>
-                    <input
-                      type="checkbox"
-                      checked={salesTax}
-                      onChange={(e) => setSalesTax(e.target.checked)}
-                      className="w-5 h-5 text-newPrimary border-gray-300 rounded focus:ring-newPrimary"
-                    />
-                  </div>
                 </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      NET Amount
-                    </label>
-                    <input
-                      type="number"
-                      value={netAmount}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="NET amount"
-                    />
-                  </div>
-                </div>
+               <div className="flex gap-4">
+  {/* NET Amount */}
+  <div className="flex-1">
+    <label className="block text-gray-700 font-medium mb-2">
+      NET Amount
+    </label>
+    <input
+      type="number"
+      value={netAmount}
+      readOnly
+      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+      placeholder="NET amount"
+    />
+  </div>
+
+  {/* Sales Tax */}
+  <div className="flex-1">
+    <label className="block text-gray-700 font-medium mb-2">
+      Sales Tax
+    </label>
+    <div className="flex items-center gap-2 border border-gray-300 rounded-md p-3">
+      <input
+        type="checkbox"
+        checked={salesTax}
+        onChange={(e) => setSalesTax(e.target.checked)}
+        className="w-5 h-5 text-newPrimary border-gray-300 rounded focus:ring-newPrimary"
+      />
+      <span className="text-gray-700">Apply</span>
+    </div>
+  </div>
+</div>
+
+
 
                 <button
                   type="submit"

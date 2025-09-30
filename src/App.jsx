@@ -61,7 +61,8 @@ import StoreAcknowledgement from "./pages/admin/Sales/StoreAcknowledgement.jsx";
 import Profile from "./components/Profile.jsx";
 import PurchaseReturn from "./pages/admin/Purchase/PurchaseReturn.jsx";
 import CustomerDistributorList from "./pages/admin/Sales/CustomerDistributor.jsx";
-import GateOutwards from "./pages/admin/Sales/GateOutwards.jsx";
+import EmptyVehicleEntry from "./pages/admin/Sales/EmptyVehicleEntry.jsx";
+import Tax from "./pages/admin/SetUp/Tax.jsx";
 
 function AppContent() {
   return (
@@ -137,9 +138,10 @@ function AppContent() {
             <Route path="designation" element={<Designation />} />
             <Route path="employee" element={<Employee />} />
             <Route path="departments" element={<Departments />} />
-            <Route path="gate-outwards" element={<GateOutwards />} />
+            <Route path="empty-vehicle-entry" element={<EmptyVehicleEntry />} />
             <Route path="promotion-item" element={<PromotionItem />} />
             <Route path="item-type" element={<ItemType />} />
+            <Route path="tax" element={<Tax />} />
           </Route>
         </Routes>
       </main>

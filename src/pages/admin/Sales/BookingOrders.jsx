@@ -555,7 +555,7 @@ const BookingOrders = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-[600px] mx-auto bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh]"
+              className="w-full max-w-[800px] mx-auto bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh]"
             >
               <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -637,7 +637,10 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.customer}</p>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
+                
+                </div>
+                <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Contact Person
                     </label>
@@ -649,8 +652,6 @@ const BookingOrders = () => {
                       placeholder="Contact person"
                     />
                   </div>
-                </div>
-                <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Phone
@@ -689,29 +690,7 @@ const BookingOrders = () => {
                       placeholder="Balance"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.deliveryAddress
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter delivery address"
-                      required
-                    />
-                    {errors.deliveryAddress && (
-                      <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Order Type <span className="text-red-500">*</span>
                     </label>
@@ -733,28 +712,7 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.orderType}</p>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={deliveryDate}
-                      onChange={(e) => setDeliveryDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.deliveryDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.deliveryDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Mode <span className="text-red-500">*</span>
                     </label>
@@ -776,7 +734,10 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
+                 
+                </div>
+                <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Payment Method <span className="text-red-500">*</span>
                     </label>
@@ -799,9 +760,7 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.paymentMethod}</p>
                     )}
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Product <span className="text-red-500">*</span>
                     </label>
@@ -826,6 +785,52 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.product}</p>
                     )}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Delivery Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.deliveryDate
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    />
+                    {errors.deliveryDate && (
+                      <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
+                    )}
+                  </div>
+                  
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Delivery Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.deliveryAddress
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter delivery address"
+                      required
+                    />
+                    {errors.deliveryAddress && (
+                      <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
+                    )}
+                  </div>
+               
+                </div>
+                <div className="flex gap-4">
+                
                   
                 </div>
                 <div className="flex gap-4">

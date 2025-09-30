@@ -109,8 +109,8 @@ const links = [
         icon: <FaShoppingCart />,
       },
        {
-        to: "/admin/gate-outwards",
-        label: "Gate Outwards",
+        to: "/admin/empty-vehicle-entry",
+        label: "Empty Vehicle Entry",
         icon: <FaDoorOpen />,
       },
         {

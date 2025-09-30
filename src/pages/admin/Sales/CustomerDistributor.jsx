@@ -563,7 +563,7 @@ const CustomerDistributorList = () => {
                 />
               </div>
               <div className="flex gap-4">
-                <div className="flex-1 min-w-0">
+                {/* <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
                     NTN <span className="text-red-500">*</span>
                   </label>
@@ -575,8 +575,8 @@ const CustomerDistributorList = () => {
                     className="w-full p-2 border rounded"
                     placeholder="e.g. NTN123456789"
                   />
-                </div>
-                <div className="flex-1 min-w-0">
+                </div> */}
+                {/* <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
                     GST <span className="text-red-500">*</span>
                   </label>
@@ -588,7 +588,7 @@ const CustomerDistributorList = () => {
                     className="w-full p-2 border rounded"
                     placeholder="e.g. 27ABCDE1234F1Z5"
                   />
-                </div>
+                </div> */}
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
