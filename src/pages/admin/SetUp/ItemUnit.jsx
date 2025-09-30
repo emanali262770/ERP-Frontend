@@ -316,8 +316,7 @@ const ItemUnit = () => {
               {/* Unit Name */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Unit Name Testing...............
-                  <span className="text-newPrimary">*</span>
+                  Unit Name
                 </label>
                 <input
                   type="text"
@@ -331,7 +330,7 @@ const ItemUnit = () => {
               {/* Description */}
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Description <span className="text-newPrimary">*</span>
+                  Description
                 </label>
                 <input
                   type="text"
