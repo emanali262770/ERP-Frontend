@@ -558,7 +558,7 @@ const PurchaseOrder = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -567,7 +567,7 @@ const PurchaseOrder = () => {
                     : "Add a New Purchase Order"}
                 </h2>
                 <button
-                  className="text-2xl text-gray-500 hover:text-gray-700"
+                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                   onClick={() => {
                     setIsSliderOpen(false);
                     setPoNo("");
@@ -582,61 +582,78 @@ const PurchaseOrder = () => {
                     setEditingPurchaseOrder(null);
                   }}
                 >
-                  <X />
+                  ×
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    PO No. <span className="text-blue-600">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={poNo}
-                    onChange={(e) => setPoNo(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
-                    placeholder="Enter PO No."
-                    required
-                  />
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      PO No. <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={poNo}
+                      onChange={(e) => setPoNo(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-600"
+                      placeholder="Enter PO No."
+                      required
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    />
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    For Demand <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={forDemand}
-                    onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.forDemand
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                  >
-                    <option value="">Select Quotation</option>
-                    {quotations.map((q) => (
-                      <option key={q._id} value={q._id}>
-                        {q.estimationId}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.forDemand}
-                    </p>
-                  )}
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      For Demand <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={forDemand}
+                      onChange={(e) => setForDemand(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.forDemand
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                    >
+                      <option value="">Select Quotation</option>
+                      {quotations.map((q) => (
+                        <option key={q._id} value={q._id}>
+                          {q.estimationId}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.forDemand && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.forDemand}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Supplier <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={supplier?.supplierName || ""}
+                      disabled
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                      placeholder="Supplier"
+                      required
+                    />
+                  </div>
                 </div>
                 {loading ? (
                   <span className="animate-spin flex justify-center">
@@ -676,42 +693,32 @@ const PurchaseOrder = () => {
                     </div>
                   )
                 )}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Supplier <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={supplier?.supplierName || ""}
-                    disabled
-                    className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
-                    placeholder="Supplier"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Delivery Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={deliveryDate}
-                    onChange={(e) => setDeliveryDate(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Tax
-                  </label>
-                  <input
-                    type="number"
-                    value={tax}
-                    onChange={(e) => setTax(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter tax"
-                  />
+
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Delivery Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      onChange={(e) => setDeliveryDate(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Tax
+                    </label>
+                    <input
+                      type="number"
+                      value={tax}
+                      onChange={(e) => setTax(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Enter tax"
+                    />
+                  </div>
                 </div>
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">

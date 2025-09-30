@@ -415,7 +415,7 @@ const GatepassIn = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -430,53 +430,55 @@ const GatepassIn = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Gatepass ID <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={gatepassId}
-                    onChange={(e) => setGatepassId(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.gatepassId
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    placeholder="Enter gatepass ID"
-                    required
-                  />
-                  {errors.gatepassId && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.gatepassId}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    To <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={toCompany}
-                    onChange={(e) => setToCompany(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.toCompany
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    required
-                  >
-                    <option value="">Select Company</option>
-                    <option value="ABC Corp">ABC Corp</option>
-                    <option value="XYZ Ltd">XYZ Ltd</option>
-                    <option value="Tech Solutions">Tech Solutions</option>
-                    <option value="Global Supplies">Global Supplies</option>
-                  </select>
-                  {errors.toCompany && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.toCompany}
-                    </p>
-                  )}
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Gatepass ID <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={gatepassId}
+                      onChange={(e) => setGatepassId(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.gatepassId
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter gatepass ID"
+                      required
+                    />
+                    {errors.gatepassId && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.gatepassId}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      To <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={toCompany}
+                      onChange={(e) => setToCompany(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.toCompany
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="">Select Company</option>
+                      <option value="ABC Corp">ABC Corp</option>
+                      <option value="XYZ Ltd">XYZ Ltd</option>
+                      <option value="Tech Solutions">Tech Solutions</option>
+                      <option value="Global Supplies">Global Supplies</option>
+                    </select>
+                    {errors.toCompany && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.toCompany}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <div className="flex items-center gap-4">
                   <label className="block text-gray-700 font-medium">
@@ -502,52 +504,56 @@ const GatepassIn = () => {
                 </div>
                 {poType === "withPO" && (
                   <>
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Against PO No. <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={supplier}
-                        onChange={(e) => setSupplier(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.supplier
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        required
-                      >
-                        <option value="">Select PO No</option>
-                        <option value="ABC Corp">ABC Corp</option>
-                        <option value="XYZ Ltd">XYZ Ltd</option>
-                        <option value="Tech Solutions">Tech Solutions</option>
-                        <option value="Global Supplies">Global Supplies</option>
-                      </select>
-                      {errors.againstPoNo && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.againstPoNo}
-                        </p>
-                      )}
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Supplier <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type=""
-                        value={supplier}
-                        onChange={(e) => setSupplier(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.supplier
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        readOnly
-                      />
-                      {errors.supplier && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.supplier}
-                        </p>
-                      )}
+                    <div className="flex gap-4">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Against PO No. <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={supplier}
+                          onChange={(e) => setSupplier(e.target.value)}
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.supplier
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          required
+                        >
+                          <option value="">Select PO No</option>
+                          <option value="ABC Corp">ABC Corp</option>
+                          <option value="XYZ Ltd">XYZ Ltd</option>
+                          <option value="Tech Solutions">Tech Solutions</option>
+                          <option value="Global Supplies">
+                            Global Supplies
+                          </option>
+                        </select>
+                        {errors.againstPoNo && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.againstPoNo}
+                          </p>
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Supplier <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type=""
+                          value={supplier}
+                          onChange={(e) => setSupplier(e.target.value)}
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.supplier
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          readOnly
+                        />
+                        {errors.supplier && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.supplier}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </>
                 )}
@@ -682,46 +688,50 @@ const GatepassIn = () => {
                     </div>
                   </>
                 )}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.date
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    required
-                  />
-                  {errors.date && (
-                    <p className="text-red-500 text-xs mt-1">{errors.date}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Status <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={status}
-                    onChange={(e) => setStatus(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.status
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                    required
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                  </select>
-                  {errors.status && (
-                    <p className="text-red-500 text-xs mt-1">{errors.status}</p>
-                  )}
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.date
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    />
+                    {errors.date && (
+                      <p className="text-red-500 text-xs mt-1">{errors.date}</p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Status <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={status}
+                      onChange={(e) => setStatus(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.status
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="Pending">Pending</option>
+                      <option value="Active">Active</option>
+                      <option value="Inactive">Inactive</option>
+                    </select>
+                    {errors.status && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.status}
+                      </p>
+                    )}
+                  </div>
                 </div>
                 <button
                   type="submit"
