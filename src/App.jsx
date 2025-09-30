@@ -81,7 +81,6 @@ function AppContent() {
               // </ProtectedRoute>
             }
           >
-            I love u
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="profile" element={<Profile />} />
