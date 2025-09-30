@@ -8,64 +8,109 @@ const BookingOrders = () => {
   const [bookingOrders, setBookingOrders] = useState([
     {
       _id: "1",
-      orderId: "BO-001",
-      itemName: "Laptop",
-      customer: "Tech Corp",
-      orderQuantity: 5,
-      unitPrice: 1000,
-      deliveryDate: "2025-10-01",
-      orderStatus: "Pending",
-      createdBy: "John Doe",
-      totalAmount: 5000, // (5 * 1000)
+      orderNo: "ORD-001",
+      orderDate: "2025-10-01",
+      customer: "cust1",
+      person: "John Doe",
+      phone: "123-456-7890",
+      address: "123 Tech St",
+      balance: 500,
+      deliveryAddress: "456 Delivery Rd",
+      orderType: "Standard",
+      deliveryDate: "2025-10-05",
+      mode: "Delivery",
+      paymentMethod: "Cash",
+      items: [
+        {
+          product: "prod1",
+          specification: "15-inch, 16GB RAM",
+          weight: 2.5,
+          packing: "Box",
+          inStock: 10,
+          qty: 2,
+          rate: 1000,
+          total: 2000,
+        },
+      ],
+      totalWeight: 2.5,
+      totalAmount: 2000,
+      remarks: "Urgent delivery",
     },
     {
       _id: "2",
-      orderId: "BO-002",
-      itemName: "Mouse",
-      customer: "Retail Inc",
-      orderQuantity: 20,
-      unitPrice: 20,
-      deliveryDate: "2025-10-15",
-      orderStatus: "Confirmed",
-      createdBy: "Jane Smith",
-      totalAmount: 400, // (20 * 20)
+      orderNo: "ORD-002",
+      orderDate: "2025-10-02",
+      customer: "cust2",
+      person: "Jane Smith",
+      phone: "987-654-3210",
+      address: "789 Retail Ave",
+      balance: 200,
+      deliveryAddress: "321 Pickup St",
+      orderType: "Express",
+      deliveryDate: "2025-10-06",
+      mode: "Pickup",
+      paymentMethod: "Online",
+      items: [
+        {
+          product: "prod2",
+          specification: "Wireless",
+          weight: 0.2,
+          packing: "Plastic",
+          inStock: 50,
+          qty: 5,
+          rate: 20,
+          total: 100,
+        },
+      ],
+      totalWeight: 0.2,
+      totalAmount: 100,
+      remarks: "Handle with care",
     },
   ]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [orderId, setOrderId] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [customer, setCustomer] = useState("");
-  const [orderQuantity, setOrderQuantity] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
-  const [orderStatus, setOrderStatus] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [editingBookingOrder, setEditingBookingOrder] = useState(null);
+  const [orderNo, setOrderNo] = useState("");
+  const [orderDate, setOrderDate] = useState("");
+  const [customer, setCustomer] = useState("");
+  const [person, setPerson] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [balance, setBalance] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [orderType, setOrderType] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [mode, setMode] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("");
+  const [product, setProduct] = useState("");
+  const [rate, setRate] = useState("");
+  const [weight, setWeight] = useState("");
+  const [packing, setPacking] = useState("");
+  const [inStock, setInStock] = useState("");
+  const [total, setTotal] = useState("");
+  const [specification, setSpecification] = useState("");
+  const [itemsList, setItemsList] = useState([]);
+  const [totalWeight, setTotalWeight] = useState(0);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const [remarks, setRemarks] = useState("");
+  const [editingOrder, setEditingOrder] = useState(null);
   const [errors, setErrors] = useState({});
-  const [itemList, setItemList] = useState([
-    { _id: "item1", itemName: "Laptop" },
-    { _id: "item2", itemName: "Mouse" },
-    { _id: "item3", itemName: "Keyboard" },
-  ]);
   const [customerList, setCustomerList] = useState([
-    { _id: "cust1", customerName: "Tech Corp" },
-    { _id: "cust2", customerName: "Retail Inc" },
-    { _id: "cust3", customerName: "Global Traders" },
+    { _id: "cust1", customerName: "Tech Corp", contactPerson: "John Doe", phone: "123-456-7890", address: "123 Tech St", balance: 500 },
+    { _id: "cust2", customerName: "Retail Inc", contactPerson: "Jane Smith", phone: "987-654-3210", address: "789 Retail Ave", balance: 200 },
+    { _id: "cust3", customerName: "Global Traders", contactPerson: "Alice Brown", phone: "555-123-4567", address: "456 Global Rd", balance: 1000 },
   ]);
-  const [statusList, setStatusList] = useState([
-    { _id: "status1", statusName: "Pending" },
-    { _id: "status2", statusName: "Confirmed" },
-    { _id: "status3", statusName: "Shipped" },
+  const [productList, setProductList] = useState([
+    { _id: "prod1", productName: "Laptop", rate: 1000, weight: 2.5, packing: "Box", inStock: 10, total: 1000, specification: "15-inch, 16GB RAM" },
+    { _id: "prod2", productName: "Mouse", rate: 20, weight: 0.2, packing: "Plastic", inStock: 50, total: 20, specification: "Wireless" },
+    { _id: "prod3", productName: "Keyboard", rate: 50, weight: 0.8, packing: "Box", inStock: 30, total: 50, specification: "Mechanical" },
   ]);
-  const [nextOrderId, setNextOrderId] = useState("003");
+  const [nextOrderNo, setNextOrderNo] = useState("003");
   const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
-  // Simulate fetching booking orders
   const fetchBookingOrders = useCallback(async () => {
     try {
       setLoading(true);
@@ -83,9 +128,8 @@ const BookingOrders = () => {
     fetchBookingOrders();
   }, [fetchBookingOrders]);
 
-  // Booking order search
   useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("BO-")) {
+    if (searchTerm && !searchTerm.startsWith("ORD-")) {
       fetchBookingOrders();
       return;
     }
@@ -94,7 +138,7 @@ const BookingOrders = () => {
       try {
         setLoading(true);
         const filtered = bookingOrders.filter((order) =>
-          order.orderId.toUpperCase().includes(searchTerm.toUpperCase())
+          order.orderNo.toUpperCase().includes(searchTerm.toUpperCase())
         );
         setBookingOrders(filtered);
       } catch (error) {
@@ -108,81 +152,161 @@ const BookingOrders = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, fetchBookingOrders, bookingOrders]);
 
-  // Generate next order ID
   useEffect(() => {
     if (bookingOrders.length > 0) {
       const maxNo = Math.max(
         ...bookingOrders.map((o) => {
-          const match = o.orderId?.match(/BO-(\d+)/);
+          const match = o.orderNo?.match(/ORD-(\d+)/);
           return match ? parseInt(match[1], 10) : 0;
         })
       );
-      setNextOrderId((maxNo + 1).toString().padStart(3, "0"));
+      setNextOrderNo((maxNo + 1).toString().padStart(3, "0"));
     } else {
-      setNextOrderId("001");
+      setNextOrderNo("001");
     }
   }, [bookingOrders]);
 
-  // Reset form fields
+  useEffect(() => {
+    if (customer && customerList.length > 0) {
+      const selectedCustomer = customerList.find((c) => c._id === customer);
+      if (selectedCustomer) {
+        setPerson(selectedCustomer.contactPerson || "");
+        setPhone(selectedCustomer.phone || "");
+        setAddress(selectedCustomer.address || "");
+        setBalance(selectedCustomer.balance || "");
+      }
+    }
+  }, [customer, customerList]);
+
+  useEffect(() => {
+    if (product && productList.length > 0) {
+      const selectedProduct = productList.find((p) => p._id === product);
+      if (selectedProduct) {
+        setRate(selectedProduct.rate || "");
+        setWeight(selectedProduct.weight || "");
+        setPacking(selectedProduct.packing || "");
+        setInStock(selectedProduct.inStock || "");
+        setTotal(selectedProduct.total || "");
+        setSpecification(selectedProduct.specification || "");
+      }
+    }
+  }, [product, productList]);
+
+  const calculateTotals = () => {
+    const weightSum = itemsList.reduce((sum, item) => sum + parseFloat(item.weight || 0), 0);
+    const amountSum = itemsList.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
+    setTotalWeight(weightSum.toFixed(2));
+    setTotalAmount(amountSum.toFixed(2));
+  };
+
+  useEffect(() => {
+    calculateTotals();
+  }, [itemsList]);
+
+  const handleAddItem = () => {
+    if (!product || !rate || !weight || !packing || !inStock || !total || !specification) {
+      Swal.fire({
+        icon: "warning",
+        title: "Missing Fields",
+        text: "Please select a product to add.",
+        confirmButtonColor: "#d33",
+      });
+      return;
+    }
+
+    const newItem = {
+      product,
+      rate: parseFloat(rate),
+      weight: parseFloat(weight),
+      packing,
+      inStock,
+      total: parseFloat(total),
+      specification,
+      qty: 1,
+    };
+
+    setItemsList([...itemsList, newItem]);
+    setProduct("");
+    setRate("");
+    setWeight("");
+    setPacking("");
+    setInStock("");
+    setTotal("");
+    setSpecification("");
+  };
+
+  const handleRemoveItem = (index) => {
+    setItemsList(itemsList.filter((_, i) => i !== index));
+  };
+
   const resetForm = () => {
-    setOrderId("");
-    setItemName("");
+    setOrderNo("");
+    setOrderDate("");
     setCustomer("");
-    setOrderQuantity("");
-    setUnitPrice("");
+    setPerson("");
+    setPhone("");
+    setAddress("");
+    setBalance("");
+    setDeliveryAddress("");
+    setOrderType("");
     setDeliveryDate("");
-    setOrderStatus("");
-    setCreatedBy(userInfo.employeeName || "");
-    setEditingBookingOrder(null);
+    setMode("");
+    setPaymentMethod("");
+    setProduct("");
+    setRate("");
+    setWeight("");
+    setPacking("");
+    setInStock("");
+    setTotal("");
+    setSpecification("");
+    setItemsList([]);
+    setTotalWeight(0);
+    setTotalAmount(0);
+    setRemarks("");
+    setEditingOrder(null);
     setErrors({});
     setIsSliderOpen(false);
   };
 
-  // Validate form fields
   const validateForm = () => {
     const newErrors = {};
-    const trimmedOrderId = orderId.trim();
-    const trimmedItemName = itemName.trim();
-    const trimmedCustomer = customer.trim();
-    const trimmedOrderQuantity = orderQuantity.trim();
-    const trimmedUnitPrice = unitPrice.trim();
-    const trimmedDeliveryDate = deliveryDate.trim();
-    const trimmedOrderStatus = orderStatus.trim();
-    const parsedOrderQuantity = parseInt(orderQuantity);
-    const parsedUnitPrice = parseFloat(unitPrice);
-
-    if (!trimmedOrderId) newErrors.orderId = "Order ID is required";
-    if (!trimmedItemName) newErrors.itemName = "Item Name is required";
-    if (!trimmedCustomer) newErrors.customer = "Customer is required";
-    if (!trimmedOrderQuantity || isNaN(parsedOrderQuantity) || parsedOrderQuantity <= 0) {
-      newErrors.orderQuantity = "Order Quantity must be a positive integer";
-    }
-    if (!trimmedUnitPrice || isNaN(parsedUnitPrice) || parsedUnitPrice <= 0) {
-      newErrors.unitPrice = "Unit Price must be a positive number";
-    }
-    if (!trimmedDeliveryDate) newErrors.deliveryDate = "Delivery Date is required";
-    if (!trimmedOrderStatus) newErrors.orderStatus = "Order Status is required";
+    if (!orderNo && !editingOrder) newErrors.orderNo = "Order No is required";
+    if (!orderDate) newErrors.orderDate = "Order Date is required";
+    if (!customer) newErrors.customer = "Customer is required";
+    if (!deliveryAddress) newErrors.deliveryAddress = "Delivery Address is required";
+    if (!orderType) newErrors.orderType = "Order Type is required";
+    if (!deliveryDate) newErrors.deliveryDate = "Delivery Date is required";
+    if (!mode) newErrors.mode = "Mode is required";
+    if (!paymentMethod) newErrors.paymentMethod = "Payment Method is required";
+    if (itemsList.length === 0) newErrors.items = "At least one item is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Handlers for form and table actions
   const handleAddBookingOrder = () => {
     resetForm();
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (bookingOrder) => {
-    setEditingBookingOrder(bookingOrder);
-    setOrderId(bookingOrder.orderId || "");
-    setItemName(bookingOrder.itemName || "");
-    setCustomer(bookingOrder.customer || "");
-    setOrderQuantity(bookingOrder.orderQuantity || "");
-    setUnitPrice(bookingOrder.unitPrice || "");
-    setDeliveryDate(bookingOrder.deliveryDate || "");
-    setOrderStatus(bookingOrder.orderStatus || "");
-    setCreatedBy(bookingOrder.createdBy || userInfo.employeeName || "");
+  const handleEditClick = (order) => {
+    setEditingOrder(order);
+    setOrderNo(order.orderNo || "");
+    setOrderDate(order.orderDate || "");
+    setCustomer(order.customer || "");
+    setPerson(order.person || "");
+    setPhone(order.phone || "");
+    setAddress(order.address || "");
+    setBalance(order.balance || "");
+    setDeliveryAddress(order.deliveryAddress || "");
+    setOrderType(order.orderType || "");
+    setDeliveryDate(order.deliveryDate || "");
+    setMode(order.mode || "");
+    setPaymentMethod(order.paymentMethod || "");
+    setItemsList(order.items || []);
+    setTotalWeight(order.totalWeight || 0);
+    setTotalAmount(order.totalAmount || 0);
+    setRemarks(order.remarks || "");
     setErrors({});
     setIsSliderOpen(true);
   };
@@ -194,24 +318,29 @@ const BookingOrders = () => {
       return;
     }
 
-    const totalAmount = parseInt(orderQuantity) * parseFloat(unitPrice);
-
-    const newBookingOrder = {
-      orderId: editingBookingOrder ? orderId : `BO-${nextOrderId}`,
-      itemName: itemName.trim(),
-      customer: customer.trim(),
-      orderQuantity: parseInt(orderQuantity),
-      unitPrice: parseFloat(unitPrice),
-      deliveryDate: deliveryDate.trim(),
-      orderStatus: orderStatus.trim(),
-      createdBy: createdBy.trim(),
-      totalAmount: parseFloat(totalAmount.toFixed(2)),
+    const newOrder = {
+      orderNo: editingOrder ? orderNo : `ORD-${nextOrderNo}`,
+      orderDate,
+      customer,
+      person,
+      phone,
+      address,
+      balance,
+      deliveryAddress,
+      orderType,
+      deliveryDate,
+      mode,
+      paymentMethod,
+      items: itemsList,
+      totalWeight: parseFloat(totalWeight),
+      totalAmount: parseFloat(totalAmount),
+      remarks,
     };
 
     try {
-      if (editingBookingOrder) {
+      if (editingOrder) {
         setBookingOrders((prev) =>
-          prev.map((o) => (o._id === editingBookingOrder._id ? { ...o, ...newBookingOrder, _id: o._id } : o))
+          prev.map((o) => (o._id === editingOrder._id ? { ...o, ...newOrder, _id: o._id } : o))
         );
         Swal.fire({
           icon: "success",
@@ -220,7 +349,7 @@ const BookingOrders = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setBookingOrders((prev) => [...prev, { ...newBookingOrder, _id: `temp-${Date.now()}` }]);
+        setBookingOrders((prev) => [...prev, { ...newOrder, _id: `temp-${Date.now()}` }]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -290,7 +419,6 @@ const BookingOrders = () => {
       });
   };
 
-  // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
   const currentRecords = bookingOrders.slice(indexOfFirstRecord, indexOfLastRecord);
@@ -313,7 +441,7 @@ const BookingOrders = () => {
           <div className="flex items-center gap-3">
             <input
               type="text"
-              placeholder="Enter Order ID eg: BO-001"
+              placeholder="Enter Order No eg: ORD-001"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
@@ -330,14 +458,13 @@ const BookingOrders = () => {
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1400px]">
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>Order ID</div>
-                <div>Item Name</div>
+              <div className="hidden lg:grid grid-cols-[150px,200px,150px,150px,150px,150px,100px] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Order No</div>
                 <div>Customer</div>
-                <div>Order Quantity</div>
-                <div>Unit Price</div>
+                <div>Order Date</div>
                 <div>Delivery Date</div>
-                <div>Order Status</div>
+                <div>Order Type</div>
+                <div>Payment Method</div>
                 <div>Actions</div>
               </div>
 
@@ -345,8 +472,8 @@ const BookingOrders = () => {
                 {loading ? (
                   <TableSkeleton
                     rows={recordsPerPage}
-                    cols={8}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]"
+                    cols={7}
+                    className="lg:grid-cols-[150px,200px,150px,150px,150px,150px,100px]"
                   />
                 ) : currentRecords.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
@@ -356,15 +483,16 @@ const BookingOrders = () => {
                   currentRecords.map((order) => (
                     <div
                       key={order._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      className="grid grid-cols-1 lg:grid-cols-[150px,200px,150px,150px,150px,150px,100px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{order.orderId}</div>
-                      <div className="text-gray-600">{order.itemName}</div>
-                      <div className="text-gray-600">{order.customer}</div>
-                      <div className="text-gray-600">{order.orderQuantity}</div>
-                      <div className="text-gray-600">{order.unitPrice}</div>
+                      <div className="text-gray-600">{order.orderNo}</div>
+                      <div className="text-gray-600">
+                        {customerList.find((c) => c._id === order.customer)?.customerName || "N/A"}
+                      </div>
+                      <div className="text-gray-600">{order.orderDate}</div>
                       <div className="text-gray-600">{order.deliveryDate}</div>
-                      <div className="text-gray-600">{order.orderStatus}</div>
+                      <div className="text-gray-600">{order.orderType}</div>
+                      <div className="text-gray-600">{order.paymentMethod}</div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(order)}
@@ -388,11 +516,10 @@ const BookingOrders = () => {
             </div>
           </div>
 
-          {/* Pagination Controls */}
           {totalPages > 1 && (
             <div className="flex justify-between my-4 px-10">
               <div className="text-sm text-gray-600">
-                Showing {indexOfFirstRecord + 1} to{" "}
+                Showing {indexOfLastRecord + 1} to{" "}
                 {Math.min(indexOfLastRecord, bookingOrders.length)} of{" "}
                 {bookingOrders.length} records
               </div>
@@ -432,7 +559,7 @@ const BookingOrders = () => {
             >
               <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingBookingOrder ? "Update Booking Order" : "Add a New Booking Order"}
+                  {editingOrder ? "Update Booking Order" : "Add a New Booking Order"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -446,47 +573,41 @@ const BookingOrders = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Order ID <span className="text-red-500">*</span>
+                      Order No <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
-                      value={editingBookingOrder ? orderId : `BO-${nextOrderId}`}
+                      value={editingOrder ? orderNo : `ORD-${nextOrderNo}`}
                       readOnly
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderId
+                        errors.orderNo
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter order ID"
+                      placeholder="Enter order number"
                       required
                     />
-                    {errors.orderId && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderId}</p>
+                    {errors.orderNo && (
+                      <p className="text-red-500 text-xs mt-1">{errors.orderNo}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Item Name <span className="text-red-500">*</span>
+                      Order Date <span className="text-red-500">*</span>
                     </label>
-                    <select
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
+                    <input
+                      type="date"
+                      value={orderDate}
+                      onChange={(e) => setOrderDate(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.itemName
+                        errors.orderDate
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
                       required
-                    >
-                      <option value="">Select Item</option>
-                      {itemList?.map((item) => (
-                        <option key={item._id} value={item.itemName}>
-                          {item.itemName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.itemName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.itemName}</p>
+                    />
+                    {errors.orderDate && (
+                      <p className="text-red-500 text-xs mt-1">{errors.orderDate}</p>
                     )}
                   </div>
                 </div>
@@ -506,8 +627,8 @@ const BookingOrders = () => {
                       required
                     >
                       <option value="">Select Customer</option>
-                      {customerList?.map((cust) => (
-                        <option key={cust._id} value={cust.customerName}>
+                      {customerList.map((cust) => (
+                        <option key={cust._id} value={cust._id}>
                           {cust.customerName}
                         </option>
                       ))}
@@ -518,48 +639,98 @@ const BookingOrders = () => {
                   </div>
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Order Quantity <span className="text-red-500">*</span>
+                      Contact Person
                     </label>
                     <input
-                      type="number"
-                      value={orderQuantity}
-                      onChange={(e) => setOrderQuantity(e.target.value)}
+                      type="text"
+                      value={person}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Contact person"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Phone
+                    </label>
+                    <input
+                      type="text"
+                      value={phone}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Phone number"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={address}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Address"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Balance
+                    </label>
+                    <input
+                      type="text"
+                      value={balance}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Balance"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Delivery Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={deliveryAddress}
+                      onChange={(e) => setDeliveryAddress(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderQuantity
+                        errors.deliveryAddress
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter order quantity"
-                      min="0"
-                      step="1"
+                      placeholder="Enter delivery address"
                       required
                     />
-                    {errors.orderQuantity && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderQuantity}</p>
+                    {errors.deliveryAddress && (
+                      <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
                     )}
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Unit Price <span className="text-red-500">*</span>
+                      Order Type <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="number"
-                      value={unitPrice}
-                      onChange={(e) => setUnitPrice(e.target.value)}
+                    <select
+                      value={orderType}
+                      onChange={(e) => setOrderType(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.unitPrice
+                        errors.orderType
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter unit price"
-                      min="0"
-                      step="0.01"
                       required
-                    />
-                    {errors.unitPrice && (
-                      <p className="text-red-500 text-xs mt-1">{errors.unitPrice}</p>
+                    >
+                      <option value="">Select Order Type</option>
+                      <option value="Standard">Standard</option>
+                      <option value="Express">Express</option>
+                    </select>
+                    {errors.orderType && (
+                      <p className="text-red-500 text-xs mt-1">{errors.orderType}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -585,60 +756,253 @@ const BookingOrders = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Order Status <span className="text-red-500">*</span>
+                      Mode <span className="text-red-500">*</span>
                     </label>
                     <select
-                      value={orderStatus}
-                      onChange={(e) => setOrderStatus(e.target.value)}
+                      value={mode}
+                      onChange={(e) => setMode(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderStatus
+                        errors.mode
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
                       required
                     >
-                      <option value="">Select Status</option>
-                      {statusList?.map((status) => (
-                        <option key={status._id} value={status.statusName}>
-                          {status.statusName}
-                        </option>
-                      ))}
+                      <option value="">Select Mode</option>
+                      <option value="Delivery">Delivery</option>
+                      <option value="Pickup">Pickup</option>
                     </select>
-                    {errors.orderStatus && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderStatus}</p>
+                    {errors.mode && (
+                      <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Created By <span className="text-red-500">*</span>
+                      Payment Method <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      value={createdBy}
-                      readOnly
+                    <select
+                      value={paymentMethod}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.createdBy
+                        errors.paymentMethod
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter created by"
                       required
-                    />
-                    {errors.createdBy && (
-                      <p className="text-red-500 text-xs mt-1">{errors.createdBy}</p>
+                    >
+                      <option value="">Select Payment Method</option>
+                      <option value="Cash">Cash</option>
+                      <option value="Credit">Credit</option>
+                      <option value="Online">Online</option>
+                    </select>
+                    {errors.paymentMethod && (
+                      <p className="text-red-500 text-xs mt-1">{errors.paymentMethod}</p>
                     )}
                   </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Product <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={product}
+                      onChange={(e) => setProduct(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.product
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="">Select Product</option>
+                      {productList.map((prod) => (
+                        <option key={prod._id} value={prod._id}>
+                          {prod.productName}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.product && (
+                      <p className="text-red-500 text-xs mt-1">{errors.product}</p>
+                    )}
+                  </div>
+                  
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Rate
+                    </label>
+                    <input
+                      type="text"
+                      value={rate}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Rate"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Weight
+                    </label>
+                    <input
+                      type="text"
+                      value={weight}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Weight"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Packing
+                    </label>
+                    <input
+                      type="text"
+                      value={packing}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Packing"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      In Stock
+                    </label>
+                    <input
+                      type="text"
+                      value={inStock}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="In Stock"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Total
+                    </label>
+                    <input
+                      type="text"
+                      value={total}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Total"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Specification
+                    </label>
+                    <input
+                      type="text"
+                      value={specification}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Specification"
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <button
+                      type="button"
+                      onClick={handleAddItem}
+                      className="w-20 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
+                    >
+                      <span>+</span> Add
+                    </button>
+                  </div>
+                </div>
+                {itemsList.length > 0 && (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                      <thead className="bg-gray-100 text-gray-600 text-sm">
+                        <tr>
+                          <th className="px-4 py-2 border-b">Sr #</th>
+                          <th className="px-4 py-2 border-b">Item</th>
+                          <th className="px-4 py-2 border-b">Specifications</th>
+                          <th className="px-4 py-2 border-b">Weight</th>
+                          <th className="px-4 py-2 border-b">Packing</th>
+                          <th className="px-4 py-2 border-b">Stock</th>
+                          <th className="px-4 py-2 border-b">Qty</th>
+                          <th className="px-4 py-2 border-b">Rate</th>
+                          <th className="px-4 py-2 border-b">Total</th>
+                          <th className="px-4 py-2 border-b">Remove</th>
+                        </tr>
+                      </thead>
+                      <tbody className="text-gray-700 text-sm">
+                        {itemsList.map((item, idx) => (
+                          <tr key={idx} className="hover:bg-gray-50">
+                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {productList.find((p) => p._id === item.product)?.productName || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">{item.specification}</td>
+                            <td className="px-4 py-2 border-b text-center">{item.weight}</td>
+                            <td className="px-4 py-2 border-b text-center">{item.packing}</td>
+                            <td className="px-4 py-2 border-b text-center">{item.inStock}</td>
+                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
+                            <td className="px-4 py-2 border-b text-center">{item.rate}</td>
+                            <td className="px-4 py-2 border-b text-center">{item.total}</td>
+                            <td className="px-4 py-2 border-b text-center">
+                              <button onClick={() => handleRemoveItem(idx)}>
+                                <X size={18} className="text-red-600" />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+                {itemsList.length > 0 && (
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Total Weight
+                      </label>
+                      <input
+                        type="text"
+                        value={totalWeight}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Total Weight"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Total Amount
+                      </label>
+                      <input
+                        type="text"
+                        value={totalAmount}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Total Amount"
+                      />
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Remarks
+                  </label>
+                  <textarea
+                    value={remarks}
+                    onChange={(e) => setRemarks(e.target.value)}
+                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    placeholder="Enter remarks"
+                    rows="3"
+                  />
                 </div>
                 <button
                   type="submit"
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                 >
-                  {loading
-                    ? "Saving..."
-                    : editingBookingOrder
-                    ? "Update Booking Order"
-                    : "Save Booking Order"}
+                  {loading ? "Saving..." : editingOrder ? "Update Booking Order" : "Save Booking Order"}
                 </button>
               </form>
             </div>

@@ -9,45 +9,88 @@ const SalesInvoices = () => {
     {
       _id: "1",
       invoiceId: "INV-001",
-      customerName: "Acme Corp",
-      itemName: "Laptop",
-      quantity: 2,
-      unitPrice: 1000,
-      totalAmount: 2070, // (2 * 1000 * (1 + 0.035))
       invoiceDate: "2025-09-01",
-      status: "Paid",
-      createdBy: "John Doe",
+      dcNo: "DC-001",
+      deliveryDate: "2025-09-05",
+      medicineType: "Tablet",
+      bookingNo: "BN-001",
+      vendor: "Pharma Corp",
+      address: "123 Health St, Med City",
+      phoneNo: "555-0101",
+      balance: 5000,
+      items: [
+        { srNo: 1, item: "Paracetamol", packSize: "10x10", rate: 50, qty: 100, total: 5000 },
+      ],
     },
     {
       _id: "2",
       invoiceId: "INV-002",
-      customerName: "Tech Solutions",
-      itemName: "Mouse",
-      quantity: 10,
-      unitPrice: 20,
-      totalAmount: 207, // (10 * 20 * (1 + 0.035))
       invoiceDate: "2025-09-15",
-      status: "Pending",
-      createdBy: "Jane Smith",
+      dcNo: "DC-002",
+      deliveryDate: "2025-09-20",
+      medicineType: "Syrup",
+      bookingNo: "BN-002",
+      vendor: "Health Solutions",
+      address: "456 Wellness Ave, Med City",
+      phoneNo: "555-0102",
+      balance: 3000,
+      items: [
+        { srNo: 1, item: "Ibuprofen", packSize: "10x10", rate: 80, qty: 50, total: 4000 },
+      ],
     },
   ]);
+
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [invoiceId, setInvoiceId] = useState("");
-  const [customerName, setCustomerName] = useState("");
-  const [itemName, setItemName] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
   const [invoiceDate, setInvoiceDate] = useState("");
-  const [status, setStatus] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
+  const [dcNo, setDcNo] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState("");
+  const [medicineType, setMedicineType] = useState("");
+  const [bookingNo, setBookingNo] = useState("");
+  const [orderDate, setOrderDate] = useState("");
+  const [vendor, setVendor] = useState("");
+  const [address, setAddress] = useState("");
+  const [phoneNo, setPhoneNo] = useState("");
+  const [balance, setBalance] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingInvoice, setEditingInvoice] = useState(null);
   const [errors, setErrors] = useState({});
-  const [itemList, setItemList] = useState([
-    { _id: "item1", itemName: "Laptop" },
-    { _id: "item2", itemName: "Mouse" },
-    { _id: "item3", itemName: "Keyboard" },
+  const [items, setItems] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+  const [discountPercentage, setDiscountPercentage] = useState("");
+  const [discountAmount, setDiscountAmount] = useState("");
+  const [salesTax, setSalesTax] = useState(false);
+  const [netAmount, setNetAmount] = useState("");
+  const [dcList, setDcList] = useState([
+    {
+      dcNo: "DC-001",
+      deliveryDate: "2025-09-05",
+      medicineType: "Tablet",
+      bookingNo: "BN-001",
+      orderDate: "2025-08-30",
+      vendor: "Pharma Corp",
+      address: "123 Health St, Med City",
+      phoneNo: "555-0101",
+      balance: 5000,
+      items: [
+        { srNo: 1, item: "Paracetamol", packSize: "10x10", rate: 50, qty: 100, total: 5000 },
+      ],
+    },
+    {
+      dcNo: "DC-002",
+      deliveryDate: "2025-09-20",
+      medicineType: "Syrup",
+      bookingNo: "BN-002",
+      orderDate: "2025-09-10",
+      vendor: "Health Solutions",
+      address: "456 Wellness Ave, Med City",
+      phoneNo: "555-0102",
+      balance: 3000,
+      items: [
+        { srNo: 1, item: "Ibuprofen", packSize: "10x10", rate: 80, qty: 50, total: 4000 },
+      ],
+    },
   ]);
   const [nextInvoiceId, setNextInvoiceId] = useState("003");
   const [currentPage, setCurrentPage] = useState(1);
@@ -113,16 +156,68 @@ const SalesInvoices = () => {
     }
   }, [invoices]);
 
+  // Handle DC No. selection
+  const handleDcNoChange = (e) => {
+    const selectedDcNo = e.target.value;
+    setDcNo(selectedDcNo);
+    const selectedDc = dcList.find((dc) => dc.dcNo === selectedDcNo);
+    if (selectedDc) {
+      setDeliveryDate(selectedDc.deliveryDate);
+      setMedicineType(selectedDc.medicineType);
+      setBookingNo(selectedDc.bookingNo);
+      setOrderDate(selectedDc.orderDate);
+      setVendor(selectedDc.vendor);
+      setAddress(selectedDc.address);
+      setPhoneNo(selectedDc.phoneNo);
+      setBalance(selectedDc.balance.toString());
+      setItems(selectedDc.items || []);
+    } else {
+      setDeliveryDate("");
+      setMedicineType("");
+      setBookingNo("");
+      setOrderDate("");
+      setVendor("");
+      setAddress("");
+      setPhoneNo("");
+      setBalance("");
+      setItems([]);
+    }
+  };
+
+  // Calculate totals
+  useEffect(() => {
+    const calculatedTotal = items.reduce((sum, item) => sum + item.total, 0);
+    setTotalPrice(calculatedTotal);
+
+    const discount = discountPercentage
+      ? (calculatedTotal * parseFloat(discountPercentage)) / 100
+      : 0;
+    setDiscountAmount(discount.toFixed(2));
+
+    const taxAmount = salesTax ? calculatedTotal * 0.035 : 0;
+    const net = calculatedTotal - discount + taxAmount;
+    setNetAmount(net.toFixed(2));
+  }, [items, discountPercentage, salesTax]);
+
   // Reset form fields
   const resetForm = () => {
     setInvoiceId("");
-    setCustomerName("");
-    setItemName("");
-    setQuantity("");
-    setUnitPrice("");
     setInvoiceDate("");
-    setStatus("");
-    setCreatedBy(userInfo.employeeName || "");
+    setDcNo("");
+    setDeliveryDate("");
+    setMedicineType("");
+    setBookingNo("");
+    setOrderDate("");
+    setVendor("");
+    setAddress("");
+    setPhoneNo("");
+    setBalance("");
+    setItems([]);
+    setTotalPrice(0);
+    setDiscountPercentage("");
+    setDiscountAmount("");
+    setSalesTax(false);
+    setNetAmount("");
     setEditingInvoice(null);
     setErrors({});
     setIsSliderOpen(false);
@@ -132,26 +227,13 @@ const SalesInvoices = () => {
   const validateForm = () => {
     const newErrors = {};
     const trimmedInvoiceId = invoiceId.trim();
-    const trimmedCustomerName = customerName.trim();
-    const trimmedItemName = itemName.trim();
-    const trimmedQuantity = quantity.trim();
-    const trimmedUnitPrice = unitPrice.trim();
     const trimmedInvoiceDate = invoiceDate.trim();
-    const trimmedStatus = status.trim();
-    const parsedQuantity = parseInt(quantity);
-    const parsedUnitPrice = parseFloat(unitPrice);
+    const trimmedDcNo = dcNo.trim();
 
     if (!trimmedInvoiceId) newErrors.invoiceId = "Invoice ID is required";
-    if (!trimmedCustomerName) newErrors.customerName = "Customer Name is required";
-    if (!trimmedItemName) newErrors.itemName = "Item Name is required";
-    if (!trimmedQuantity || isNaN(parsedQuantity) || parsedQuantity <= 0) {
-      newErrors.quantity = "Quantity must be a positive number";
-    }
-    if (!trimmedUnitPrice || isNaN(parsedUnitPrice) || parsedUnitPrice <= 0) {
-      newErrors.unitPrice = "Unit Price must be a positive number";
-    }
     if (!trimmedInvoiceDate) newErrors.invoiceDate = "Invoice Date is required";
-    if (!trimmedStatus) newErrors.status = "Status is required";
+    if (!trimmedDcNo) newErrors.dcNo = "DC No. is required";
+    if (items.length === 0) newErrors.items = "At least one item is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -166,13 +248,22 @@ const SalesInvoices = () => {
   const handleEditClick = (invoice) => {
     setEditingInvoice(invoice);
     setInvoiceId(invoice.invoiceId || "");
-    setCustomerName(invoice.customerName || "");
-    setItemName(invoice.itemName || "");
-    setQuantity(invoice.quantity || "");
-    setUnitPrice(invoice.unitPrice || "");
     setInvoiceDate(invoice.invoiceDate || "");
-    setStatus(invoice.status || "");
-    setCreatedBy(invoice.createdBy || userInfo.employeeName || "");
+    setDcNo(invoice.dcNo || "");
+    setDeliveryDate(invoice.deliveryDate || "");
+    setMedicineType(invoice.medicineType || "");
+    setBookingNo(invoice.bookingNo || "");
+    setOrderDate(invoice.orderDate || "");
+    setVendor(invoice.vendor || "");
+    setAddress(invoice.address || "");
+    setPhoneNo(invoice.phoneNo || "");
+    setBalance(invoice.balance?.toString() || "");
+    setItems(invoice.items || []);
+    setTotalPrice(invoice.totalPrice || 0);
+    setDiscountPercentage(invoice.discountPercentage?.toString() || "");
+    setDiscountAmount(invoice.discountAmount?.toString() || "");
+    setSalesTax(invoice.salesTax || false);
+    setNetAmount(invoice.netAmount?.toString() || "");
     setErrors({});
     setIsSliderOpen(true);
   };
@@ -184,18 +275,24 @@ const SalesInvoices = () => {
       return;
     }
 
-    const totalAmount = parseFloat(quantity) * parseFloat(unitPrice) * (1 + 0.035); // Assuming 3.5% tax
-
     const newInvoice = {
       invoiceId: editingInvoice ? invoiceId : `INV-${nextInvoiceId}`,
-      customerName: customerName.trim(),
-      itemName: itemName.trim(),
-      quantity: parseInt(quantity),
-      unitPrice: parseFloat(unitPrice),
-      totalAmount: parseFloat(totalAmount.toFixed(2)),
       invoiceDate: invoiceDate.trim(),
-      status: status.trim(),
-      createdBy: createdBy.trim(),
+      dcNo: dcNo.trim(),
+      deliveryDate: deliveryDate.trim(),
+      medicineType: medicineType.trim(),
+      bookingNo: bookingNo.trim(),
+      orderDate: orderDate.trim(),
+      vendor: vendor.trim(),
+      address: address.trim(),
+      phoneNo: phoneNo.trim(),
+      balance: parseFloat(balance) || 0,
+      items,
+      totalPrice: parseFloat(totalPrice),
+      discountPercentage: parseFloat(discountPercentage) || 0,
+      discountAmount: parseFloat(discountAmount) || 0,
+      salesTax,
+      netAmount: parseFloat(netAmount) || 0,
     };
 
     try {
@@ -320,15 +417,17 @@ const SalesInvoices = () => {
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1200px]">
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>Invoice ID</div>
-                <div>Customer Name</div>
-                <div>Item Name</div>
-                <div>Quantity</div>
-                <div>Unit Price</div>
-                <div>Total Amount</div>
+              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Invoice No.</div>
                 <div>Invoice Date</div>
-                <div>Status</div>
+                <div>DC No.</div>
+                <div>Delivery Date</div>
+                <div>Medicine Type</div>
+                <div>Booking Number</div>
+                <div>Vendor</div>
+                <div>Address</div>
+                <div>Phone Number</div>
+                <div>Balance</div>
                 <div>Actions</div>
               </div>
 
@@ -336,8 +435,8 @@ const SalesInvoices = () => {
                 {loading ? (
                   <TableSkeleton
                     rows={recordsPerPage}
-                    cols={9}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]"
+                    cols={11}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr]"
                   />
                 ) : currentRecords.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
@@ -347,16 +446,18 @@ const SalesInvoices = () => {
                   currentRecords.map((invoice) => (
                     <div
                       key={invoice._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
                       <div className="text-gray-600">{invoice.invoiceId}</div>
-                      <div className="text-gray-600">{invoice.customerName}</div>
-                      <div className="text-gray-600">{invoice.itemName}</div>
-                      <div className="text-gray-600">{invoice.quantity}</div>
-                      <div className="text-gray-600">{invoice.unitPrice}</div>
-                      <div className="text-gray-600">{invoice.totalAmount}</div>
                       <div className="text-gray-600">{invoice.invoiceDate}</div>
-                      <div className="text-gray-600">{invoice.status}</div>
+                      <div className="text-gray-600">{invoice.dcNo}</div>
+                      <div className="text-gray-600">{invoice.deliveryDate}</div>
+                      <div className="text-gray-600">{invoice.medicineType}</div>
+                      <div className="text-gray-600">{invoice.bookingNo}</div>
+                      <div className="text-gray-600">{invoice.vendor}</div>
+                      <div className="text-gray-600">{invoice.address}</div>
+                      <div className="text-gray-600">{invoice.phoneNo}</div>
+                      <div className="text-gray-600">{invoice.balance}</div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(invoice)}
@@ -438,7 +539,7 @@ const SalesInvoices = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Invoice ID <span className="text-red-500">*</span>
+                      Invoice No. <span className="text-red-500">*</span>
                     </label>
                     <input
                       type="text"
@@ -449,103 +550,11 @@ const SalesInvoices = () => {
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter invoice ID"
+                      placeholder="Enter invoice no."
                       required
                     />
                     {errors.invoiceId && (
                       <p className="text-red-500 text-xs mt-1">{errors.invoiceId}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Customer Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.customerName
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter customer name"
-                      required
-                    />
-                    {errors.customerName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.customerName}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Item Name <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.itemName
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Item</option>
-                      {itemList?.map((item) => (
-                        <option key={item._id} value={item.itemName}>
-                          {item.itemName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.itemName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.itemName}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Quantity <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={quantity}
-                      onChange={(e) => setQuantity(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.quantity
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter quantity"
-                      min="1"
-                      required
-                    />
-                    {errors.quantity && (
-                      <p className="text-red-500 text-xs mt-1">{errors.quantity}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Unit Price <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={unitPrice}
-                      onChange={(e) => setUnitPrice(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.unitPrice
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter unit price"
-                      min="0"
-                      step="0.01"
-                      required
-                    />
-                    {errors.unitPrice && (
-                      <p className="text-red-500 text-xs mt-1">{errors.unitPrice}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
@@ -571,48 +580,240 @@ const SalesInvoices = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Status <span className="text-red-500">*</span>
+                      DC No. <span className="text-red-500">*</span>
                     </label>
                     <select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
+                      value={dcNo}
+                      onChange={handleDcNoChange}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.status
+                        errors.dcNo
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
                       required
                     >
-                      <option value="">Select Status</option>
-                      <option value="Paid">Paid</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Overdue">Overdue</option>
+                      <option value="">Select DC No.</option>
+                      {dcList?.map((dc) => (
+                        <option key={dc.dcNo} value={dc.dcNo}>
+                          {dc.dcNo}
+                        </option>
+                      ))}
                     </select>
-                    {errors.status && (
-                      <p className="text-red-500 text-xs mt-1">{errors.status}</p>
+                    {errors.dcNo && (
+                      <p className="text-red-500 text-xs mt-1">{errors.dcNo}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Created By <span className="text-red-500">*</span>
+                      Delivery Date
+                    </label>
+                    <input
+                      type="date"
+                      value={deliveryDate}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Delivery date"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Medicine Type
                     </label>
                     <input
                       type="text"
-                      value={createdBy}
+                      value={medicineType}
                       readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.createdBy
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter created by"
-                      required
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Medicine type"
                     />
-                    {errors.createdBy && (
-                      <p className="text-red-500 text-xs mt-1">{errors.createdBy}</p>
-                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Booking No.
+                    </label>
+                    <input
+                      type="text"
+                      value={bookingNo}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Booking number"
+                    />
                   </div>
                 </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Order Date
+                    </label>
+                    <input
+                      type="date"
+                      value={orderDate}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Order date"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Vendor
+                    </label>
+                    <input
+                      type="text"
+                      value={vendor}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Vendor"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={address}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Address"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Phone No.
+                    </label>
+                    <input
+                      type="text"
+                      value={phoneNo}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Phone number"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Balance
+                    </label>
+                    <input
+                      type="number"
+                      value={balance}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Balance"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <h3 className="text-lg font-medium text-gray-700 mb-4">Items</h3>
+                  <div className="rounded-md shadow border border-gray-200 overflow-hidden">
+                    <div className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase">
+                      <div>SR#.</div>
+                      <div>Item</div>
+                      <div>Pack Size</div>
+                      <div>Rate</div>
+                      <div>Qty</div>
+                      <div>Total</div>
+                    </div>
+                    {items.length === 0 ? (
+                      <div className="text-center py-4 text-gray-500 bg-white">
+                        No items available for this DC No.
+                      </div>
+                    ) : (
+                      items.map((item) => (
+                        <div
+                          key={item.srNo}
+                          className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-4 text-sm bg-white"
+                        >
+                          <div>{item.srNo}</div>
+                          <div>{item.item}</div>
+                          <div>{item.packSize}</div>
+                          <div>{item.rate}</div>
+                          <div>{item.qty}</div>
+                          <div>{item.total}</div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  {errors.items && (
+                    <p className="text-red-500 text-xs mt-1">{errors.items}</p>
+                  )}
+                </div>
+
+                <div className="flex gap-4 mt-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Total Price
+                    </label>
+                    <input
+                      type="number"
+                      value={totalPrice}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Total price"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Discount %age
+                    </label>
+                    <input
+                      type="number"
+                      value={discountPercentage}
+                      onChange={(e) => setDiscountPercentage(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Discount percentage"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Discount Amount
+                    </label>
+                    <input
+                      type="number"
+                      value={discountAmount}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Discount amount"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Sales Tax
+                    </label>
+                    <input
+                      type="checkbox"
+                      checked={salesTax}
+                      onChange={(e) => setSalesTax(e.target.checked)}
+                      className="w-5 h-5 text-newPrimary border-gray-300 rounded focus:ring-newPrimary"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      NET Amount
+                    </label>
+                    <input
+                      type="number"
+                      value={netAmount}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="NET amount"
+                    />
+                  </div>
+                </div>
+
                 <button
                   type="submit"
                   disabled={loading}
