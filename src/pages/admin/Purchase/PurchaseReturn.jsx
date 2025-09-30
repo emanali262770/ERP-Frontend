@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
-import { SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2, X } from "lucide-react";
 import TableSkeleton from "../Skeleton";
 
 const PurchaseReturn = () => {
@@ -128,6 +128,10 @@ const PurchaseReturn = () => {
     setItems(items.filter((_, i) => i !== index));
   }
 
+  function handleRemoveItem(idx) {
+    const updatedItems = items.filter((_, index) => index !== idx);
+    setItems(updatedItems);
+  }
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <CommanHeader />
@@ -135,7 +139,9 @@ const PurchaseReturn = () => {
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-newPrimary">Purchase Returns</h1>
+          <h1 className="text-2xl font-bold text-newPrimary">
+            Purchase Returns
+          </h1>
           <p className="text-gray-500 text-sm">
             Manage your purchase return entries
           </p>
@@ -213,7 +219,7 @@ const PurchaseReturn = () => {
                 {isEdit ? "Update Return" : "Add New Return"}
               </h2>
               <button
-                className="w-8 h-8 bg-newPrimary text-white rounded-full"
+                className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                 onClick={() => setIsSliderOpen(false)}
               >
                 ×
@@ -222,8 +228,8 @@ const PurchaseReturn = () => {
 
             <div className="space-y-4 p-6">
               {/* Form Fields */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">Return ID</label>
                   <input
                     type="text"
@@ -232,7 +238,7 @@ const PurchaseReturn = () => {
                     className="w-full p-2 border rounded"
                   />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">Date</label>
                   <input
                     type="date"
@@ -241,8 +247,12 @@ const PurchaseReturn = () => {
                     className="w-full p-2 border rounded"
                   />
                 </div>
-                <div>
-                  <label className="text-gray-700 font-medium">Gate Pass In</label>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                  <label className="text-gray-700 font-medium">
+                    Gate Pass In
+                  </label>
                   <select
                     value={gatePass}
                     onChange={(e) => setGatePass(e.target.value)}
@@ -252,7 +262,7 @@ const PurchaseReturn = () => {
                     <option value="GP001">GP001</option>
                   </select>
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">Supplier</label>
                   <input
                     type="text"
@@ -261,7 +271,9 @@ const PurchaseReturn = () => {
                     className="w-full p-2 border rounded"
                   />
                 </div>
-                <div>
+              </div>
+              <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">PO ID</label>
                   <input
                     type="text"
@@ -270,43 +282,61 @@ const PurchaseReturn = () => {
                     className="w-full p-2 border rounded"
                   />
                 </div>
-              </div>
-
-              {/* Items Section */}
-              <div>
-                <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
-                <div className="flex gap-3 mb-3">
-                <select onClick={itemName} name="" id="" className="w-full p-2 border rounded">
+                {/* Items Section */}
+                <div className="flex-1 min-w-0 mt-6">
+                  <select
+                    onClick={itemName}
+                    name=""
+                    id=""
+                    className="w-full p-2 border rounded"
+                  >
                     <option value="">Select Item Name</option>
                   </select>
-                  <input
-                    type="number"
-                    placeholder="Qty"
-                    value={qty}
-                    onChange={(e) => setQty(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Damage"
-                    value={damageQty}
-                    onChange={(e) => setDamageQty(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
-                  <input
-                    type="number"
-                    placeholder="Good"
-                    value={goodQty}
-                    onChange={(e) => setGoodQty(e.target.value)}
-                    className="w-full p-2 border rounded"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAddItem}
-                    className="px-3 flex-shrink-0 bg-newPrimary text-white rounded"
-                  >
-                    + Add
-                  </button>
+                </div>
+              </div>
+
+              {/* Items Section Inputs*/}
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
+
+                <div className="flex gap-4 mb-3">
+                  <div className="flex-1 min-w-0">
+                    <input
+                      type="number"
+                      placeholder="Qty"
+                      value={qty}
+                      onChange={(e) => setQty(e.target.value)}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <input
+                      type="number"
+                      placeholder="Damage"
+                      value={damageQty}
+                      onChange={(e) => setDamageQty(e.target.value)}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <input
+                      type="number"
+                      placeholder="Good"
+                      value={goodQty}
+                      onChange={(e) => setGoodQty(e.target.value)}
+                      className="w-full p-2 border rounded"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <button
+                      type="button"
+                      onClick={handleAddItem}
+                      className="px-3 bg-newPrimary text-white rounded flex items-center h-full w-full justify-center"
+                    >
+                      + Add
+                    </button>
+                  </div>
+
                 </div>
 
                 {/* Items Table */}
@@ -322,17 +352,27 @@ const PurchaseReturn = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((it) => (
+                      {items.map((it, idx) => (
                         <tr key={it.id}>
-                          <td className="border text-center px-2 py-1">{it.name}</td>
-                          <td className="border text-center px-2 py-1">{it.qty}</td>
-                          <td className="border text-center px-2 py-1">{it.damage}</td>
-                          <td className="border text-center px-2 py-1">{it.good}</td>
-                           <td className="px-4 py-2 border-b text-center">
-                              <button onClick={() => handleRemoveItem(idx)}>
-                                <X size={18} className="text-red-600" />
-                              </button>
-                            </td>
+
+                          <td className="border text-center px-2 py-1">
+                            {it.name}
+                          </td>
+                          <td className="border text-center px-2 py-1">
+                            {it.qty}
+                          </td>
+                          <td className="border text-center px-2 py-1">
+                            {it.damage}
+                          </td>
+                          <td className="border text-center px-2 py-1">
+                            {it.good}
+                          </td>
+                          <td className="px-4 py-2 border-b text-center">
+                            <button onClick={() => handleRemoveItem(idx)}>
+                              <X size={18} className="text-red-600" />
+                            </button>
+                          </td>
+
                         </tr>
                       ))}
                     </tbody>
