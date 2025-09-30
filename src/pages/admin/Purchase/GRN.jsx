@@ -411,14 +411,14 @@ const GRN = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingGrn ? "Update GRN" : "Add a New GRN"}
                 </h2>
                 <button
-                  className="text-2xl text-gray-500 hover:text-gray-700"
+                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                   onClick={() => {
                     setIsSliderOpen(false);
                     setGrnId("");
@@ -435,192 +435,198 @@ const GRN = () => {
                     setEditingGrn(null);
                   }}
                 >
-                  <X />
+                  ×
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    GRN ID <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={grnId}
-                    onChange={(e) => setGrnId(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter GRN ID"
-                    required
-                  />
-                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      GRN ID <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={grnId}
+                      onChange={(e) => setGrnId(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Enter GRN ID"
+                      required
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Date <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="date"
-                    value={date}
-                    onChange={(e) => setDate(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  />
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Date <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="date"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    />
+                  </div>
                 </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Gate Pass IN <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={gatePassIn}
+                      onChange={(e) => setGatePassIn(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      required
+                    >
+                      <option value="">Select Gate Pass</option>
+                      {gatePassOptions.map((gp) => (
+                        <option key={gp._id} value={gp.gatePassId}>
+                          {gp.gatePassId}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Gate Pass IN <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={gatePassIn}
-                    onChange={(e) => setGatePassIn(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    required
-                  >
-                    <option value="">Select Gate Pass</option>
-                    {gatePassOptions.map((gp) => (
-                      <option key={gp._id} value={gp.gatePassId}>
-                        {gp.gatePassId}
-                      </option>
-                    ))}
-                  </select>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Supplier <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Enter supplier name"
+                      required
+                    />
+                  </div>
                 </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => setAddress(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Enter address"
+                      required
+                    />
+                  </div>
 
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Supplier <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={supplier}
-                    onChange={(e) => setSupplier(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter supplier name"
-                    required
-                  />
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Phone <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      placeholder="Enter phone number"
+                      required
+                    />
+                  </div>
                 </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Address <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter address"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Phone <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                    placeholder="Enter phone number"
-                    required
-                  />
-                </div>
-
                 <div className="space-y-3">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Item
-                      </label>
-                      <select
-                        value={item}
-                        onChange={(e) => setItem(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      >
-                        <option value="">Select Item</option>
-                        {itemOptions.map((opt) => (
-                          <option key={opt._id} value={opt.itemName}>
-                            {opt.itemName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={qty}
-                        onChange={(e) => setQty(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter quantity"
-                        min="1"
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Description
-                      </label>
-                      <input
-                        type="text"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter description"
-                      />
-                    </div>
-                    <div className="flex items-end">
-                      <button
-                        type="button"
-                        onClick={handleAddItem}
-                        className="w-16 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
-                      >
-                        + Add
-                      </button>
-                    </div>
-                  </div>
-
-                  {itemsList.length > 0 && (
-                    <div className="overflow-x-auto">
-                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-100 text-gray-600 text-sm">
-                          <tr>
-                            <th className="px-4 py-2 border-b">Sr #</th>
-                            <th className="px-4 py-2 border-b">Item</th>
-                            <th className="px-4 py-2 border-b">Qty</th>
-                            <th className="px-4 py-2 border-b">Description</th>
-                          </tr>
-                        </thead>
-                        <tbody className="text-gray-700 text-sm">
-                          {itemsList.map((item, idx) => (
-                            <tr key={idx} className="hover:bg-gray-50">
-                              <td className="px-4 py-2 border-b text-center">
-                                {idx + 1}
-                              </td>
-                              <td className="px-4 py-2 border-b">
-                                {item.item}
-                              </td>
-                              <td className="px-4 py-2 border-b text-center">
-                                {item.qty}
-                              </td>
-                              <td className="px-4 py-2 border-b">
-                                {item.description}
-                              </td>
-                            </tr>
+                  <div className="flex gap-4">
+                    <div className="flex gap-4">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Item
+                        </label>
+                        <select
+                          value={item}
+                          onChange={(e) => setItem(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        >
+                          <option value="">Select Item</option>
+                          {itemOptions.map((opt) => (
+                            <option key={opt._id} value={opt.itemName}>
+                              {opt.itemName}
+                            </option>
                           ))}
-                        </tbody>
-                      </table>
+                        </select>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Quantity
+                        </label>
+                        <input
+                          type="number"
+                          value={qty}
+                          onChange={(e) => setQty(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                          placeholder="Enter quantity"
+                          min="1"
+                        />
+                      </div>
                     </div>
-                  )}
-                </div>
+                    <div className="flex gap-4">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Description
+                        </label>
+                        <input
+                          type="text"
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                          placeholder="Enter description"
+                        />
+                      </div>
+                      <div className="flex items-end">
+                        <button
+                          type="button"
+                          onClick={handleAddItem}
+                          className="w-40 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition"
+                        >
+                          + Add
+                        </button>
+                      </div>
+                    </div>
 
-                <div className="flex items-center justify-between">
-                  <label className="text-gray-700 font-medium">Status</label>
+                    {itemsList.length > 0 && (
+                      <div className="overflow-x-auto">
+                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                          <thead className="bg-gray-100 text-gray-600 text-sm">
+                            <tr>
+                              <th className="px-4 py-2 border-b">Sr #</th>
+                              <th className="px-4 py-2 border-b">Item</th>
+                              <th className="px-4 py-2 border-b">Qty</th>
+                              <th className="px-4 py-2 border-b">
+                                Description
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-700 text-sm">
+                            {itemsList.map((item, idx) => (
+                              <tr key={idx} className="hover:bg-gray-50">
+                                <td className="px-4 py-2 border-b text-center">
+                                  {idx + 1}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.item}
+                                </td>
+                                <td className="px-4 py-2 border-b text-center">
+                                  {item.qty}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.description}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <div className="flex items-center gap-5">
+                  <label className="text-gray-700 font-medium">Status:</label>
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
