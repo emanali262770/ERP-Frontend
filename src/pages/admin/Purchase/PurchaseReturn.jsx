@@ -278,6 +278,7 @@ const PurchaseReturn = () => {
                     placeholder="Item Name"
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
+                    readOnly
                     className="flex-1 p-2 border rounded"
                   />
                   <input
