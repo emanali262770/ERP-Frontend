@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
-import { SquarePen, Trash2 } from "lucide-react";
+import { SquarePen, Trash2, X } from "lucide-react";
 import TableSkeleton from "../Skeleton";
 
 const PurchaseReturn = () => {
@@ -125,6 +125,10 @@ const PurchaseReturn = () => {
     });
   };
 
+  function handleRemoveItem(idx) {
+    const updatedItems =items.filter((_,index)=> index !== idx);
+    setItems(updatedItems)
+  }
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <CommanHeader />
@@ -273,14 +277,11 @@ const PurchaseReturn = () => {
               <div>
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
                 <div className="flex gap-3 mb-3">
-                  <input
-                    type="text"
-                    placeholder="Item Name"
-                    value={itemName}
-                    onChange={(e) => setItemName(e.target.value)}
-                    readOnly
-                    className="flex-1 p-2 border rounded"
-                  />
+
+                  <select onClick={itemName} name="" id="" className="w-full p-2 border rounded">
+                    <option value="">Select Item Name</option>
+                  </select>
+
                   <input
                     type="number"
                     placeholder="Qty"
@@ -320,15 +321,21 @@ const PurchaseReturn = () => {
                         <th className="border px-2 py-1">Qty</th>
                         <th className="border px-2 py-1">Damage</th>
                         <th className="border px-2 py-1">Good</th>
+                        <th className="border px-2 py-1">Remove</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {items.map((it) => (
+                      {items.map((it,idx) => (
                         <tr key={it.id}>
-                          <td className="border px-2 py-1">{it.name}</td>
-                          <td className="border px-2 py-1">{it.qty}</td>
-                          <td className="border px-2 py-1">{it.damage}</td>
-                          <td className="border px-2 py-1">{it.good}</td>
+                          <td className="border text-center px-2 py-1">{it.name}</td>
+                          <td className="border text-center px-2 py-1">{it.qty}</td>
+                          <td className="border text-center px-2 py-1">{it.damage}</td>
+                          <td className="border text-center px-2 py-1">{it.good}</td>
+                          <td className="px-4 py-2 border-b text-center">
+                              <button onClick={() => handleRemoveItem(idx)}>
+                                <X size={18} className="text-red-600" />
+                              </button>
+                            </td>
                         </tr>
                       ))}
                     </tbody>
