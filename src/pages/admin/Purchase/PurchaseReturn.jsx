@@ -279,7 +279,7 @@ const PurchaseReturn = () => {
                     value={itemName}
                     onChange={(e) => setItemName(e.target.value)}
                     readOnly
-                    className="flex-1 p-2 border rounded"
+                    className="flex-1 p-2 border rounded hyyy"
                   />
                   <input
                     type="number"
