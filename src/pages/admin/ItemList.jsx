@@ -494,6 +494,19 @@ const ItemList = () => {
     });
   };
 
+  // Pagination logic
+  const [currentPage, setCurrentPage] = useState(1);
+  const recordsPerPage = 10; // you can change this
+
+  const indexOfLastRecord = currentPage * recordsPerPage;
+  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
+  const currentRecords = itemList.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(itemList.length / recordsPerPage);
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       {/* Coomon header */}
@@ -511,96 +524,137 @@ const ItemList = () => {
       </div>
 
       {/* Item Table */}
-      <div className="rounded-xl border border-gray-200 w-full overflow-hidden">
+      <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <div className="min-w-full w-full overflow-x-auto">
-            {/* Header */}
-            <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-              <div>Item Category</div>
-              <div>Item Name</div>
-              <div>Purchase</div>
-              <div>Sales</div>
-              <div>Stock</div>
-              <div>Barcode</div>
-              {userInfo?.isAdmin && <div className="text-right">Actions</div>}
-            </div>
+          <div className="max-h-screen overflow-y-auto custom-scrollbar">
+            <div className="inline-block w-full align-middle">
+              {/* Header */}
+              <div className="hidden lg:grid grid-cols-[200px,200px,200px,200px,200px,200px,120px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>Item Category</div>
+                <div>Item Name</div>
+                <div>Purchase</div>
+                <div>Sales</div>
+                <div>Stock</div>
+                <div>Barcode</div>
+                {userInfo?.isAdmin && <div className="">Actions</div>}
+              </div>
 
-            {/* Body */}
-            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
-              {loading ? (
-                <TableSkeleton
-                  rows={itemList.length || 5}
-                  cols={userInfo?.isAdmin ? 7 : 6}
-                  className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
-                />
-              ) : itemList.length === 0 ? (
-                <div className="text-center py-4 text-gray-500 bg-white">
-                  No Items found.
-                </div>
-              ) : (
-                itemList.map((item, index) => (
-                  <div
-                    key={item._id}
-                    className="grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 items-center px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                  >
-                    {/* Item Category (with icon) */}
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={item.itemImage?.url || item.itemImage}
-                        alt="Product Icon"
-                        className="w-7 h-7 object-cover rounded-full"
-                      />
-                      <span className="font-medium text-gray-900">
-                        {item?.itemType?.itemTypeName}
-                      </span>
-                    </div>
-
-                    {/* Item Name */}
-                    <div className="text-gray-600">{item.itemName}</div>
-
-                    {/* Purchase */}
-                    <div className="font-semibold text-gray-600">
-                      {item.purchase}
-                    </div>
-
-                    {/* Sales */}
-                    <div className="font-semibold text-gray-600">
-                      {item.price}
-                    </div>
-
-                    {/* Stock */}
-                    <div className="font-semibold text-gray-600">
-                      {item.stock}
-                    </div>
-
-                    {/* Barcode */}
-                    <div className="font-semibold text-gray-600">
-                      {item.secondaryBarcode || "N/A"}
-                    </div>
-
-                    {/* Actions */}
-                    {userInfo?.isAdmin && (
-                      <div className="flex justify-end gap-3">
-                        <button
-                          onClick={() => handleEdit(item)}
-                          className="text-blue-500 hover:underline"
-                        >
-                          <SquarePen size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(item._id)}
-                          className="text-red-500 hover:underline"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    )}
+              {/* Body */}
+              <div className="flex flex-col divide-y divide-gray-100">
+                {loading ? (
+                  <TableSkeleton
+                    rows={itemList.length || 5}
+                    cols={userInfo?.isAdmin ? 7 : 6}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                  />
+                ) : itemList.length === 0 ? (
+                  <div className="text-center py-4 text-gray-500 bg-white">
+                    No Items found.
                   </div>
-                ))
-              )}
+                ) : (
+                  currentRecords.map((item, index) => (
+                    <div
+                      key={item._id}
+                      className="grid grid-cols-1 lg:grid-cols-[200px,200px,200px,200px,200px,100px,200px,_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                    >
+                      {/* Item Category (with icon) */}
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={item.itemImage?.url || item.itemImage}
+                          alt="Product Icon"
+                          className="w-7 h-7 object-cover rounded-full"
+                        />
+                        <span className="font-medium text-gray-900">
+                          {item?.itemType?.itemTypeName}
+                        </span>
+                      </div>
+
+                      {/* Item Name */}
+                      <div className="text-gray-600">{item.itemName}</div>
+
+                      {/* Purchase */}
+                      <div className="font-semibold text-gray-600">
+                        {item.purchase}
+                      </div>
+
+                      {/* Sales */}
+                      <div className="font-semibold text-gray-600">
+                        {item.price}
+                      </div>
+
+                      {/* Stock */}
+                      <div className="font-semibold text-gray-600">
+                        {item.stock}
+                      </div>
+
+                      {/* Barcode */}
+                      <div className="font-semibold text-gray-600">
+                        {item.secondaryBarcode || "N/A"}
+                      </div>
+
+                      {/* Actions */}
+                      {userInfo?.isAdmin && (
+                        <div className="flex justify-end gap-3">
+                          <button
+                            onClick={() => handleEdit(item)}
+                            className="text-blue-500 hover:underline"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item._id)}
+                            className="text-red-500 hover:underline"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="flex justify-between my-4 px-10">
+            {/* Records info */}
+            <div className="text-sm text-gray-600">
+              Showing {indexOfFirstRecord + 1} to{" "}
+              {Math.min(indexOfLastRecord, itemList.length)} of{" "}
+              {itemList.length} records
+            </div>
+
+            {/* Pagination buttons */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === 1
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                }`}
+              >
+                Previous
+              </button>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-md ${
+                  currentPage === totalPages
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Slider */}
