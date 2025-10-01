@@ -1,49 +1,178 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { SquarePen, Trash2 } from "lucide-react";
+import { Eye, SquarePen, Trash2, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { api } from "../../../context/ApiService";
+import ViewModel from "./ViewModel";
 
 const GatepassIn = () => {
   const [gatepasses, setGatepasses] = useState([]);
+  const [supplierList, setSupplierList] = useState([]);
+  const [withOutPoSupplier, setWithOutPoSupplier] = useState("");
+  const [purchaseOrders, setPurchaseOrders] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [gatepassId, setGatepassId] = useState("");
+  const [driverName, setDriverName] = useState("");
   const [toCompany, setToCompany] = useState("");
   const [poType, setPoType] = useState("withPO"); // Default to "With PO"
   const [itemsList, setItemsList] = useState([]);
   const [itemName, setItemName] = useState("");
+  const [itemNameList, setItemNameList] = useState([]);
   const [itemQuantity, setItemQuantity] = useState("");
   const [itemUnits, setItemUnits] = useState("");
-  const [category, setCategory] = useState("");
+  const [isView, setIsView] = useState(false);
+  const [selectedGatepass, setSelectedGatepass] = useState(null);
+  const [itemUnitsList, setItemUnitsList] = useState([]);
+  const [category, setCategory] = useState({ id: "", name: "" });
   const [againstPoNo, setAgainstPoNo] = useState("");
+  const [driverNameWithoutPo, setDriverNameWithoutPo] = useState("");
   const [supplier, setSupplier] = useState("");
   const [date, setDate] = useState("");
-  const [status, setStatus] = useState("Pending");
+  const [status, setStatus] = useState("");
   const [editingGatepass, setEditingGatepass] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
+  const [nextGatePassId, setGatePassId] = useState("001");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
- 
-
-    const API_URL = `${import.meta.env.VITE_API_BASE_URL}/gatePassIn`;
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/gatePassIn`;
   // gate pass inn fetch
-    const fetchGatePassInn = useCallback(async () => {
-      try {
-        setLoading(true);
-        const res = await axios.get(`${API_URL}`);
-        setGatepasses(res.data); // store actual categories array
-        console.log("gate pass Inn  ", res.data);
-      } catch (error) {
-        console.error("Failed to fetch Supplier", error);
-      } finally {
-        setTimeout(() => setLoading(false), 1000);
-      }
-    }, []);
-    useEffect(() => {
-      fetchGatePassInn();
-    }, [fetchGatePassInn]);
+  const fetchGatePassInn = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setGatepasses(res.data); // store actual categories array
+      console.log("gate pass Inn  ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchGatePassInn();
+  }, [fetchGatePassInn]);
+  // next gass pass id creation
+  useEffect(() => {
+    if (gatepasses.length > 0) {
+      const maxNo = Math.max(
+        ...gatepasses.map((r) => {
+          const match = r.gatePassId?.match(/GPIN-(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setGatePassId((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setGatePassId("001");
+    }
+  }, [gatepasses]);
+
+  // Fetch purchase orders
+  const fetchPurchaseOrders = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`
+      );
+      setPurchaseOrders(res.data);
+    } catch (error) {
+      console.error("Failed to fetch purchase orders", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchPurchaseOrders();
+  }, [fetchPurchaseOrders]);
+
+  // Fetch Categories
+  const fetchCategory = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/categories`
+      );
+      setCategories(res.data);
+      console.log("Category ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Category", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCategory();
+  }, [fetchCategory]);
+
+  // Fetch suppliers
+  const fetchSupplier = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/suppliers`
+      );
+      setSupplierList(res.data);
+      console.log("supplier ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSupplier();
+  }, [fetchSupplier]);
+
+  // Fetch suppliers
+  const fetchGetItemNameByCategory = useCallback(async () => {
+    if (!category.name) return;
+
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-details/category/${
+          category.name
+        }`
+      );
+      setItemNameList(res.data);
+      console.log("ItemName ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch ItemName", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, [category]);
+
+  useEffect(() => {
+    fetchGetItemNameByCategory();
+  }, [fetchGetItemNameByCategory]);
+
+  //  Fetch Item Unit
+  const fetchItemUnit = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-unit`
+      );
+      setItemUnitsList(res.data);
+      console.log("item unit ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch item unit", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchItemUnit();
+  }, [fetchItemUnit]);
 
   // Format date for display
   const formatDate = (date) => {
@@ -54,23 +183,33 @@ const GatepassIn = () => {
     const year = d.getFullYear();
     return `${day}-${month}-${year}`;
   };
-
- 
+  // format date for input
+  const formatDateForInput = (date) => {
+    if (!date) return "";
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`; // yyyy-mm-dd
+  };
 
   // Reset form fields
   const resetForm = () => {
     setGatepassId("");
     setToCompany("");
-    setPoType("withPO");
+    setPoType("withPO"); // or default to "withoutPO" if that's your use case
     setItemsList([]);
     setItemName("");
     setItemQuantity("");
     setItemUnits("");
-    setCategory("");
+    setCategory({ id: "", name: "" }); // reset properly
     setAgainstPoNo("");
     setSupplier("");
+    setWithOutPoSupplier(""); // clear supplier dropdown
+    setDriverName(""); // clear driver name for withPO
+    setDriverNameWithoutPo(""); // clear driver name for withoutPO
     setDate("");
-    setStatus("Pending");
+    setStatus("Permanent");
     setEditingGatepass(null);
     setErrors({});
     setIsSliderOpen(false);
@@ -83,19 +222,31 @@ const GatepassIn = () => {
     const trimmedToCompany = toCompany.trim();
     const trimmedAgainstPoNo = againstPoNo.trim();
     const trimmedSupplier = supplier.trim();
+    const trimmedWithoutSupplier = withOutPoSupplier.trim();
 
+    // Gatepass ID required
     if (!trimmedGatepassId) newErrors.gatepassId = "Gatepass ID is required";
-    if (!trimmedToCompany) newErrors.toCompany = "To Company is required";
+
+    // Date required
     if (!date) newErrors.date = "Date is required";
-    if (!status) newErrors.status = "Status is required";
+
+    // Status must be Permanent or Temporary
+    if (!["Permanent", "Temporary"].includes(status)) {
+      newErrors.status = "Status must be Permanent or Temporary";
+    }
 
     if (poType === "withPO") {
+      if (!trimmedAgainstPoNo) newErrors.againstPoNo = "PO Number is required";
+      if (!driverName.trim()) newErrors.driverName = "Driver name is required";
+    } else if (poType === "withoutPO") {
+      if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
+      if (!trimmedWithoutSupplier)
+        newErrors.withOutPoSupplier = "Supplier is required";
+      if (!driverNameWithoutPo.trim())
+        newErrors.driverNameWithoutPo = "Driver name is required";
       if (itemsList.length === 0)
         newErrors.itemsList = "At least one item is required";
       if (!category) newErrors.category = "Category is required";
-    } else if (poType === "withoutPO") {
-      if (!trimmedAgainstPoNo) newErrors.againstPoNo = "PO Number is required";
-      if (!trimmedSupplier) newErrors.supplier = "Supplier is required";
     }
 
     setErrors(newErrors);
@@ -110,35 +261,49 @@ const GatepassIn = () => {
 
   const handleEditClick = (gatepass) => {
     setEditingGatepass(gatepass);
-    setGatepassId(gatepass.gatepassId);
-    setToCompany(gatepass.toCompany || "");
-    setPoType(
-      gatepass.items && gatepass.items.length > 0 ? "withPO" : "withoutPO"
-    );
-    setItemsList(gatepass.items || []);
-    setItemName("");
-    setItemQuantity("");
-    setItemUnits("");
-    setCategory(gatepass.itemsCategory || "");
-    setAgainstPoNo(gatepass.againstPoNo || "");
-    setSupplier(gatepass.supplier || "");
-    setDate(formatDate(gatepass.date));
-    setStatus(gatepass.status ? "Active" : "Inactive");
+    setGatepassId(gatepass.gatePassId || "");
+    setDate(formatDateForInput(gatepass.date));
+    setStatus(gatepass.status || "Permanent");
+    console.log({ gatepass }, "data");
+
+    if (gatepass.type === "withPO") {
+      setPoType("withPO");
+      const matchedPO = purchaseOrders.find(
+        (po) => po.purchaseOrderId === gatepass.withPO?.poNo
+      );
+      setAgainstPoNo(matchedPO?._id || "");
+      setSupplier(gatepass.withPO?.supplier?.supplierName || "");
+      setDriverName(gatepass.driverName || "");
+      setItemsList(gatepass.withPO?.items || []);
+    } else {
+      setPoType("withoutPO");
+      setWithOutPoSupplier(gatepass.withoutPO?.supplier?._id || "");
+      setDriverNameWithoutPo(gatepass.driverName || "");
+      setItemsList(gatepass.withoutPO?.items || []);
+
+      // set category only if one item exists (or handle multiple)
+      if (gatepass.withoutPO?.items?.length > 0) {
+        const firstItem = gatepass.withoutPO.items[0];
+        setCategory({
+          id: firstItem.category?._id || "",
+          name: firstItem.category?.categoryName || "", // adjust if you store categoryName separately
+        });
+      }
+    }
+
     setErrors({});
     setIsSliderOpen(true);
   };
 
   const handleAddItem = () => {
-    const trimmedItemName = itemName.trim();
     const parsedItemQuantity = parseInt(itemQuantity, 10);
-    const trimmedItemUnits = itemUnits.trim();
 
     if (
-      !trimmedItemName ||
+      !itemName ||
       !itemQuantity ||
       isNaN(parsedItemQuantity) ||
       parsedItemQuantity <= 0 ||
-      !trimmedItemUnits
+      !itemUnits
     ) {
       Swal.fire({
         icon: "warning",
@@ -149,55 +314,85 @@ const GatepassIn = () => {
       return;
     }
 
+    // find selected item & unit objects
+    const selectedItem = itemNameList.find((i) => i._id === itemName);
+    const selectedUnit = itemUnitsList.find((u) => u._id === itemUnits);
+
     setItemsList([
       ...itemsList,
       {
-        name: trimmedItemName,
+        itemId: itemName, // ID
+        itemName: selectedItem?.itemName, // Name
         qty: parsedItemQuantity,
-        units: trimmedItemUnits,
+        unitId: itemUnits, // ID
+        unitName: selectedUnit?.unitName, // Name
       },
     ]);
+
+    // reset
     setItemName("");
     setItemQuantity("");
     setItemUnits("");
     setErrors((prev) => ({ ...prev, itemsList: null }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing or Invalid Fields",
-        html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
-          errors
-        )
-          .map((err) => `<li>${err}</li>`)
-          .join("")}</ul>`,
-        confirmButtonColor: "#d33",
-      });
-      return;
-    }
-
-    const newGatepass = {
-      _id: editingGatepass ? editingGatepass._id : Date.now().toString(),
-      gatepassId: gatepassId.trim(),
-      toCompany: toCompany.trim(),
-      driverName: "TBD", // Placeholder, can be dynamically set if needed
-      itemsCategory: poType === "withPO" ? category : "",
-      supplier: poType === "withoutPO" ? supplier : "",
-      items: poType === "withPO" ? itemsList : [],
-      againstPoNo: poType === "withoutPO" ? againstPoNo : "",
-      date,
-      status: status === "Active",
-      createdAt: new Date().toISOString(),
+    const { token } = userInfo || {};
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     };
 
+    // if (!validateForm()) {
+    //   Swal.fire({
+    //     icon: "warning",
+    //     title: "Missing or Invalid Fields",
+    //     html: `Please correct the following errors:<br/><ul class='list-disc pl-5'>${Object.values(
+    //       errors
+    //     )
+    //       .map((err) => `<li>${err}</li>`)
+    //       .join("")}</ul>`,
+    //     confirmButtonColor: "#d33",
+    //   });
+    //   return;
+    // }
+
+    let newGatepass;
+
+    if (poType === "withPO") {
+      newGatepass = {
+        gatePassId: editingGatepass ? gatepassId : `GPIN-${nextGatePassId}`,
+        type: "withPO",
+        driverName: driverName.trim(),
+        withPO: {
+          poNo: againstPoNo, // PO _id
+        },
+        status,
+      };
+    } else {
+      newGatepass = {
+        gatePassId: editingGatepass ? gatepassId : `GPIN-${nextGatePassId}`,
+        type: "withoutPO",
+        driverName: driverNameWithoutPo.trim(),
+        status,
+        withoutPO: {
+          supplierName: withOutPoSupplier, // now inside withoutPO
+          items: itemsList.map((item) => ({
+            category: category.id,
+            itemName: item.itemName,
+            qty: item.qty,
+            unit: item.unitName,
+          })),
+        },
+      };
+    }
+
     if (editingGatepass) {
-      setGatepasses(
-        gatepasses.map((g) => (g._id === editingGatepass._id ? newGatepass : g))
-      );
+      await api.put(`/gatePassIn/${editingGatepass._id}`, newGatepass, {
+        headers,
+      });
+
       Swal.fire({
         icon: "success",
         title: "Updated!",
@@ -205,7 +400,7 @@ const GatepassIn = () => {
         confirmButtonColor: "#3085d6",
       });
     } else {
-      setGatepasses([...gatepasses, newGatepass]);
+      await api.post("/gatePassIn", newGatepass, { headers });
       Swal.fire({
         icon: "success",
         title: "Added!",
@@ -213,7 +408,7 @@ const GatepassIn = () => {
         confirmButtonColor: "#3085d6",
       });
     }
-
+    fetchGatePassInn();
     resetForm();
   };
 
@@ -239,8 +434,13 @@ const GatepassIn = () => {
         cancelButtonText: "No, cancel!",
         reverseButtons: true,
       })
-      .then((result) => {
+      .then(async (result) => {
         if (result.isConfirmed) {
+          const { token } = userInfo || {};
+          const headers = {
+            Authorization: `Bearer ${token}`,
+          };
+          await api.delete(`/gatePassIn/${id}`, { headers });
           setGatepasses(gatepasses.filter((g) => g._id !== id));
           swalWithTailwindButtons.fire(
             "Deleted!",
@@ -256,6 +456,16 @@ const GatepassIn = () => {
         }
       });
   };
+
+  function handleRemoveItem(index) {
+    setItemsList(itemsList.filter((_, i) => i !== index));
+  }
+  const handleView = (gatepass) => {
+    setSelectedGatepass(gatepass);
+    setIsView(true);
+  };
+
+  console.log({ itemsList });
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -279,12 +489,12 @@ const GatepassIn = () => {
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[1200px]">
               {/* Table Header */}
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>GatePass ID</div>
                 <div>Driver Name</div>
                 <div>Items Category</div>
                 <div>Supplier</div>
-                <div>Items</div>
+                {/* <div>Items</div> */}
                 <div>Date</div>
                 <div>Status</div>
                 <div className="text-right">Actions</div>
@@ -295,95 +505,120 @@ const GatepassIn = () => {
                 {loading ? (
                   <TableSkeleton
                     rows={3}
-                    cols={8}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto]"
+                    cols={7}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
                   />
                 ) : gatepasses.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No gatepasses found.
                   </div>
                 ) : (
-                  gatepasses.map((gatepass) => (
-                    <div
-                      key={gatepass._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_3fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                    >
-                      <div className="font-medium text-gray-900">
-                        {gatepass.gatepassId}
-                      </div>
-                      <div className="text-gray-600">{gatepass.driverName}</div>
-                      <div className="text-gray-600">
-                        {gatepass.itemsCategory}
-                      </div>
-                      <div className="text-gray-600">{gatepass.supplier}</div>
-                      <div className="text-gray-600">
-                        <div className="flex flex-wrap gap-2">
-                          {gatepass.items && gatepass.items.length > 0 ? (
-                            gatepass.items.map((item, idx) => (
-                              <div key={idx} className="flex gap-2">
-                                <span
-                                  className="px-3 py-1 rounded-full text-xs font-medium"
-                                  style={{
-                                    backgroundColor: `hsl(${
-                                      (idx * 70) % 360
-                                    }, 80%, 85%)`,
-                                    color: `hsl(${(idx * 70) % 360}, 40%, 25%)`,
-                                  }}
-                                >
-                                  {item.name}
-                                </span>
-                                <span
-                                  className="px-3 py-1 rounded-full text-xs font-medium"
-                                  style={{
-                                    backgroundColor: `hsl(${
-                                      (idx * 70 + 35) % 360
-                                    }, 80%, 85%)`,
-                                    color: `hsl(${
-                                      (idx * 70 + 35) % 360
-                                    }, 40%, 25%)`,
-                                  }}
-                                >
-                                  Qty: {item.qty} {item.units}
-                                </span>
-                              </div>
-                            ))
-                          ) : (
-                            <span className="text-gray-500">No items</span>
-                          )}
+                  gatepasses.map((gatepass) => {
+                    const isWithPO = gatepass.type === "withPO";
+                    const poData = gatepass.withPO;
+                    const withoutPOData = gatepass.withoutPO;
+
+                    return (
+                      <div
+                        key={gatepass._id}
+                        className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      >
+                        {/* GatePass ID */}
+                        <div className="font-medium text-gray-900">
+                          {gatepass.gatePassId}
+                        </div>
+
+                        {/* Driver Name */}
+                        <div className="text-gray-600">
+                          {gatepass.driverName}
+                        </div>
+
+                        {/* Category */}
+                        <div className="text-gray-600">
+                          {isWithPO
+                            ? poData?.estimation?.demandItem?.category
+                                ?.categoryName || "-"
+                            : withoutPOData?.items?.[0]?.category
+                                ?.categoryName || "-"}
+                        </div>
+
+                        {/* Supplier */}
+                        <div className="text-gray-600">
+                          {isWithPO
+                            ? poData?.supplier?.supplierName || "-"
+                            : withoutPOData?.supplier?.supplierName || "-"}
+                        </div>
+
+                        {/* Items */}
+                        {/* <div className="text-gray-600">
+                          <div className="flex flex-wrap gap-2">
+                            {isWithPO
+                              ? poData?.items?.map((item, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
+                                  >
+                                    {item.itemName} (Qty: {item.qty}, Price:{" "}
+                                    {item.price})
+                                  </span>
+                                ))
+                              : withoutPOData?.map((item, idx) => (
+                                  <span
+                                    key={idx}
+                                    className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
+                                  >
+                                    {item.itemName} (Qty: {item.qty} {item.unit}
+                                    )
+                                  </span>
+                                ))}
+                          </div>
+                        </div> */}
+
+                        {/* Date */}
+                        <div className="text-gray-500">
+                          {formatDate(gatepass.date)}
+                        </div>
+
+                        {/* Status */}
+                        <div className="text-gray-600">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs ${
+                              gatepass.status === "Permanent"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
+                            {gatepass.status}
+                          </span>
+                        </div>
+
+                        {/* Actions */}
+                        <div>
+                          <button
+                            onClick={() => handleEditClick(gatepass)}
+                            className="py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
+                            title="Edit"
+                          >
+                            <SquarePen size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(gatepass._id)}
+                            className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 size={18} />
+                          </button>
+                          <button
+                            onClick={() => handleView(gatepass)}
+                            className="py-1 text-sm text-amber-600 hover:bg-amber-50"
+                            title="View"
+                          >
+                            <Eye size={18} />
+                          </button>
                         </div>
                       </div>
-                      <div className="text-gray-500">
-                        {formatDate(gatepass.date)}
-                      </div>
-                      <div className="text-gray-600">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs ${
-                            gatepass.status
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
-                        >
-                          {gatepass.status ? "Active" : "Inactive"}
-                        </span>
-                      </div>
-                      <div>
-                        <button
-                          onClick={() => handleEditClick(gatepass)}
-                          className="py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
-                          title="Edit"
-                        >
-                          <SquarePen size={18} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(gatepass._id)}
-                          className="px-3 py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
-                          title="Delete"
-                        >
-                          <Trash2 size={18} />
-                        </button>
-                      </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
             </div>
@@ -416,7 +651,10 @@ const GatepassIn = () => {
                     </label>
                     <input
                       type="text"
-                      value={gatepassId}
+                      value={
+                        editingGatepass ? gatepassId : `GPIN-${nextGatePassId}`
+                      }
+                      readOnly
                       onChange={(e) => setGatepassId(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                         errors.gatepassId
@@ -426,6 +664,7 @@ const GatepassIn = () => {
                       placeholder="Enter gatepass ID"
                       required
                     />
+
                     {errors.gatepassId && (
                       <p className="text-red-500 text-xs mt-1">
                         {errors.gatepassId}
@@ -454,27 +693,45 @@ const GatepassIn = () => {
                 </div>
 
                 <div className="flex items-center gap-4">
-                  <label className="block text-gray-700 font-medium">
-                    <input
-                      type="radio"
-                      value="withPO"
-                      checked={poType === "withPO"}
-                      onChange={(e) => setPoType(e.target.value)}
-                      className="mr-2"
-                    />
-                    With PO
-                  </label>
-                  <label className="block text-gray-700 font-medium">
-                    <input
-                      type="radio"
-                      value="withoutPO"
-                      checked={poType === "withoutPO"}
-                      onChange={(e) => setPoType(e.target.value)}
-                      className="mr-2"
-                    />
-                    Without PO
-                  </label>
+                  {/* Show both radios only in Add mode */}
+                  {!editingGatepass ? (
+                    <>
+                      <label className="block text-gray-700 font-medium">
+                        <input
+                          type="radio"
+                          value="withPO"
+                          checked={poType === "withPO"}
+                          onChange={(e) => setPoType(e.target.value)}
+                          className="mr-2"
+                        />
+                        With PO
+                      </label>
+                      <label className="block text-gray-700 font-medium">
+                        <input
+                          type="radio"
+                          value="withoutPO"
+                          checked={poType === "withoutPO"}
+                          onChange={(e) => setPoType(e.target.value)}
+                          className="mr-2"
+                        />
+                        Without PO
+                      </label>
+                    </>
+                  ) : (
+                    // In edit mode, show only the one originally selected
+                    <label className="block text-gray-700 font-medium">
+                      <input
+                        type="radio"
+                        value={poType}
+                        checked
+                        readOnly
+                        className="mr-2"
+                      />
+                      {poType === "withPO" ? "With PO" : "Without PO"}
+                    </label>
+                  )}
                 </div>
+
                 {poType === "withPO" && (
                   <>
                     <div className="flex gap-4">
@@ -483,8 +740,25 @@ const GatepassIn = () => {
                           Against PO No. <span className="text-red-500">*</span>
                         </label>
                         <select
-                          value={supplier}
-                          onChange={(e) => setSupplier(e.target.value)}
+                          value={againstPoNo}
+                          onChange={(e) => {
+                            const selectedId = e.target.value;
+                            setAgainstPoNo(selectedId);
+
+                            // 🔑 Find selected PO
+                            const selectedPO = purchaseOrders.find(
+                              (po) => po._id === selectedId
+                            );
+                            console.log({ selectedPO });
+
+                            if (selectedPO) {
+                              // supplier is nested inside -> estimation.demandItem.supplier.supplierName
+                              setSupplier(
+                                selectedPO.estimation?.demandItem?.supplier
+                                  ?.supplierName || ""
+                              );
+                            }
+                          }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.supplier
                               ? "border-red-500 focus:ring-red-500"
@@ -493,13 +767,13 @@ const GatepassIn = () => {
                           required
                         >
                           <option value="">Select PO No</option>
-                          <option value="ABC Corp">ABC Corp</option>
-                          <option value="XYZ Ltd">XYZ Ltd</option>
-                          <option value="Tech Solutions">Tech Solutions</option>
-                          <option value="Global Supplies">
-                            Global Supplies
-                          </option>
+                          {purchaseOrders?.map((po) => (
+                            <option key={po._id} value={po._id}>
+                              {po.purchaseOrderId}
+                            </option>
+                          ))}
                         </select>
+
                         {errors.againstPoNo && (
                           <p className="text-red-500 text-xs mt-1">
                             {errors.againstPoNo}
@@ -527,37 +801,126 @@ const GatepassIn = () => {
                           </p>
                         )}
                       </div>
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Driver Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={driverName}
+                          onChange={(e) => setDriverName(e.target.value)}
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.driverName
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          placeholder="Enter driver name"
+                          required
+                        />
+                        {errors.driverName && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.driverName}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </>
                 )}
                 {poType === "withoutPO" && (
                   <>
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Category <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={category}
-                        onChange={(e) => setCategory(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.category
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        required
-                      >
-                        <option value="">Select Category</option>
-                        <option value="Electronics">Electronics</option>
-                        <option value="Stationery">Stationery</option>
-                        <option value="IT Equipment">IT Equipment</option>
-                        <option value="Furniture">Furniture</option>
-                      </select>
-                      {errors.category && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.category}
-                        </p>
-                      )}
+                    <div className="flex gap-4">
+                      {/* Category */}
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Category <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={category.id}
+                          onChange={(e) => {
+                            const selected = categories.find(
+                              (cat) => cat._id === e.target.value
+                            );
+                            setCategory({
+                              id: selected?._id || "",
+                              name: selected?.categoryName || "",
+                            });
+                          }}
+                          className="w-full p-3 border rounded-md"
+                          required
+                        >
+                          <option value="">Select Category</option>
+                          {categories?.map((cat) => (
+                            <option key={cat._id} value={cat._id}>
+                              {cat.categoryName}
+                            </option>
+                          ))}
+                        </select>
+
+                        {errors.category && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.category}
+                          </p>
+                        )}
+                      </div>
+
+                      {/* Supplier */}
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Supplier <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={withOutPoSupplier}
+                          onChange={(e) => setWithOutPoSupplier(e.target.value)}
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.supplier
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          required
+                        >
+                          <option value="">Select Supplier</option>
+
+                          {/*supplierr list */}
+                          {supplierList.map((s) => (
+                            <option key={s._id} value={s._id}>
+                              {s.supplierName}
+                            </option>
+                          ))}
+                        </select>
+
+                        {errors.withOutPoSupplier && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.withOutPoSupplier}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Driver Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={driverNameWithoutPo}
+                          onChange={(e) =>
+                            setDriverNameWithoutPo(e.target.value)
+                          }
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.driverNameWithoutPo
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          placeholder="Enter driver name"
+                          required
+                        />
+                        {errors.driverNameWithoutPo && (
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.driverNameWithoutPo}
+                          </p>
+                        )}
+                      </div>
                     </div>
+
                     <div className="space-y-3">
                       <div className="flex justify-between gap-2 items-end">
                         <div className="flex-1">
@@ -570,12 +933,11 @@ const GatepassIn = () => {
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           >
                             <option value="">Select Item</option>
-                            <option value="Laptop">Laptop</option>
-                            <option value="Desktop">Desktop</option>
-                            <option value="Printer">Printer</option>
-                            <option value="Scanner">Scanner</option>
-                            <option value="Projector">Projector</option>
-                            <option value="Stationery">Stationery</option>
+                            {itemNameList.map((item) => (
+                              <option key={item._id} value={item._id}>
+                                {item.itemName}
+                              </option>
+                            ))}
                           </select>
                         </div>
                         <div className="flex-1">
@@ -601,12 +963,11 @@ const GatepassIn = () => {
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           >
                             <option value="">Select Unit</option>
-                            <option value="Piece">Piece</option>
-                            <option value="Box">Box</option>
-                            <option value="Packet">Packet</option>
-                            <option value="Kg">Kg</option>
-                            <option value="Liters">Liters</option>
-                            <option value="Dozen">Dozen</option>
+                            {itemUnitsList.map((item) => (
+                              <option key={item._id} value={item._id}>
+                                {item.unitName}
+                              </option>
+                            ))}
                           </select>
                         </div>
                         <div>
@@ -635,6 +996,7 @@ const GatepassIn = () => {
                                 </th>
                                 <th className="px-4 py-2 border-b">Quantity</th>
                                 <th className="px-4 py-2 border-b">Units</th>
+                                <th className="px-4 py-2 border-b">Remove</th>
                               </tr>
                             </thead>
                             <tbody className="text-gray-700 text-sm">
@@ -643,14 +1005,21 @@ const GatepassIn = () => {
                                   <td className="px-4 py-2 border-b text-center">
                                     {idx + 1}
                                   </td>
-                                  <td className="px-4 py-2 border-b">
-                                    {item.name}
+                                  <td className="px-4 py-2 border-b text-center">
+                                    {item.itemName}
                                   </td>
                                   <td className="px-4 py-2 border-b text-center">
                                     {item.qty}
                                   </td>
-                                  <td className="px-4 py-2 border-b">
-                                    {item.units}
+                                  <td className="px-4 py-2 border-b text-center">
+                                    {item.unitName}
+                                  </td>
+                                  <td className="px-4 py-2 border-b text-center">
+                                    <button
+                                      onClick={() => handleRemoveItem(idx)}
+                                    >
+                                      <X size={18} className="text-red-600" />
+                                    </button>
                                   </td>
                                 </tr>
                               ))}
@@ -676,8 +1045,8 @@ const GatepassIn = () => {
                       }`}
                       required
                     >
-                      <option value="Active">Permanent</option>
-                      <option value="Inactive">Temporary</option>
+                      <option value="Permanent">Permanent</option>
+                      <option value="Temporary">Temporary</option>
                     </select>
                     {errors.status && (
                       <p className="text-red-500 text-xs mt-1">
@@ -700,6 +1069,14 @@ const GatepassIn = () => {
               </form>
             </div>
           </div>
+        )}
+
+        {isView && selectedGatepass && (
+          <ViewModel
+            data={selectedGatepass}
+            type="gatepass"
+            onClose={() => setIsView(false)}
+          />
         )}
 
         <style jsx>{`
