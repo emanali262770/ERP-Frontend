@@ -513,36 +513,6 @@ const GatePassOut = () => {
 
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Driver Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={driverName}
-                      onChange={(e) => setDriverName(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.driverName
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter driver name"
-                      required
-                      aria-describedby={
-                        errors.driverName ? "driverName-error" : undefined
-                      }
-                    />
-                    {errors.driverName && (
-                      <p
-                        id="driverName-error"
-                        className="text-red-500 text-xs mt-1"
-                      >
-                        {errors.driverName}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
                       Date <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -563,36 +533,8 @@ const GatePassOut = () => {
                       </p>
                     )}
                   </div>
-
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Supplier <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={supplier}
-                      onChange={(e) => setSupplier(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.supplier
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter supplier"
-                      required
-                      aria-describedby={
-                        errors.supplier ? "supplier-error" : undefined
-                      }
-                    />
-                    {errors.supplier && (
-                      <p
-                        id="supplier-error"
-                        className="text-red-500 text-xs mt-1"
-                      >
-                        {errors.supplier}
-                      </p>
-                    )}
-                  </div>
                 </div>
+
                 <div className="flex items-center gap-4">
                   <label className="block text-gray-700 font-medium">
                     <input
@@ -618,44 +560,106 @@ const GatePassOut = () => {
 
                 {poType === "withPO" && (
                   <>
-                    <div className="flex-1 min-w-0">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        PO No. <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={poNo}
-                        onChange={(e) => setPoNo(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.poNo
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        required
-                        aria-describedby={
-                          errors.poNo ? "poNo-error" : undefined
-                        }
-                      >
-                        <option value="">Select PO Number</option>
-                        {poOptions.map((po) => (
-                          <option key={po} value={po}>
-                            {po}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.poNo && (
-                        <p
-                          id="poNo-error"
-                          className="text-red-500 text-xs mt-1"
-                        >
-                          {errors.poNo}
-                        </p>
-                      )}
+                    <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-50">
+                      <div className="w-[49%]">
+                        <div className="flex-1 min-w-0">
+                          <label className="block text-gray-700 font-medium mb-2">
+                            PO No. <span className="text-red-500">*</span>
+                          </label>
+                          <select
+                            value={poNo}
+                            onChange={(e) => setPoNo(e.target.value)}
+                            className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.poNo
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-newPrimary"
+                            }`}
+                            required
+                            aria-describedby={
+                              errors.poNo ? "poNo-error" : undefined
+                            }
+                          >
+                            <option value="">Select PO Number</option>
+                            {poOptions.map((po) => (
+                              <option key={po} value={po}>
+                                {po}
+                              </option>
+                            ))}
+                          </select>
+                          {errors.poNo && (
+                            <p
+                              id="poNo-error"
+                              className="text-red-500 text-xs mt-1"
+                            >
+                              {errors.poNo}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex gap-4">
+                        <div className="flex-1 min-w-0">
+                          <label className="block text-gray-700 font-medium mb-2">
+                            Supplier <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={supplier}
+                            onChange={(e) => setSupplier(e.target.value)}
+                            className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.supplier
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-newPrimary"
+                            }`}
+                            placeholder="Enter supplier"
+                            required
+                            aria-describedby={
+                              errors.supplier ? "supplier-error" : undefined
+                            }
+                          />
+                          {errors.supplier && (
+                            <p
+                              id="supplier-error"
+                              className="text-red-500 text-xs mt-1"
+                            >
+                              {errors.supplier}
+                            </p>
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <label className="block text-gray-700 font-medium mb-2">
+                            Driver Name <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            value={driverName}
+                            onChange={(e) => setDriverName(e.target.value)}
+                            className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                              errors.driverName
+                                ? "border-red-500 focus:ring-red-500"
+                                : "border-gray-300 focus:ring-newPrimary"
+                            }`}
+                            placeholder="Enter driver name"
+                            required
+                            aria-describedby={
+                              errors.driverName ? "driverName-error" : undefined
+                            }
+                          />
+                          {errors.driverName && (
+                            <p
+                              id="driverName-error"
+                              className="text-red-500 text-xs mt-1"
+                            >
+                              {errors.driverName}
+                            </p>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </>
                 )}
 
                 {poType === "withoutPO" && (
-                  <div className="space-y-3">
+                  <div className="space-y-3 border p-4 rounded-lg bg-gray-50 pb-6">
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
@@ -740,29 +744,40 @@ const GatePassOut = () => {
                       </p>
                     )}
                     {itemsList.length > 0 && (
-                      <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                          <thead className="bg-gray-100 text-gray-600 text-sm">
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse">
+                          <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
                             <tr>
-                              <th className="px-4 py-2 border-b">Sr #</th>
-                              <th className="px-4 py-2 border-b">Item Name</th>
-                              <th className="px-4 py-2 border-b">Quantity</th>
-                              <th className="px-4 py-2 border-b">Units</th>
+                              <th className="px-4 py-2 border border-gray-300">
+                                Sr #
+                              </th>
+                              <th className="px-4 py-2 border border-gray-300">
+                                Item Name
+                              </th>
+                              <th className="px-4 py-2 border border-gray-300">
+                                Quantity
+                              </th>
+                              <th className="px-4 py-2 border border-gray-300">
+                                Units
+                              </th>
                             </tr>
                           </thead>
-                          <tbody className="text-gray-700 text-sm">
+                          <tbody className="text-gray-700 text-sm ">
                             {itemsList.map((item, idx) => (
-                              <tr key={idx} className="hover:bg-gray-50">
-                                <td className="px-4 py-2 border-b text-center">
+                              <tr
+                                key={idx}
+                                className="bg-gray-100 text-center border border-gray-300"
+                              >
+                                <td className="px-4 py-2 text-center border border-gray-300">
                                   {idx + 1}
                                 </td>
-                                <td className="px-4 py-2 border-b">
+                                <td className="px-4 py-2 border border-gray-300">
                                   {item.name}
                                 </td>
-                                <td className="px-4 py-2 border-b text-center">
+                                <td className="px-4 py-2 text-center border border-gray-300">
                                   {item.qty}
                                 </td>
-                                <td className="px-4 py-2 border-b">
+                                <td className="px-4 py-2 border border-gray-300">
                                   {item.units}
                                 </td>
                               </tr>
@@ -771,9 +786,73 @@ const GatePassOut = () => {
                         </table>
                       </div>
                     )}
+                    <div className="flex gap-4">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Supplier <span className="text-red-500">*</span>
+                        </label>
+
+                        <select
+                          value={supplier}
+                          onChange={(e) => setSupplier(e.target.value)}
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.supplier
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          required
+                          aria-describedby={
+                            errors.supplier ? "supplier-error" : undefined
+                          }
+                        >
+                          <option value="">Select Supplier</option>
+                          <option value="ABC Supplier">ABC Supplier</option>
+                          <option value="XYZ Supplier">XYZ Supplier</option>
+                          <option value="PQR Supplier">PQR Supplier</option>
+                        </select>
+
+                        {errors.supplier && (
+                          <p
+                            id="supplier-error"
+                            className="text-red-500 text-xs mt-1"
+                          >
+                            {errors.supplier}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Driver Name <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={driverName}
+                          onChange={(e) => setDriverName(e.target.value)}
+                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                            errors.driverName
+                              ? "border-red-500 focus:ring-red-500"
+                              : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                          placeholder="Enter driver name"
+                          required
+                          aria-describedby={
+                            errors.driverName ? "driverName-error" : undefined
+                          }
+                        />
+                        {errors.driverName && (
+                          <p
+                            id="driverName-error"
+                            className="text-red-500 text-xs mt-1"
+                          >
+                            {errors.driverName}
+                          </p>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 )}
-                <div className="flex gap-4">
+                <div className="flex gap-4 w-[49%]">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Status <span className="text-red-500">*</span>
@@ -791,8 +870,8 @@ const GatePassOut = () => {
                         errors.status ? "status-error" : undefined
                       }
                     >
-                      <option value="Active">Permanent</option>
-                      <option value="Inactive">Temporary</option>
+                      <option value="Permanent">Permanent</option>
+                      <option value="Temporary">Temporary</option>
                     </select>
                     {errors.status && (
                       <p
