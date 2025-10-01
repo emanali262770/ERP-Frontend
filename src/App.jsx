@@ -57,9 +57,12 @@ import PaymentReceiptVoucher from "./pages/admin/Sales/PaymentReceiptVoucher.jsx
 import CustomerLedger from "./pages/admin/Sales/CustomerLedger.jsx";
 import Receivable from "./pages/admin/Sales/Receivable.jsx";
 import SalesReturn from "./pages/admin/Sales/SalesReturn.jsx";
-import DeliveryChallanAcknowledgement from "./pages/admin/Sales/DeliveryChallanAcknowledgement.jsx";
+import StoreAcknowledgement from "./pages/admin/Sales/StoreAcknowledgement.jsx";
 import Profile from "./components/Profile.jsx";
 import PurchaseReturn from "./pages/admin/Purchase/PurchaseReturn.jsx";
+import CustomerDistributorList from "./pages/admin/Sales/CustomerDistributor.jsx";
+import EmptyVehicleEntry from "./pages/admin/Sales/EmptyVehicleEntry.jsx";
+import Tax from "./pages/admin/SetUp/Tax.jsx";
 
 function AppContent() {
   return (
@@ -120,12 +123,13 @@ function AppContent() {
             <Route path="distribution-rate-list" element={<DistributionRateList />} />
             <Route path="booking-orders" element={<BookingOrders />} />
             <Route path="delivery-challan" element={<DeliveryChallan />} />
-            <Route path="delivery-challan-acknowledgement" element={<DeliveryChallanAcknowledgement />} />
+            <Route path="store-acknowledgement" element={<StoreAcknowledgement />} />
             <Route path="sales-invoices" element={<SalesInvoices />} />
             <Route path="payment-receipt-voucher" element={<PaymentReceiptVoucher />} />
             <Route path="customer-ledger" element={<CustomerLedger />} />
             <Route path="receivable" element={<Receivable />} />
             <Route path="sales-return" element={<SalesReturn />} />
+            <Route path="customer-distributor" element={<CustomerDistributorList />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
@@ -134,9 +138,10 @@ function AppContent() {
             <Route path="designation" element={<Designation />} />
             <Route path="employee" element={<Employee />} />
             <Route path="departments" element={<Departments />} />
-
+            <Route path="empty-vehicle-entry" element={<EmptyVehicleEntry />} />
             <Route path="promotion-item" element={<PromotionItem />} />
             <Route path="item-type" element={<ItemType />} />
+            <Route path="tax" element={<Tax />} />
           </Route>
         </Routes>
       </main>

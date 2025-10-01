@@ -96,6 +96,7 @@ const links = [
     label: "Sales ",
     icon: <FaShoppingCart />,
     children: [
+      { to: "/admin/customer-distributor", label: "Customer/Distributor", icon: <FaListAlt /> },
       { to: "/admin/rate-list", label: "Rate List", icon: <FaListAlt /> },
       {
         to: "/admin/distribution-rate-list",
@@ -107,6 +108,16 @@ const links = [
         label: "Booking Order",
         icon: <FaShoppingCart />,
       },
+       {
+        to: "/admin/empty-vehicle-entry",
+        label: "Empty Vehicle Entry",
+        icon: <FaDoorOpen />,
+      },
+        {
+        to: "/admin/store-acknowledgement",
+        label: "Store Acknowledgement",
+        icon: <FaClipboardCheck />,
+      },
       {
         to: "/admin/delivery-challan",
         label: "Delivery Challan",
@@ -117,36 +128,29 @@ const links = [
         label: "Sales Invoice",
         icon: <FaFileInvoiceDollar />,
       },
-      {
-        to: "/admin/gatepass-out",
-        label: "Gatepass Out",
-        icon: <FaDoorOpen />,
+            {
+        to: "/admin/sales-return",
+        label: "Sales Return",
+        icon: <FaUndoAlt />,
       },
-      {
-        to: "/admin/delivery-challan-acknowledgement",
-        label: "Delivery Challan Acknowledgement",
-        icon: <FaClipboardCheck />,
+            {
+        to: "/admin/customer-ledger",
+        label: "Customer Ledger",
+        icon: <FaAddressBook />,
+      },
+            {
+        to: "/admin/receivable",
+        label: "Receivable",
+        icon: <FaMoneyBillWave />,
       },
       {
         to: "/admin/payment-receipt-voucher",
         label: "Payment Receipt Voucher",
         icon: <FaReceipt />,
       },
-      {
-        to: "/admin/customer-ledger",
-        label: "Customer Ledger",
-        icon: <FaAddressBook />,
-      },
-      {
-        to: "/admin/receivable",
-        label: "Receivable",
-        icon: <FaMoneyBillWave />,
-      },
-      {
-        to: "/admin/sales-return",
-        label: "Sales Return",
-        icon: <FaUndoAlt />,
-      },
+
+
+
     ],
   },
   {
