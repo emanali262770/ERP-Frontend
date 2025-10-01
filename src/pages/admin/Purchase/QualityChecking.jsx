@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { SquarePen, Trash2 } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { Loader, SquarePen, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -8,6 +8,8 @@ import { api } from "../../../context/ApiService";
 
 const QualityChecking = () => {
   const [qualityChecks, setQualityChecks] = useState([]);
+  const [gatePassList, setGatePassList] = useState([]);
+  const [gatePassListItems, setGatePassListItems] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [qcId, setQcId] = useState("");
@@ -21,10 +23,11 @@ const QualityChecking = () => {
   const [result, setResult] = useState("");
   const [editingQC, setEditingQC] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsLoading, setItemsLoading] = useState(false);
   const [errors, setErrors] = useState({});
   const [nextQcId, setNextQcId] = useState("001");
   const [editingQualityChecks, setEditingQualityChecks] = useState(null);
-
+const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const sliderRef = useRef(null);
 
   // 🔹 ID Creation of Quality Checking
@@ -49,8 +52,8 @@ const QualityChecking = () => {
   const [modalResult, setModalResult] = useState("");
 
   // 🔹 Open per-item QC Modal
-  const openQcModal = (item) => {
-    setSelectedItem(item);
+  const openQcModal = (item, index) => {
+    setSelectedItem({ ...item, index });
     setModalRemarks(item.remarks || "");
     setModalResult(item.result || "");
     setQcModalOpen(true);
@@ -59,14 +62,15 @@ const QualityChecking = () => {
   // 🔹 Save per-item QC Modal
   const saveQcModal = () => {
     setItemsList((prev) =>
-      prev.map((i) =>
-        i.id === selectedItem.id
+      prev.map((i, idx) =>
+        (i._id && i._id === selectedItem._id) || idx === selectedItem.index
           ? { ...i, remarks: modalRemarks, result: modalResult }
           : i
       )
     );
     setQcModalOpen(false);
   };
+
   // 🔹 Add this static mapping at the top of your component
   const gatePassItems = {
     GP001: [
@@ -88,28 +92,6 @@ const QualityChecking = () => {
     }
   }, [gpId]);
 
-  // Static data
-  const staticData = [
-    {
-      _id: "1",
-      qcId: "QC-001",
-      date: "2025-09-01",
-      items: [{ name: "Laptop", qty: 5 }],
-      description: "Laptop batch inspection",
-      remarks: "Looks fine",
-      result: "uptoStandard",
-    },
-    {
-      _id: "2",
-      qcId: "QC-002",
-      date: "2025-09-15",
-      items: [{ name: "Notebooks", qty: 10 }],
-      description: "Stationery quality check",
-      remarks: "Few damaged covers",
-      result: "damage",
-    },
-  ];
-
   const formatDate = (date) => {
     if (!date) return "";
     const d = new Date(date);
@@ -119,11 +101,71 @@ const QualityChecking = () => {
     return `${day}-${month}-${year}`;
   };
 
-  useEffect(() => {
-    setLoading(true);
-    setQualityChecks(staticData);
-    setTimeout(() => setLoading(false), 800);
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/qualityCheck`;
+  // Qulaity Check fetch
+  const fetchQualityCheckInn = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      setQualityChecks(res.data); // store actual categories array
+      console.log("qualtity check  ", res.data);
+    } catch (error) {
+      console.error("Failed to qualtity check ", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
   }, []);
+  useEffect(() => {
+    fetchQualityCheckInn();
+  }, [fetchQualityCheckInn]);
+  const GATEPASS_URL = `${import.meta.env.VITE_API_BASE_URL}/gatePassIn`;
+  // Qulaity Check fetch
+  const fetchGatePassInn = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${GATEPASS_URL}`);
+      setGatePassList(res.data); // store actual categories array
+      console.log("gate pass", res.data);
+    } catch (error) {
+      console.error("Failed to Gate pass", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchGatePassInn();
+  }, [fetchGatePassInn]);
+
+  const fetchGatePassInnItems = useCallback(async () => {
+    if (!gpId) {
+      return;
+    }
+    try {
+      setItemsLoading(true);
+      const res = await axios.get(`${GATEPASS_URL}/${gpId}`);
+      const data = res.data;
+
+      // ✅ Normalize items from withPO or withoutPO
+      const items =
+        data?.withPO?.items?.length > 0
+          ? data.withPO.items
+          : data?.withoutPO?.items?.length > 0
+          ? data.withoutPO.items
+          : [];
+
+      setGatePassListItems(data);
+      setItemsList(items); // ✅ now itemsList always has correct array
+      console.log("gate pass id items", items);
+    } catch (error) {
+      console.error("Failed to Gate pass", error);
+    } finally {
+      setItemsLoading(false);
+    }
+  }, [gpId]);
+
+  useEffect(() => {
+    fetchGatePassInnItems();
+  }, [fetchGatePassInnItems]);
 
   // reset QC ID
   const resetForm = () => {
@@ -142,7 +184,7 @@ const QualityChecking = () => {
 
   const handleAddClick = () => {
     resetForm();
-    setQcId(`QC${nextQcId}`); // ✅ use QC instead of REQ
+    setQcId(`QC-${nextQcId}`); // ✅ use QC instead of REQ
     setIsSliderOpen(true);
   };
 
@@ -209,17 +251,26 @@ const QualityChecking = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-
-    const newQC = {
-      _id: editingQC ? editingQC._id : Date.now().toString(),
-      qcId: qcId.trim(),
-      gpId,
-      date,
-      items: itemsList,
-      description,
-      remarks,
-      result,
+const { token } = userInfo || {};
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
     };
+    const newQC = {
+      qcId: qcId.trim(),
+      date,
+      gatePassId: gpId,
+      description,
+      items: itemsList.map((i) => ({
+        itemName: i.itemName || i.name,
+        quantity: i.quantity || i.qty,
+        action: i.action || i.result || "",
+        remarks: i.remarks || "",
+      })),
+    };
+  console.log(newQC);
+  
+
 
     try {
       if (editingQC) {
@@ -239,15 +290,13 @@ const QualityChecking = () => {
         );
       } else {
         // Create new
-        await api.post("/gatePassIn", newQC, {
-          headers: { "Content-Type": "application/json" },
-        });
+        await api.post("/qualityCheck", newQC, {headers});
 
         Swal.fire("Added!", "Quality Checking added successfully.", "success");
 
-        setQualityChecks([...qualityChecks, newQC]);
+       
       }
-
+      fetchQualityCheckInn()
       resetForm();
     } catch (error) {
       console.error("Error saving quality checking", error);
@@ -293,19 +342,23 @@ const QualityChecking = () => {
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[900px]">
-              <div className="hidden lg:grid grid-cols-[1fr_2fr_2fr_2fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0">
+              <div className="hidden lg:grid grid-cols-[1fr_2fr_2fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0">
                 <div>QC ID</div>
-                <div>Items</div>
+                {/* <div>Items</div> */}
                 <div>Description</div>
                 <div>Remarks</div>
                 <div>Date</div>
-                <div>Result</div>
+                {/* <div>Result</div> */}
                 <div className="text-right">Actions</div>
               </div>
 
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
-                  <TableSkeleton rows={3} cols={7} />
+                  <TableSkeleton
+                    rows={qualityChecks.length || 5}
+                    cols={5}
+                    className="lg:grid-cols-[1fr_2fr_2fr_1fr_auto]"
+                  />
                 ) : qualityChecks.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No records found.
@@ -314,10 +367,10 @@ const QualityChecking = () => {
                   qualityChecks.map((qc) => (
                     <div
                       key={qc._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_2fr_2fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50"
+                      className="grid grid-cols-1 lg:grid-cols-[1fr_2fr_2fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50"
                     >
                       <div className="font-medium">{qc.qcId}</div>
-                      <div>
+                      {/* <div>
                         {qc.items.map((i, idx) => (
                           <span
                             key={idx}
@@ -326,11 +379,17 @@ const QualityChecking = () => {
                             {i.name} ({i.qty})
                           </span>
                         ))}
-                      </div>
+                      </div> */}
                       <div>{qc.description}</div>
-                      <div>{qc.remarks}</div>
+                      <div>
+                        {qc.items?.map((i) => (
+                          <div key={i._id} className="">
+                            {i.remarks || "—"}
+                          </div>
+                        ))}
+                      </div>
                       <div>{formatDate(qc.date)}</div>
-                      <div className="capitalize">{qc.result}</div>
+                      {/* <div className="capitalize">{qc.result}</div> */}
                       <div className="flex gap-2 justify-end">
                         <button
                           onClick={() => handleEditClick(qc)}
@@ -421,7 +480,11 @@ const QualityChecking = () => {
                     required
                   >
                     <option value="">Select Gate Pass</option>
-                    <option value="GP001">GP001</option>
+                    {gatePassList?.map((gatepass) => (
+                      <option key={gatepass._id} value={gatepass._id}>
+                        {gatepass.gatePassId}
+                      </option>
+                    ))}
                   </select>
 
                   {errors.gpId && (
@@ -429,48 +492,62 @@ const QualityChecking = () => {
                   )}
                 </div>
 
-                {gpId && itemsList.length > 0 && (
-                  <table className="w-full border mt-4">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="border p-2">Item</th>
-                        <th className="border p-2">Quantity</th>
-                        <th className="border p-2">Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {itemsList.map((item) => (
-                        <tr key={item.id} className="text-center">
-                          <td className="border p-2">{item.name}</td>
-                          <td className="border p-2">{item.qty}</td>
-                          <td className="border p-2 text-center">
-                            {item.result === "uptoStandard" ? (
-                              <div
-                                className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
-                                onClick={() => openQcModal(item)}
-                              >
-                                ✓
-                              </div>
-                            ) : item.result === "damage" ||
-                              item.result === "rejected" ? (
-                              <div
-                                className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
-                                onClick={() => openQcModal(item)}
-                              >
-                                ✕
-                              </div>
-                            ) : (
-                              <div
-                                className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
-                                onClick={() => openQcModal(item)}
-                              />
-                            )}
-                          </td>
+                {gpId &&
+                  (itemsLoading ? (
+                    <div className="flex justify-center py-4">
+                      <Loader size={24} className="animate-spin" />
+                    </div>
+                  ) : itemsList.length > 0 ? (
+                    <table className="w-full border mt-4">
+                      <thead className="bg-gray-100">
+                        <tr>
+                          <th className="border p-2">Item</th>
+                          <th className="border p-2">Quantity</th>
+                          <th className="border p-2">Action</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                )}
+                      </thead>
+                      <tbody>
+                        {itemsList.map((item, idx) => (
+                          <tr key={idx} className="text-center">
+                            <td className="border p-2">
+                              {item.itemName || item.name}
+                            </td>
+                            <td className="border p-2">
+                              {item.quantity || item.qty} {item.unit || ""}
+                            </td>
+                            <td className="border p-2 text-center">
+                              {item.result === "Upto Standard" ? (
+                                <div
+                                  className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
+                                  onClick={() => openQcModal(item, idx)}
+                                >
+                                  ✓
+                                </div>
+                              ) : item.result === "Damage" ||
+                                item.result === "Rejected" ? (
+                                <div
+                                  className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
+                                  onClick={() => openQcModal(item, idx)}
+                                >
+                                  ✕
+                                </div>
+                              ) : (
+                                <div
+                                  className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
+                                  onClick={() => openQcModal(item, idx)}
+                                />
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  ) : (
+                    <div className="text-center py-4 text-gray-500">
+                      No items found
+                    </div>
+                  ))}
+
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
                     Description
@@ -482,49 +559,6 @@ const QualityChecking = () => {
                   />
                 </div>
 
-                {/* <div>
-                  <label className="block text-gray-700 font-medium mb-1">
-                    Remarks
-                  </label>
-                  <textarea
-                    value={remarks}
-                    onChange={(e) => setRemarks(e.target.value)}
-                    className="w-full p-3 border rounded-md"
-                  />
-                </div>
-
-                <div className="flex gap-4">
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="qcResult"
-                      value="uptoStandard"
-                      checked={result === "uptoStandard"}
-                      onChange={(e) => setResult(e.target.value)}
-                    />
-                    Upto Standard
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="qcResult"
-                      value="damage"
-                      checked={result === "damage"}
-                      onChange={(e) => setResult(e.target.value)}
-                    />
-                    Damage
-                  </label>
-                  <label className="flex items-center gap-2">
-                    <input
-                      type="radio"
-                      name="qcResult"
-                      value="rejected"
-                      checked={result === "rejected"}
-                      onChange={(e) => setResult(e.target.value)}
-                    />
-                    Rejected
-                  </label>
-                </div> */}
                 {errors.result && (
                   <p className="text-red-500 text-xs">{errors.result}</p>
                 )}
@@ -572,8 +606,8 @@ const QualityChecking = () => {
                   <input
                     type="radio"
                     name="qcResult"
-                    value="uptoStandard"
-                    checked={modalResult === "uptoStandard"}
+                    value="Upto Standard"
+                   checked={modalResult === "Upto Standard"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Upto Standard
@@ -582,8 +616,8 @@ const QualityChecking = () => {
                   <input
                     type="radio"
                     name="qcResult"
-                    value="damage"
-                    checked={modalResult === "damage"}
+                    value="Damage"
+                    checked={modalResult === "Damage"} 
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Damage
@@ -592,8 +626,8 @@ const QualityChecking = () => {
                   <input
                     type="radio"
                     name="qcResult"
-                    value="rejected"
-                    checked={modalResult === "rejected"}
+                    value="Rejected"
+                    checked={modalResult === "Rejected"} 
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Rejected

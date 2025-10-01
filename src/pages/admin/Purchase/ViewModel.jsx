@@ -3,7 +3,7 @@ import { Mail, MessageCircle, X } from "lucide-react";
 
 const ViewModel = ({ data, type, onClose }) => {
   const printRef = useRef();
- const [exportOpen, setExportOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
 
   // ✅ Handle print
   const handlePrint = () => {
@@ -12,7 +12,15 @@ const ViewModel = ({ data, type, onClose }) => {
     win.document.write(`
       <html>
         <head>
-          <title>${type === "requisition" ? "Purchase Requisition" : "Purchase Order"}</title>
+          <title>
+            ${
+              type === "requisition"
+                ? "Purchase Requisition"
+                : type === "purchaseOrder"
+                ? "Purchase Order"
+                : "Gatepass In"
+            }
+          </title>
           <style>
             body { font-family: Arial, sans-serif; padding: 20px; }
             h2 { text-align: center; margin-bottom: 20px; }
@@ -30,11 +38,6 @@ const ViewModel = ({ data, type, onClose }) => {
     win.print();
   };
 
-  // ✅ Handle PDF
-  const handlePDF = () => {
-    alert("PDF export coming soon 🚀 (use html2pdf.js or jsPDF here)");
-  };
-
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white w-[700px] rounded-xl shadow-lg p-6 relative">
@@ -50,12 +53,16 @@ const ViewModel = ({ data, type, onClose }) => {
         <div ref={printRef}>
           {/* Header */}
           <h2 className="text-2xl font-bold mb-6 text-center border-b pb-2">
-            {type === "requisition" ? "Purchase Requisition" : "Purchase Order"}
+            {type === "requisition"
+              ? "Purchase Requisition"
+              : type === "purchaseOrder"
+              ? "Purchase Order"
+              : "Gatepass In"}
           </h2>
 
           {/* Info Section */}
           <div className="grid grid-cols-2 gap-y-3 gap-8 text-base mb-6">
-            {type === "requisition" ? (
+            {type === "requisition" && (
               <>
                 <div><strong>Req ID:</strong> {data.requisitionId}</div>
                 <div><strong>Date:</strong> {new Date(data.date).toLocaleDateString()}</div>
@@ -64,7 +71,20 @@ const ViewModel = ({ data, type, onClose }) => {
                 <div><strong>Category:</strong> {data.category?.categoryName}</div>
                 <div><strong>Status:</strong> {data.status}</div>
               </>
-            ) : (
+            )}
+
+            {type === "gatepass" && (
+              <>
+                <div><strong>GatePass ID:</strong> {data.gatePassId}</div>
+                <div><strong>Date:</strong> {new Date(data.date).toLocaleDateString()}</div>
+                <div><strong>Driver Name:</strong> {data.driverName}</div>
+                <div><strong>Status:</strong> {data.status}</div>
+                <div><strong>Supplier:</strong> {data.supplierName || "-"}</div>
+                <div><strong>Type:</strong> {data.type}</div>
+              </>
+            )}
+
+            {type === "purchaseOrder" && (
               <>
                 <div><strong>PO No:</strong> {data.purchaseOrderId}</div>
                 <div><strong>Date:</strong> {new Date(data.date).toLocaleDateString()}</div>
@@ -85,16 +105,21 @@ const ViewModel = ({ data, type, onClose }) => {
                 <th className="border px-2 py-1">Qty</th>
                 {type === "purchaseOrder" && <th className="border px-2 py-1">Price</th>}
                 {type === "purchaseOrder" && <th className="border px-2 py-1">Total</th>}
+                {type === "gatepass" && <th className="border px-2 py-1">Unit</th>}
               </tr>
             </thead>
             <tbody>
-              {(data.items || []).map((item, idx) => (
+              {(type === "gatepass"
+                ? data.withoutPO || data.withPO?.items || []
+                : data.items || []
+              ).map((item, idx) => (
                 <tr key={idx} className="text-center">
                   <td className="border px-2 py-1">{idx + 1}</td>
                   <td className="border px-2 py-1">{item.itemName}</td>
                   <td className="border px-2 py-1">{item.quantity || item.qty}</td>
                   {type === "purchaseOrder" && <td className="border px-2 py-1">{item.price}</td>}
                   {type === "purchaseOrder" && <td className="border px-2 py-1">{item.total}</td>}
+                  {type === "gatepass" && <td className="border px-2 py-1">{item.unit || item.unitName}</td>}
                 </tr>
               ))}
             </tbody>
@@ -102,7 +127,6 @@ const ViewModel = ({ data, type, onClose }) => {
         </div>
 
         {/* Actions */}
-        
         <div className="flex justify-end gap-3 mt-6">
           {/* Export Button */}
           <div className="relative">
@@ -141,7 +165,6 @@ const ViewModel = ({ data, type, onClose }) => {
             Print
           </button>
         </div>
-      
       </div>
     </div>
   );
