@@ -3,6 +3,7 @@ import { SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
+import gsap from "gsap";
 
 const Tax = () => {
   const [taxes, setTaxes] = useState([
@@ -34,6 +35,33 @@ const Tax = () => {
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+
+  // GSAP Animation for Modal
+  useEffect(() => {
+    if (isSliderOpen) {
+      if (sliderRef.current) {
+        sliderRef.current.style.display = "block"; // ensure visible before animation
+      }
+      gsap.fromTo(
+        sliderRef.current,
+        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
+      );
+    } else {
+      gsap.to(sliderRef.current, {
+        scale: 0.7,
+        opacity: 0,
+        y: -50,
+        duration: 0.4,
+        ease: "power3.in",
+        onComplete: () => {
+          if (sliderRef.current) {
+            sliderRef.current.style.display = "none";
+          }
+        },
+      });
+    }
+  }, [isSliderOpen]);
 
   // Simulate fetching tax data
   const fetchTaxes = useCallback(async () => {
@@ -81,9 +109,7 @@ const Tax = () => {
   // Generate next tax ID
   useEffect(() => {
     if (taxes.length > 0) {
-      const maxNo = Math.max(
-        ...taxes.map((t, index) => index + 1)
-      );
+      const maxNo = Math.max(...taxes.map((t, index) => index + 1));
       setNextTaxId((maxNo + 1).toString().padStart(3, "0"));
     } else {
       setNextTaxId("001");
@@ -107,7 +133,12 @@ const Tax = () => {
     const parsedValue = parseFloat(value);
 
     if (!trimmedTaxName) newErrors.taxName = "Tax Name is required";
-    if (!trimmedValue || isNaN(parsedValue) || parsedValue < 0 || parsedValue > 100) {
+    if (
+      !trimmedValue ||
+      isNaN(parsedValue) ||
+      parsedValue < 0 ||
+      parsedValue > 100
+    ) {
       newErrors.value = "Tax Value must be between 0 and 100";
     }
 
@@ -144,7 +175,9 @@ const Tax = () => {
     try {
       if (editingTax) {
         setTaxes((prev) =>
-          prev.map((t) => (t._id === editingTax._id ? { ...t, ...newTax, _id: t._id } : t))
+          prev.map((t) =>
+            t._id === editingTax._id ? { ...t, ...newTax, _id: t._id } : t
+          )
         );
         Swal.fire({
           icon: "success",
@@ -214,11 +247,7 @@ const Tax = () => {
             );
           }
         } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithTailwindButtons.fire(
-            "Cancelled",
-            "Tax is safe 🙂",
-            "error"
-          );
+          swalWithTailwindButtons.fire("Cancelled", "Tax is safe 🙂", "error");
         }
       });
   };
@@ -239,9 +268,7 @@ const Tax = () => {
       <div className="px-6 mx-auto">
         <div className="flex justify-between items-center mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-newPrimary">
-              Tax Details
-            </h1>
+            <h1 className="text-2xl font-bold text-newPrimary">Tax Details</h1>
           </div>
           <div className="flex items-center gap-3">
             <input
@@ -316,8 +343,8 @@ const Tax = () => {
             <div className="flex justify-between my-4 px-10">
               <div className="text-sm text-gray-600">
                 Showing {indexOfFirstRecord + 1} to{" "}
-                {Math.min(indexOfLastRecord, taxes.length)} of{" "}
-                {taxes.length} records
+                {Math.min(indexOfLastRecord, taxes.length)} of {taxes.length}{" "}
+                records
               </div>
               <div className="flex gap-2">
                 <button
@@ -351,14 +378,14 @@ const Tax = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingTax ? "Update Tax" : "Add a New Tax"}
                 </h2>
                 <button
-                  className="text-2xl text-gray-500 hover:text-gray-700"
+                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                   onClick={resetForm}
                 >
                   ×
@@ -366,51 +393,52 @@ const Tax = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Tax Name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={taxName}
-                      onChange={(e) => setTaxName(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.taxName
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter tax name"
-                      required
-                    />
-                    {errors.taxName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.taxName}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Value (%) <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={value}
-                      onChange={(e) => setValue(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.value
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter tax value"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                      required
-                    />
-                    {errors.value && (
-                      <p className="text-red-500 text-xs mt-1">{errors.value}</p>
-                    )}
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Tax Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    value={taxName}
+                    onChange={(e) => setTaxName(e.target.value)}
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.taxName
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                    }`}
+                    placeholder="Enter tax name"
+                    required
+                  />
+                  {errors.taxName && (
+                    <p className="text-red-500 text-xs mt-1">
+                      {errors.taxName}
+                    </p>
+                  )}
                 </div>
+                <div className="flex-1 min-w-0">
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Value (%) <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={value}
+                    onChange={(e) => setValue(e.target.value)}
+                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                      errors.value
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                    }`}
+                    placeholder="Enter tax value"
+                    min="0"
+                    max="100"
+                    step="0.01"
+                    required
+                  />
+                  {errors.value && (
+                    <p className="text-red-500 text-xs mt-1">{errors.value}</p>
+                  )}
+                </div>
+
                 <button
                   type="submit"
                   disabled={loading}

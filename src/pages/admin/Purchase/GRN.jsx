@@ -339,7 +339,7 @@ const GRN = () => {
               <div className="inline-block min-w-[1200px] w-full align-middle">
                 <div className="hidden lg:grid grid-cols-7 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                   <div>GRN ID</div>
-                  <div>Gate Pass IN</div>
+                  <div>Gate Pass QC.</div>
                   <div>Supplier</div>
                   <div>Address</div>
                   <div>Phone</div>
@@ -471,7 +471,7 @@ const GRN = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Gate Pass IN <span className="text-red-500">*</span>
+                      Gate Pass QC. <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={gatePassIn}
@@ -479,7 +479,7 @@ const GRN = () => {
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       required
                     >
-                      <option value="">Select Gate Pass</option>
+                      <option value="">Select Gate Pass QC </option>
                       {gatePassOptions.map((gp) => (
                         <option key={gp._id} value={gp.gatePassId}>
                           {gp.gatePassId}
@@ -588,33 +588,43 @@ const GRN = () => {
                         </button>
                       </div>
                     </div>
-
-                    {itemsList.length > 0 && (
-                      <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                  </div>
+                  {itemsList.length > 0 && (
+                    <div className="overflow-x-auto">
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse">
                           <thead className="bg-gray-100 text-gray-600 text-sm">
                             <tr>
-                              <th className="px-4 py-2 border-b">Sr #</th>
-                              <th className="px-4 py-2 border-b">Item</th>
-                              <th className="px-4 py-2 border-b">Qty</th>
-                              <th className="px-4 py-2 border-b">
+                              <th className="px-4 py-2 border border-gray-300">
+                                Sr #
+                              </th>
+                              <th className="px-4 py-2 border border-gray-300">
+                                Item
+                              </th>
+                              <th className="px-4 py-2 border border-gray-300">
+                                Qty
+                              </th>
+                              <th className="px-4 py-2 border border-gray-300">
                                 Description
                               </th>
                             </tr>
                           </thead>
                           <tbody className="text-gray-700 text-sm">
                             {itemsList.map((item, idx) => (
-                              <tr key={idx} className="hover:bg-gray-50">
-                                <td className="px-4 py-2 border-b text-center">
+                              <tr
+                                key={idx}
+                                className="hover:bg-gray-50 text-center"
+                              >
+                                <td className="px-4 py-2 border border-gray-300 text-center">
                                   {idx + 1}
                                 </td>
-                                <td className="px-4 py-2 border-b">
+                                <td className="px-4 py-2 border border-gray-300">
                                   {item.item}
                                 </td>
-                                <td className="px-4 py-2 border-b text-center">
+                                <td className="px-4 py-2 border border-gray-300 text-center">
                                   {item.qty}
                                 </td>
-                                <td className="px-4 py-2 border-b">
+                                <td className="px-4 py-2 border border-gray-300">
                                   {item.description}
                                 </td>
                               </tr>
@@ -622,33 +632,8 @@ const GRN = () => {
                           </tbody>
                         </table>
                       </div>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-5">
-                  <label className="text-gray-700 font-medium">Status:</label>
-                  <div className="flex items-center gap-3">
-                    <button
-                      type="button"
-                      onClick={() => setIsEnable(!isEnable)}
-                      className={`w-12 h-6 flex items-center rounded-full p-1 transition-colors duration-300 ${
-                        isEnable ? "bg-newPrimary/80" : "bg-gray-300"
-                      }`}
-                    >
-                      <div
-                        className={`w-4 h-4 bg-white rounded-full shadow-md transform transition-transform duration-300 ${
-                          isEnable ? "translate-x-6" : "translate-x-0"
-                        }`}
-                      />
-                    </button>
-                    <span
-                      className={`text-sm font-medium ${
-                        isEnable ? "text-newPrimary" : "text-gray-500"
-                      }`}
-                    >
-                      {isEnable ? "Enabled" : "Disabled"}
-                    </span>
-                  </div>
+                    </div>
+                  )}
                 </div>
 
                 <button
