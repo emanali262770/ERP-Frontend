@@ -189,9 +189,10 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   };
 
   const handleEditClick = (qc) => {
+    console.log({qc});
+    
     setEditingQC(qc);
     setQcId(qc.qcId);
-    setQcId(qc.gpId);
     setDate(qc.date);
     setItemsList(qc.items);
     setDescription(qc.description);
@@ -275,8 +276,8 @@ const { token } = userInfo || {};
     try {
       if (editingQC) {
         // Update existing
-        await api.put(`/gatePassIn/${editingQC._id}`, newQC, {
-          headers: { "Content-Type": "application/json" },
+        await api.put(`/qualityCheck/${editingQC._id}`, newQC, {
+         headers
         });
 
         Swal.fire(
