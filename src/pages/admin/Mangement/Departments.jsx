@@ -8,10 +8,7 @@ import TableSkeleton from "../Skeleton";
 import axios from "axios";
 
 const Departments = () => {
-
-  const [departmentList, setDepartmentList] = useState([
-    
-  ]);
+  const [departmentList, setDepartmentList] = useState([]);
 
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [department, setDepartment] = useState("");
@@ -20,7 +17,7 @@ const Departments = () => {
   const [loading, setLoading] = useState(false);
   const sliderRef = useRef(null);
 
- const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const API_URL = `${import.meta.env.VITE_API_BASE_URL}/departments`;
 
@@ -51,10 +48,8 @@ const Departments = () => {
     }
   }, [isSliderOpen]);
 
-
   // Fetch Department list
   const fetchDepartmentList = useCallback(async () => {
-
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
@@ -78,9 +73,7 @@ const Departments = () => {
     setDepartment("");
   };
 
-
-  const handleSave = async() => {
-
+  const handleSave = async () => {
     if (!department) {
       toast.error("❌ Department is required");
       return;
@@ -93,12 +86,10 @@ const Departments = () => {
         "Content-Type": "application/json",
       };
       const newDept = {
+        departmentName: department,
+      };
 
-      departmentName:department,
-    };
-
-      if (isEdit&&editId) {
-
+      if (isEdit && editId) {
         const res = await axios.put(`${API_URL}/${editId}`, newDept, {
           headers,
         });
@@ -120,46 +111,44 @@ const Departments = () => {
   const handleEdit = (d) => {
     setIsEdit(true);
 
-    setEditId(d._id)
+    setEditId(d._id);
 
     setDepartment(d.departmentName);
     setIsSliderOpen(true);
   };
 
+  const handleDelete = (id) => {
+    const swalWithTailwindButtons = Swal.mixin({
+      customClass: {
+        actions: "space-x-2",
+        confirmButton:
+          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+        cancelButton:
+          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+      },
+      buttonsStyling: false,
+    });
 
- const handleDelete = (id) => {
-  const swalWithTailwindButtons = Swal.mixin({
-    customClass: {
-      actions: "space-x-2",
-      confirmButton:
-        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-      cancelButton:
-        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-    },
-    buttonsStyling: false,
-  });
-
-  swalWithTailwindButtons
-    .fire({
-      title: "Are you sure?",
-      text: "You want to delete this department?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Yes, delete it!",
-      cancelButtonText: "No, cancel!",
-      reverseButtons: true,
-    })
-    .then(async(result) => {
-      if (result.isConfirmed) {
-        try {
+    swalWithTailwindButtons
+      .fire({
+        title: "Are you sure?",
+        text: "You want to delete this department?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Yes, delete it!",
+        cancelButtonText: "No, cancel!",
+        reverseButtons: true,
+      })
+      .then(async (result) => {
+        if (result.isConfirmed) {
+          try {
             await axios.delete(`${API_URL}/${id}`, {
               headers: {
                 Authorization: `Bearer ${userInfo?.token}`,
               },
             });
 
-
-           setDepartmentList(departmentList.filter((d) => d._id !== id));
+            setDepartmentList(departmentList.filter((d) => d._id !== id));
 
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -174,19 +163,15 @@ const Departments = () => {
               "error"
             );
           }
-
-        
-       
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        swalWithTailwindButtons.fire(
-          "Cancelled",
-          "Department is safe 🙂",
-          "error"
-        );
-      }
-    });
-};
-
+        } else if (result.dismiss === Swal.DismissReason.cancel) {
+          swalWithTailwindButtons.fire(
+            "Cancelled",
+            "Department is safe 🙂",
+            "error"
+          );
+        }
+      });
+  };
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
@@ -196,8 +181,9 @@ const Departments = () => {
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">Departments</h1>
 
-          <p className="text-gray-500 text-sm">Manage your department details</p>
-
+          <p className="text-gray-500 text-sm">
+            Manage your department details
+          </p>
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/90"
@@ -221,9 +207,11 @@ const Departments = () => {
             {/* Table Body */}
             <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
               {loading ? (
-
-                <TableSkeleton rows={departmentList.length>0?departmentList.length:5} cols={3} className="lg:grid-cols-[80px_1fr_auto]" />
-
+                <TableSkeleton
+                  rows={departmentList.length > 0 ? departmentList.length : 5}
+                  cols={3}
+                  className="lg:grid-cols-[80px_1fr_auto]"
+                />
               ) : departmentList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No departments found.
@@ -280,7 +268,7 @@ const Departments = () => {
             <div className="space-y-4 p-4 md:p-6">
               <div>
                 <label className="block text-gray-700 font-medium">
-                  Department <span className="text-newPrimary">*</span>
+                  Department <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
@@ -295,9 +283,7 @@ const Departments = () => {
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
               >
-
-                 {isEdit ? "Update Department" : "Save Department"}
-
+                {isEdit ? "Update Department" : "Save Department"}
               </button>
             </div>
           </div>
