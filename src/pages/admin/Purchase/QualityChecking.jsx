@@ -3,6 +3,8 @@ import { SquarePen, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
+import axios from "axios";
+import { api } from "../../../context/ApiService";
 
 const QualityChecking = () => {
   const [qualityChecks, setQualityChecks] = useState([]);
@@ -18,8 +20,28 @@ const QualityChecking = () => {
   const [remarks, setRemarks] = useState("");
   const [result, setResult] = useState("");
   const [editingQC, setEditingQC] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [errors, setErrors] = useState({});
+  const [nextQcId, setNextQcId] = useState("001");
+  const [editingQualityChecks, setEditingQualityChecks] = useState(null);
+
   const sliderRef = useRef(null);
+
+  // 🔹 ID Creation of Quality Checking
+  useEffect(() => {
+    if (qualityChecks.length > 0) {
+      const maxNo = Math.max(
+        ...qualityChecks.map((qc) => {
+          const match = qc.qcId?.match(/QC-(\d+)/); // extract number after QC-
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setNextQcId((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setNextQcId("001");
+    }
+  }, [qualityChecks]);
+
   // 🔹 QC Modal states
   const [qcModalOpen, setQcModalOpen] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
@@ -70,7 +92,7 @@ const QualityChecking = () => {
   const staticData = [
     {
       _id: "1",
-      qcId: "QC001",
+      qcId: "QC-001",
       date: "2025-09-01",
       items: [{ name: "Laptop", qty: 5 }],
       description: "Laptop batch inspection",
@@ -79,7 +101,7 @@ const QualityChecking = () => {
     },
     {
       _id: "2",
-      qcId: "QC002",
+      qcId: "QC-002",
       date: "2025-09-15",
       items: [{ name: "Notebooks", qty: 10 }],
       description: "Stationery quality check",
@@ -103,8 +125,9 @@ const QualityChecking = () => {
     setTimeout(() => setLoading(false), 800);
   }, []);
 
+  // reset QC ID
   const resetForm = () => {
-    setQcId("");
+    setQcId(""); // reset QC ID
     setDate("");
     setItemsList([]);
     setItemName("");
@@ -119,6 +142,7 @@ const QualityChecking = () => {
 
   const handleAddClick = () => {
     resetForm();
+    setQcId(`QC${nextQcId}`); // ✅ use QC instead of REQ
     setIsSliderOpen(true);
   };
 
@@ -174,18 +198,22 @@ const QualityChecking = () => {
     if (!date) newErrors.date = "Date is required";
     if (itemsList.length === 0)
       newErrors.itemsList = "At least one item is required";
-    if (!result) newErrors.result = "Result is required";
+
+    // if (!result) newErrors.result = "Result is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e) => {
+  // Handle Submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     const newQC = {
       _id: editingQC ? editingQC._id : Date.now().toString(),
       qcId: qcId.trim(),
+      gpId,
       date,
       items: itemsList,
       description,
@@ -193,17 +221,41 @@ const QualityChecking = () => {
       result,
     };
 
-    if (editingQC) {
-      setQualityChecks(
-        qualityChecks.map((q) => (q._id === editingQC._id ? newQC : q))
-      );
-      Swal.fire("Updated!", "Quality check updated successfully.", "success");
-    } else {
-      setQualityChecks([...qualityChecks, newQC]);
-      Swal.fire("Added!", "Quality check added successfully.", "success");
-    }
+    try {
+      if (editingQC) {
+        // Update existing
+        await api.put(`/gatePassIn/${editingQC._id}`, newQC, {
+          headers: { "Content-Type": "application/json" },
+        });
 
-    resetForm();
+        Swal.fire(
+          "Updated!",
+          "Quality Checking updated successfully.",
+          "success"
+        );
+
+        setQualityChecks(
+          qualityChecks.map((q) => (q._id === editingQC._id ? newQC : q))
+        );
+      } else {
+        // Create new
+        await api.post("/gatePassIn", newQC, {
+          headers: { "Content-Type": "application/json" },
+        });
+
+        Swal.fire("Added!", "Quality Checking added successfully.", "success");
+
+        setQualityChecks([...qualityChecks, newQC]);
+      }
+
+      resetForm();
+    } catch (error) {
+      console.error("Error saving quality checking", error);
+      Swal.fire(
+        "Error!",
+        error.response?.data?.message || "Failed to save quality checking."
+      );
+    }
   };
 
   const handleDelete = (id) => {
@@ -329,10 +381,12 @@ const QualityChecking = () => {
                     </label>
                     <input
                       type="text"
-                      value={qcId}
+                      value={editingQC ? qcId : `QC-${nextQcId}`} // ✅ FIXED
                       onChange={(e) => setQcId(e.target.value)}
                       className="w-full p-3 border rounded-md"
+                      required
                     />
+
                     {errors.qcId && (
                       <p className="text-red-500 text-xs">{errors.qcId}</p>
                     )}
