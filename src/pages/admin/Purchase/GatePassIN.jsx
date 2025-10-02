@@ -31,6 +31,7 @@ const GatepassIn = () => {
   const [againstPoNo, setAgainstPoNo] = useState("");
   const [driverNameWithoutPo, setDriverNameWithoutPo] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [supplierId, setSupplierId] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("");
   const [selectedPoItems, setselectedPoItems] = useState(null);
@@ -374,6 +375,7 @@ const GatepassIn = () => {
           poNo: againstPoNo, // PO _id
         },
         status,
+        supplierName:supplierId
       };
     } else {
       newGatepass = {
@@ -667,6 +669,7 @@ const GatepassIn = () => {
                       </p>
                     )}
                   </div>
+                  {/* date */}
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Date <span className="text-red-500">*</span>
@@ -753,7 +756,9 @@ const GatepassIn = () => {
                                 selectedPO.estimation?.demandItem?.supplier
                                   ?.supplierName || ""
                               );
+                              setSupplierId(selectedPO.estimation?.demandItem?.supplier?._id)
                               setselectedPoItems(selectedPO);
+                              
                             }
                           }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
