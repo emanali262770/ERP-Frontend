@@ -27,13 +27,22 @@ const CustomerLedger = () => {
       notes: "Purchase of goods",
     },
   ]);
+  // New states for CustomerLedger form
+  const [ledgerId, setLedgerId] = useState("");
+  const [date, setDate] = useState("");
+  const [salesInvoice, setSalesInvoice] = useState("");
+  const [status, setStatus] = useState("");
+
+  // Already present in your code:
+  const [customerName, setCustomerName] = useState("");
+  const [amount, setAmount] = useState("");
+  const [transactionDate, setTransactionDate] = useState("");
+  const [transactionType, setTransactionType] = useState("");
+
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [customerId, setCustomerId] = useState("");
-  const [customerName, setCustomerName] = useState("");
-  const [transactionDate, setTransactionDate] = useState("");
-  const [transactionType, setTransactionType] = useState("");
-  const [amount, setAmount] = useState("");
+
   const [notes, setNotes] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingLedgerEntry, setEditingLedgerEntry] = useState(null);
@@ -131,9 +140,12 @@ const CustomerLedger = () => {
     const parsedAmount = parseFloat(amount);
 
     if (!trimmedCustomerId) newErrors.customerId = "Customer ID is required";
-    if (!trimmedCustomerName) newErrors.customerName = "Customer Name is required";
-    if (!trimmedTransactionDate) newErrors.transactionDate = "Transaction Date is required";
-    if (!trimmedTransactionType) newErrors.transactionType = "Transaction Type is required";
+    if (!trimmedCustomerName)
+      newErrors.customerName = "Customer Name is required";
+    if (!trimmedTransactionDate)
+      newErrors.transactionDate = "Transaction Date is required";
+    if (!trimmedTransactionType)
+      newErrors.transactionType = "Transaction Type is required";
     if (!trimmedAmount || isNaN(parsedAmount) || parsedAmount <= 0) {
       newErrors.amount = "Amount must be a positive number";
     }
@@ -185,7 +197,9 @@ const CustomerLedger = () => {
       if (editingLedgerEntry) {
         setLedgerEntries((prev) =>
           prev.map((entry) =>
-            entry._id === editingLedgerEntry._id ? { ...entry, ...newLedgerEntry, _id: entry._id } : entry
+            entry._id === editingLedgerEntry._id
+              ? { ...entry, ...newLedgerEntry, _id: entry._id }
+              : entry
           )
         );
         Swal.fire({
@@ -195,7 +209,10 @@ const CustomerLedger = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setLedgerEntries((prev) => [...prev, { ...newLedgerEntry, _id: `temp-${Date.now()}` }]);
+        setLedgerEntries((prev) => [
+          ...prev,
+          { ...newLedgerEntry, _id: `temp-${Date.now()}` },
+        ]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -241,7 +258,9 @@ const CustomerLedger = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            setLedgerEntries((prev) => prev.filter((entry) => entry._id !== id));
+            setLedgerEntries((prev) =>
+              prev.filter((entry) => entry._id !== id)
+            );
             swalWithTailwindButtons.fire(
               "Deleted!",
               "Ledger entry deleted successfully.",
@@ -268,7 +287,10 @@ const CustomerLedger = () => {
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = ledgerEntries.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = ledgerEntries.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
   const totalPages = Math.ceil(ledgerEntries.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -332,10 +354,18 @@ const CustomerLedger = () => {
                       key={ledgerEntry._id}
                       className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{ledgerEntry.customerId}</div>
-                      <div className="text-gray-600">{ledgerEntry.customerName}</div>
-                      <div className="text-gray-600">{ledgerEntry.transactionDate}</div>
-                      <div className="text-gray-600">{ledgerEntry.transactionType}</div>
+                      <div className="text-gray-600">
+                        {ledgerEntry.customerId}
+                      </div>
+                      <div className="text-gray-600">
+                        {ledgerEntry.customerName}
+                      </div>
+                      <div className="text-gray-600">
+                        {ledgerEntry.transactionDate}
+                      </div>
+                      <div className="text-gray-600">
+                        {ledgerEntry.transactionType}
+                      </div>
                       <div className="text-gray-600">{ledgerEntry.amount}</div>
                       <div className="text-gray-600">{ledgerEntry.balance}</div>
                       <div className="flex gap-3 justify-start">
@@ -405,7 +435,9 @@ const CustomerLedger = () => {
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingLedgerEntry ? "Update Ledger Entry" : "Add a New Ledger Entry"}
+                  {editingLedgerEntry
+                    ? "Update Ledger Entry"
+                    : "Add a New Ledger Entry"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -416,139 +448,132 @@ const CustomerLedger = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Customer ID <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editingLedgerEntry ? customerId : `CUS-${nextCustomerId}`}
-                      readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.customerId
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter customer ID"
-                      required
-                    />
-                    {errors.customerId && (
-                      <p className="text-red-500 text-xs mt-1">{errors.customerId}</p>
-                    )}
+                {/* Top Section */}
+                <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Ledger ID
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          editingLedgerEntry
+                            ? ledgerId
+                            : `LED-${nextCustomerId}`
+                        }
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Customer Name <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.customerName
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Customer</option>
-                      {customerList?.map((customer) => (
-                        <option key={customer._id} value={customer.customerName}>
-                          {customer.customerName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.customerName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.customerName}</p>
-                    )}
+
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Sales Invoice
+                      </label>
+                      <select
+                        value={salesInvoice}
+                        onChange={(e) => setSalesInvoice(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      >
+                        <option value="">Select Invoice</option>
+                        <option value="INV-001">INV-001</option>
+                        <option value="INV-002">INV-002</option>
+                      </select>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Customer Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Enter customer name"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Transaction Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={transactionDate}
-                      onChange={(e) => setTransactionDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.transactionDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.transactionDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.transactionDate}</p>
-                    )}
+
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Amount <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="Enter amount"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Transaction Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={transactionDate}
+                        onChange={(e) => setTransactionDate(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Transaction Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={transactionType}
-                      onChange={(e) => setTransactionType(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.transactionType
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Type</option>
-                      <option value="Credit">Credit</option>
-                      <option value="Debit">Debit</option>
-                    </select>
-                    {errors.transactionType && (
-                      <p className="text-red-500 text-xs mt-1">{errors.transactionType}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Amount <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.amount
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter amount"
-                      min="0"
-                      step="0.01"
-                      required
-                    />
-                    {errors.amount && (
-                      <p className="text-red-500 text-xs mt-1">{errors.amount}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Notes
-                    </label>
-                    <input
-                      type="text"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.notes
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter notes"
-                    />
-                    {errors.notes && (
-                      <p className="text-red-500 text-xs mt-1">{errors.notes}</p>
-                    )}
+
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Transaction Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={transactionType}
+                        onChange={(e) => setTransactionType(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      >
+                        <option value="">Select Type</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Debit">Debit</option>
+                      </select>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Status <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      >
+                        <option value="">Select Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Processed">Processed</option>
+                        <option value="Rejected">Rejected</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
+
+                {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}
