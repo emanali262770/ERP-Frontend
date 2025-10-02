@@ -29,6 +29,13 @@ const Receivable = () => {
       notes: "Mouse purchase",
     },
   ]);
+  // New states for Receivable form
+  const [date, setDate] = useState(""); // record creation date
+  const [invoiceList, setInvoiceList] = useState([
+    { _id: "inv1", invoiceNumber: "INV-001" },
+    { _id: "inv2", invoiceNumber: "INV-002" },
+  ]);
+
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [receivableId, setReceivableId] = useState("");
@@ -82,7 +89,9 @@ const Receivable = () => {
       try {
         setLoading(true);
         const filtered = receivables.filter((receivable) =>
-          receivable.receivableId.toUpperCase().includes(searchTerm.toUpperCase())
+          receivable.receivableId
+            .toUpperCase()
+            .includes(searchTerm.toUpperCase())
         );
         setReceivables(filtered);
       } catch (error) {
@@ -138,9 +147,12 @@ const Receivable = () => {
     const trimmedStatus = status.trim();
     const parsedAmount = parseFloat(amount);
 
-    if (!trimmedReceivableId) newErrors.receivableId = "Receivable ID is required";
-    if (!trimmedCustomerName) newErrors.customerName = "Customer Name is required";
-    if (!trimmedInvoiceNumber) newErrors.invoiceNumber = "Invoice Number is required";
+    if (!trimmedReceivableId)
+      newErrors.receivableId = "Receivable ID is required";
+    if (!trimmedCustomerName)
+      newErrors.customerName = "Customer Name is required";
+    if (!trimmedInvoiceNumber)
+      newErrors.invoiceNumber = "Invoice Number is required";
     if (!trimmedInvoiceDate) newErrors.invoiceDate = "Invoice Date is required";
     if (!trimmedDueDate) newErrors.dueDate = "Due Date is required";
     if (!trimmedAmount || isNaN(parsedAmount) || parsedAmount <= 0) {
@@ -180,7 +192,9 @@ const Receivable = () => {
     }
 
     const newReceivable = {
-      receivableId: editingReceivable ? receivableId : `REC-${nextReceivableId}`,
+      receivableId: editingReceivable
+        ? receivableId
+        : `REC-${nextReceivableId}`,
       customerName: customerName.trim(),
       invoiceNumber: invoiceNumber.trim(),
       invoiceDate: invoiceDate.trim(),
@@ -193,7 +207,11 @@ const Receivable = () => {
     try {
       if (editingReceivable) {
         setReceivables((prev) =>
-          prev.map((r) => (r._id === editingReceivable._id ? { ...r, ...newReceivable, _id: r._id } : r))
+          prev.map((r) =>
+            r._id === editingReceivable._id
+              ? { ...r, ...newReceivable, _id: r._id }
+              : r
+          )
         );
         Swal.fire({
           icon: "success",
@@ -202,7 +220,10 @@ const Receivable = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setReceivables((prev) => [...prev, { ...newReceivable, _id: `temp-${Date.now()}` }]);
+        setReceivables((prev) => [
+          ...prev,
+          { ...newReceivable, _id: `temp-${Date.now()}` },
+        ]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -275,7 +296,10 @@ const Receivable = () => {
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = receivables.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = receivables.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
   const totalPages = Math.ceil(receivables.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -340,10 +364,18 @@ const Receivable = () => {
                       key={receivable._id}
                       className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{receivable.receivableId}</div>
-                      <div className="text-gray-600">{receivable.customerName}</div>
-                      <div className="text-gray-600">{receivable.invoiceNumber}</div>
-                      <div className="text-gray-600">{receivable.invoiceDate}</div>
+                      <div className="text-gray-600">
+                        {receivable.receivableId}
+                      </div>
+                      <div className="text-gray-600">
+                        {receivable.customerName}
+                      </div>
+                      <div className="text-gray-600">
+                        {receivable.invoiceNumber}
+                      </div>
+                      <div className="text-gray-600">
+                        {receivable.invoiceDate}
+                      </div>
                       <div className="text-gray-600">{receivable.dueDate}</div>
                       <div className="text-gray-600">{receivable.amount}</div>
                       <div className="text-gray-600">{receivable.status}</div>
@@ -414,7 +446,9 @@ const Receivable = () => {
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingReceivable ? "Update Receivable" : "Add a New Receivable"}
+                  {editingReceivable
+                    ? "Update Receivable"
+                    : "Add a New Receivable"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -425,181 +459,138 @@ const Receivable = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Receivable ID <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editingReceivable ? receivableId : `REC-${nextReceivableId}`}
-                      readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.receivableId
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter receivable ID"
-                      required
-                    />
-                    {errors.receivableId && (
-                      <p className="text-red-500 text-xs mt-1">{errors.receivableId}</p>
-                    )}
+                <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
+                  {/* Row 1 */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Receivable ID
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          editingReceivable
+                            ? receivableId
+                            : `REC-${nextReceivableId}`
+                        }
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100 text-gray-600 cursor-not-allowed"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Customer Name <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={customerName}
-                      onChange={(e) => setCustomerName(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.customerName
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Customer</option>
-                      {customerList?.map((customer) => (
-                        <option key={customer._id} value={customer.customerName}>
-                          {customer.customerName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.customerName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.customerName}</p>
-                    )}
+
+                  {/* Row 2 */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Invoice No <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={invoiceNumber}
+                        onChange={(e) => setInvoiceNumber(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      >
+                        <option value="">Select Invoice</option>
+                        {invoiceList.map((inv) => (
+                          <option key={inv._id} value={inv.invoiceNumber}>
+                            {inv.invoiceNumber}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Invoice Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={invoiceDate}
+                        onChange={(e) => setInvoiceDate(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Invoice Number <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={invoiceNumber}
-                      onChange={(e) => setInvoiceNumber(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.invoiceNumber
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter invoice number"
-                      required
-                    />
-                    {errors.invoiceNumber && (
-                      <p className="text-red-500 text-xs mt-1">{errors.invoiceNumber}</p>
-                    )}
+
+                  {/* Row 3 */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Customer Name <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={customerName}
+                        onChange={(e) => setCustomerName(e.target.value)}
+                        placeholder="Enter customer name"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Due Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={dueDate}
+                        onChange={(e) => setDueDate(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Invoice Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={invoiceDate}
-                      onChange={(e) => setInvoiceDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.invoiceDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.invoiceDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.invoiceDate}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Due Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={dueDate}
-                      onChange={(e) => setDueDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.dueDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.dueDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.dueDate}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Amount <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setAmount(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.amount
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter amount"
-                      min="0"
-                      step="0.01"
-                      required
-                    />
-                    {errors.amount && (
-                      <p className="text-red-500 text-xs mt-1">{errors.amount}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Status <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={status}
-                      onChange={(e) => setStatus(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.status
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Status</option>
-                      <option value="Pending">Pending</option>
-                      <option value="Paid">Paid</option>
-                      <option value="Overdue">Overdue</option>
-                    </select>
-                    {errors.status && (
-                      <p className="text-red-500 text-xs mt-1">{errors.status}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Notes
-                    </label>
-                    <input
-                      type="text"
-                      value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.notes
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter notes"
-                    />
-                    {errors.notes && (
-                      <p className="text-red-500 text-xs mt-1">{errors.notes}</p>
-                    )}
+
+                  {/* Row 4 */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Amount <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        placeholder="Enter amount"
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Status <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={status}
+                        onChange={(e) => setStatus(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        required
+                      >
+                        <option value="">Select Status</option>
+                        <option value="Pending">Pending</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Overdue">Overdue</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
+
+                {/* Submit */}
                 <button
                   type="submit"
                   disabled={loading}

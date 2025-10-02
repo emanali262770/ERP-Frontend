@@ -235,8 +235,29 @@ const DeliveryChallan = () => {
     const trimmedDate = date.trim();
     const trimmedOrderNo = orderNo.trim();
     const trimmedOrderDate = orderDate.trim();
-    const { customer, person, phone, address, orderType, mode, deliveryAddress, deliveryDate, totalWeight } = orderDetails;
-    const { truckNo, driverName, cnic, mobileNo, containerNo1, batchNo1, forLocation1, firstWeight, weightBridgeName, weightBridgeSlipNo } = vehicleDetails;
+    const {
+      customer,
+      person,
+      phone,
+      address,
+      orderType,
+      mode,
+      deliveryAddress,
+      deliveryDate,
+      totalWeight,
+    } = orderDetails;
+    const {
+      truckNo,
+      driverName,
+      cnic,
+      mobileNo,
+      containerNo1,
+      batchNo1,
+      forLocation1,
+      firstWeight,
+      weightBridgeName,
+      weightBridgeSlipNo,
+    } = vehicleDetails;
 
     if (!trimmedDcNo) newErrors.dcNo = "DC No is required";
     if (!trimmedDate) newErrors.date = "Date is required";
@@ -249,8 +270,10 @@ const DeliveryChallan = () => {
     if (!address.trim()) newErrors.address = "Address is required";
     if (!orderType.trim()) newErrors.orderType = "Order Type is required";
     if (!mode.trim()) newErrors.mode = "Mode is required";
-    if (!deliveryAddress.trim()) newErrors.deliveryAddress = "Delivery Address is required";
-    if (!deliveryDate.trim()) newErrors.deliveryDate = "Delivery Date is required";
+    if (!deliveryAddress.trim())
+      newErrors.deliveryAddress = "Delivery Address is required";
+    if (!deliveryDate.trim())
+      newErrors.deliveryDate = "Delivery Date is required";
     if (!totalWeight || isNaN(totalWeight) || totalWeight <= 0) {
       newErrors.totalWeight = "Total Weight must be a positive number";
     }
@@ -259,14 +282,18 @@ const DeliveryChallan = () => {
     if (!driverName.trim()) newErrors.driverName = "Driver Name is required";
     if (!cnic.trim()) newErrors.cnic = "CNIC is required";
     if (!mobileNo.trim()) newErrors.mobileNo = "Mobile No is required";
-    if (!containerNo1.trim()) newErrors.containerNo1 = "Container No 1 is required";
+    if (!containerNo1.trim())
+      newErrors.containerNo1 = "Container No 1 is required";
     if (!batchNo1.trim()) newErrors.batchNo1 = "Batch No 1 is required";
-    if (!forLocation1.trim()) newErrors.forLocation1 = "For Location 1 is required";
+    if (!forLocation1.trim())
+      newErrors.forLocation1 = "For Location 1 is required";
     if (!firstWeight || isNaN(firstWeight) || firstWeight <= 0) {
       newErrors.firstWeight = "First Weight must be a positive number";
     }
-    if (!weightBridgeName.trim()) newErrors.weightBridgeName = "Weight Bridge Name is required";
-    if (!weightBridgeSlipNo.trim()) newErrors.weightBridgeSlipNo = "Weight Bridge Slip No is required";
+    if (!weightBridgeName.trim())
+      newErrors.weightBridgeName = "Weight Bridge Name is required";
+    if (!weightBridgeSlipNo.trim())
+      newErrors.weightBridgeSlipNo = "Weight Bridge Slip No is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -305,8 +332,14 @@ const DeliveryChallan = () => {
       date: date.trim(),
       orderNo: orderNo.trim(),
       orderDate: orderDate.trim(),
-      orderDetails: { ...orderDetails, totalWeight: parseFloat(orderDetails.totalWeight) },
-      vehicleDetails: { ...vehicleDetails, firstWeight: parseFloat(vehicleDetails.firstWeight) },
+      orderDetails: {
+        ...orderDetails,
+        totalWeight: parseFloat(orderDetails.totalWeight),
+      },
+      vehicleDetails: {
+        ...vehicleDetails,
+        firstWeight: parseFloat(vehicleDetails.firstWeight),
+      },
       remarks: remarks.trim(),
       approvalRemarks: approvalRemarks.trim(),
       status,
@@ -315,7 +348,11 @@ const DeliveryChallan = () => {
     try {
       if (editingChallan) {
         setDeliveryChallans((prev) =>
-          prev.map((c) => (c._id === editingChallan._id ? { ...c, ...newChallan, _id: c._id } : c))
+          prev.map((c) =>
+            c._id === editingChallan._id
+              ? { ...c, ...newChallan, _id: c._id }
+              : c
+          )
         );
         Swal.fire({
           icon: "success",
@@ -324,7 +361,10 @@ const DeliveryChallan = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setDeliveryChallans((prev) => [...prev, { ...newChallan, _id: `temp-${Date.now()}` }]);
+        setDeliveryChallans((prev) => [
+          ...prev,
+          { ...newChallan, _id: `temp-${Date.now()}` },
+        ]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -396,9 +436,7 @@ const DeliveryChallan = () => {
 
   const handleStatusChange = (id, newStatus) => {
     setDeliveryChallans((prev) =>
-      prev.map((c) =>
-        c._id === id ? { ...c, status: newStatus } : c
-      )
+      prev.map((c) => (c._id === id ? { ...c, status: newStatus } : c))
     );
     Swal.fire({
       icon: "success",
@@ -411,7 +449,10 @@ const DeliveryChallan = () => {
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = deliveryChallans.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = deliveryChallans.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
   const totalPages = Math.ceil(deliveryChallans.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -480,10 +521,18 @@ const DeliveryChallan = () => {
                       <div className="text-gray-600">{challan.dcNo}</div>
                       <div className="text-gray-600">{challan.date}</div>
                       <div className="text-gray-600">{challan.orderNo}</div>
-                      <div className="text-gray-600">{challan.orderDetails.customer}</div>
-                      <div className="text-gray-600">{challan.orderDetails.deliveryDate}</div>
-                      <div className="text-gray-600">{challan.orderDetails.totalWeight}</div>
-                      <div className="text-gray-600">{challan.vehicleDetails.truckNo}</div>
+                      <div className="text-gray-600">
+                        {challan.orderDetails.customer}
+                      </div>
+                      <div className="text-gray-600">
+                        {challan.orderDetails.deliveryDate}
+                      </div>
+                      <div className="text-gray-600">
+                        {challan.orderDetails.totalWeight}
+                      </div>
+                      <div className="text-gray-600">
+                        {challan.vehicleDetails.truckNo}
+                      </div>
                       <div className="text-gray-600">{challan.status}</div>
                       <div className="flex gap-3 justify-start">
                         <button
@@ -501,14 +550,18 @@ const DeliveryChallan = () => {
                           <Trash2 size={18} />
                         </button>
                         <button
-                          onClick={() => handleStatusChange(challan._id, "Approved")}
+                          onClick={() =>
+                            handleStatusChange(challan._id, "Approved")
+                          }
                           className="py-1 text-sm rounded text-green-600 hover:bg-green-50 transition-colors"
                           title="Approve"
                         >
                           <CheckCircle size={18} />
                         </button>
                         <button
-                          onClick={() => handleStatusChange(challan._id, "Rejected")}
+                          onClick={() =>
+                            handleStatusChange(challan._id, "Rejected")
+                          }
                           className="py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
                           title="Reject"
                         >
@@ -566,7 +619,9 @@ const DeliveryChallan = () => {
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingChallan ? "Update Delivery Challan" : "Add a New Delivery Challan"}
+                  {editingChallan
+                    ? "Update Delivery Challan"
+                    : "Add a New Delivery Challan"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -577,120 +632,129 @@ const DeliveryChallan = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      DC No <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editingChallan ? dcNo : `DC-${nextDcNo}`}
-                      readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.dcNo
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter DC No"
-                      required
-                    />
-                    {errors.dcNo && (
-                      <p className="text-red-500 text-xs mt-1">{errors.dcNo}</p>
-                    )}
+                <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        DC No <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editingChallan ? dcNo : `DC-${nextDcNo}`}
+                        readOnly
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.dcNo
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        placeholder="Enter DC No"
+                        required
+                      />
+                      {errors.dcNo && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.dcNo}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.date
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        required
+                      />
+                      {errors.date && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.date}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.date
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.date && (
-                      <p className="text-red-500 text-xs mt-1">{errors.date}</p>
-                    )}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order No <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={orderNo}
+                        onChange={(e) => setOrderNo(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.orderNo
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        placeholder="Enter Order No"
+                        required
+                      />
+                      {errors.orderNo && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.orderNo}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={orderDate}
+                        onChange={(e) => setOrderDate(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.orderDate
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        required
+                      />
+                      {errors.orderDate && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.orderDate}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order No <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={orderNo}
-                      onChange={(e) => setOrderNo(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderNo
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1">
+                    <button
+                      type="button"
+                      className={`w-full py-2 rounded-md ${
+                        activeTab === "orderDetails"
+                          ? "bg-newPrimary text-white"
+                          : "bg-gray-200 text-gray-700"
                       }`}
-                      placeholder="Enter Order No"
-                      required
-                    />
-                    {errors.orderNo && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderNo}</p>
-                    )}
+                      onClick={() => setActiveTab("orderDetails")}
+                    >
+                      Order Details
+                    </button>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={orderDate}
-                      onChange={(e) => setOrderDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
+                  <div className="flex-1">
+                    <button
+                      type="button"
+                      className={`w-full py-2 rounded-md ${
+                        activeTab === "vehicleDetails"
+                          ? "bg-newPrimary text-white"
+                          : "bg-gray-200 text-gray-700"
                       }`}
-                      required
-                    />
-                    {errors.orderDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderDate}</p>
-                    )}
+                      onClick={() => setActiveTab("vehicleDetails")}
+                    >
+                      Vehicle Details
+                    </button>
                   </div>
                 </div>
-
-              <div className="flex gap-4 mb-4">
-  <div className="flex-1">
-    <button
-      type="button"
-      className={`w-full py-2 rounded-md ${
-        activeTab === "orderDetails"
-          ? "bg-newPrimary text-white"
-          : "bg-gray-200 text-gray-700"
-      }`}
-      onClick={() => setActiveTab("orderDetails")}
-    >
-      Order Details
-    </button>
-  </div>
-  <div className="flex-1">
-    <button
-      type="button"
-      className={`w-full py-2 rounded-md ${
-        activeTab === "vehicleDetails"
-          ? "bg-newPrimary text-white"
-          : "bg-gray-200 text-gray-700"
-      }`}
-      onClick={() => setActiveTab("vehicleDetails")}
-    >
-      Vehicle Details
-    </button>
-  </div>
-</div>
-
-
+              
                 {activeTab === "orderDetails" && (
+                  <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
                   <div className="space-y-4">
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">
@@ -701,7 +765,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={orderDetails.customer}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, customer: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              customer: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.customer
@@ -712,7 +779,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.customer && (
-                          <p className="text-red-500 text-xs mt-1">{errors.customer}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.customer}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -723,7 +792,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={orderDetails.person}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, person: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              person: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.person
@@ -734,7 +806,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.person && (
-                          <p className="text-red-500 text-xs mt-1">{errors.person}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.person}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -747,7 +821,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={orderDetails.phone}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, phone: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              phone: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.phone
@@ -758,7 +835,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.phone && (
-                          <p className="text-red-500 text-xs mt-1">{errors.phone}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.phone}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -769,7 +848,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={orderDetails.address}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, address: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              address: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.address
@@ -780,7 +862,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.address && (
-                          <p className="text-red-500 text-xs mt-1">{errors.address}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.address}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -792,7 +876,10 @@ const DeliveryChallan = () => {
                         <select
                           value={orderDetails.orderType}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, orderType: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              orderType: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.orderType
@@ -806,7 +893,9 @@ const DeliveryChallan = () => {
                           <option value="Express">Express</option>
                         </select>
                         {errors.orderType && (
-                          <p className="text-red-500 text-xs mt-1">{errors.orderType}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.orderType}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -816,7 +905,10 @@ const DeliveryChallan = () => {
                         <select
                           value={orderDetails.mode}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, mode: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              mode: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.mode
@@ -830,12 +922,14 @@ const DeliveryChallan = () => {
                           <option value="Van">Van</option>
                         </select>
                         {errors.mode && (
-                          <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.mode}
+                          </p>
                         )}
                       </div>
                     </div>
                     <div className="flex gap-4">
-                       <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
                           Total Weight <span className="text-red-500">*</span>
                         </label>
@@ -843,7 +937,10 @@ const DeliveryChallan = () => {
                           type="number"
                           value={orderDetails.totalWeight}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, totalWeight: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              totalWeight: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.totalWeight
@@ -856,10 +953,12 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.totalWeight && (
-                          <p className="text-red-500 text-xs mt-1">{errors.totalWeight}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.totalWeight}
+                          </p>
                         )}
                       </div>
-                    
+
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
                           Delivery Date <span className="text-red-500">*</span>
@@ -868,7 +967,10 @@ const DeliveryChallan = () => {
                           type="date"
                           value={orderDetails.deliveryDate}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, deliveryDate: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              deliveryDate: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.deliveryDate
@@ -878,20 +980,26 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.deliveryDate && (
-                          <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.deliveryDate}
+                          </p>
                         )}
                       </div>
                     </div>
                     <div className="flex gap-4">
-                       <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
-                          Delivery Address <span className="text-red-500">*</span>
+                          Delivery Address{" "}
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={orderDetails.deliveryAddress}
                           onChange={(e) =>
-                            setOrderDetails({ ...orderDetails, deliveryAddress: e.target.value })
+                            setOrderDetails({
+                              ...orderDetails,
+                              deliveryAddress: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.deliveryAddress
@@ -902,14 +1010,19 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.deliveryAddress && (
-                          <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.deliveryAddress}
+                          </p>
                         )}
                       </div>
                     </div>
                   </div>
+                  </div>
                 )}
-
-                {activeTab === "vehicleDetails" && (
+            
+              
+                  {activeTab === "vehicleDetails" && (
+                    <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
                   <div className="space-y-4">
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">
@@ -920,7 +1033,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.truckNo}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, truckNo: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              truckNo: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.truckNo
@@ -931,7 +1047,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.truckNo && (
-                          <p className="text-red-500 text-xs mt-1">{errors.truckNo}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.truckNo}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -942,7 +1060,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.driverName}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, driverName: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              driverName: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.driverName
@@ -953,7 +1074,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.driverName && (
-                          <p className="text-red-500 text-xs mt-1">{errors.driverName}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.driverName}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -966,7 +1089,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.father}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, father: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              father: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.father
@@ -977,7 +1103,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.father && (
-                          <p className="text-red-500 text-xs mt-1">{errors.father}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.father}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -988,7 +1116,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.cnic}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, cnic: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              cnic: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.cnic
@@ -999,7 +1130,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.cnic && (
-                          <p className="text-red-500 text-xs mt-1">{errors.cnic}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.cnic}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -1012,7 +1145,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.mobileNo}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, mobileNo: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              mobileNo: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.mobileNo
@@ -1023,7 +1159,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.mobileNo && (
-                          <p className="text-red-500 text-xs mt-1">{errors.mobileNo}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.mobileNo}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1034,7 +1172,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.containerNo1}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, containerNo1: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              containerNo1: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.containerNo1
@@ -1045,7 +1186,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.containerNo1 && (
-                          <p className="text-red-500 text-xs mt-1">{errors.containerNo1}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.containerNo1}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -1058,7 +1201,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.batchNo1}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, batchNo1: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              batchNo1: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.batchNo1
@@ -1069,7 +1215,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.batchNo1 && (
-                          <p className="text-red-500 text-xs mt-1">{errors.batchNo1}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.batchNo1}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -1080,7 +1228,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.forLocation1}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, forLocation1: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              forLocation1: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.forLocation1
@@ -1091,7 +1242,9 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.forLocation1 && (
-                          <p className="text-red-500 text-xs mt-1">{errors.forLocation1}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.forLocation1}
+                          </p>
                         )}
                       </div>
                     </div>
@@ -1104,7 +1257,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.containerNo2}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, containerNo2: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              containerNo2: e.target.value,
+                            })
                           }
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           placeholder="Enter Container No 2"
@@ -1118,7 +1274,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.batchNo2}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, batchNo2: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              batchNo2: e.target.value,
+                            })
                           }
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           placeholder="Enter Batch No 2"
@@ -1134,7 +1293,10 @@ const DeliveryChallan = () => {
                           type="text"
                           value={vehicleDetails.forLocation2}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, forLocation2: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              forLocation2: e.target.value,
+                            })
                           }
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           placeholder="Enter For Location 2"
@@ -1148,7 +1310,10 @@ const DeliveryChallan = () => {
                           type="number"
                           value={vehicleDetails.firstWeight}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, firstWeight: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              firstWeight: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.firstWeight
@@ -1161,20 +1326,26 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.firstWeight && (
-                          <p className="text-red-500 text-xs mt-1">{errors.firstWeight}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.firstWeight}
+                          </p>
                         )}
                       </div>
                     </div>
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
-                          Weight Bridge Name <span className="text-red-500">*</span>
+                          Weight Bridge Name{" "}
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={vehicleDetails.weightBridgeName}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, weightBridgeName: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              weightBridgeName: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.weightBridgeName
@@ -1185,18 +1356,24 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.weightBridgeName && (
-                          <p className="text-red-500 text-xs mt-1">{errors.weightBridgeName}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.weightBridgeName}
+                          </p>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
-                          Weight Bridge Slip No <span className="text-red-500">*</span>
+                          Weight Bridge Slip No{" "}
+                          <span className="text-red-500">*</span>
                         </label>
                         <input
                           type="text"
                           value={vehicleDetails.weightBridgeSlipNo}
                           onChange={(e) =>
-                            setVehicleDetails({ ...vehicleDetails, weightBridgeSlipNo: e.target.value })
+                            setVehicleDetails({
+                              ...vehicleDetails,
+                              weightBridgeSlipNo: e.target.value,
+                            })
                           }
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                             errors.weightBridgeSlipNo
@@ -1207,13 +1384,18 @@ const DeliveryChallan = () => {
                           required
                         />
                         {errors.weightBridgeSlipNo && (
-                          <p className="text-red-500 text-xs mt-1">{errors.weightBridgeSlipNo}</p>
+                          <p className="text-red-500 text-xs mt-1">
+                            {errors.weightBridgeSlipNo}
+                          </p>
                         )}
                       </div>
                     </div>
                   </div>
+                  </div>
                 )}
-
+              
+              
+              <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -1227,8 +1409,8 @@ const DeliveryChallan = () => {
                       rows="3"
                     />
                   </div>
-                  </div>
-                  <div className="flex gap-4">
+                </div>
+                <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Approval Remarks
@@ -1242,7 +1424,7 @@ const DeliveryChallan = () => {
                     />
                   </div>
                 </div>
-
+                </div>
                 <button
                   type="submit"
                   disabled={loading}
