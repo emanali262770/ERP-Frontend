@@ -96,11 +96,11 @@ const links = [
     label: "Sales ",
     icon: <FaShoppingCart />,
     children: [
-      { to: "/admin/customer-distributor", label: "Customer/Distributor", icon: <FaListAlt /> },
+      { to: "/admin/distributor", label: "Distributor", icon: <FaListAlt /> },
       { to: "/admin/rate-list", label: "Rate List", icon: <FaListAlt /> },
       {
-        to: "/admin/distribution-rate-list",
-        label: "Distribution Rate List",
+        to: "/admin/distributor-rate-list",
+        label: "Distributor Rate List",
         icon: <FaExchangeAlt />,
       },
       {
@@ -189,6 +189,7 @@ const links = [
     label: "Setup",
     icon: <FaCogs />,
     children: [
+       { to: "/admin/customers-list", label: "Customers", icon: <FaTags /> },
       {
         to: "/admin/category-item",
         label: "Item Categories",

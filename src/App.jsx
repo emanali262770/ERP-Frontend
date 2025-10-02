@@ -60,8 +60,9 @@ import SalesReturn from "./pages/admin/Sales/SalesReturn.jsx";
 import StoreAcknowledgement from "./pages/admin/Sales/StoreAcknowledgement.jsx";
 import Profile from "./components/Profile.jsx";
 import PurchaseReturn from "./pages/admin/Purchase/PurchaseReturn.jsx";
-import CustomerDistributorList from "./pages/admin/Sales/CustomerDistributor.jsx";
+import DistributorList from "./pages/admin/Sales/Distributor.jsx";
 import EmptyVehicleEntry from "./pages/admin/Sales/EmptyVehicleEntry.jsx";
+import CustomerList from "./pages/admin/SetUp/Customer.jsx";
 import Tax from "./pages/admin/SetUp/Tax.jsx";
 
 function AppContent() {
@@ -129,7 +130,7 @@ function AppContent() {
             <Route path="customer-ledger" element={<CustomerLedger />} />
             <Route path="receivable" element={<Receivable />} />
             <Route path="sales-return" element={<SalesReturn />} />
-            <Route path="customer-distributor" element={<CustomerDistributorList />} />
+            <Route path="distributor" element={<DistributorList />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
@@ -142,6 +143,7 @@ function AppContent() {
             <Route path="promotion-item" element={<PromotionItem />} />
             <Route path="item-type" element={<ItemType />} />
             <Route path="tax" element={<Tax />} />
+            <Route path="customers-list" element={<CustomerList />} />
           </Route>
         </Routes>
       </main>
