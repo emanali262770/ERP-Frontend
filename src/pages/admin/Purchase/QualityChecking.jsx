@@ -119,28 +119,35 @@ const QualityChecking = () => {
   }, [fetchGatePassInn]);
 
  const fetchGatePassInnItems = useCallback(async () => {
-  // Don’t fetch items if we’re editing an existing QC
-  if (!gpId || editingQC) {
+  if (!gpId) return;
+
+  // 🚫 Don't fetch items if editing existing QC and gpId hasn't changed
+  if (editingQC && gpId === (editingQC.gatePassIn?._id || "")) {
     return;
   }
+
   try {
     setItemsLoading(true);
     const res = await axios.get(`${GATEPASS_URL}/${gpId}`);
     const data = res.data;
+
     const items =
       data?.withPO?.items?.length > 0
         ? data.withPO.items
         : data?.withoutPO?.items?.length > 0
         ? data.withoutPO.items
         : [];
+
     setGatePassListItems(data);
-    setItemsList(items);  // only set itemsList when adding new QC
+    setItemsList(items);
   } catch (error) {
     console.error("Failed to fetch gate pass", error);
   } finally {
     setItemsLoading(false);
   }
 }, [gpId, editingQC]);
+
+
 
 
   useEffect(() => {
