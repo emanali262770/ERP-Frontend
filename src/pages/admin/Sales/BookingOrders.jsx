@@ -570,6 +570,7 @@ const BookingOrders = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-6">
+                  <div className="border bg-gray-100 p-4 rounded-lg space-y-4"> 
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -611,6 +612,8 @@ const BookingOrders = () => {
                     )}
                   </div>
                 </div>
+                </div>
+                   <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -637,10 +640,7 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.customer}</p>
                     )}
                   </div>
-                
-                </div>
-                <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
+                  <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Contact Person
                     </label>
@@ -652,6 +652,9 @@ const BookingOrders = () => {
                       placeholder="Contact person"
                     />
                   </div>
+                </div>
+                <div className="flex gap-4">
+                  
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Phone
@@ -664,21 +667,7 @@ const BookingOrders = () => {
                       placeholder="Phone number"
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      value={address}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Address"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Balance
                     </label>
@@ -690,7 +679,28 @@ const BookingOrders = () => {
                       placeholder="Balance"
                     />
                   </div>
-                   <div className="flex-1 min-w-0">
+                  
+                </div>
+                <div className="flex gap-4">
+                <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Address
+                    </label>
+                    <input
+                      type="text"
+                      value={address}
+                      readOnly
+                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      placeholder="Address"
+                    />
+                  </div>
+                
+                 
+                </div>
+                </div>
+                 <div className="border bg-gray-100 p-4 rounded-lg space-y-4"> 
+                <div className="flex gap-4">
+                     <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Order Type <span className="text-red-500">*</span>
                     </label>
@@ -734,10 +744,13 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
                     )}
                   </div>
-                 
+                  
+                   
+                  
+                  
                 </div>
                 <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
+                 <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Payment Method <span className="text-red-500">*</span>
                     </label>
@@ -785,6 +798,8 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.product}</p>
                     )}
                   </div>
+                  </div>
+                <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Delivery Date <span className="text-red-500">*</span>
@@ -804,9 +819,6 @@ const BookingOrders = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
                     )}
                   </div>
-                  
-                </div>
-                <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Delivery Address <span className="text-red-500">*</span>
@@ -829,10 +841,9 @@ const BookingOrders = () => {
                   </div>
                
                 </div>
-                <div className="flex gap-4">
-                
-                  
                 </div>
+
+                  <div className="border bg-gray-100 p-4 rounded-lg space-y-4"> 
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -920,6 +931,7 @@ const BookingOrders = () => {
                     </button>
                   </div>
                 </div>
+               </div>
                 {itemsList.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
