@@ -406,22 +406,20 @@ const RateList = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Next
                 </button>
@@ -434,8 +432,9 @@ const RateList = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[800px] bg-white rounded-2xl  pb-5 shadow-2xl overflow-y-auto "
             >
+              {/* Header */}
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingRateList ? "Update Rate List" : "Add a New Rate List"}
@@ -448,132 +447,143 @@ const RateList = () => {
                 </button>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={type}
-                      onChange={(e) => setType(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.type
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-4 p-4 py-4 md:p-6">
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  {/* Type & Product Name */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={type}
+                        onChange={(e) => setType(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.type
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Type</option>
-                      {types.map((typeOption) => (
-                        <option key={typeOption} value={typeOption}>
-                          {typeOption}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.type && (
-                      <p className="text-red-500 text-xs mt-1">{errors.type}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Product Name <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={itemName}
-                      onChange={(e) => handleProductChange(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.itemName
+                          }`}
+                        required
+                      >
+                        <option value="">Select Type</option>
+                        {types.map((typeOption) => (
+                          <option key={typeOption} value={typeOption}>
+                            {typeOption}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.type && (
+                        <p className="text-red-500 text-xs mt-1">{errors.type}</p>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Product Name <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={itemName}
+                        onChange={(e) => handleProductChange(e.target.value)}
+                        className={`w-full p-3  border rounded-md focus:outline-none focus:ring-2 ${errors.itemName
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Product</option>
-                      {itemList.map((item) => (
-                        <option key={item._id} value={item.itemName}>
-                          {item.itemName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.itemName && (
-                      <p className="text-red-500 text-xs mt-1">{errors.itemName}</p>
-                    )}
+                          }`}
+                        required
+                      >
+                        <option value="">Select Product</option>
+                        {itemList.map((item) => (
+                          <option key={item._id} value={item.itemName}>
+                            {item.itemName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.itemName && (
+                        <p className="text-red-500 text-xs mt-1">{errors.itemName}</p>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Product Code
-                    </label>
-                    <input
-                      type="text"
-                      value={productCode}
-                      readOnly
-                      className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
-                      placeholder="Product Code"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Pack Size
-                    </label>
-                    <input
-                      type="text"
-                      value={packSize}
-                      readOnly
-                      className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
-                      placeholder="Pack Size"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Specifications
-                    </label>
-                    <input
-                      type="text"
-                      value={specifications}
-                      readOnly
-                      className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
-                      placeholder="Specifications"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Sale Price <span className="text-red-500">*</span>
-                    </label>
-                    <div className="flex gap-2 items-center">
+
+                  {/* Product Code & Pack Size */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Product Code
+                      </label>
                       <input
-                        type="number"
-                        value={salePrice}
-                        onChange={(e) => setSalePrice(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.salePrice
+                        type="text"
+                        value={productCode}
+                        readOnly
+                        className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
+
+
+
+                        placeholder="Product Code"
+                      />
+
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Pack Size
+                      </label>
+                      <input
+                        type="text"
+                        value={packSize}
+                        readOnly
+                        className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
+                        placeholder="Pack Size"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Specifications & Sale Price */}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Specifications
+                      </label>
+                      <input
+                        type="text"
+                        value={specifications}
+                        readOnly
+                        className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
+                        placeholder="Specifications"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Sale Price <span className="text-red-500">*</span>
+                      </label>
+                      <div className="flex gap-2 items-center">
+                        <input
+                          type="number"
+                          value={salePrice}
+                          onChange={(e) => setSalePrice(e.target.value)}
+                          className={`w-full p-3 border rounded-md bg-white focus:outline-none focus:ring-2 ${errors.salePrice
                             ? "border-red-500 focus:ring-red-500"
                             : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        placeholder="Enter sale price"
-                        min="0"
-                        step="0.01"
-                        required
-                      />
-                      <button
-                        type="button"
-                        onClick={handleAddClick}
-                        disabled={loading}
-                        className="bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
-                      >
-                        Add
-                      </button>
+                            }`}
+                          placeholder="Enter sale price"
+                          min="0"
+                          step="0.01"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={handleAddClick}
+                          disabled={loading}
+                          className="bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
+                        >
+                          Add
+                        </button>
+                      </div>
+                      {errors.salePrice && (
+                        <p className="text-red-500 text-xs mt-1">{errors.salePrice}</p>
+                      )}
                     </div>
-                    {errors.salePrice && (
-                      <p className="text-red-500 text-xs mt-1">{errors.salePrice}</p>
-                    )}
                   </div>
                 </div>
 
+                {/* Preview Section */}
                 {showPreviewTable && previewData && (
                   <div className="mt-4">
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">Preview</h3>
@@ -588,7 +598,11 @@ const RateList = () => {
                         <div>Remove</div>
                       </div>
                       <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white">
-                        <div className="text-gray-600">{editingRateList ? rateLists.findIndex(r => r._id === editingRateList._id) + 1 : rateLists.length + 1}</div>
+                        <div className="text-gray-600">
+                          {editingRateList
+                            ? rateLists.findIndex((r) => r._id === editingRateList._id) + 1
+                            : rateLists.length + 1}
+                        </div>
                         <div className="text-gray-600">{previewData.type}</div>
                         <div className="text-gray-600">{previewData.productCode}</div>
                         <div className="text-gray-600">{previewData.itemName}</div>
@@ -597,7 +611,7 @@ const RateList = () => {
                         <div className="flex justify-start">
                           <button
                             onClick={handleRemovePreview}
-                            className="py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                            className=" text-xl flex-shrink-0 text-red-500 transition-colors"
                             title="Remove"
                           >
                             ×
@@ -618,6 +632,7 @@ const RateList = () => {
             </div>
           </div>
         )}
+
 
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {

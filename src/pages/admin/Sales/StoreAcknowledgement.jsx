@@ -401,7 +401,7 @@ const StoreAcknowledgement = () => {
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={currentRecords.length ||5}
+                    rows={currentRecords.length || 5}
                     cols={5}
                     className="lg:grid-cols-5"
                   />
@@ -453,22 +453,20 @@ const StoreAcknowledgement = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Next
                 </button>
@@ -496,8 +494,10 @@ const StoreAcknowledgement = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+
+                <div className="flex gap-6">
+                  {/* ID */}
+                  <div>
                     <label className="block text-gray-700 font-medium mb-2">
                       ID <span className="text-red-500">*</span>
                     </label>
@@ -505,11 +505,10 @@ const StoreAcknowledgement = () => {
                       type="text"
                       value={editingAcknowledgement ? storeId : `ACK-${nextStoreId}`}
                       readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.storeId
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                      className={`w-48 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.storeId
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                       placeholder="Enter store ID"
                       required
                     />
@@ -517,7 +516,9 @@ const StoreAcknowledgement = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.storeId}</p>
                     )}
                   </div>
-                  <div className="flex-1 min-w-0">
+
+                  {/* Date */}
+                  <div>
                     <label className="block text-gray-700 font-medium mb-2">
                       Date <span className="text-red-500">*</span>
                     </label>
@@ -525,11 +526,10 @@ const StoreAcknowledgement = () => {
                       type="date"
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.date
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                      className={`w-56 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.date
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                       required
                     />
                     {errors.date && (
@@ -537,6 +537,7 @@ const StoreAcknowledgement = () => {
                     )}
                   </div>
                 </div>
+
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -545,11 +546,10 @@ const StoreAcknowledgement = () => {
                     <select
                       value={bookingOrderNo}
                       onChange={(e) => setBookingOrderNo(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.bookingOrderNo
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                      className={`w-90 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.bookingOrderNo
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                       required
                     >
                       <option value="">Select Booking Order</option>
@@ -563,177 +563,179 @@ const StoreAcknowledgement = () => {
                       <p className="text-red-500 text-xs mt-1">{errors.bookingOrderNo}</p>
                     )}
                   </div>
-                 
-                </div>
-                <div className="flex gap-4">
-                   <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Customer
-                    </label>
-                    <input
-                      type="text"
-                      value={customerList.find((c) => c._id === customer)?.customerName || ""}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Customer"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Contact Person
-                    </label>
-                    <input
-                      type="text"
-                      value={person}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Contact person"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Phone
-                    </label>
-                    <input
-                      type="text"
-                      value={phone}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Phone number"
-                    />
-                  </div>
-                  
-                </div>
-                <div className="flex gap-4">
-                  
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      value={address}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Address"
-                    />
-                  </div>
-                 
-                </div>
-                <div className="flex gap-4">
-                   <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Balance
-                    </label>
-                    <input
-                      type="text"
-                      value={balance}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Balance"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Address
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Delivery Address"
-                    />
-                  </div>
-                   <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order Type
-                    </label>
-                    <input
-                      type="text"
-                      value={orderType}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Order Type"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                 
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Date
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryDate}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Delivery Date"
-                    />
-                  </div>
-                    <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Mode
-                    </label>
-                    <input
-                      type="text"
-                      value={mode}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Mode"
-                    />
-                  </div>
-                   <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Payment Method
-                    </label>
-                    <input
-                      type="text"
-                      value={paymentMethod}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Payment Method"
-                    />
-                  </div>
-                </div>
 
+                </div>
+                <div className="border p-4 rounded-xl bg-gray-100">
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Customer
+                      </label>
+                      <input
+                        type="text"
+                        value={customerList.find((c) => c._id === customer)?.customerName || ""}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Customer"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Contact Person
+                      </label>
+                      <input
+                        type="text"
+                        value={person}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Contact person"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="text"
+                        value={phone}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Phone number"
+                      />
+                    </div>
+
+                  </div>
+                  <div className="flex gap-4">
+
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        value={address}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Address"
+                      />
+                    </div>
+
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Balance
+                      </label>
+                      <input
+                        type="text"
+                        value={balance}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Balance"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Address
+                      </label>
+                      <input
+                        type="text"
+                        value={deliveryAddress}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Delivery Address"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order Type
+                      </label>
+                      <input
+                        type="text"
+                        value={orderType}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Order Type"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Date
+                      </label>
+                      <input
+                        type="text"
+                        value={deliveryDate}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Delivery Date"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Mode
+                      </label>
+                      <input
+                        type="text"
+                        value={mode}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Mode"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Payment Method
+                      </label>
+                      <input
+                        type="text"
+                        value={paymentMethod}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Payment Method"
+                      />
+                    </div>
+                  </div>
+                </div>
                 {itemsList.length > 0 && (
                   <div className="overflow-x-auto">
-                    <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                      <thead className="bg-gray-100 text-gray-600 text-sm">
+                    <table className="w-full border border-gray-200 rounded-xl">
+                      <thead className="bg-gray-500 text-white text-sm uppercase tracking-wide">
                         <tr>
-                          <th className="px-4 py-2 border-b">Sr #</th>
-                          <th className="px-4 py-2 border-b">Item</th>
-                          <th className="px-4 py-2 border-b">Specifications</th>
-                          <th className="px-4 py-2 border-b">Weight</th>
-                          <th className="px-4 py-2 border-b">Packing</th>
-                          <th className="px-4 py-2 border-b">Stock</th>
-                          <th className="px-4 py-2 border-b">Qty</th>
-                          <th className="px-4 py-2 border-b">Rate</th>
-                          <th className="px-4 py-2 border-b">Total</th>
+                          <th className="px-4 py-2 border-b text-center">Sr #</th>
+                          <th className="px-4 py-2 border-b text-left">Item</th>
+                          <th className="px-4 py-2 border-b text-left">Specifications</th>
+                          <th className="px-4 py-2 border-b text-center">Weight</th>
+                          <th className="px-4 py-2 border-b text-center">Packing</th>
+                          <th className="px-4 py-2 border-b text-center">Stock</th>
+                          <th className="px-4 py-2 border-b text-center">Qty</th>
+                          <th className="px-4 py-2 border-b text-center">Rate</th>
+                          <th className="px-4 py-2 border-b text-center">Total</th>
                         </tr>
                       </thead>
-                      <tbody className="text-gray-700 text-sm">
+                      <tbody className="text-gray-800 text-sm divide-y divide-gray-200">
                         {itemsList.map((item, idx) => (
-                          <tr key={idx} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
-                            <td className="px-4 py-2 border-b text-center">
-                              {item.product}
-                            </td>
-                            <td className="px-4 py-2 border-b text-center">{item.specification}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.weight}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.packing}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.inStock}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.rate}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.total}</td>
+                          <tr key={idx} className="hover:bg-gray-50 transition">
+                            <td className="px-4 py-2 text-center font-medium">{idx + 1}</td>
+                            <td className="px-4 py-2">{item.product}</td>
+                            <td className="px-4 py-2">{item.specification}</td>
+                            <td className="px-4 py-2 text-center">{item.weight}</td>
+                            <td className="px-4 py-2 text-center">{item.packing}</td>
+                            <td className="px-4 py-2 text-center">{item.inStock}</td>
+                            <td className="px-4 py-2 text-center">{item.qty}</td>
+                            <td className="px-4 py-2 text-center">{item.rate}</td>
+                            <td className="px-4 py-2 text-center font-semibold">{item.total}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 )}
+
+
+
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
@@ -743,11 +745,10 @@ const StoreAcknowledgement = () => {
                       type="number"
                       value={acknowledgedQty}
                       onChange={(e) => setAcknowledgedQty(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.acknowledgedQty
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.acknowledgedQty
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                       placeholder="Enter acknowledged quantity"
                       min="0"
                       step="1"
