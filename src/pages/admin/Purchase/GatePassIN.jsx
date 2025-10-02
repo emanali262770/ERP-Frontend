@@ -31,8 +31,10 @@ const GatepassIn = () => {
   const [againstPoNo, setAgainstPoNo] = useState("");
   const [driverNameWithoutPo, setDriverNameWithoutPo] = useState("");
   const [supplier, setSupplier] = useState("");
+  const [supplierId, setSupplierId] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("");
+  const [selectedPoItems, setselectedPoItems] = useState(null);
   const [editingGatepass, setEditingGatepass] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
@@ -201,10 +203,14 @@ const GatepassIn = () => {
     setItemsList([]);
     setItemName("");
     setItemQuantity("");
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
     setselectedPoItems(null);
 >>>>>>> Stashed changes
+=======
+     setselectedPoItems(null);
+>>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
     setItemUnits("");
     setCategory({ id: "", name: "" }); // reset properly
     setAgainstPoNo("");
@@ -279,12 +285,18 @@ const GatepassIn = () => {
       setSupplier(gatepass.withPO?.supplier?.supplierName || "");
       setDriverName(gatepass.driverName || "");
       setItemsList(gatepass.withPO?.items || []);
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
       if (matchedPO) {
         setselectedPoItems(matchedPO);
       }
 >>>>>>> Stashed changes
+=======
+       if (matchedPO) {
+    setselectedPoItems(matchedPO);
+  }
+>>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
     } else {
       setPoType("withoutPO");
       setWithOutPoSupplier(gatepass.withoutPO?.supplier?._id || "");
@@ -379,10 +391,14 @@ const GatepassIn = () => {
           poNo: againstPoNo, // PO _id
         },
         status,
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
         supplierName: supplierId,
 >>>>>>> Stashed changes
+=======
+        supplierName:supplierId
+>>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
       };
     } else {
       newGatepass = {
@@ -479,8 +495,12 @@ const GatepassIn = () => {
     setIsView(true);
   };
 
+<<<<<<< HEAD
 <<<<<<< Updated upstream
   console.log({ itemsList });
+=======
+  
+>>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
 
 =======
 >>>>>>> Stashed changes
@@ -506,10 +526,10 @@ const GatepassIn = () => {
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[1200px]">
               {/* Table Header */}
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>GatePass ID</div>
                 <div>Driver Name</div>
-                <div>Items Category</div>
+                {/* <div>Items Category</div> */}
                 <div>Supplier</div>
                 {/* <div>Items</div> */}
                 <div>Date</div>
@@ -521,9 +541,9 @@ const GatepassIn = () => {
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={3}
-                    cols={7}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                    rows={gatepasses.length || 5}
+                    cols={6}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
                   />
                 ) : gatepasses.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
@@ -538,7 +558,7 @@ const GatepassIn = () => {
                     return (
                       <div
                         key={gatepass._id}
-                        className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         {/* GatePass ID */}
                         <div className="font-medium text-gray-900">
@@ -548,15 +568,6 @@ const GatepassIn = () => {
                         {/* Driver Name */}
                         <div className="text-gray-600">
                           {gatepass.driverName}
-                        </div>
-
-                        {/* Category */}
-                        <div className="text-gray-600">
-                          {isWithPO
-                            ? poData?.estimation?.demandItem?.category
-                                ?.categoryName || "-"
-                            : withoutPOData?.items?.[0]?.category
-                                ?.categoryName || "-"}
                         </div>
 
                         {/* Supplier */}
@@ -688,6 +699,7 @@ const GatepassIn = () => {
                       </p>
                     )}
                   </div>
+                  {/* date */}
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Date <span className="text-red-500">*</span>
@@ -774,6 +786,7 @@ const GatepassIn = () => {
                                 selectedPO.estimation?.demandItem?.supplier
                                   ?.supplierName || ""
                               );
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
                               setSupplierId(
@@ -781,6 +794,11 @@ const GatepassIn = () => {
                               );
                               setselectedPoItems(selectedPO);
 >>>>>>> Stashed changes
+=======
+                              setSupplierId(selectedPO.estimation?.demandItem?.supplier?._id)
+                              setselectedPoItems(selectedPO);
+                              
+>>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
                             }
                           }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
@@ -850,6 +868,7 @@ const GatepassIn = () => {
                     </div>
                   </>
                 )}
+<<<<<<< HEAD
 <<<<<<< Updated upstream
 =======
                 {poType === "withPO" &&
@@ -899,6 +918,59 @@ const GatepassIn = () => {
                   )}
 
 >>>>>>> Stashed changes
+=======
+                {poType === "withPO" &&
+                  selectedPoItems &&
+                  selectedPoItems.items?.length > 0 && (
+                    <div className="mt-4">
+                     
+                      <div className="overflow-x-auto">
+                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                          <thead className="bg-gray-100 text-gray-600 text-sm">
+                            <tr>
+                              <th className="px-4 py-2 border-b text-left">
+                                Sr #
+                              </th>
+                              <th className="px-4 py-2 border-b text-left">
+                                Item Name
+                              </th>
+                              <th className="px-4 py-2 border-b text-left">
+                                Quantity
+                              </th>
+                              <th className="px-4 py-2 border-b text-left">
+                                Price
+                              </th>
+                            
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-700 text-sm">
+                            {selectedPoItems.items.map((item, idx) => (
+                              <tr
+                                key={item._id || idx}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-4 py-2 border-b">
+                                  {idx + 1}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.itemName}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.qty}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.price}
+                                </td>
+                               
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
+>>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
                 {poType === "withoutPO" && (
                   <>
                     <div className="flex gap-4">
