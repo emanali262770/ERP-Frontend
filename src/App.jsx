@@ -64,6 +64,9 @@ import DistributorList from "./pages/admin/Sales/Distributor.jsx";
 import EmptyVehicleEntry from "./pages/admin/Sales/EmptyVehicleEntry.jsx";
 import CustomerList from "./pages/admin/SetUp/Customer.jsx";
 import Tax from "./pages/admin/SetUp/Tax.jsx";
+import PurchasePage from "./pages/admin/Purchase/PurchasePage.jsx";
+import SalesPage from "./pages/admin/Sales/SalesPage.jsx";
+
 
 function AppContent() {
   return (
@@ -93,6 +96,9 @@ function AppContent() {
             <Route path="shelve-location" element={<ShelveLocation />} />
             <Route path="category-item" element={<CategoryItem />} />
             <Route path="supplier" element={<SupplierList />} />
+              <Route path="purchase" element={<PurchasePage />} />
+               <Route path="sales" element={<SalesPage />} />
+
             <Route path="manufacture" element={<Manufacture />} />
             <Route path="item-barcode" element={<ItemBarcode />} />
             <Route path="sales-invoice" element={<SalesInvoice />} />

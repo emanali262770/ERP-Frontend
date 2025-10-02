@@ -2,9 +2,6 @@ import React, { useEffect, useState } from "react";
 import {
   FaChevronDown,
   FaChevronUp,
-  FaWallet,
-  FaFileInvoiceDollar,
-  FaBookOpen,
   FaBox,
   FaReceipt,
   FaUsers,
@@ -20,22 +17,9 @@ import {
   FaBalanceScale,
   FaUserCog,
   FaShoppingCart,
-  FaFileAlt,
-  FaCheckCircle,
-  FaCommentsDollar,
-  FaCalculator,
-  FaClipboardCheck,
-  FaSignInAlt,
-  FaCheckDouble,
-  FaFileInvoice,
-  FaUndoAlt,
-  FaSignOutAlt,
-  FaDoorOpen,
-  FaListAlt, // Added missing import
-  FaExchangeAlt, // Added missing import
-  FaMoneyBillWave, // Added missing import
-  FaAddressBook, // Added missing import
 } from "react-icons/fa";
+
+import { FcSalesPerformance } from "react-icons/fc";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 
@@ -49,109 +33,15 @@ const links = [
     key: "isItemDetails",
   },
   {
+    to: "/admin/purchase",
     label: "Purchase",
     icon: <FaShoppingCart />,
-    children: [
-      {
-        to: "/admin/purchase-requisition",
-        label: "Purchase Requisition",
-        icon: <FaFileAlt />,
-      },
-      {
-        to: "/admin/purchase-approval",
-        label: "Purchase Approval",
-        icon: <FaCheckCircle />,
-      },
-      {
-        to: "/admin/quotation",
-        label: "Market Quotation",
-        icon: <FaCommentsDollar />,
-      },
-      { to: "/admin/estimation", label: "Estimation", icon: <FaCalculator /> },
-      {
-        to: "/admin/purchase-order",
-        label: "Purchase Order",
-        icon: <FaFileInvoiceDollar />,
-      },
-      { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
-      {
-        to: "/admin/quality-checking",
-        label: "Quality Checking",
-        icon: <FaCheckDouble />,
-      },
-      { to: "/admin/grn", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
-      {
-        to: "/admin/purchase-return",
-        label: "Purchase Return",
-        icon: <FaUndoAlt />,
-      },
-      {
-        to: "/admin/gatepass-out",
-        label: "GatePass OUT",
-        icon: <FaSignOutAlt />,
-      },
-    ],
   },
-    {
+
+  {
+    to: "/admin/sales",
     label: "Sales ",
-    icon: <FaShoppingCart />,
-    children: [
-      { to: "/admin/distributor", label: "Distributor", icon: <FaListAlt /> },
-      { to: "/admin/rate-list", label: "Rate List", icon: <FaListAlt /> },
-      {
-        to: "/admin/distributor-rate-list",
-        label: "Distributor Rate List",
-        icon: <FaExchangeAlt />,
-      },
-      {
-        to: "/admin/booking-orders",
-        label: "Booking Order",
-        icon: <FaShoppingCart />,
-      },
-       {
-        to: "/admin/empty-vehicle-entry",
-        label: "Empty Vehicle Entry",
-        icon: <FaDoorOpen />,
-      },
-        {
-        to: "/admin/store-acknowledgement",
-        label: "Store Acknowledgement",
-        icon: <FaClipboardCheck />,
-      },
-      {
-        to: "/admin/delivery-challan",
-        label: "Delivery Challan",
-        icon: <FaTruck />,
-      },
-      {
-        to: "/admin/sales-invoices",
-        label: "Sales Invoice",
-        icon: <FaFileInvoiceDollar />,
-      },
-            {
-        to: "/admin/sales-return",
-        label: "Sales Return",
-        icon: <FaUndoAlt />,
-      },
-            {
-        to: "/admin/customer-ledger",
-        label: "Customer Ledger",
-        icon: <FaAddressBook />,
-      },
-            {
-        to: "/admin/receivable",
-        label: "Receivable",
-        icon: <FaMoneyBillWave />,
-      },
-      {
-        to: "/admin/payment-receipt-voucher",
-        label: "Payment Receipt Voucher",
-        icon: <FaReceipt />,
-      },
-
-
-
-    ],
+    icon: <FcSalesPerformance color="#1d4ed8"/>,
   },
   {
     to: "/admin/sales-invoice",
@@ -189,7 +79,7 @@ const links = [
     label: "Setup",
     icon: <FaCogs />,
     children: [
-       { to: "/admin/customers-list", label: "Customers", icon: <FaTags /> },
+      { to: "/admin/customers-list", label: "Customers", icon: <FaTags /> },
       {
         to: "/admin/category-item",
         label: "Item Categories",
@@ -300,9 +190,9 @@ const AdminSidebar = () => {
     .map((link) =>
       link.children
         ? {
-            ...link,
-            children: link.children.filter(filterWithPermissions),
-          }
+          ...link,
+          children: link.children.filter(filterWithPermissions),
+        }
         : link
     );
 
@@ -327,9 +217,8 @@ const AdminSidebar = () => {
               <div key={link.label}>
                 <button
                   onClick={() => toggleMenu(link.label)}
-                  className={`w-full flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30 ${
-                    openMenu === link.label ? "bg-newPrimary/20" : ""
-                  }`}
+                  className={`w-full flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30 ${openMenu === link.label ? "bg-newPrimary/20" : ""
+                    }`}
                 >
                   {link.icon}
                   <span className="hidden sm:inline">{link.label}</span>
@@ -347,10 +236,9 @@ const AdminSidebar = () => {
                         key={sub.to}
                         to={sub.to}
                         className={({ isActive }) =>
-                          `flex items-center gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${
-                            isActive
-                              ? "bg-newPrimary/80 text-white"
-                              : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
+                          `flex items-center gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${isActive
+                            ? "bg-newPrimary/80 text-white"
+                            : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
                           }`
                         }
                       >
@@ -366,10 +254,9 @@ const AdminSidebar = () => {
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
-                  `flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${
-                    isActive
-                      ? "bg-newPrimary/80 text-white"
-                      : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
+                  `flex items-center justify-center sm:justify-start gap-2 px-2 sm:px-4 py-2 rounded-lg font-medium transition ${isActive
+                    ? "bg-newPrimary/80 text-white"
+                    : "text-gray-700 hover:text-gray-600 hover:bg-newPrimary/30"
                   }`
                 }
                 end={link.to === "/admin"}
