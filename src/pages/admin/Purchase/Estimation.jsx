@@ -594,67 +594,80 @@ const Estimation = () => {
                     <p className="text-red-500 text-xs mt-1">{errors.date}</p>
                   )}
                 </div>
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    For Demand <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={forDemand}
-                    onChange={(e) => setForDemand(e.target.value)}
-                    className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                      errors.forDemand
-                        ? "border-red-500 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-newPrimary"
-                    }`}
-                  >
-                    <option value="">Select Quotation</option>
-                    {quotations.map((q) => (
-                      <option key={q._id} value={q._id}>
-                        {q.quotationNo} - {q.supplier?.supplierName}
-                      </option>
-                    ))}
-                  </select>
-                  {errors.forDemand && (
-                    <p className="text-red-500 text-xs mt-1">
-                      {errors.forDemand}
-                    </p>
+                <div className="space-y-4 border p-4 rounded-lg bg-gray-50 px-4 py-8">
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-2">
+                      For Demand <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={forDemand}
+                      onChange={(e) => setForDemand(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.forDemand
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                    >
+                      <option value="">Select Quotation</option>
+                      {quotations.map((q) => (
+                        <option key={q._id} value={q._id}>
+                          {q.quotationNo} - {q.supplier?.supplierName}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.forDemand && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.forDemand}
+                      </p>
+                    )}
+                  </div>
+                  {quotationItems.length > 0 && (
+                    <div className=" overflow-hidden rounded-lg">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                          <tr>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Item Name
+                            </th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Quantity
+                            </th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Price
+                            </th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Total
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {quotationItems.map((item) => (
+                            <tr
+                              key={item._id}
+                              className="bg-gray-100 text-center border border-gray-300"
+                            >
+                              <td className="px-4 text-center py-2 border border-gray-300">
+                                {item.itemName}
+                              </td>
+                              <td className="px-4 text-center py-2 border border-gray-300">
+                                {item.qty}
+                              </td>
+                              <td className="px-4 text-center py-2 border border-gray-300">
+                                {item.price}
+                              </td>
+                              <td className="px-4 text-center py-2 border border-gray-300">
+                                {item.total}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div className="mt-2 text-right font-semibold">
+                        Total Amount: {total}
+                      </div>
+                    </div>
                   )}
                 </div>
-                {quotationItems.length > 0 && (
-                  <div className="overflow-x-auto mt-4">
-                    <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                      <thead className="bg-gray-100">
-                        <tr>
-                          <th className="px-4 py-2 border">Item Name</th>
-                          <th className="px-4 py-2 border">Quantity</th>
-                          <th className="px-4 py-2 border">Price</th>
-                          <th className="px-4 py-2 border">Total</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {quotationItems.map((item) => (
-                          <tr key={item._id}>
-                            <td className="px-4 text-center py-2 border">
-                              {item.itemName}
-                            </td>
-                            <td className="px-4 text-center py-2 border">
-                              {item.qty}
-                            </td>
-                            <td className="px-4 text-center py-2 border">
-                              {item.price}
-                            </td>
-                            <td className="px-4 text-center py-2 border">
-                              {item.total}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                    <div className="mt-2 text-right font-semibold">
-                      Total Amount: {total}
-                    </div>
-                  </div>
-                )}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Supplier <span className="text-red-500">*</span>
