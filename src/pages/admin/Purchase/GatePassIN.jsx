@@ -203,14 +203,7 @@ const GatepassIn = () => {
     setItemsList([]);
     setItemName("");
     setItemQuantity("");
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-    setselectedPoItems(null);
->>>>>>> Stashed changes
-=======
      setselectedPoItems(null);
->>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
     setItemUnits("");
     setCategory({ id: "", name: "" }); // reset properly
     setAgainstPoNo("");
@@ -285,18 +278,9 @@ const GatepassIn = () => {
       setSupplier(gatepass.withPO?.supplier?.supplierName || "");
       setDriverName(gatepass.driverName || "");
       setItemsList(gatepass.withPO?.items || []);
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-      if (matchedPO) {
-        setselectedPoItems(matchedPO);
-      }
->>>>>>> Stashed changes
-=======
        if (matchedPO) {
     setselectedPoItems(matchedPO);
   }
->>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
     } else {
       setPoType("withoutPO");
       setWithOutPoSupplier(gatepass.withoutPO?.supplier?._id || "");
@@ -391,14 +375,7 @@ const GatepassIn = () => {
           poNo: againstPoNo, // PO _id
         },
         status,
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-        supplierName: supplierId,
->>>>>>> Stashed changes
-=======
         supplierName:supplierId
->>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
       };
     } else {
       newGatepass = {
@@ -495,12 +472,7 @@ const GatepassIn = () => {
     setIsView(true);
   };
 
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-  console.log({ itemsList });
-=======
   
->>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
 
 =======
 >>>>>>> Stashed changes
@@ -786,19 +758,9 @@ const GatepassIn = () => {
                                 selectedPO.estimation?.demandItem?.supplier
                                   ?.supplierName || ""
                               );
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-=======
-                              setSupplierId(
-                                selectedPO.estimation?.demandItem?.supplier?._id
-                              );
-                              setselectedPoItems(selectedPO);
->>>>>>> Stashed changes
-=======
                               setSupplierId(selectedPO.estimation?.demandItem?.supplier?._id)
                               setselectedPoItems(selectedPO);
                               
->>>>>>> c73261803d3b035777bb30ed6cdf61b0297b2ba5
                             }
                           }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
@@ -922,51 +884,46 @@ const GatepassIn = () => {
                 {poType === "withPO" &&
                   selectedPoItems &&
                   selectedPoItems.items?.length > 0 && (
-                    <div className="mt-4">
-                     
-                      <div className="overflow-x-auto">
-                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                          <thead className="bg-gray-100 text-gray-600 text-sm">
-                            <tr>
-                              <th className="px-4 py-2 border-b text-left">
-                                Sr #
-                              </th>
-                              <th className="px-4 py-2 border-b text-left">
-                                Item Name
-                              </th>
-                              <th className="px-4 py-2 border-b text-left">
-                                Quantity
-                              </th>
-                              <th className="px-4 py-2 border-b text-left">
-                                Price
-                              </th>
-                            
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                          <tr>
+                            <th className="px-4 py-2 border-b border border-gray-300">
+                              Sr #
+                            </th>
+                            <th className="px-4 py-2 border-b border border-gray-300">
+                              Item Name
+                            </th>
+                            <th className="px-4 py-2 border-b border border-gray-300">
+                              Quantity
+                            </th>
+                            <th className="px-4 py-2 border-b border border-gray-300">
+                              Price
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-gray-700 text-sm">
+                          {selectedPoItems.items.map((item, idx) => (
+                            <tr
+                              key={item._id || idx}
+                              className="bg-gray-100 text-center border border-gray-300"
+                            >
+                              <td className="px-4 py-2 border border-gray-300">
+                                {idx + 1}
+                              </td>
+                              <td className="px-4 py-2 border border-gray-300">
+                                {item.itemName}
+                              </td>
+                              <td className="px-4 py-2 border border-gray-300">
+                                {item.qty}
+                              </td>
+                              <td className="px-4 py-2 border border-gray-300">
+                                {item.price}
+                              </td>
                             </tr>
-                          </thead>
-                          <tbody className="text-gray-700 text-sm">
-                            {selectedPoItems.items.map((item, idx) => (
-                              <tr
-                                key={item._id || idx}
-                                className="hover:bg-gray-50"
-                              >
-                                <td className="px-4 py-2 border-b">
-                                  {idx + 1}
-                                </td>
-                                <td className="px-4 py-2 border-b">
-                                  {item.itemName}
-                                </td>
-                                <td className="px-4 py-2 border-b">
-                                  {item.qty}
-                                </td>
-                                <td className="px-4 py-2 border-b">
-                                  {item.price}
-                                </td>
-                               
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   )}
 
