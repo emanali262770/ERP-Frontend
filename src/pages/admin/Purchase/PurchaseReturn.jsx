@@ -320,48 +320,49 @@ const PurchaseReturn = () => {
               </div>
 
               {/* Items Section Inputs*/}
-              <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
+              <div>
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
 
-                <div className="flex gap-4 mb-3">
-                  <div className="flex-1 min-w-0">
-                    <input
-                      type="text"
-                      placeholder="Item Name"
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      className="w-full p-2 border rounded"
-                      disabled={!isItemSelected}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <input
-                      type="number"
-                      placeholder="Qty"
-                      value={qty}
-                      onChange={(e) => setQty(e.target.value)}
-                      className="w-full p-2 border rounded"
-                      disabled={!isItemSelected}
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={priceQty}
-                      onChange={(e) => setPriceQty(e.target.value)}
-                      className="w-full p-2 border rounded"
-                      disabled={!isItemSelected}
-                    />
-                  </div>
-                  <div className="flex gap-4">
-                    <button
-                      type="button"
-                      onClick={handleAddItem}
-                      className="px-3 bg-newPrimary hover:bg-blue-600 text-white rounded flex items-center h-full w-full justify-center flex-1 min-w-0 text-sm whitespace-nowrap"
-                    >
-                      Update Item
-                    </button>
+                  <div className="flex gap-4 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="text"
+                        placeholder="Item Name"
+                        value={itemName}
+                        onChange={(e) => setItemName(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        disabled={!isItemSelected}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="number"
+                        placeholder="Qty"
+                        value={qty}
+                        onChange={(e) => setQty(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        disabled={!isItemSelected}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={priceQty}
+                        onChange={(e) => setPriceQty(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        disabled={!isItemSelected}
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="px-3 bg-newPrimary hover:bg-blue-600 text-white rounded flex items-center h-full w-full justify-center flex-1 min-w-0 text-sm whitespace-nowrap"
+                      >
+                        Update Item
+                      </button>
+                    </div>
                   </div>
                 </div>
                 {/* Items Table */}
@@ -369,7 +370,7 @@ const PurchaseReturn = () => {
                   <div className="overflow-x-auto">
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <table className="w-full border-collapse text-sm">
-                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                        <thead className="bg-gray-100 text-gray-600 text-sm">
                           <tr>
                             <th className="border border-gray-300 px-2 py-1">
                               Item
