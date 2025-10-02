@@ -19,7 +19,14 @@ const SalesInvoices = () => {
       phoneNo: "555-0101",
       balance: 5000,
       items: [
-        { srNo: 1, item: "Paracetamol", packSize: "10x10", rate: 50, qty: 100, total: 5000 },
+        {
+          srNo: 1,
+          item: "Paracetamol",
+          packSize: "10x10",
+          rate: 50,
+          qty: 100,
+          total: 5000,
+        },
       ],
     },
     {
@@ -35,7 +42,14 @@ const SalesInvoices = () => {
       phoneNo: "555-0102",
       balance: 3000,
       items: [
-        { srNo: 1, item: "Ibuprofen", packSize: "10x10", rate: 80, qty: 50, total: 4000 },
+        {
+          srNo: 1,
+          item: "Ibuprofen",
+          packSize: "10x10",
+          rate: 80,
+          qty: 50,
+          total: 4000,
+        },
       ],
     },
   ]);
@@ -74,7 +88,14 @@ const SalesInvoices = () => {
       phoneNo: "555-0101",
       balance: 5000,
       items: [
-        { srNo: 1, item: "Paracetamol", packSize: "10x10", rate: 50, qty: 100, total: 5000 },
+        {
+          srNo: 1,
+          item: "Paracetamol",
+          packSize: "10x10",
+          rate: 50,
+          qty: 100,
+          total: 5000,
+        },
       ],
     },
     {
@@ -88,7 +109,14 @@ const SalesInvoices = () => {
       phoneNo: "555-0102",
       balance: 3000,
       items: [
-        { srNo: 1, item: "Ibuprofen", packSize: "10x10", rate: 80, qty: 50, total: 4000 },
+        {
+          srNo: 1,
+          item: "Ibuprofen",
+          packSize: "10x10",
+          rate: 80,
+          qty: 50,
+          total: 4000,
+        },
       ],
     },
   ]);
@@ -298,7 +326,11 @@ const SalesInvoices = () => {
     try {
       if (editingInvoice) {
         setInvoices((prev) =>
-          prev.map((inv) => (inv._id === editingInvoice._id ? { ...inv, ...newInvoice, _id: inv._id } : inv))
+          prev.map((inv) =>
+            inv._id === editingInvoice._id
+              ? { ...inv, ...newInvoice, _id: inv._id }
+              : inv
+          )
         );
         Swal.fire({
           icon: "success",
@@ -307,7 +339,10 @@ const SalesInvoices = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setInvoices((prev) => [...prev, { ...newInvoice, _id: `temp-${Date.now()}` }]);
+        setInvoices((prev) => [
+          ...prev,
+          { ...newInvoice, _id: `temp-${Date.now()}` },
+        ]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -451,8 +486,12 @@ const SalesInvoices = () => {
                       <div className="text-gray-600">{invoice.invoiceId}</div>
                       <div className="text-gray-600">{invoice.invoiceDate}</div>
                       <div className="text-gray-600">{invoice.dcNo}</div>
-                      <div className="text-gray-600">{invoice.deliveryDate}</div>
-                      <div className="text-gray-600">{invoice.medicineType}</div>
+                      <div className="text-gray-600">
+                        {invoice.deliveryDate}
+                      </div>
+                      <div className="text-gray-600">
+                        {invoice.medicineType}
+                      </div>
                       <div className="text-gray-600">{invoice.bookingNo}</div>
                       <div className="text-gray-600">{invoice.vendor}</div>
                       <div className="text-gray-600">{invoice.address}</div>
@@ -525,7 +564,9 @@ const SalesInvoices = () => {
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingInvoice ? "Update Sales Invoice" : "Add a New Sales Invoice"}
+                  {editingInvoice
+                    ? "Update Sales Invoice"
+                    : "Add a New Sales Invoice"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -536,190 +577,215 @@ const SalesInvoices = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Invoice No. <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editingInvoice ? invoiceId : `INV-${nextInvoiceId}`}
-                      readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.invoiceId
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter invoice no."
-                      required
-                    />
-                    {errors.invoiceId && (
-                      <p className="text-red-500 text-xs mt-1">{errors.invoiceId}</p>
-                    )}
+                <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Invoice No. <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={
+                          editingInvoice ? invoiceId : `INV-${nextInvoiceId}`
+                        }
+                        readOnly
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.invoiceId
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        placeholder="Enter invoice no."
+                        required
+                      />
+                      {errors.invoiceId && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.invoiceId}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Invoice Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={invoiceDate}
+                        onChange={(e) => setInvoiceDate(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.invoiceDate
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        required
+                      />
+                      {errors.invoiceDate && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.invoiceDate}
+                        </p>
+                      )}
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Invoice Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={invoiceDate}
-                      onChange={(e) => setInvoiceDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.invoiceDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.invoiceDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.invoiceDate}</p>
-                    )}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        DC No. <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={dcNo}
+                        onChange={handleDcNoChange}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.dcNo
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        required
+                      >
+                        <option value="">Select DC No.</option>
+                        {dcList?.map((dc) => (
+                          <option key={dc.dcNo} value={dc.dcNo}>
+                            {dc.dcNo}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.dcNo && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.dcNo}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Date
+                      </label>
+                      <input
+                        type="date"
+                        value={deliveryDate}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Delivery date"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      DC No. <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={dcNo}
-                      onChange={handleDcNoChange}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.dcNo
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select DC No.</option>
-                      {dcList?.map((dc) => (
-                        <option key={dc.dcNo} value={dc.dcNo}>
-                          {dc.dcNo}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.dcNo && (
-                      <p className="text-red-500 text-xs mt-1">{errors.dcNo}</p>
-                    )}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Medicine Type
+                      </label>
+                      <input
+                        type="text"
+                        value={medicineType}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Medicine type"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Booking No.
+                      </label>
+                      <input
+                        type="text"
+                        value={bookingNo}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Booking number"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Date
-                    </label>
-                    <input
-                      type="date"
-                      value={deliveryDate}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Delivery date"
-                    />
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order Date
+                      </label>
+                      <input
+                        type="date"
+                        value={orderDate}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Order date"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Vendor
+                      </label>
+                      <input
+                        type="text"
+                        value={vendor}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Vendor"
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Medicine Type
-                    </label>
-                    <input
-                      type="text"
-                      value={medicineType}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Medicine type"
-                    />
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        value={address}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Address"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Phone No.
+                      </label>
+                      <input
+                        type="text"
+                        value={phoneNo}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Phone number"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Booking No.
-                    </label>
-                    <input
-                      type="text"
-                      value={bookingNo}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Booking number"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order Date
-                    </label>
-                    <input
-                      type="date"
-                      value={orderDate}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Order date"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Vendor
-                    </label>
-                    <input
-                      type="text"
-                      value={vendor}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Vendor"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      value={address}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Address"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Phone No.
-                    </label>
-                    <input
-                      type="text"
-                      value={phoneNo}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Phone number"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Balance
-                    </label>
-                    <input
-                      type="number"
-                      value={balance}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Balance"
-                    />
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Balance
+                      </label>
+                      <input
+                        type="number"
+                        value={balance}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Balance"
+                      />
+                    </div>
                   </div>
                 </div>
 
                 <div className="mt-6">
-                  <h3 className="text-lg font-medium text-gray-700 mb-4">Items</h3>
-                  <div className="rounded-md shadow border border-gray-200 overflow-hidden">
-                    <div className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase">
-                      <div>SR#.</div>
-                      <div>Item</div>
-                      <div>Pack Size</div>
-                      <div>Rate</div>
-                      <div>Qty</div>
-                      <div>Total</div>
+                  <h3 className="text-lg font-medium text-gray-700 mb-4">
+                    Items
+                  </h3>
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    {/* Header */}
+                    <div className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] bg-gray-200 text-gray-600 text-sm font-semibold uppercase border-b border-gray-300">
+                      <div className="px-4 py-2 border-r border-gray-300">
+                        SR#.
+                      </div>
+                      <div className="px-4 py-2 border-r border-gray-300">
+                        Item
+                      </div>
+                      <div className="px-4 py-2 border-r border-gray-300">
+                        Pack Size
+                      </div>
+                      <div className="px-4 py-2 border-r border-gray-300">
+                        Rate
+                      </div>
+                      <div className="px-4 py-2 border-r border-gray-300">
+                        Qty
+                      </div>
+                      <div className="px-4 py-2">Total</div>
                     </div>
+
+                    {/* Body */}
                     {items.length === 0 ? (
                       <div className="text-center py-4 text-gray-500 bg-white">
                         No items available for this DC No.
@@ -728,37 +794,51 @@ const SalesInvoices = () => {
                       items.map((item) => (
                         <div
                           key={item.srNo}
-                          className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] gap-4 px-6 py-4 text-sm bg-white"
+                          className="grid grid-cols-[1fr_2fr_1fr_1fr_1fr_1fr] text-sm text-gray-700 bg-gray-100 even:bg-white border-t border-gray-300"
                         >
-                          <div>{item.srNo}</div>
-                          <div>{item.item}</div>
-                          <div>{item.packSize}</div>
-                          <div>{item.rate}</div>
-                          <div>{item.qty}</div>
-                          <div>{item.total}</div>
+                          <div className="px-4 py-2 border-r border-gray-300 text-center">
+                            {item.srNo}
+                          </div>
+                          <div className="px-4 py-2 border-r border-gray-300 text-center">
+                            {item.item}
+                          </div>
+                          <div className="px-4 py-2 border-r border-gray-300 text-center">
+                            {item.packSize}
+                          </div>
+                          <div className="px-4 py-2 border-r border-gray-300 text-center">
+                            {item.rate}
+                          </div>
+                          <div className="px-4 py-2 border-r border-gray-300 text-center">
+                            {item.qty}
+                          </div>
+                          <div className="px-4 py-2 text-center">
+                            {item.total}
+                          </div>
                         </div>
                       ))
                     )}
                   </div>
+
                   {errors.items && (
                     <p className="text-red-500 text-xs mt-1">{errors.items}</p>
                   )}
                 </div>
 
-                <div className="flex gap-4 mt-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Total Price
-                    </label>
-                    <input
-                      type="number"
-                      value={totalPrice}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Total price"
-                    />
-                  </div>
-                  {/* <div className="flex-1 min-w-0">
+                <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
+                  <div className="flex gap-4 mt-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Total Price
+                      </label>
+                      <input
+                        type="number"
+                        value={totalPrice}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Total price"
+                      />
+                    </div>
+                    {/* <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
                       Discount %age
                     </label>
@@ -773,52 +853,51 @@ const SalesInvoices = () => {
                       step="0.01"
                     />
                   </div> */}
-                   <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Discount Amount
-                    </label>
-                    <input
-                      type="number"
-                      value={discountAmount}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                      placeholder="Discount amount"
-                    />
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Discount Amount
+                      </label>
+                      <input
+                        type="number"
+                        value={discountAmount}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Discount amount"
+                      />
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    {/* NET Amount */}
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        NET Amount
+                      </label>
+                      <input
+                        type="number"
+                        value={netAmount}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="NET amount"
+                      />
+                    </div>
+
+                    {/* Sales Tax */}
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Sales Tax
+                      </label>
+                      <div className="flex items-center gap-2 border bg-white border-gray-300 rounded-md p-3">
+                        <input
+                          type="checkbox"
+                          checked={salesTax}
+                          onChange={(e) => setSalesTax(e.target.checked)}
+                          className="w-5 h-5 text-newPrimary border-gray-300 rounded focus:ring-newPrimary"
+                        />
+                        <span className="text-gray-700">Apply</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
-               <div className="flex gap-4">
-  {/* NET Amount */}
-  <div className="flex-1">
-    <label className="block text-gray-700 font-medium mb-2">
-      NET Amount
-    </label>
-    <input
-      type="number"
-      value={netAmount}
-      readOnly
-      className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-      placeholder="NET amount"
-    />
-  </div>
-
-  {/* Sales Tax */}
-  <div className="flex-1">
-    <label className="block text-gray-700 font-medium mb-2">
-      Sales Tax
-    </label>
-    <div className="flex items-center gap-2 border border-gray-300 rounded-md p-3">
-      <input
-        type="checkbox"
-        checked={salesTax}
-        onChange={(e) => setSalesTax(e.target.checked)}
-        className="w-5 h-5 text-newPrimary border-gray-300 rounded focus:ring-newPrimary"
-      />
-      <span className="text-gray-700">Apply</span>
-    </div>
-  </div>
-</div>
-
-
 
                 <button
                   type="submit"

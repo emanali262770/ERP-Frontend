@@ -480,7 +480,7 @@ const EmptyVehicleEntry = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                <div className="rounded-lg space-y-4">
                   <div className="flex gap-4">
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -539,7 +539,7 @@ const EmptyVehicleEntry = () => {
                     </div>
                   </div>
                 </div>
-                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                <div className="rounded-lg space-y-4">
                   <div className="flex gap-4">
 
                     <div className="flex-1 min-w-0">
