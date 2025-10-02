@@ -33,6 +33,7 @@ const GatepassIn = () => {
   const [supplier, setSupplier] = useState("");
   const [date, setDate] = useState("");
   const [status, setStatus] = useState("");
+  const [selectedPoItems, setselectedPoItems] = useState(null);
   const [editingGatepass, setEditingGatepass] = useState(null);
   const [errors, setErrors] = useState({});
   const sliderRef = useRef(null);
@@ -201,6 +202,7 @@ const GatepassIn = () => {
     setItemsList([]);
     setItemName("");
     setItemQuantity("");
+     setselectedPoItems(null);
     setItemUnits("");
     setCategory({ id: "", name: "" }); // reset properly
     setAgainstPoNo("");
@@ -275,6 +277,9 @@ const GatepassIn = () => {
       setSupplier(gatepass.withPO?.supplier?.supplierName || "");
       setDriverName(gatepass.driverName || "");
       setItemsList(gatepass.withPO?.items || []);
+       if (matchedPO) {
+    setselectedPoItems(matchedPO);
+  }
     } else {
       setPoType("withoutPO");
       setWithOutPoSupplier(gatepass.withoutPO?.supplier?._id || "");
@@ -465,7 +470,7 @@ const GatepassIn = () => {
     setIsView(true);
   };
 
-  console.log({ itemsList });
+  
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -748,6 +753,7 @@ const GatepassIn = () => {
                                 selectedPO.estimation?.demandItem?.supplier
                                   ?.supplierName || ""
                               );
+                              setselectedPoItems(selectedPO);
                             }
                           }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
@@ -817,6 +823,57 @@ const GatepassIn = () => {
                     </div>
                   </>
                 )}
+                {poType === "withPO" &&
+                  selectedPoItems &&
+                  selectedPoItems.items?.length > 0 && (
+                    <div className="mt-4">
+                     
+                      <div className="overflow-x-auto">
+                        <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                          <thead className="bg-gray-100 text-gray-600 text-sm">
+                            <tr>
+                              <th className="px-4 py-2 border-b text-left">
+                                Sr #
+                              </th>
+                              <th className="px-4 py-2 border-b text-left">
+                                Item Name
+                              </th>
+                              <th className="px-4 py-2 border-b text-left">
+                                Quantity
+                              </th>
+                              <th className="px-4 py-2 border-b text-left">
+                                Price
+                              </th>
+                            
+                            </tr>
+                          </thead>
+                          <tbody className="text-gray-700 text-sm">
+                            {selectedPoItems.items.map((item, idx) => (
+                              <tr
+                                key={item._id || idx}
+                                className="hover:bg-gray-50"
+                              >
+                                <td className="px-4 py-2 border-b">
+                                  {idx + 1}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.itemName}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.qty}
+                                </td>
+                                <td className="px-4 py-2 border-b">
+                                  {item.price}
+                                </td>
+                               
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  )}
+
                 {poType === "withoutPO" && (
                   <>
                     <div className="flex gap-4">
