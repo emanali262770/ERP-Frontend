@@ -659,7 +659,7 @@ const GatePassOut = () => {
                 )}
 
                 {poType === "withoutPO" && (
-                  <div className="space-y-3 border p-4 rounded-lg bg-gray-50 pb-6">
+                  <div className="space-y-4 border p-4 rounded-lg bg-gray-50 pb-6">
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">
                         <label className="block text-gray-700 font-medium mb-2">
