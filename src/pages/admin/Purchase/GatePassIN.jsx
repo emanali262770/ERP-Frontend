@@ -489,10 +489,10 @@ const GatepassIn = () => {
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[400px]">
             <div className="min-w-[1200px]">
               {/* Table Header */}
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>GatePass ID</div>
                 <div>Driver Name</div>
-                <div>Items Category</div>
+                {/* <div>Items Category</div> */}
                 <div>Supplier</div>
                 {/* <div>Items</div> */}
                 <div>Date</div>
@@ -504,9 +504,9 @@ const GatepassIn = () => {
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={3}
-                    cols={7}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto]"
+                    rows={gatepasses.length || 5}
+                    cols={6}
+                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto]"
                   />
                 ) : gatepasses.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
@@ -521,7 +521,7 @@ const GatepassIn = () => {
                     return (
                       <div
                         key={gatepass._id}
-                        className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         {/* GatePass ID */}
                         <div className="font-medium text-gray-900">
@@ -531,15 +531,6 @@ const GatepassIn = () => {
                         {/* Driver Name */}
                         <div className="text-gray-600">
                           {gatepass.driverName}
-                        </div>
-
-                        {/* Category */}
-                        <div className="text-gray-600">
-                          {isWithPO
-                            ? poData?.estimation?.demandItem?.category
-                                ?.categoryName || "-"
-                            : withoutPOData?.items?.[0]?.category
-                                ?.categoryName || "-"}
                         </div>
 
                         {/* Supplier */}
