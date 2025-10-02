@@ -27,7 +27,7 @@ const QualityChecking = () => {
   const [errors, setErrors] = useState({});
   const [nextQcId, setNextQcId] = useState("001");
   const [editingQualityChecks, setEditingQualityChecks] = useState(null);
-const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const sliderRef = useRef(null);
 
   // 🔹 ID Creation of Quality Checking
@@ -189,8 +189,8 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   };
 
   const handleEditClick = (qc) => {
-    console.log({qc});
-    
+    console.log({ qc });
+
     setEditingQC(qc);
     setQcId(qc.qcId);
     setDate(qc.date);
@@ -252,7 +252,7 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-const { token } = userInfo || {};
+    const { token } = userInfo || {};
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -269,15 +269,13 @@ const { token } = userInfo || {};
         remarks: i.remarks || "",
       })),
     };
-  console.log(newQC);
-  
-
+    console.log(newQC);
 
     try {
       if (editingQC) {
         // Update existing
         await api.put(`/qualityCheck/${editingQC._id}`, newQC, {
-         headers
+          headers,
         });
 
         Swal.fire(
@@ -291,13 +289,11 @@ const { token } = userInfo || {};
         );
       } else {
         // Create new
-        await api.post("/qualityCheck", newQC, {headers});
+        await api.post("/qualityCheck", newQC, { headers });
 
         Swal.fire("Added!", "Quality Checking added successfully.", "success");
-
-       
       }
-      fetchQualityCheckInn()
+      fetchQualityCheckInn();
       resetForm();
     } catch (error) {
       console.error("Error saving quality checking", error);
@@ -418,7 +414,7 @@ const { token } = userInfo || {};
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[650px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -469,86 +465,99 @@ const { token } = userInfo || {};
                   </div>
                 </div>
 
-                {/* Gate Pass In ID */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-1">
-                    Gate Pass In Id <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={gpId}
-                    onChange={(e) => setGpId(e.target.value)}
-                    className="w-full p-3 border rounded-md"
-                    required
-                  >
-                    <option value="">Select Gate Pass</option>
-                    {gatePassList?.map((gatepass) => (
-                      <option key={gatepass._id} value={gatepass._id}>
-                        {gatepass.gatePassId}
-                      </option>
+                {/* Section */}
+                <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
+                  {/* Gate Pass In ID */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Gate Pass In Id <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={gpId}
+                      onChange={(e) => setGpId(e.target.value)}
+                      className="w-full p-3 border rounded-md"
+                      required
+                    >
+                      <option value="">Select Gate Pass</option>
+                      {gatePassList?.map((gatepass) => (
+                        <option key={gatepass._id} value={gatepass._id}>
+                          {gatepass.gatePassId}
+                        </option>
+                      ))}
+                    </select>
+
+                    {errors.gpId && (
+                      <p className="text-red-500 text-xs">{errors.gpId}</p>
+                    )}
+                  </div>
+
+                  {gpId &&
+                    (itemsLoading ? (
+                      <div className="flex justify-center py-4">
+                        <Loader size={24} className="animate-spin" />
+                      </div>
+                    ) : itemsList.length > 0 ? (
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse">
+                          <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                            <tr>
+                              <th className="border border-gray-300 p-2">
+                                Item
+                              </th>
+                              <th className="border border-gray-300 p-2">
+                                Quantity
+                              </th>
+                              <th className="border border-gray-300 p-2">
+                                Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {itemsList.map((item, idx) => (
+                              <tr
+                                key={idx}
+                                className="bg-gray-100 text-center border border-gray-300"
+                              >
+                                <td className="border border-gray-300 p-2">
+                                  {item.itemName || item.name}
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  {item.quantity || item.qty} {item.unit || ""}
+                                </td>
+                                <td className="border border-gray-300 p-2 text-center">
+                                  {item.result === "Upto Standard" ? (
+                                    <div
+                                      className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
+                                      onClick={() => openQcModal(item, idx)}
+                                    >
+                                      ✓
+                                    </div>
+                                  ) : item.result === "Damage" ||
+                                    item.result === "Rejected" ? (
+                                    <div
+                                      className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
+                                      onClick={() => openQcModal(item, idx)}
+                                    >
+                                      ✕
+                                    </div>
+                                  ) : (
+                                    <div
+                                      className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
+                                      onClick={() => openQcModal(item, idx)}
+                                    />
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        No items found
+                      </div>
                     ))}
-                  </select>
-
-                  {errors.gpId && (
-                    <p className="text-red-500 text-xs">{errors.gpId}</p>
-                  )}
                 </div>
-
-                {gpId &&
-                  (itemsLoading ? (
-                    <div className="flex justify-center py-4">
-                      <Loader size={24} className="animate-spin" />
-                    </div>
-                  ) : itemsList.length > 0 ? (
-                    <table className="w-full border mt-4">
-                      <thead className="bg-gray-100">
-                        <tr>
-                          <th className="border p-2">Item</th>
-                          <th className="border p-2">Quantity</th>
-                          <th className="border p-2">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {itemsList.map((item, idx) => (
-                          <tr key={idx} className="text-center">
-                            <td className="border p-2">
-                              {item.itemName || item.name}
-                            </td>
-                            <td className="border p-2">
-                              {item.quantity || item.qty} {item.unit || ""}
-                            </td>
-                            <td className="border p-2 text-center">
-                              {item.result === "Upto Standard" ? (
-                                <div
-                                  className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
-                                  onClick={() => openQcModal(item, idx)}
-                                >
-                                  ✓
-                                </div>
-                              ) : item.result === "Damage" ||
-                                item.result === "Rejected" ? (
-                                <div
-                                  className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
-                                  onClick={() => openQcModal(item, idx)}
-                                >
-                                  ✕
-                                </div>
-                              ) : (
-                                <div
-                                  className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
-                                  onClick={() => openQcModal(item, idx)}
-                                />
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      No items found
-                    </div>
-                  ))}
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
                     Description
@@ -608,7 +617,7 @@ const { token } = userInfo || {};
                     type="radio"
                     name="qcResult"
                     value="Upto Standard"
-                   checked={modalResult === "Upto Standard"}
+                    checked={modalResult === "Upto Standard"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Upto Standard
@@ -618,7 +627,7 @@ const { token } = userInfo || {};
                     type="radio"
                     name="qcResult"
                     value="Damage"
-                    checked={modalResult === "Damage"} 
+                    checked={modalResult === "Damage"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Damage
@@ -628,7 +637,7 @@ const { token } = userInfo || {};
                     type="radio"
                     name="qcResult"
                     value="Rejected"
-                    checked={modalResult === "Rejected"} 
+                    checked={modalResult === "Rejected"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Rejected
