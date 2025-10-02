@@ -295,10 +295,12 @@ const PurchaseReturn = () => {
                 </div>
               </div>
 
-              {/* Items Section Inputs*/}
-              <div>
-                <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
+              {/* Section */}
+              <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
 
+<<<<<<< Updated upstream
                 <div className="flex gap-4 mb-3">
                   <div className="flex-1 min-w-0">
                     <input
@@ -335,12 +337,55 @@ const PurchaseReturn = () => {
                     >
                       + Add
                     </button>
+=======
+                  <div className="flex gap-4 mb-3">
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="text"
+                        placeholder="Item Name"
+                        value={itemName}
+                        onChange={(e) => setItemName(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        disabled={!isItemSelected}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="number"
+                        placeholder="Qty"
+                        value={qty}
+                        onChange={(e) => setQty(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        disabled={!isItemSelected}
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={priceQty}
+                        onChange={(e) => setPriceQty(e.target.value)}
+                        className="w-full p-2 border rounded"
+                        disabled={!isItemSelected}
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="px-3 bg-newPrimary hover:bg-blue-600 text-white rounded flex items-center h-full w-full justify-center flex-1 min-w-0 text-sm whitespace-nowrap"
+                      >
+                        Update Item
+                      </button>
+                    </div>
+>>>>>>> Stashed changes
                   </div>
 
                 </div>
 
                 {/* Items Table */}
                 {items.length > 0 && (
+<<<<<<< Updated upstream
                   <table className="w-full border text-sm">
                     <thead className="bg-gray-100">
                       <tr>
@@ -372,6 +417,50 @@ const PurchaseReturn = () => {
                               <X size={18} className="text-red-600" />
                             </button>
                           </td>
+=======
+                  <div className="overflow-x-auto">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                          <tr>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Item
+                            </th>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Qty
+                            </th>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Price
+                            </th>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Remove
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((it, idx) => (
+                            <tr
+                              key={it.id}
+                              onClick={() => {
+                                setItemName(it.name);
+                                setQty(it.qty);
+                                setPriceQty(it.price);
+
+                                setSelectedItemIndex(idx);
+                                setIsItemSelected(true);
+                              }}
+                              className="bg-gray-100 text-center border border-gray-300"
+                            >
+                              <td className="border border-gray-300 text-center px-2 py-1">
+                                {it.name}
+                              </td>
+                              <td className="border border-gray-300 text-center px-2 py-1">
+                                {it.qty}
+                              </td>
+                              <td className="border border-gray-300 text-center px-2 py-1">
+                                {it.price}
+                              </td>
+>>>>>>> Stashed changes
 
                         </tr>
                       ))}
