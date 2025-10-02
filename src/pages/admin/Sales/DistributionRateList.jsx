@@ -458,7 +458,7 @@ const DistributionRateList = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[800px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[750px] pb-6 bg-white rounded-2xl shadow-2xl overflow-y-auto"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -473,7 +473,7 @@ const DistributionRateList = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                <div className="rounded-lg space-y-4">
                   <div className="flex gap-4">
                     <div className="w-1/2">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -482,7 +482,7 @@ const DistributionRateList = () => {
                       <select
                         value={distributor}
                         onChange={(e) => setDistributor(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.distributor
+                        className={`w-60 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.distributor
                             ? "border-red-500 focus:ring-red-500"
                             : "border-gray-300 focus:ring-newPrimary"
                           }`}
@@ -561,7 +561,7 @@ const DistributionRateList = () => {
                         type="text"
                         value={productCode}
                         readOnly
-                        className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
+                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Product Code"
                       />
                     </div>
@@ -573,7 +573,7 @@ const DistributionRateList = () => {
                         type="text"
                         value={packSize}
                         readOnly
-                        className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
+                        className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Pack Size"
                       />
                     </div>
@@ -587,7 +587,7 @@ const DistributionRateList = () => {
                         type="text"
                         value={specifications}
                         readOnly
-                        className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
+                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Specifications"
                       />
                     </div>
@@ -600,7 +600,7 @@ const DistributionRateList = () => {
                           type="number"
                           value={salePrice}
                           onChange={(e) => setSalePrice(e.target.value)}
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.salePrice
+                          className={`w-full p-3 border rounded-md focus:outline-none bg-white focus:ring-2 ${errors.salePrice
                               ? "border-red-500 focus:ring-red-500"
                               : "border-gray-300 focus:ring-newPrimary"
                             }`}
@@ -649,7 +649,7 @@ const DistributionRateList = () => {
                         <div className="flex justify-start">
                           <button
                             onClick={handleRemovePreview}
-                            className="py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                            className=" text-xl flex-shrink-0 text-red-500 transition-colors"
                             title="Remove"
                           >
                             ×

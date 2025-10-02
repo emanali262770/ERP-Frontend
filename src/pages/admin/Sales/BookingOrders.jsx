@@ -527,22 +527,20 @@ const BookingOrders = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Next
                 </button>
@@ -555,7 +553,7 @@ const BookingOrders = () => {
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full max-w-[800px] mx-auto bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[80vh]"
+              className="w-full max-w-[900px] pb-2 mx-auto bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -570,368 +568,364 @@ const BookingOrders = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-6">
-                  <div className="border bg-gray-100 p-4 rounded-lg space-y-4"> 
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order No <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={editingOrder ? orderNo : `ORD-${nextOrderNo}`}
-                      readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderNo
+                <div className=" rounded-lg space-y-4">
+                  {/* order and date */}
+                  <div className="flex gap-6">
+                    {/* Order No */}
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order No <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editingOrder ? orderNo : `ORD-${nextOrderNo}`}
+                        readOnly
+                        className={`w-44 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.orderNo
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter order number"
-                      required
-                    />
-                    {errors.orderNo && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderNo}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={orderDate}
-                      onChange={(e) => setOrderDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderDate
+                          }`}
+                        placeholder="Enter order number"
+                        required
+                      />
+                      {errors.orderNo && (
+                        <p className="text-red-500 text-xs mt-1">{errors.orderNo}</p>
+                      )}
+                    </div>
+
+                    {/* Order Date */}
+                    <div>
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={orderDate}
+                        onChange={(e) => setOrderDate(e.target.value)}
+                        className={`w-50 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.orderDate
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.orderDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderDate}</p>
-                    )}
+                          }`}
+                        required
+                      />
+                      {errors.orderDate && (
+                        <p className="text-red-500 text-xs mt-1">{errors.orderDate}</p>
+                      )}
+                    </div>
                   </div>
+
                 </div>
-                </div>
-                   <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Customer <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={customer}
-                      onChange={(e) => setCustomer(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.customer
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Customer</option>
-                      {customerList.map((cust) => (
-                        <option key={cust._id} value={cust._id}>
-                          {cust.customerName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.customer && (
-                      <p className="text-red-500 text-xs mt-1">{errors.customer}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Contact Person
-                    </label>
-                    <input
-                      type="text"
-                      value={person}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Contact person"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Phone
-                    </label>
-                    <input
-                      type="text"
-                      value={phone}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Phone number"
-                    />
-                  </div>
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  <div className="flex gap-4">
                     <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Balance
-                    </label>
-                    <input
-                      type="text"
-                      value={balance}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Balance"
-                    />
-                  </div>
-                  
-                </div>
-                <div className="flex gap-4">
-                <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Address
-                    </label>
-                    <input
-                      type="text"
-                      value={address}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Address"
-                    />
-                  </div>
-                
-                 
-                </div>
-                </div>
-                 <div className="border bg-gray-100 p-4 rounded-lg space-y-4"> 
-                <div className="flex gap-4">
-                     <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Order Type <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={orderType}
-                      onChange={(e) => setOrderType(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.orderType
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Customer <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={customer}
+                        onChange={(e) => setCustomer(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.customer
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Order Type</option>
-                      <option value="Standard">Standard</option>
-                      <option value="Express">Express</option>
-                    </select>
-                    {errors.orderType && (
-                      <p className="text-red-500 text-xs mt-1">{errors.orderType}</p>
-                    )}
-                  </div>
-                   <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Mode <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={mode}
-                      onChange={(e) => setMode(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.mode
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Mode</option>
-                      <option value="Delivery">Delivery</option>
-                      <option value="Pickup">Pickup</option>
-                    </select>
-                    {errors.mode && (
-                      <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
-                    )}
-                  </div>
-                  
-                   
-                  
-                  
-                </div>
-                <div className="flex gap-4">
-                 <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Payment Method <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={paymentMethod}
-                      onChange={(e) => setPaymentMethod(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.paymentMethod
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Payment Method</option>
-                      <option value="Cash">Cash</option>
-                      <option value="Credit">Credit</option>
-                      <option value="Online">Online</option>
-                    </select>
-                    {errors.paymentMethod && (
-                      <p className="text-red-500 text-xs mt-1">{errors.paymentMethod}</p>
-                    )}
-                  </div>
+                          }`}
+                        required
+                      >
+                        <option value="">Select Customer</option>
+                        {customerList.map((cust) => (
+                          <option key={cust._id} value={cust._id}>
+                            {cust.customerName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.customer && (
+                        <p className="text-red-500 text-xs mt-1">{errors.customer}</p>
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Product <span className="text-red-500">*</span>
-                    </label>
-                    <select
-                      value={product}
-                      onChange={(e) => setProduct(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.product
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    >
-                      <option value="">Select Product</option>
-                      {productList.map((prod) => (
-                        <option key={prod._id} value={prod._id}>
-                          {prod.productName}
-                        </option>
-                      ))}
-                    </select>
-                    {errors.product && (
-                      <p className="text-red-500 text-xs mt-1">{errors.product}</p>
-                    )}
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Contact Person
+                      </label>
+                      <input
+                        type="text"
+                        value={person}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Contact person"
+                      />
+                    </div>
                   </div>
+                  <div className="flex gap-4">
+
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Phone
+                      </label>
+                      <input
+                        type="text"
+                        value={phone}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Phone number"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Balance
+                      </label>
+                      <input
+                        type="text"
+                        value={balance}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Balance"
+                      />
+                    </div>
+
                   </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={deliveryDate}
-                      onChange={(e) => setDeliveryDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.deliveryDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.deliveryDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
-                    )}
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Address
+                      </label>
+                      <input
+                        type="text"
+                        value={address}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Address"
+                      />
+                    </div>
+
+
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Delivery Address <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={deliveryAddress}
-                      onChange={(e) => setDeliveryAddress(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.deliveryAddress
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter delivery address"
-                      required
-                    />
-                    {errors.deliveryAddress && (
-                      <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
-                    )}
-                  </div>
-               
                 </div>
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Order Type <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={orderType}
+                        onChange={(e) => setOrderType(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.orderType
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                        required
+                      >
+                        <option value="">Select Order Type</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Express">Express</option>
+                      </select>
+                      {errors.orderType && (
+                        <p className="text-red-500 text-xs mt-1">{errors.orderType}</p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Mode <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={mode}
+                        onChange={(e) => setMode(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.mode
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                        required
+                      >
+                        <option value="">Select Mode</option>
+                        <option value="Delivery">Delivery</option>
+                        <option value="Pickup">Pickup</option>
+                      </select>
+                      {errors.mode && (
+                        <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
+                      )}
+                    </div>
+
+
+
+
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Payment Method <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={paymentMethod}
+                        onChange={(e) => setPaymentMethod(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.paymentMethod
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                        required
+                      >
+                        <option value="">Select Payment Method</option>
+                        <option value="Cash">Cash</option>
+                        <option value="Credit">Credit</option>
+                        <option value="Online">Online</option>
+                      </select>
+                      {errors.paymentMethod && (
+                        <p className="text-red-500 text-xs mt-1">{errors.paymentMethod}</p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Product <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={product}
+                        onChange={(e) => setProduct(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.product
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                        required
+                      >
+                        <option value="">Select Product</option>
+                        {productList.map((prod) => (
+                          <option key={prod._id} value={prod._id}>
+                            {prod.productName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.product && (
+                        <p className="text-red-500 text-xs mt-1">{errors.product}</p>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={deliveryDate}
+                        onChange={(e) => setDeliveryDate(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.deliveryDate
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                        required
+                      />
+                      {errors.deliveryDate && (
+                        <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={deliveryAddress}
+                        onChange={(e) => setDeliveryAddress(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.deliveryAddress
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                          }`}
+                        placeholder="Enter delivery address"
+                        required
+                      />
+                      {errors.deliveryAddress && (
+                        <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
+                      )}
+                    </div>
+
+                  </div>
                 </div>
 
-                  <div className="border bg-gray-100 p-4 rounded-lg space-y-4"> 
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Rate
-                    </label>
-                    <input
-                      type="text"
-                      value={rate}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Rate"
-                    />
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Rate
+                      </label>
+                      <input
+                        type="text"
+                        value={rate}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Rate"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Weight
+                      </label>
+                      <input
+                        type="text"
+                        value={weight}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Weight"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Packing
+                      </label>
+                      <input
+                        type="text"
+                        value={packing}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Packing"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Weight
-                    </label>
-                    <input
-                      type="text"
-                      value={weight}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Weight"
-                    />
+                  <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        In Stock
+                      </label>
+                      <input
+                        type="text"
+                        value={inStock}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="In Stock"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Total
+                      </label>
+                      <input
+                        type="text"
+                        value={total}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Total"
+                      />
+                    </div>
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Packing
-                    </label>
-                    <input
-                      type="text"
-                      value={packing}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Packing"
-                    />
+                  <div className="flex gap-4 mb-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Specification
+                      </label>
+                      <input
+                        type="text"
+                        value={specification}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                        placeholder="Specification"
+                      />
+                    </div>
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="w-20 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
+                      >
+                        <span>+</span> Add
+                      </button>
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      In Stock
-                    </label>
-                    <input
-                      type="text"
-                      value={inStock}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="In Stock"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Total
-                    </label>
-                    <input
-                      type="text"
-                      value={total}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Total"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-4 mb-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Specification
-                    </label>
-                    <input
-                      type="text"
-                      value={specification}
-                      readOnly
-                      className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                      placeholder="Specification"
-                    />
-                  </div>
-                  <div className="flex items-end">
-                    <button
-                      type="button"
-                      onClick={handleAddItem}
-                      className="w-20 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
-                    >
-                      <span>+</span> Add
-                    </button>
-                  </div>
-                </div>
-               </div>
                 {itemsList.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -965,7 +959,8 @@ const BookingOrders = () => {
                             <td className="px-4 py-2 border-b text-center">{item.total}</td>
                             <td className="px-4 py-2 border-b text-center">
                               <button onClick={() => handleRemoveItem(idx)}>
-                                <X size={18} className="text-red-600" />
+                                <X size={18} className=" text-xl flex-shrink-0 text-red-500 transition-colors"
+                                />
                               </button>
                             </td>
                           </tr>

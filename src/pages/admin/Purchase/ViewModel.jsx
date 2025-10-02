@@ -83,7 +83,12 @@ const ViewModel = ({ data, type, onClose }) => {
                 <div><strong>Date:</strong> {new Date(data.date).toLocaleDateString()}</div>
                 <div><strong>Driver Name:</strong> {data.driverName}</div>
                 <div><strong>Status:</strong> {data.status}</div>
-                <div><strong>Supplier:</strong> {data.supplierName || "-"}</div>
+                <div>
+                  <strong>Supplier:</strong>{" "}
+                  {data.type === "withPO"
+                    ? data.withPO?.supplier?.supplierName
+                    : data.withoutPO?.supplier?.supplierName || "-"}
+                </div>
                 <div><strong>Type:</strong> {data.type}</div>
               </>
             )}
@@ -107,7 +112,12 @@ const ViewModel = ({ data, type, onClose }) => {
                 <div><strong>GatePass ID:</strong> {data.gatePassIn?.gatePassId}</div>
                 <div><strong>Driver:</strong> {data.gatePassIn?.driverName}</div>
                 <div><strong>Status:</strong> {data.gatePassIn?.status}</div>
-                <div><strong>Supplier:</strong> {data.gatePassIn?.withoutPO?.supplierName?.supplierName || "-"}</div>
+                <div>
+                  <strong>Supplier:</strong>{" "}
+                  {data.gatePassIn?.type === "withPO"
+                    ? data.gatePassIn?.withPO?.supplier?.supplierName
+                    : data.gatePassIn?.withoutPO?.supplier?.supplierName || "-"}
+                </div>
               </>
             )}
           </div>
@@ -130,7 +140,9 @@ const ViewModel = ({ data, type, onClose }) => {
               {(type === "qualityCheck"
                 ? data.items || []
                 : type === "gatepass"
-                ? data.withoutPO?.items || data.withPO?.items || []
+                ? data.type === "withPO"
+                  ? data.withPO?.items || []
+                  : data.withoutPO?.items || []
                 : data.items || []
               ).map((item, idx) => (
                 <tr key={idx} className="text-center">
@@ -153,7 +165,7 @@ const ViewModel = ({ data, type, onClose }) => {
                   )}
 
                   {type === "gatepass" && (
-                    <td className="border px-2 py-1">{item.unit || item.unitName}</td>
+                    <td className="border px-2 py-1">{item.unit || item.unitName || "-"}</td>
                   )}
                 </tr>
               ))}
