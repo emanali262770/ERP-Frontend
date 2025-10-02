@@ -320,7 +320,9 @@ const PurchaseReturn = () => {
               </div>
 
               {/* Items Section Inputs*/}
-              <div>
+
+              <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
+
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
 
                 <div className="flex gap-4 mb-3">
@@ -369,7 +371,9 @@ const PurchaseReturn = () => {
                   <div className="overflow-x-auto">
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <table className="w-full border-collapse text-sm">
-                        <thead className="bg-gray-100 text-gray-600 text-sm">
+
+                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+
                           <tr>
                             <th className="border border-gray-300 px-2 py-1">
                               Item
