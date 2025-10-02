@@ -18,7 +18,9 @@ const ViewModel = ({ data, type, onClose }) => {
                 ? "Purchase Requisition"
                 : type === "purchaseOrder"
                 ? "Purchase Order"
-                : "Gatepass In"
+                : type === "gatepass"
+                ? "Gatepass In"
+                : "Quality Check"
             }
           </title>
           <style>
@@ -57,7 +59,9 @@ const ViewModel = ({ data, type, onClose }) => {
               ? "Purchase Requisition"
               : type === "purchaseOrder"
               ? "Purchase Order"
-              : "Gatepass In"}
+              : type === "gatepass"
+              ? "Gatepass In"
+              : "Quality Check"}
           </h2>
 
           {/* Info Section */}
@@ -94,6 +98,18 @@ const ViewModel = ({ data, type, onClose }) => {
                 <div><strong>Total Amount:</strong> {data.totalAmount}</div>
               </>
             )}
+
+            {type === "qualityCheck" && (
+              <>
+                <div><strong>QC ID:</strong> {data.qcId}</div>
+                <div><strong>Date:</strong> {new Date(data.date).toLocaleDateString()}</div>
+                <div><strong>Description:</strong> {data.description}</div>
+                <div><strong>GatePass ID:</strong> {data.gatePassIn?.gatePassId}</div>
+                <div><strong>Driver:</strong> {data.gatePassIn?.driverName}</div>
+                <div><strong>Status:</strong> {data.gatePassIn?.status}</div>
+                <div><strong>Supplier:</strong> {data.gatePassIn?.withoutPO?.supplierName?.supplierName || "-"}</div>
+              </>
+            )}
           </div>
 
           {/* Items Table */}
@@ -103,23 +119,42 @@ const ViewModel = ({ data, type, onClose }) => {
                 <th className="border px-2 py-1">Sr #</th>
                 <th className="border px-2 py-1">Item</th>
                 <th className="border px-2 py-1">Qty</th>
+                {type === "qualityCheck" && <th className="border px-2 py-1">Action</th>}
+                {type === "qualityCheck" && <th className="border px-2 py-1">Remarks</th>}
                 {type === "purchaseOrder" && <th className="border px-2 py-1">Price</th>}
                 {type === "purchaseOrder" && <th className="border px-2 py-1">Total</th>}
                 {type === "gatepass" && <th className="border px-2 py-1">Unit</th>}
               </tr>
             </thead>
             <tbody>
-              {(type === "gatepass"
-                ? data.withoutPO || data.withPO?.items || []
+              {(type === "qualityCheck"
+                ? data.items || []
+                : type === "gatepass"
+                ? data.withoutPO?.items || data.withPO?.items || []
                 : data.items || []
               ).map((item, idx) => (
                 <tr key={idx} className="text-center">
                   <td className="border px-2 py-1">{idx + 1}</td>
                   <td className="border px-2 py-1">{item.itemName}</td>
                   <td className="border px-2 py-1">{item.quantity || item.qty}</td>
-                  {type === "purchaseOrder" && <td className="border px-2 py-1">{item.price}</td>}
-                  {type === "purchaseOrder" && <td className="border px-2 py-1">{item.total}</td>}
-                  {type === "gatepass" && <td className="border px-2 py-1">{item.unit || item.unitName}</td>}
+
+                  {type === "qualityCheck" && (
+                    <>
+                      <td className="border px-2 py-1">{item.action}</td>
+                      <td className="border px-2 py-1">{item.remarks}</td>
+                    </>
+                  )}
+
+                  {type === "purchaseOrder" && (
+                    <>
+                      <td className="border px-2 py-1">{item.price}</td>
+                      <td className="border px-2 py-1">{item.total}</td>
+                    </>
+                  )}
+
+                  {type === "gatepass" && (
+                    <td className="border px-2 py-1">{item.unit || item.unitName}</td>
+                  )}
                 </tr>
               ))}
             </tbody>
