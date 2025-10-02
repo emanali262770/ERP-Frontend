@@ -532,7 +532,9 @@ const GRN = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-3">
+
+                {/* Section */}
+                <div className="space-y-4 border p-4 rounded-lg bg-formBgGray">
                   <div className="flex gap-4">
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">

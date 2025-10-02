@@ -14,7 +14,8 @@ export default {
         newPrimary: "#84CF16",
         secondary: "#58C5A0",
         Green: "#2B9943",
-      
+      formBG: "#f5faf8",
+      formBgGray: "#f9fafb"
       },
 
       //Oragne #FF8901

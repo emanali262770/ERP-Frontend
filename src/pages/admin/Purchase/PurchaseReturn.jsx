@@ -21,8 +21,9 @@ const PurchaseReturn = () => {
 
   const [itemName, setItemName] = useState("");
   const [qty, setQty] = useState("");
-  const [damageQty, setDamageQty] = useState("");
-  const [goodQty, setGoodQty] = useState("");
+  const [priceQty, setPriceQty] = useState("");
+  const [isItemSelected, setIsItemSelected] = useState(false);
+  const [selectedItemIndex, setSelectedItemIndex] = useState(null);
 
   const sliderRef = useRef(null);
 
@@ -53,27 +54,37 @@ const PurchaseReturn = () => {
     setItems([]);
     setItemName("");
     setQty("");
-    setDamageQty("");
-    setGoodQty("");
+    setPriceQty("");
     setEditId(null);
   };
 
+  // Add items
   const handleAddItem = () => {
     if (!itemName || !qty) return;
-    setItems([
-      ...items,
-      {
-        id: Date.now(),
-        name: itemName,
-        qty: parseInt(qty),
-        damage: parseInt(damageQty) || 0,
-        good: parseInt(goodQty) || 0,
-      },
-    ]);
+
+    const newItem = {
+      id: Date.now(),
+      name: itemName,
+      qty: parseInt(qty),
+      price: parseInt(priceQty) || 0,
+    };
+
+    if (selectedItemIndex !== null) {
+      // Update existing item
+      const updatedItems = [...items];
+      updatedItems[selectedItemIndex] = newItem;
+      setItems(updatedItems);
+    } else {
+      // Add new item
+      setItems([...items, newItem]);
+    }
+
+    // Reset inputs
     setItemName("");
     setQty("");
-    setDamageQty("");
-    setGoodQty("");
+    setPriceQty("");
+    setSelectedItemIndex(null);
+    setIsItemSelected(false);
   };
 
   const handleSave = () => {
@@ -111,20 +122,7 @@ const PurchaseReturn = () => {
     setItems(ret.items);
   };
 
-  const handleDelete = (id) => {
-    Swal.fire({
-      title: "Are you sure?",
-      text: "This return will be deleted permanently!",
-      icon: "warning",
-      showCancelButton: true,
-    }).then((res) => {
-      if (res.isConfirmed) {
-        setReturnList(returnList.filter((r) => r.id !== id));
-        Swal.fire("Deleted!", "Purchase return deleted", "success");
-      }
-    });
-  };
-   function handleRemoveItem(index) {
+  function handleRemoveItem(index) {
     setItems(items.filter((_, i) => i !== index));
   }
 
@@ -192,12 +190,6 @@ const PurchaseReturn = () => {
                       >
                         <SquarePen size={18} />
                       </button>
-                      <button
-                        onClick={() => handleDelete(r.id)}
-                        className="text-red-600 hover:underline"
-                      >
-                        <Trash2 size={18} />
-                      </button>
                     </div>
                   </div>
                 ))
@@ -216,7 +208,7 @@ const PurchaseReturn = () => {
           >
             <div className="flex justify-between items-center p-4 border-b">
               <h2 className="text-xl font-bold text-newPrimary">
-                {isEdit ? "Update Return" : "Add New Return"}
+                {isEdit ? "Update Return" : "Purchase Return"}
               </h2>
               <button
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
@@ -251,11 +243,20 @@ const PurchaseReturn = () => {
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">
-                    Gate Pass In
+                    Gate Pass ID
                   </label>
                   <select
                     value={gatePass}
-                    onChange={(e) => setGatePass(e.target.value)}
+                    onChange={(e) => {
+                      const selectedGatePass = e.target.value;
+                      setGatePass(selectedGatePass);
+
+                      // Example: auto-fill Supplier & PO ID based on selected gate pass
+                      if (selectedGatePass === "GP001") {
+                        setSupplier("ABC Supplier");
+                        setPoId("PO12345");
+                      }
+                    }}
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Select Gate Pass</option>
@@ -269,10 +270,9 @@ const PurchaseReturn = () => {
                     value={supplier}
                     onChange={(e) => setSupplier(e.target.value)}
                     className="w-full p-2 border rounded"
+                    disabled={!gatePass} // disabled if no gatePass selected
                   />
                 </div>
-              </div>
-              <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">PO ID</label>
                   <input
@@ -280,17 +280,41 @@ const PurchaseReturn = () => {
                     value={poId}
                     onChange={(e) => setPoId(e.target.value)}
                     className="w-full p-2 border rounded"
+                    disabled={!gatePass} // disabled if no gatePass selected
                   />
                 </div>
+              </div>
+              <div className="flex gap-4">
                 {/* Items Section */}
-                <div className="flex-1 min-w-0 mt-6">
+                <div className="flex-1 min-w-0">
+                  <label className="text-gray-700 font-medium">Item Name</label>
                   <select
-                    onClick={itemName}
-                    name=""
-                    id=""
+                    value={itemName} // make sure select shows the current itemName
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      setItemName(value); // update state
+                      setIsItemSelected(value !== ""); // enable inputs
+
+                      // Auto-fill qty & price if item exists in items list
+                      const existingItem = items.find(
+                        (it) => it.name === value
+                      );
+                      if (existingItem) {
+                        setQty(existingItem.qty);
+                        setPriceQty(existingItem.price);
+                        setSelectedItemIndex(items.indexOf(existingItem));
+                      } else {
+                        setQty("");
+                        setPriceQty("");
+                        setSelectedItemIndex(null);
+                      }
+                    }}
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Select Item Name</option>
+                    <option value="Item1">Item1</option>
+                    <option value="Item2">Item2</option>
+                    <option value="Item3">Item3</option>
                   </select>
                 </div>
               </div>
@@ -302,81 +326,105 @@ const PurchaseReturn = () => {
                 <div className="flex gap-4 mb-3">
                   <div className="flex-1 min-w-0">
                     <input
+                      type="text"
+                      placeholder="Item Name"
+                      value={itemName}
+                      onChange={(e) => setItemName(e.target.value)}
+                      className="w-full p-2 border rounded"
+                      disabled={!isItemSelected}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <input
                       type="number"
                       placeholder="Qty"
                       value={qty}
                       onChange={(e) => setQty(e.target.value)}
                       className="w-full p-2 border rounded"
+                      disabled={!isItemSelected}
                     />
                   </div>
                   <div className="flex-1 min-w-0">
                     <input
                       type="number"
-                      placeholder="Damage"
-                      value={damageQty}
-                      onChange={(e) => setDamageQty(e.target.value)}
+                      placeholder="Price"
+                      value={priceQty}
+                      onChange={(e) => setPriceQty(e.target.value)}
                       className="w-full p-2 border rounded"
+                      disabled={!isItemSelected}
                     />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <input
-                      type="number"
-                      placeholder="Good"
-                      value={goodQty}
-                      onChange={(e) => setGoodQty(e.target.value)}
-                      className="w-full p-2 border rounded"
-                    />
-                  </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="flex gap-4">
                     <button
                       type="button"
                       onClick={handleAddItem}
-                      className="px-3 bg-newPrimary text-white rounded flex items-center h-full w-full justify-center"
+                      className="px-3 bg-newPrimary hover:bg-blue-600 text-white rounded flex items-center h-full w-full justify-center flex-1 min-w-0 text-sm whitespace-nowrap"
                     >
-                      + Add
+                      Update Item
                     </button>
                   </div>
-
                 </div>
-
                 {/* Items Table */}
                 {items.length > 0 && (
-                  <table className="w-full border text-sm">
-                    <thead className="bg-gray-100">
-                      <tr>
-                        <th className="border px-2 py-1">Item</th>
-                        <th className="border px-2 py-1">Qty</th>
-                        <th className="border px-2 py-1">Damage</th>
-                        <th className="border px-2 py-1">Good</th>
-                        <th className="border px-2 py-1">Remove</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items.map((it, idx) => (
-                        <tr key={it.id}>
+                  <div className="overflow-x-auto">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full border-collapse text-sm">
+                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                          <tr>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Item
+                            </th>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Qty
+                            </th>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Price
+                            </th>
+                            <th className="border border-gray-300 px-2 py-1">
+                              Remove
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {items.map((it, idx) => (
+                            <tr
+                              key={it.id}
+                              onClick={() => {
+                                setItemName(it.name);
+                                setQty(it.qty);
+                                setPriceQty(it.price);
 
-                          <td className="border text-center px-2 py-1">
-                            {it.name}
-                          </td>
-                          <td className="border text-center px-2 py-1">
-                            {it.qty}
-                          </td>
-                          <td className="border text-center px-2 py-1">
-                            {it.damage}
-                          </td>
-                          <td className="border text-center px-2 py-1">
-                            {it.good}
-                          </td>
-                          <td className="px-4 py-2 border-b text-center">
-                            <button onClick={() => handleRemoveItem(idx)}>
-                              <X size={18} className="text-red-600" />
-                            </button>
-                          </td>
+                                setSelectedItemIndex(idx);
+                                setIsItemSelected(true);
+                              }}
+                              className="cursor-pointer hover:bg-gray-100"
+                            >
+                              <td className="border border-gray-300 text-center px-2 py-1">
+                                {it.name}
+                              </td>
+                              <td className="border border-gray-300 text-center px-2 py-1">
+                                {it.qty}
+                              </td>
+                              <td className="border border-gray-300 text-center px-2 py-1">
+                                {it.price}
+                              </td>
 
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                              <td className="px-4 py-2 border-b border-gray-300 text-center">
+                                <button
+                                  onClick={(e) => {
+                                    e.stopPropagation(); // prevent row click from triggering edit
+                                    handleRemoveItem(idx);
+                                  }}
+                                >
+                                  <X size={18} className="text-red-600 " />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
                 )}
               </div>
 
