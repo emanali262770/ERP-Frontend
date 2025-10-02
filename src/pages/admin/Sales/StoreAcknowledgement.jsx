@@ -390,7 +390,7 @@ const StoreAcknowledgement = () => {
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
             <div className="min-w-[1000px]">
-              <div className="hidden lg:grid grid-cols-[150px,150px,200px,150px,100px] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+              <div className="hidden lg:grid grid-cols-5 gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                 <div>Store ID</div>
                 <div>Date</div>
                 <div>Booking Order #</div>
@@ -401,9 +401,9 @@ const StoreAcknowledgement = () => {
               <div className="flex flex-col divide-y divide-gray-100">
                 {loading ? (
                   <TableSkeleton
-                    rows={recordsPerPage}
+                    rows={currentRecords.length ||5}
                     cols={5}
-                    className="lg:grid-cols-[150px,150px,200px,150px,100px]"
+                    className="lg:grid-cols-5"
                   />
                 ) : currentRecords.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
@@ -413,7 +413,7 @@ const StoreAcknowledgement = () => {
                   currentRecords.map((ack) => (
                     <div
                       key={ack._id}
-                      className="grid grid-cols-1 lg:grid-cols-[150px,150px,200px,150px,100px] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      className="grid grid-cols-1 lg:grid-cols-5 items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
                       <div className="text-gray-600">{ack.storeId}</div>
                       <div className="text-gray-600">{ack.date}</div>
