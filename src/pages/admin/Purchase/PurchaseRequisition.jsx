@@ -456,7 +456,7 @@ const PurchaseRequisition = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="space-y-4 border p-4 rounded-lg bg-gray-50 pb-6">
+                <div className="space-y-4 border p-4 rounded-lg bg-gray-50 px-4 py-8">
                   <div className="flex gap-4">
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -550,7 +550,7 @@ const PurchaseRequisition = () => {
                 </div>
 
                 {/* Section */}
-                <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
+                <div className="border p-4 rounded-lg bg-formBgGray space-y-4 px-4 py-8">
                   <div className="flex gap-4">
                     <div className="flex gap-2 items-end">
                       <div>
