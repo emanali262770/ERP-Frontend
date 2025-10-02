@@ -8,35 +8,35 @@ import CommanHeader from "../../../components/CommanHeader";
 import { SquarePen, Trash2 } from "lucide-react";
 import TableSkeleton from "../Skeleton";
 
-const CustomerDistributorList = () => {
+const CustomerList = () => {
   const [customerList, setCustomerList] = useState([
     {
       _id: "cust1",
-      customerName: "Global Retail",
-      contactPerson: "John Doe",
-      email: "john@globalretail.com",
-      address: "123 Retail St, New York, NY",
-      phoneNumber: "+1-212-555-1234",
-      mobileNumber: "03001234567",
-      designation: "Sales Manager",
-      ntn: "NTN123456789",
-      gst: "27ABCDE1234F1Z5",
+      customerName: "Prime Retail",
+      contactPerson: "Alice Johnson",
+      email: "alice@primeretail.com",
+      address: "789 Market St, Los Angeles, CA",
+      phoneNumber: "+1-213-555-9876",
+      mobileNumber: "03005678901",
+      designation: "Purchasing Manager",
+      ntn: "NTN456789123",
+      gst: "27DEFGH5678J2K4",
       paymentTerms: "Credit",
-      creditLimit: "100000",
-      creditTime: "30",
+      creditLimit: "150000",
+      creditTime: "45",
       status: true,
     },
     {
       _id: "cust2",
-      customerName: "City Distributors",
-      contactPerson: "Jane Smith",
-      email: "jane@citydistributors.com",
-      address: "456 Main St, Chicago, IL",
-      phoneNumber: "+1-312-555-5678",
-      mobileNumber: "03009876543",
-      designation: "Procurement Head",
-      ntn: "NTN987654321",
-      gst: "27XYZAB5678G2H3",
+      customerName: "Urban Buyers",
+      contactPerson: "Bob Wilson",
+      email: "bob@urbanbuyers.com",
+      address: "321 Oak Ave, Miami, FL",
+      phoneNumber: "+1-305-555-4321",
+      mobileNumber: "03008765432",
+      designation: "Store Manager",
+      ntn: "NTN654321987",
+      gst: "27KLMNO9876P3Q2",
       paymentTerms: "Cash",
       status: false,
     },
@@ -46,7 +46,6 @@ const CustomerDistributorList = () => {
   const [contactPerson, setContactPerson] = useState("");
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
-  const [productsSupplied, setProductsSupplied] = useState("");
   const [paymentTerms, setPaymentTerms] = useState("");
   const [status, setStatus] = useState(true);
   const [phoneNumber, setPhoneNumber] = useState("");
@@ -117,7 +116,6 @@ const CustomerDistributorList = () => {
     setContactPerson("");
     setEmail("");
     setAddress("");
-    setProductsSupplied("");
     setPaymentTerms("");
     setPhoneNumber("");
     setMobileNumber("");
@@ -186,7 +184,6 @@ const CustomerDistributorList = () => {
       setContactPerson("");
       setEmail("");
       setAddress("");
-      setProductsSupplied("");
       setPaymentTerms("");
       setPhoneNumber("");
       setDesignation("");
@@ -289,17 +286,17 @@ const CustomerDistributorList = () => {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-2xl font-bold text-newPrimary">
-            Customers/Distributors List
+            Customers List
           </h1>
           <p className="text-gray-500 text-sm">
-            Manage your customer/distributor details
+            Manage your customer details
           </p>
         </div>
         <button
           className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/90"
           onClick={handleAddCustomer}
         >
-          + Add Customer/Distributor
+          + Add Customer
         </button>
       </div>
 
@@ -327,7 +324,7 @@ const CustomerDistributorList = () => {
                 />
               ) : customerList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
-                  No customers/distributors found.
+                  No customers found.
                 </div>
               ) : (
                 customerList?.map((c) => (
@@ -439,9 +436,7 @@ const CustomerDistributorList = () => {
           >
             <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
               <h2 className="text-xl font-bold text-newPrimary">
-                {isEdit
-                  ? "Update Customer/Distributor"
-                  : "Add a New Customer/Distributor"}
+                {isEdit ? "Update a Customer" : "Add a New Customer"}
               </h2>
               <button
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
@@ -453,7 +448,6 @@ const CustomerDistributorList = () => {
                   setContactPerson("");
                   setEmail("");
                   setAddress("");
-                  setProductsSupplied("");
                   setPaymentTerms("");
                   setPhoneNumber("");
                   setDesignation("");
@@ -492,7 +486,7 @@ const CustomerDistributorList = () => {
                     required
                     onChange={(e) => setPhoneNumber(e.target.value)}
                     className="w-full p-2 border rounded"
-                    placeholder="e.g. +1-212-555-1234"
+                    placeholder="e.g. +1-213-555-9876"
                   />
                 </div>
               </div>
@@ -507,7 +501,7 @@ const CustomerDistributorList = () => {
                     required
                     onChange={(e) => setMobileNumber(e.target.value)}
                     className="w-full p-2 border rounded"
-                    placeholder="e.g. 03001234567"
+                    placeholder="e.g. 03005678901"
                   />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -546,7 +540,7 @@ const CustomerDistributorList = () => {
                     required
                     onChange={(e) => setDesignation(e.target.value)}
                     className="w-full p-2 border rounded"
-                    placeholder="e.g. Sales Manager"
+                    placeholder="e.g. Purchasing Manager"
                   />
                 </div>
               </div>
@@ -563,7 +557,7 @@ const CustomerDistributorList = () => {
                 />
               </div>
               <div className="flex gap-4">
-                {/* <div className="flex-1 min-w-0">
+                <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
                     NTN <span className="text-red-500">*</span>
                   </label>
@@ -573,10 +567,10 @@ const CustomerDistributorList = () => {
                     required
                     onChange={(e) => setNtn(e.target.value)}
                     className="w-full p-2 border rounded"
-                    placeholder="e.g. NTN123456789"
+                    placeholder="e.g. NTN456789123"
                   />
-                </div> */}
-                {/* <div className="flex-1 min-w-0">
+                </div>
+                <div className="flex-1 min-w-0">
                   <label className="block text-gray-700 font-medium">
                     GST <span className="text-red-500">*</span>
                   </label>
@@ -586,9 +580,9 @@ const CustomerDistributorList = () => {
                     required
                     onChange={(e) => setGst(e.target.value)}
                     className="w-full p-2 border rounded"
-                    placeholder="e.g. 27ABCDE1234F1Z5"
+                    placeholder="e.g. 27DEFGH5678J2K4"
                   />
-                </div> */}
+                </div>
               </div>
               <div>
                 <label className="block text-gray-700 font-medium">
@@ -668,7 +662,7 @@ const CustomerDistributorList = () => {
                 className="bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80 w-full"
                 onClick={handleSave}
               >
-                Save Customer/Distributor
+                Save Customer
               </button>
             </div>
           </div>
@@ -708,4 +702,4 @@ const CustomerDistributorList = () => {
   );
 };
 
-export default CustomerDistributorList;
+export default CustomerList;

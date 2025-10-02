@@ -8,55 +8,71 @@ const RateList = () => {
   const [rateLists, setRateLists] = useState([
     {
       _id: "1",
-      rateListId: "RL-001",
+      type: "Electronics",
+      productCode: "ELC-001",
       itemName: "Laptop",
-      unitPrice: 1000,
-      discount: 10,
-      taxRate: 15,
-      effectiveDate: "2025-09-01",
-      createdBy: "John Doe",
-      totalPrice: 935, // (1000 * (1 - 0.1) * (1 + 0.15))
+      packSize: "1 Unit",
+      specifications: "16GB RAM, 512GB SSD",
+      salePrice: 1200,
     },
     {
       _id: "2",
-      rateListId: "RL-002",
+      type: "Accessories",
+      productCode: "ACC-001",
       itemName: "Mouse",
-      unitPrice: 20,
-      discount: 5,
-      taxRate: 10,
-      effectiveDate: "2025-09-15",
-      createdBy: "Jane Smith",
-      totalPrice: 20.9, // (20 * (1 - 0.05) * (1 + 0.1))
+      packSize: "1 Piece",
+      specifications: "Wireless, Optical",
+      salePrice: 25,
     },
   ]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [rateListId, setRateListId] = useState("");
+  const [type, setType] = useState("");
   const [itemName, setItemName] = useState("");
-  const [unitPrice, setUnitPrice] = useState("");
-  const [discount, setDiscount] = useState("");
-  const [taxRate, setTaxRate] = useState("");
-  const [effectiveDate, setEffectiveDate] = useState("");
-  const [createdBy, setCreatedBy] = useState("");
+  const [productCode, setProductCode] = useState("");
+  const [packSize, setPackSize] = useState("");
+  const [specifications, setSpecifications] = useState("");
+  const [salePrice, setSalePrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRateList, setEditingRateList] = useState(null);
   const [errors, setErrors] = useState({});
   const [itemList, setItemList] = useState([
-    { _id: "item1", itemName: "Laptop" },
-    { _id: "item2", itemName: "Mouse" },
-    { _id: "item3", itemName: "Keyboard" },
+    {
+      _id: "item1",
+      itemName: "Laptop",
+      productCode: "ELC-001",
+      packSize: "1 Unit",
+      specifications: "16GB RAM, 512GB SSD",
+      type: "Electronics",
+    },
+    {
+      _id: "item2",
+      itemName: "Mouse",
+      productCode: "ACC-001",
+      packSize: "1 Piece",
+      specifications: "Wireless, Optical",
+      type: "Accessories",
+    },
+    {
+      _id: "item3",
+      itemName: "Keyboard",
+      productCode: "ACC-002",
+      packSize: "1 Piece",
+      specifications: "Mechanical, RGB",
+      type: "Accessories",
+    },
   ]);
-  const [nextRateListId, setNextRateListId] = useState("003");
+  const [types] = useState(["Electronics", "Accessories", "Peripherals"]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showPreviewTable, setShowPreviewTable] = useState(false);
+  const [previewData, setPreviewData] = useState(null);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
-  const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
 
   // Simulate fetching rate list
   const fetchRateList = useCallback(async () => {
     try {
       setLoading(true);
-      // Static data already set in state
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
     } finally {
@@ -72,7 +88,7 @@ const RateList = () => {
 
   // Rate list search
   useEffect(() => {
-    if (!searchTerm || !searchTerm.startsWith("RL-")) {
+    if (!searchTerm) {
       fetchRateList();
       return;
     }
@@ -81,7 +97,7 @@ const RateList = () => {
       try {
         setLoading(true);
         const filtered = rateLists.filter((rate) =>
-          rate.rateListId.toUpperCase().includes(searchTerm.toUpperCase())
+          rate.productCode.toUpperCase().includes(searchTerm.toUpperCase())
         );
         setRateLists(filtered);
       } catch (error) {
@@ -95,63 +111,54 @@ const RateList = () => {
     return () => clearTimeout(delayDebounce);
   }, [searchTerm, fetchRateList, rateLists]);
 
-  // Generate next rate list ID
-  useEffect(() => {
-    if (rateLists.length > 0) {
-      const maxNo = Math.max(
-        ...rateLists.map((r) => {
-          const match = r.rateListId?.match(/RL-(\d+)/);
-          return match ? parseInt(match[1], 10) : 0;
-        })
-      );
-      setNextRateListId((maxNo + 1).toString().padStart(3, "0"));
-    } else {
-      setNextRateListId("001");
-    }
-  }, [rateLists]);
-
   // Reset form fields
   const resetForm = () => {
-    setRateListId("");
+    setType("");
     setItemName("");
-    setUnitPrice("");
-    setDiscount("");
-    setTaxRate("");
-    setEffectiveDate("");
-    setCreatedBy(userInfo.employeeName || "");
+    setProductCode("");
+    setPackSize("");
+    setSpecifications("");
+    setSalePrice("");
     setEditingRateList(null);
     setErrors({});
+    setShowPreviewTable(false);
+    setPreviewData(null);
     setIsSliderOpen(false);
   };
 
   // Validate form fields
   const validateForm = () => {
     const newErrors = {};
-    const trimmedRateListId = rateListId.trim();
+    const trimmedType = type.trim();
     const trimmedItemName = itemName.trim();
-    const trimmedUnitPrice = unitPrice.trim();
-    const trimmedDiscount = discount.trim();
-    const trimmedTaxRate = taxRate.trim();
-    const trimmedEffectiveDate = effectiveDate.trim();
-    const parsedUnitPrice = parseFloat(unitPrice);
-    const parsedDiscount = parseFloat(discount);
-    const parsedTaxRate = parseFloat(taxRate);
+    const trimmedSalePrice = salePrice.trim();
+    const parsedSalePrice = parseFloat(salePrice);
 
-    if (!trimmedRateListId) newErrors.rateListId = "Rate List ID is required";
-    if (!trimmedItemName) newErrors.itemName = "Item Name is required";
-    if (!trimmedUnitPrice || isNaN(parsedUnitPrice) || parsedUnitPrice <= 0) {
-      newErrors.unitPrice = "Unit Price must be a positive number";
+    if (!trimmedType) newErrors.type = "Type is required";
+    if (!trimmedItemName) newErrors.itemName = "Product Name is required";
+    if (!trimmedSalePrice || isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
+      newErrors.salePrice = "Sale Price must be a positive number";
     }
-    if (trimmedDiscount && (isNaN(parsedDiscount) || parsedDiscount < 0 || parsedDiscount > 100)) {
-      newErrors.discount = "Discount must be between 0 and 100";
-    }
-    if (trimmedTaxRate && (isNaN(parsedTaxRate) || parsedTaxRate < 0 || parsedTaxRate > 100)) {
-      newErrors.taxRate = "Tax Rate must be between 0 and 100";
-    }
-    if (!trimmedEffectiveDate) newErrors.effectiveDate = "Effective Date is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  // Handle Product Name selection
+  const handleProductChange = (selectedItemName) => {
+    setItemName(selectedItemName);
+    const selectedItem = itemList.find((item) => item.itemName === selectedItemName);
+    if (selectedItem) {
+      setProductCode(selectedItem.productCode);
+      setPackSize(selectedItem.packSize);
+      setSpecifications(selectedItem.specifications);
+      setType(selectedItem.type);
+    } else {
+      setProductCode("");
+      setPackSize("");
+      setSpecifications("");
+      setType("");
+    }
   };
 
   // Handlers for form and table actions
@@ -162,41 +169,55 @@ const RateList = () => {
 
   const handleEditClick = (rateList) => {
     setEditingRateList(rateList);
-    setRateListId(rateList.rateListId || "");
+    setType(rateList.type || "");
     setItemName(rateList.itemName || "");
-    setUnitPrice(rateList.unitPrice || "");
-    setDiscount(rateList.discount || "");
-    setTaxRate(rateList.taxRate || "");
-    setEffectiveDate(rateList.effectiveDate || "");
-    setCreatedBy(rateList.createdBy || userInfo.employeeName || "");
+    setProductCode(rateList.productCode || "");
+    setPackSize(rateList.packSize || "");
+    setSpecifications(rateList.specifications || "");
+    setSalePrice(rateList.salePrice || "");
     setErrors({});
+    setShowPreviewTable(false);
+    setPreviewData(null);
     setIsSliderOpen(true);
+  };
+
+  const handleAddClick = (e) => {
+    e.preventDefault();
+    if (validateForm()) {
+      const newPreviewData = {
+        type: type.trim(),
+        productCode: productCode.trim(),
+        itemName: itemName.trim(),
+        packSize: packSize.trim(),
+        salePrice: parseFloat(salePrice),
+        specifications: specifications.trim(),
+      };
+      setPreviewData(newPreviewData);
+      setShowPreviewTable(true);
+    }
+  };
+
+  const handleRemovePreview = () => {
+    setPreviewData(null);
+    setShowPreviewTable(false);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    if (!validateForm()) {
+    if (!previewData) {
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Please click Add to preview the data before saving.",
+        confirmButtonColor: "#d33",
+      });
       return;
     }
-
-    const totalPrice = parseFloat(unitPrice) * (1 - (parseFloat(discount || 0) / 100)) * (1 + (parseFloat(taxRate || 0) / 100));
-
-    const newRateList = {
-      rateListId: editingRateList ? rateListId : `RL-${nextRateListId}`,
-      itemName: itemName.trim(),
-      unitPrice: parseFloat(unitPrice),
-      discount: parseFloat(discount || 0),
-      taxRate: parseFloat(taxRate || 0),
-      effectiveDate: effectiveDate.trim(),
-      createdBy: createdBy.trim(),
-      totalPrice: parseFloat(totalPrice.toFixed(2)),
-    };
 
     try {
       if (editingRateList) {
         setRateLists((prev) =>
-          prev.map((r) => (r._id === editingRateList._id ? { ...r, ...newRateList, _id: r._id } : r))
+          prev.map((r) => (r._id === editingRateList._id ? { ...r, ...previewData, _id: r._id } : r))
         );
         Swal.fire({
           icon: "success",
@@ -205,7 +226,7 @@ const RateList = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setRateLists((prev) => [...prev, { ...newRateList, _id: `temp-${Date.now()}` }]);
+        setRateLists((prev) => [...prev, { ...previewData, _id: `temp-${Date.now()}` }]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -298,7 +319,7 @@ const RateList = () => {
           <div className="flex items-center gap-3">
             <input
               type="text"
-              placeholder="Enter Rate List ID eg: RL-001"
+              placeholder="Enter Product Code eg: ELC-001"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="px-3 py-2 w-[250px] border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
@@ -314,14 +335,15 @@ const RateList = () => {
 
         <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
           <div className="overflow-y-auto lg:overflow-x-auto max-h-[900px]">
-            <div className="min-w-[1200px]">
-              <div className="hidden lg:grid grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                <div>Rate List ID</div>
-                <div>Item Name</div>
-                <div>Unit Price</div>
-                <div>Discount (%)</div>
-                <div>Tax Rate (%)</div>
-                <div>Effective Date</div>
+            <div className="min-w-[1400px]">
+              <div className="hidden lg:grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1.5fr_1fr_0.5fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div>SR#</div>
+                <div>Type</div>
+                <div>Product Name</div>
+                <div>Product Code</div>
+                <div>Pack Size</div>
+                <div>Specifications</div>
+                <div>Sale Price</div>
                 <div>Actions</div>
               </div>
 
@@ -329,25 +351,26 @@ const RateList = () => {
                 {loading ? (
                   <TableSkeleton
                     rows={recordsPerPage}
-                    cols={7}
-                    className="lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr]"
+                    cols={8}
+                    className="lg:grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1.5fr_1fr_0.5fr]"
                   />
                 ) : currentRecords.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No rate lists found.
                   </div>
                 ) : (
-                  currentRecords.map((rateList) => (
+                  currentRecords.map((rateList, index) => (
                     <div
                       key={rateList._id}
-                      className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                      className="grid grid-cols-1 lg:grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1.5fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{rateList.rateListId}</div>
+                      <div className="text-gray-600">{indexOfFirstRecord + index + 1}</div>
+                      <div className="text-gray-600">{rateList.type}</div>
                       <div className="text-gray-600">{rateList.itemName}</div>
-                      <div className="text-gray-600">{rateList.unitPrice}</div>
-                      <div className="text-gray-600">{rateList.discount}</div>
-                      <div className="text-gray-600">{rateList.taxRate}</div>
-                      <div className="text-gray-600">{rateList.effectiveDate}</div>
+                      <div className="text-gray-600">{rateList.productCode}</div>
+                      <div className="text-gray-600">{rateList.packSize}</div>
+                      <div className="text-gray-600">{rateList.specifications}</div>
+                      <div className="text-gray-600">{rateList.salePrice}</div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(rateList)}
@@ -429,31 +452,36 @@ const RateList = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Rate List ID <span className="text-red-500">*</span>
+                      Type <span className="text-red-500">*</span>
                     </label>
-                    <input
-                      type="text"
-                      value={editingRateList ? rateListId : `RL-${nextRateListId}`}
-                      readOnly
+                    <select
+                      value={type}
+                      onChange={(e) => setType(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.rateListId
+                        errors.type
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                       }`}
-                      placeholder="Enter rate list ID"
                       required
-                    />
-                    {errors.rateListId && (
-                      <p className="text-red-500 text-xs mt-1">{errors.rateListId}</p>
+                    >
+                      <option value="">Select Type</option>
+                      {types.map((typeOption) => (
+                        <option key={typeOption} value={typeOption}>
+                          {typeOption}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.type && (
+                      <p className="text-red-500 text-xs mt-1">{errors.type}</p>
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Item Name <span className="text-red-500">*</span>
+                      Product Name <span className="text-red-500">*</span>
                     </label>
                     <select
                       value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
+                      onChange={(e) => handleProductChange(e.target.value)}
                       className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                         errors.itemName
                           ? "border-red-500 focus:ring-red-500"
@@ -461,8 +489,8 @@ const RateList = () => {
                       }`}
                       required
                     >
-                      <option value="">Select Item</option>
-                      {itemList?.map((item) => (
+                      <option value="">Select Product</option>
+                      {itemList.map((item) => (
                         <option key={item._id} value={item.itemName}>
                           {item.itemName}
                         </option>
@@ -476,125 +504,116 @@ const RateList = () => {
                 <div className="flex gap-4">
                   <div className="flex-1 min-w-0">
                     <label className="block text-gray-700 font-medium mb-2">
-                      Unit Price <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="number"
-                      value={unitPrice}
-                      onChange={(e) => setUnitPrice(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.unitPrice
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter unit price"
-                      min="0"
-                      step="0.01"
-                      required
-                    />
-                    {errors.unitPrice && (
-                      <p className="text-red-500 text-xs mt-1">{errors.unitPrice}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Discount (%)
-                    </label>
-                    <input
-                      type="number"
-                      value={discount}
-                      onChange={(e) => setDiscount(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.discount
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter discount percentage"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                    />
-                    {errors.discount && (
-                      <p className="text-red-500 text-xs mt-1">{errors.discount}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Tax Rate (%)
-                    </label>
-                    <input
-                      type="number"
-                      value={taxRate}
-                      onChange={(e) => setTaxRate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.taxRate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter tax rate percentage"
-                      min="0"
-                      max="100"
-                      step="0.01"
-                    />
-                    {errors.taxRate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.taxRate}</p>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Effective Date <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      type="date"
-                      value={effectiveDate}
-                      onChange={(e) => setEffectiveDate(e.target.value)}
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.effectiveDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      required
-                    />
-                    {errors.effectiveDate && (
-                      <p className="text-red-500 text-xs mt-1">{errors.effectiveDate}</p>
-                    )}
-                  </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-gray-700 font-medium mb-2">
-                      Created By <span className="text-red-500">*</span>
+                      Product Code
                     </label>
                     <input
                       type="text"
-                      value={createdBy}
+                      value={productCode}
                       readOnly
-                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                        errors.createdBy
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                      }`}
-                      placeholder="Enter created by"
-                      required
+                      className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
+                      placeholder="Product Code"
                     />
-                    {errors.createdBy && (
-                      <p className="text-red-500 text-xs mt-1">{errors.createdBy}</p>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Pack Size
+                    </label>
+                    <input
+                      type="text"
+                      value={packSize}
+                      readOnly
+                      className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
+                      placeholder="Pack Size"
+                    />
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Specifications
+                    </label>
+                    <input
+                      type="text"
+                      value={specifications}
+                      readOnly
+                      className="w-full p-3 border rounded-md bg-gray-100 focus:outline-none"
+                      placeholder="Specifications"
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Sale Price <span className="text-red-500">*</span>
+                    </label>
+                    <div className="flex gap-2 items-center">
+                      <input
+                        type="number"
+                        value={salePrice}
+                        onChange={(e) => setSalePrice(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.salePrice
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        placeholder="Enter sale price"
+                        min="0"
+                        step="0.01"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={handleAddClick}
+                        disabled={loading}
+                        className="bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {errors.salePrice && (
+                      <p className="text-red-500 text-xs mt-1">{errors.salePrice}</p>
                     )}
                   </div>
                 </div>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
-                >
-                  {loading
-                    ? "Saving..."
-                    : editingRateList
-                    ? "Update Rate List"
-                    : "Save Rate List"}
-                </button>
+
+                {showPreviewTable && previewData && (
+                  <div className="mt-4">
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Preview</h3>
+                    <div className="rounded-lg shadow border border-gray-200 overflow-hidden">
+                      <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_0.5fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase">
+                        <div>SR#</div>
+                        <div>Type</div>
+                        <div>Code</div>
+                        <div>Item</div>
+                        <div>Pack Size</div>
+                        <div>Sale Price</div>
+                        <div>Remove</div>
+                      </div>
+                      <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white">
+                        <div className="text-gray-600">{editingRateList ? rateLists.findIndex(r => r._id === editingRateList._id) + 1 : rateLists.length + 1}</div>
+                        <div className="text-gray-600">{previewData.type}</div>
+                        <div className="text-gray-600">{previewData.productCode}</div>
+                        <div className="text-gray-600">{previewData.itemName}</div>
+                        <div className="text-gray-600">{previewData.packSize}</div>
+                        <div className="text-gray-600">{previewData.salePrice}</div>
+                        <div className="flex justify-start">
+                          <button
+                            onClick={handleRemovePreview}
+                            className="py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                            title="Remove"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="mt-4 w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
+                    >
+                      {loading ? "Saving..." : "Save Rate List"}
+                    </button>
+                  </div>
+                )}
               </form>
             </div>
           </div>
