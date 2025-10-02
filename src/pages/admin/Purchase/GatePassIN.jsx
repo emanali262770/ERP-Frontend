@@ -203,7 +203,7 @@ const GatepassIn = () => {
     setItemsList([]);
     setItemName("");
     setItemQuantity("");
-     setselectedPoItems(null);
+    setselectedPoItems(null);
     setItemUnits("");
     setCategory({ id: "", name: "" }); // reset properly
     setAgainstPoNo("");
@@ -278,9 +278,9 @@ const GatepassIn = () => {
       setSupplier(gatepass.withPO?.supplier?.supplierName || "");
       setDriverName(gatepass.driverName || "");
       setItemsList(gatepass.withPO?.items || []);
-       if (matchedPO) {
-    setselectedPoItems(matchedPO);
-  }
+      if (matchedPO) {
+        setselectedPoItems(matchedPO);
+      }
     } else {
       setPoType("withoutPO");
       setWithOutPoSupplier(gatepass.withoutPO?.supplier?._id || "");
@@ -375,7 +375,7 @@ const GatepassIn = () => {
           poNo: againstPoNo, // PO _id
         },
         status,
-        supplierName:supplierId
+        supplierName: supplierId,
       };
     } else {
       newGatepass = {
@@ -472,8 +472,11 @@ const GatepassIn = () => {
     setIsView(true);
   };
 
+<<<<<<< Updated upstream
   
 
+=======
+>>>>>>> Stashed changes
 =======
 >>>>>>> Stashed changes
   return (
@@ -758,9 +761,10 @@ const GatepassIn = () => {
                                 selectedPO.estimation?.demandItem?.supplier
                                   ?.supplierName || ""
                               );
-                              setSupplierId(selectedPO.estimation?.demandItem?.supplier?._id)
+                              setSupplierId(
+                                selectedPO.estimation?.demandItem?.supplier?._id
+                              );
                               setselectedPoItems(selectedPO);
-                              
                             }
                           }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
