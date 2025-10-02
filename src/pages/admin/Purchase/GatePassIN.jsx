@@ -203,7 +203,7 @@ const GatepassIn = () => {
     setItemsList([]);
     setItemName("");
     setItemQuantity("");
-     setselectedPoItems(null);
+    setselectedPoItems(null);
     setItemUnits("");
     setCategory({ id: "", name: "" }); // reset properly
     setAgainstPoNo("");
@@ -267,7 +267,7 @@ const GatepassIn = () => {
     setGatepassId(gatepass.gatePassId || "");
     setDate(formatDateForInput(gatepass.date));
     setStatus(gatepass.status || "Permanent");
-    console.log({ gatepass }, "data");
+    console.log(gatepass.withoutPO?.items, "data");
 
     if (gatepass.type === "withPO") {
       setPoType("withPO");
@@ -278,14 +278,21 @@ const GatepassIn = () => {
       setSupplier(gatepass.withPO?.supplier?.supplierName || "");
       setDriverName(gatepass.driverName || "");
       setItemsList(gatepass.withPO?.items || []);
-       if (matchedPO) {
-    setselectedPoItems(matchedPO);
-  }
+      if (matchedPO) {
+        setselectedPoItems(matchedPO);
+      }
     } else {
       setPoType("withoutPO");
       setWithOutPoSupplier(gatepass.withoutPO?.supplier?._id || "");
       setDriverNameWithoutPo(gatepass.driverName || "");
-      setItemsList(gatepass.withoutPO?.items || []);
+      // normalize units for UI
+      const normalizedItems = (gatepass.withoutPO?.items || []).map((item) => ({
+        ...item,
+        unitName: item.unit,
+        unitId: "",
+      }));
+
+      setItemsList(normalizedItems);
 
       // set category only if one item exists (or handle multiple)
       if (gatepass.withoutPO?.items?.length > 0) {
@@ -375,7 +382,7 @@ const GatepassIn = () => {
           poNo: againstPoNo, // PO _id
         },
         status,
-        supplierName:supplierId
+        supplierName: supplierId,
       };
     } else {
       newGatepass = {
@@ -471,8 +478,6 @@ const GatepassIn = () => {
     setSelectedGatepass(gatepass);
     setIsView(true);
   };
-
-  
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -756,9 +761,10 @@ const GatepassIn = () => {
                                 selectedPO.estimation?.demandItem?.supplier
                                   ?.supplierName || ""
                               );
-                              setSupplierId(selectedPO.estimation?.demandItem?.supplier?._id)
+                              setSupplierId(
+                                selectedPO.estimation?.demandItem?.supplier?._id
+                              );
                               setselectedPoItems(selectedPO);
-                              
                             }
                           }}
                           className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
@@ -832,7 +838,6 @@ const GatepassIn = () => {
                   selectedPoItems &&
                   selectedPoItems.items?.length > 0 && (
                     <div className="mt-4">
-                     
                       <div className="overflow-x-auto">
                         <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
                           <thead className="bg-gray-100 text-gray-600 text-sm">
@@ -849,7 +854,6 @@ const GatepassIn = () => {
                               <th className="px-4 py-2 border-b text-left">
                                 Price
                               </th>
-                            
                             </tr>
                           </thead>
                           <tbody className="text-gray-700 text-sm">
@@ -870,7 +874,6 @@ const GatepassIn = () => {
                                 <td className="px-4 py-2 border-b">
                                   {item.price}
                                 </td>
-                               
                               </tr>
                             ))}
                           </tbody>
@@ -897,6 +900,9 @@ const GatepassIn = () => {
                               id: selected?._id || "",
                               name: selected?.categoryName || "",
                             });
+                            if (editingGatepass) {
+                              setItemsList([]);
+                            }
                           }}
                           className="w-full p-3 border rounded-md"
                           required

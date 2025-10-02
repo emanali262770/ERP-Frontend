@@ -7,43 +7,11 @@ import axios from "axios";
 import ViewModel from "./ViewModel";
 
 const GRN = () => {
-  const [grns, setGrns] = useState([
-    {
-      _id: "grn1",
-      grnId: "GRN001",
-      gatePassIn: "GP001",
-      supplier: { _id: "sup1", supplierName: "ABC Supplies" },
-      address: "123 Main St, City",
-      phone: "123-456-7890",
-      date: "2025-09-20",
-      items: [
-        { item: "Laptop", qty: 5, description: "High-end gaming laptop" },
-        { item: "Mouse", qty: 10, description: "Wireless mouse" },
-      ],
-    },
-    {
-      _id: "grn2",
-      grnId: "GRN002",
-      gatePassIn: "GP002",
-      supplier: { _id: "sup2", supplierName: "XYZ Corp" },
-      address: "456 Oak Ave, Town",
-      phone: "987-654-3210",
-      date: "2025-09-21",
-      items: [{ item: "Monitor", qty: 3, description: "24-inch LED monitor" }],
-    },
-  ]);
+  const [grns, setGrns] = useState([]);
 
-  const [gatePassOptions, setGatePassOptions] = useState([
-    { _id: "gp1", gatePassId: "GP001" },
-    { _id: "gp2", gatePassId: "GP002" },
-  ]);
+  const [gatePassOptions, setGatePassOptions] = useState([]);
 
-  const [itemOptions, setItemOptions] = useState([
-    { _id: "item1", itemName: "Laptop" },
-    { _id: "item2", itemName: "Mouse" },
-    { _id: "item3", itemName: "Monitor" },
-    { _id: "item4", itemName: "Keyboard" },
-  ]);
+  const [itemOptions, setItemOptions] = useState([]);
 
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -62,45 +30,74 @@ const GRN = () => {
   const [editingGrn, setEditingGrn] = useState(null);
   const [selectedGrn, setSelectedGrn] = useState(null);
   const sliderRef = useRef(null);
-  const [errors, setErrors] = useState({});
-  
+  const [nextGRNId, setNextGrnId] = useState("001");
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   // Handle adding items to the table in the form
-  const handleAddItem = () => {
-    if (!item || !qty || !description) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Fields",
-        text: "⚠️ Please fill in all item fields.",
-        confirmButtonColor: "#d33",
-      });
-      return;
-    }
+ const handleAddItem = async () => {
+  if (!item || !description) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Fields",
+      text: "⚠️ Please select an item and enter description.",
+      confirmButtonColor: "#d33",
+    });
+    return;
+  }
 
+  
+  try {
+    const { token } = userInfo || {};
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    };
+
+    // ✅ API call to update QC with item description
+    await axios.put(
+      `${import.meta.env.VITE_API_BASE_URL}/qualityCheck/${gatePassIn}`, 
+      {
+        itemId: item,          // we stored _id of item in `setItem`
+        description: description,
+      },
+      { headers }
+    );
+
+    // ✅ Add to table (with qty auto-filled)
+    const selectedOption = itemOptions.find(opt => opt._id === item);
     const newItem = {
-      item,
-      qty: parseInt(qty, 10),
+      item: selectedOption?.itemName || "",
+      qty: selectedOption?.quantity || 0,
       description,
     };
 
     setItemsList([...itemsList, newItem]);
+
+    // Clear form
     setItem("");
     setQty("");
     setDescription("");
-  };
+
+    
+
+  } catch (error) {
+    console.error("Error adding item", error);
+    Swal.fire("Error!", "Failed to add item.", "error");
+  }
+};
+
 
   // Fetch gate pass options
   const fetchGatePassOptions = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${import.meta.env.VITE_API_BASE_URL}/gate-passes`
+        `${import.meta.env.VITE_API_BASE_URL}/qualityCheck/supplierQC`
       );
       setGatePassOptions(res.data);
     } catch (error) {
-      console.error("Failed to fetch gate pass options", error);
+      console.error("Failed to fetch upto standerd options", error);
     } finally {
       setTimeout(() => setLoading(false), 2000);
     }
@@ -109,6 +106,8 @@ const GRN = () => {
   useEffect(() => {
     fetchGatePassOptions();
   }, [fetchGatePassOptions]);
+
+ 
 
   // Fetch item options
   const fetchItemOptions = useCallback(async () => {
@@ -131,7 +130,7 @@ const GRN = () => {
   const fetchGrns = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/grns`);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/grn`);
       setGrns(res.data);
     } catch (error) {
       console.error("Failed to fetch GRNs", error);
@@ -143,6 +142,21 @@ const GRN = () => {
   useEffect(() => {
     fetchGrns();
   }, [fetchGrns]);
+
+  // next grn id
+  useEffect(() => {
+    if (grns.length > 0) {
+      const maxNo = Math.max(
+        ...grns.map((r) => {
+          const match = r.grnId?.match(/GRN-(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setNextGrnId((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setNextGrnId("001");
+    }
+  }, [grns]);
 
   // Handlers for form and table actions
   const handleAddClick = () => {
@@ -161,80 +175,91 @@ const GRN = () => {
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (grn) => {
-    setEditingGrn(grn);
-    setGrnId(grn.grnId);
-    setDate(formatDate(grn.date));
-    setGatePassIn(grn.gatePassIn);
-    setSupplier(grn.supplier?.supplierName || "");
-    setAddress(grn.address);
-    setPhone(grn.phone);
-    setItemsList(grn.items || []);
-    setIsEnable(grn.isEnable);
-    setIsSliderOpen(true);
+ const handleEditClick = (grn) => {
+  console.log("Editing GRN:", grn);
+
+  setEditingGrn(grn);
+  setGrnId(grn.grnId);
+  setDate(formatDate(grn.date));
+
+  // match qcId with dropdown option
+  const selectedGatePass = gatePassOptions.find((gp) => gp.qcId === grn.qcId);
+  setGatePassIn(selectedGatePass?._id || "");
+
+  setSupplier(grn.supplier?.supplierName || "");
+  setAddress(grn.supplier?.address || "");
+  setPhone(grn.supplier?.phoneNumber || "");
+
+  // map items correctly
+  setItemsList(
+    (grn.items || []).map((it) => ({
+      item: it.itemName,
+      qty: it.quantity,
+      description: it.description,
+    }))
+  );
+
+  setIsEnable(grn.isEnable);
+  setIsSliderOpen(true);
+};
+
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+
+
+  if ( !date || !gatePassIn) {
+    Swal.fire({
+      icon: "warning",
+      title: "Missing Fields",
+      text: "⚠️ Please fill in GRN ID, Date, and Gate Pass QC.",
+      confirmButtonColor: "#d33",
+    });
+    return;
+  }
+
+  const { token } = userInfo || {};
+  const headers = {
+    Authorization: `Bearer ${token}`,
+    "Content-Type": "application/json",
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (
-      !grnId ||
-      !date ||
-      !gatePassIn ||
-      !supplier ||
-      !address ||
-      !phone ||
-      itemsList.length === 0
-    ) {
-      Swal.fire({
-        icon: "warning",
-        title: "Missing Fields",
-        text: "⚠️ Please fill in all required fields and add at least one item.",
-        confirmButtonColor: "#d33",
-      });
-      return;
-    }
-
-    const { token } = userInfo || {};
-    const headers = {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-    };
-
-    const newGrn = {
-      grnId,
-      date,
-      gatePassIn,
-      supplier,
-      address,
-      phone,
-      items: itemsList,
-      isEnable,
-    };
-
-    try {
-      if (editingGrn) {
-        await axios.put(
-          `${import.meta.env.VITE_API_BASE_URL}/grns/${editingGrn._id}`,
-          newGrn,
-          { headers }
-        );
-        Swal.fire("Updated!", "GRN updated successfully.", "success");
-      } else {
-        await axios.post(`${import.meta.env.VITE_API_BASE_URL}/grns`, newGrn, {
-          headers,
-        });
-        Swal.fire("Added!", "GRN added successfully.", "success");
-      }
-
-      fetchGrns();
-      setIsSliderOpen(false);
-      setItemsList([]);
-    } catch (error) {
-      console.error("Error saving GRN", error);
-      Swal.fire("Error!", "Something went wrong while saving.", "error");
-    }
+  // ✅ Build payload exactly like your backend expects
+  const newGrn = {
+    grnId: editingGrn ? grnId : `GRN-${nextGRNId}`,
+    date,
+    qcId: gatePassIn,   // qcId instead of gatePassIn
   };
+  
+  
+
+  try {
+    if (editingGrn) {
+      await axios.put(
+        `${import.meta.env.VITE_API_BASE_URL}/grn/${editingGrn._id}`,
+        newGrn,
+        { headers }
+      );
+      Swal.fire("Updated!", "GRN updated successfully.", "success");
+    } else {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/grn`,
+        newGrn,
+        { headers }
+      );
+      Swal.fire("Added!", "GRN added successfully.", "success");
+    }
+
+    fetchGrns();
+    setIsSliderOpen(false);
+    setItemsList([]);
+  } catch (error) {
+    console.error("Error saving GRN", error);
+    Swal.fire("Error!", "Something went wrong while saving.", "error");
+  }
+};
+
 
   const formatDate = (date) => {
     if (!date) return "N/A";
@@ -316,6 +341,29 @@ const GRN = () => {
     setSelectedGrn(null);
   };
 
+  // handler function
+  const handleGatePassChange = (e) => {
+    const selectedId = e.target.value;
+    setGatePassIn(selectedId);
+setItemsList([]);
+    const selectedQC = gatePassOptions.find((gp) => gp._id === selectedId);
+    if (selectedQC) {
+      setSupplier(selectedQC.supplier?.supplierName || "");
+      setAddress(selectedQC.supplier?.address || "");
+      setPhone(selectedQC.supplier?.phoneNumber || "");
+
+      // ✅ Update itemOptions with QC items
+      const qcItems =
+        selectedQC.items?.map((it) => ({
+          _id: it._id,
+          itemName: it.itemName,
+          quantity: it.quantity,
+        })) || [];
+
+      setItemOptions(qcItems); // Only QC items will show in dropdown
+    }
+  };
+
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
       <CommanHeader />
@@ -351,7 +399,7 @@ const GRN = () => {
                 <div className="flex flex-col divide-y divide-gray-100">
                   {loading ? (
                     <TableSkeleton
-                      rows={3}
+                      rows={grns.length || 5}
                       cols={7}
                       className="lg:grid-cols-7"
                     />
@@ -365,18 +413,35 @@ const GRN = () => {
                         key={grn._id}
                         className="grid grid-cols-1 lg:grid-cols-7 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
+                        {/* GRN ID */}
                         <div className="font-medium text-gray-900">
                           {grn.grnId}
                         </div>
-                        <div className="text-gray-600">{grn.gatePassIn}</div>
+
+                        {/* QC ID */}
+                        <div className="text-gray-600">{grn.qcId || "N/A"}</div>
+
+                        {/* Supplier */}
                         <div className="text-gray-600">
                           {grn.supplier?.supplierName || "N/A"}
                         </div>
-                        <div className="text-gray-600">{grn.address}</div>
-                        <div className="text-gray-600">{grn.phone}</div>
+
+                        {/* Address */}
+                        <div className="text-gray-600">
+                          {grn.supplier?.address || "N/A"}
+                        </div>
+
+                        {/* Phone */}
+                        <div className="text-gray-600">
+                          {grn.supplier?.phoneNumber || "N/A"}
+                        </div>
+
+                        {/* Date */}
                         <div className="text-gray-500">
                           {formatDate(grn.date)}
                         </div>
+
+                        {/* Actions */}
                         <div className="flex justify-end gap-3">
                           <button
                             onClick={() => handleEditClick(grn)}
@@ -448,7 +513,7 @@ const GRN = () => {
                     </label>
                     <input
                       type="text"
-                      value={grnId}
+                      value={editingGrn ? grnId : `GRN-${nextGRNId}`}
                       onChange={(e) => setGrnId(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       placeholder="Enter GRN ID"
@@ -476,14 +541,14 @@ const GRN = () => {
                     </label>
                     <select
                       value={gatePassIn}
-                      onChange={(e) => setGatePassIn(e.target.value)}
+                      onChange={handleGatePassChange}
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       required
                     >
-                      <option value="">Select Gate Pass QC </option>
+                      <option value="">Select Gate Pass QC</option>
                       {gatePassOptions.map((gp) => (
-                        <option key={gp._id} value={gp.gatePassId}>
-                          {gp.gatePassId}
+                        <option key={gp._id} value={gp._id}>
+                          {gp.qcId}
                         </option>
                       ))}
                     </select>
@@ -496,6 +561,8 @@ const GRN = () => {
                     <input
                       type="text"
                       value={supplier}
+                      readOnly
+                      disabled
                       onChange={(e) => setSupplier(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       placeholder="Enter supplier name"
@@ -511,6 +578,8 @@ const GRN = () => {
                     <input
                       type="text"
                       value={address}
+                      readOnly
+                      disabled
                       onChange={(e) => setAddress(e.target.value)}
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       placeholder="Enter address"
@@ -526,6 +595,8 @@ const GRN = () => {
                       type="text"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
+                      readOnly
+                      disabled
                       className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       placeholder="Enter phone number"
                       required
@@ -543,12 +614,22 @@ const GRN = () => {
                         </label>
                         <select
                           value={item}
-                          onChange={(e) => setItem(e.target.value)}
+                          onChange={(e) => {
+                            const selectedId = e.target.value;
+                            setItem(selectedId);
+
+                            const selectedOption = itemOptions.find(
+                              (opt) => opt._id === selectedId
+                            );
+                            if (selectedOption) {
+                              setQty(selectedOption.quantity || 1); 
+                            }
+                          }}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                         >
                           <option value="">Select Item</option>
                           {itemOptions.map((opt) => (
-                            <option key={opt._id} value={opt.itemName}>
+                            <option key={opt._id} value={opt._id}>
                               {opt.itemName}
                             </option>
                           ))}
@@ -562,6 +643,8 @@ const GRN = () => {
                           type="number"
                           value={qty}
                           onChange={(e) => setQty(e.target.value)}
+                          readOnly
+                          disabled
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           placeholder="Enter quantity"
                           min="1"

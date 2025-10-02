@@ -4,47 +4,32 @@ import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
 import gsap from "gsap";
+import { api } from "../../../context/ApiService";
+import { toast } from "react-toastify";
 
 const Tax = () => {
-  const [taxes, setTaxes] = useState([
-    {
-      _id: "1",
-      taxName: "GST",
-      value: 18,
-    },
-    {
-      _id: "2",
-      taxName: "VAT",
-      value: 12,
-    },
-    {
-      _id: "3",
-      taxName: "Sales Tax",
-      value: 5,
-    },
-  ]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
-  const [loading, setLoading] = useState(true);
   const [taxName, setTaxName] = useState("");
-  const [value, setValue] = useState("");
+  const [taxes, setTaxes] = useState([]);
+
+  const [Value, setValue] = useState();
   const [searchTerm, setSearchTerm] = useState("");
   const [editingTax, setEditingTax] = useState(null);
   const [errors, setErrors] = useState({});
-  const [nextTaxId, setNextTaxId] = useState("004");
-  const [currentPage, setCurrentPage] = useState(1);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
+  const [loading, setLoading] = useState(true); // for table load
 
   // GSAP Animation for Modal
   useEffect(() => {
+    if (!sliderRef.current) return; // prevent null errors
+
     if (isSliderOpen) {
-      if (sliderRef.current) {
-        sliderRef.current.style.display = "block"; // ensure visible before animation
-      }
+      sliderRef.current.style.display = "block";
       gsap.fromTo(
         sliderRef.current,
-        { scale: 0.7, opacity: 0, y: -50 }, // start smaller & slightly above
+        { scale: 0.7, opacity: 0, y: -50 },
         { scale: 1, opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }
       );
     } else {
@@ -63,59 +48,93 @@ const Tax = () => {
     }
   }, [isSliderOpen]);
 
-  // Simulate fetching tax data
-  const fetchTaxes = useCallback(async () => {
+  // Fetch Module Data
+  const fetchModuleData = useCallback(async () => {
     try {
       setLoading(true);
-      // Static data already set in state
+      const data = await api.get("/taxes");
+      setTaxes(data);
+      console.log("====", data);
     } catch (error) {
-      console.error("Failed to fetch taxes", error);
+      console.error("Error fetching module data:", error);
+      setTaxes([]); // fallback to empty array
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setTimeout(() => setLoading(false), 1000);
     }
   }, []);
 
   useEffect(() => {
-    fetchTaxes();
-  }, [fetchTaxes]);
+    fetchModuleData();
+  }, [fetchModuleData]);
 
   // Tax search
   useEffect(() => {
     if (!searchTerm) {
-      fetchTaxes();
+      fetchModuleData(); // reload full list
       return;
     }
 
     const delayDebounce = setTimeout(() => {
       try {
         setLoading(true);
-        const filtered = taxes.filter((tax) =>
-          tax.taxName.toUpperCase().includes(searchTerm.toUpperCase())
+        setTaxes((prev) =>
+          prev.filter((tax) =>
+            tax.taxName.toUpperCase().includes(searchTerm.toUpperCase())
+          )
         );
-        setTaxes(filtered);
       } catch (error) {
         console.error("Search tax failed:", error);
         setTaxes([]);
       } finally {
         setLoading(false);
       }
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchTaxes, taxes]);
+  }, [searchTerm, fetchModuleData]);
 
-  // Generate next tax ID
-  useEffect(() => {
-    if (taxes.length > 0) {
-      const maxNo = Math.max(...taxes.map((t, index) => index + 1));
-      setNextTaxId((maxNo + 1).toString().padStart(3, "0"));
-    } else {
-      setNextTaxId("001");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!taxName && !Value) {
+      toast.error("Tax name and Value cannot be empty.");
+      return;
     }
-  }, [taxes]);
 
+    const value = Number(Value);
+
+    setLoading(true);
+    const payload = { taxName, value };
+    console.log("Payload", payload);
+    try {
+      let res;
+      if (editingTax) {
+        res = await api.put(`/taxes/${editingTax._id}`, payload, {
+          headers: {
+            Authorization: `Bearer ${userInfo?.token}`,
+          },
+        });
+        toast.success("Taxes updated!");
+      } else {
+        // ➕ Add new category
+        res = await api.post("/taxes", payload, {
+          headers: {
+            Authorization: `Bearer ${userInfo?.token}`,
+          },
+        });
+        toast.success("Taxes added!");
+      }
+
+      // Reset form state
+      resetForm();
+      fetchModuleData();
+    } catch (error) {
+      console.error(error);
+      toast.error(`❌ Failed to ${editingTax ? "update" : "add"} Tax.`);
+    } finally {
+      setLoading(false);
+    }
+  };
   // Reset form fields
   const resetForm = () => {
     setTaxName("");
@@ -123,27 +142,6 @@ const Tax = () => {
     setEditingTax(null);
     setErrors({});
     setIsSliderOpen(false);
-  };
-
-  // Validate form fields
-  const validateForm = () => {
-    const newErrors = {};
-    const trimmedTaxName = taxName.trim();
-    const trimmedValue = value.trim();
-    const parsedValue = parseFloat(value);
-
-    if (!trimmedTaxName) newErrors.taxName = "Tax Name is required";
-    if (
-      !trimmedValue ||
-      isNaN(parsedValue) ||
-      parsedValue < 0 ||
-      parsedValue > 100
-    ) {
-      newErrors.value = "Tax Value must be between 0 and 100";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
   };
 
   // Handlers for form and table actions
@@ -160,54 +158,9 @@ const Tax = () => {
     setIsSliderOpen(true);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
-    const newTax = {
-      taxName: taxName.trim(),
-      value: parseFloat(value),
-    };
-
-    try {
-      if (editingTax) {
-        setTaxes((prev) =>
-          prev.map((t) =>
-            t._id === editingTax._id ? { ...t, ...newTax, _id: t._id } : t
-          )
-        );
-        Swal.fire({
-          icon: "success",
-          title: "Updated!",
-          text: "Tax updated successfully.",
-          confirmButtonColor: "#3085d6",
-        });
-      } else {
-        setTaxes((prev) => [...prev, { ...newTax, _id: `temp-${Date.now()}` }]);
-        Swal.fire({
-          icon: "success",
-          title: "Added!",
-          text: "Tax added successfully.",
-          confirmButtonColor: "#3085d6",
-        });
-      }
-      fetchTaxes();
-      resetForm();
-    } catch (error) {
-      console.error("Error saving tax:", error);
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "Failed to save tax.",
-        confirmButtonColor: "#d33",
-      });
-    }
-  };
-
   const handleDelete = (id) => {
+    console.log("id", id);
+
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -232,6 +185,15 @@ const Tax = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
+            // ✅ Call API
+
+            const res = await api.delete(`/taxes/${id}`, {
+              headers: {
+                Authorization: `Bearer ${userInfo?.token}`,
+              },
+            });
+
+            // Remove from local state
             setTaxes((prev) => prev.filter((t) => t._id !== id));
             swalWithTailwindButtons.fire(
               "Deleted!",
@@ -250,16 +212,6 @@ const Tax = () => {
           swalWithTailwindButtons.fire("Cancelled", "Tax is safe 🙂", "error");
         }
       });
-  };
-
-  // Pagination logic
-  const indexOfLastRecord = currentPage * recordsPerPage;
-  const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = taxes.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(taxes.length / recordsPerPage);
-
-  const handlePageChange = (pageNumber) => {
-    setCurrentPage(pageNumber);
   };
 
   return (
@@ -303,18 +255,18 @@ const Tax = () => {
                     cols={3}
                     className="lg:grid-cols-[1fr_1fr_1fr]"
                   />
-                ) : currentRecords.length === 0 ? (
+                ) : taxes.length === 0 ? (
                   <div className="text-center py-4 text-gray-500 bg-white">
                     No taxes found.
                   </div>
                 ) : (
-                  currentRecords.map((tax) => (
+                  taxes.map((tax) => (
                     <div
                       key={tax._id}
                       className="grid grid-cols-1 lg:grid-cols-[1fr_1fr_1fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
-                      <div className="text-gray-600">{tax.taxName}</div>
-                      <div className="text-gray-600">{tax.value}</div>
+                      <div className="text-gray-600">{tax?.taxName}</div>
+                      <div className="text-gray-600">{tax?.value}</div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(tax)}
@@ -337,41 +289,6 @@ const Tax = () => {
               </div>
             </div>
           </div>
-
-          {/* Pagination Controls */}
-          {totalPages > 1 && (
-            <div className="flex justify-between my-4 px-10">
-              <div className="text-sm text-gray-600">
-                Showing {indexOfFirstRecord + 1} to{" "}
-                {Math.min(indexOfLastRecord, taxes.length)} of {taxes.length}{" "}
-                records
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => handlePageChange(currentPage - 1)}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => handlePageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-            </div>
-          )}
         </div>
 
         {isSliderOpen && (
@@ -421,7 +338,7 @@ const Tax = () => {
                   </label>
                   <input
                     type="number"
-                    value={value}
+                    value={Value}
                     onChange={(e) => setValue(e.target.value)}
                     className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
                       errors.value
@@ -444,11 +361,7 @@ const Tax = () => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                 >
-                  {loading
-                    ? "Saving..."
-                    : editingTax
-                    ? "Update Tax"
-                    : "Save Tax"}
+                  {loading ? "Saving..." : "Save Tax"}
                 </button>
               </form>
             </div>
