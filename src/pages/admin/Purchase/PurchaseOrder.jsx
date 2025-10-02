@@ -661,29 +661,40 @@ const PurchaseOrder = () => {
                   </span>
                 ) : (
                   estimationItems.length > 0 && (
-                    <div className="overflow-x-auto mt-4">
-                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-100">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden space-y-4">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
                           <tr>
-                            <th className="px-4 py-2 border">Item Name</th>
-                            <th className="px-4 py-2 border">Quantity</th>
-                            <th className="px-4 py-2 border">Price</th>
-                            <th className="px-4 py-2 border">Total</th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Item Name
+                            </th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Quantity
+                            </th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Price
+                            </th>
+                            <th className="px-4 py-2 border border-gray-300">
+                              Total
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
                           {estimationItems.map((item) => (
-                            <tr key={item._id}>
-                              <td className="px-4 text-center py-2 border">
+                            <tr
+                              key={item._id}
+                              className="bg-gray-100 text-center border border-gray-300"
+                            >
+                              <td className="px-4 text-center py-2 border border-gray-300">
                                 {item.itemName}
                               </td>
-                              <td className="px-4 text-center py-2 border">
+                              <td className="px-4 text-center py-2 border border-gray-300">
                                 {item.qty}
                               </td>
-                              <td className="px-4 text-center py-2 border">
+                              <td className="px-4 text-center py-2 border border-gray-300">
                                 {item.price}
                               </td>
-                              <td className="px-4 text-center py-2 border">
+                              <td className="px-4 text-center py-2 border border-gray-300">
                                 {item.total}
                               </td>
                             </tr>

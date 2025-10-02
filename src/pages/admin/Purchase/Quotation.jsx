@@ -737,7 +737,7 @@ const Quotation = () => {
                     )}
                   </div>
                 </div>
-                <div className="space-y-4">
+                <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
                   <div className="flex gap-4 mb-4">
                     <div className="flex gap-4 items-end">
                       <div className="flex-1 min-w-0">
@@ -810,26 +810,26 @@ const Quotation = () => {
                   </div>
 
                   {itemsList.length > 0 && (
-                    <div className="overflow-x-auto overflow-y-auto max-h-64 custom-scrollbar">
-                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
-                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <table className="w-full border-collapse">
+                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
                           <tr>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                            <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
                               Sr #
                             </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                            <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
                               Item Name
                             </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                            <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
                               Quantity
                             </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                            <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
                               Price
                             </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                            <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
                               Total
                             </th>
-                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                            <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
                               Remove
                             </th>
                           </tr>
@@ -840,16 +840,16 @@ const Quotation = () => {
                               <td className="px-4 py-2 border-b text-center">
                                 {idx + 1}
                               </td>
-                              <td className="px-4 py-2 text-center border-b">
+                              <td className="px-4 py-2 text-center border border-gray-300">
                                 {item.itemName}
                               </td>
-                              <td className="px-4 py-2 border-b text-center">
+                              <td className="px-4 py-2 border border-gray-300 text-center">
                                 {item.qty}
                               </td>
-                              <td className="px-4 py-2 border-b text-center">
+                              <td className="px-4 py-2 border border-gray-300 text-center">
                                 {item.price}
                               </td>
-                              <td className="px-4 py-2 border-b text-center">
+                              <td className="px-4 py-2 border border-gray-300 text-center">
                                 {item.total}
                               </td>
                               <td className="px-4 py-2 border-b text-center">
