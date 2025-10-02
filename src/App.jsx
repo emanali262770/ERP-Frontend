@@ -121,7 +121,7 @@ function AppContent() {
             <Route path="grn" element={<GRN />} />
             <Route path="gatepass-out" element={<GatePassOut />} />
             <Route path="rate-list" element={<RateList />} />
-            <Route path="distribution-rate-list" element={<DistributionRateList />} />
+            <Route path="distributor-rate-list" element={<DistributionRateList />} />
             <Route path="booking-orders" element={<BookingOrders />} />
             <Route path="delivery-challan" element={<DeliveryChallan />} />
             <Route path="store-acknowledgement" element={<StoreAcknowledgement />} />

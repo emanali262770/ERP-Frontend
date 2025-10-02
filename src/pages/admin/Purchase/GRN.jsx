@@ -63,6 +63,7 @@ const GRN = () => {
   const [selectedGrn, setSelectedGrn] = useState(null);
   const sliderRef = useRef(null);
   const [errors, setErrors] = useState({});
+  
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -531,7 +532,9 @@ const GRN = () => {
                     />
                   </div>
                 </div>
-                <div className="space-y-3">
+
+                {/* Section */}
+                <div className="space-y-4 border p-4 rounded-lg bg-formBgGray">
                   <div className="flex gap-4">
                     <div className="flex gap-4">
                       <div className="flex-1 min-w-0">

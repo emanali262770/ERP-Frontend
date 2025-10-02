@@ -1,13 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { Loader, SquarePen, Trash2 } from "lucide-react";
+import { Eye, Loader, SquarePen, Trash2 } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import axios from "axios";
 import { api } from "../../../context/ApiService";
+import ViewModel from "./ViewModel";
 
 const QualityChecking = () => {
   const [qualityChecks, setQualityChecks] = useState([]);
+  const [isView, setIsView] = useState(false);
+  const [selectedGatepass, setSelectedGatepass] = useState(null);
   const [gatePassList, setGatePassList] = useState([]);
   const [gatePassListItems, setGatePassListItems] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -27,7 +30,7 @@ const QualityChecking = () => {
   const [errors, setErrors] = useState({});
   const [nextQcId, setNextQcId] = useState("001");
   const [editingQualityChecks, setEditingQualityChecks] = useState(null);
-const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const sliderRef = useRef(null);
 
   // 🔹 ID Creation of Quality Checking
@@ -70,27 +73,6 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     );
     setQcModalOpen(false);
   };
-
-  // 🔹 Add this static mapping at the top of your component
-  const gatePassItems = {
-    GP001: [
-      { id: 1, name: "Laptop", qty: 5, price: 50000 },
-      { id: 2, name: "Notebook", qty: 10, price: 200 },
-    ],
-    GP002: [
-      { id: 3, name: "Keyboard", qty: 15, price: 1500 },
-      { id: 4, name: "Mouse", qty: 20, price: 700 },
-    ],
-  };
-
-  // 🔹 Whenever gpId changes, load items
-  useEffect(() => {
-    if (gpId && gatePassItems[gpId]) {
-      setItemsList(gatePassItems[gpId]);
-    } else {
-      setItemsList([]);
-    }
-  }, [gpId]);
 
   const formatDate = (date) => {
     if (!date) return "";
@@ -136,35 +118,35 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     fetchGatePassInn();
   }, [fetchGatePassInn]);
 
-  const fetchGatePassInnItems = useCallback(async () => {
-    if (!gpId) {
-      return;
-    }
-    try {
-      setItemsLoading(true);
-      const res = await axios.get(`${GATEPASS_URL}/${gpId}`);
-      const data = res.data;
+ const fetchGatePassInnItems = useCallback(async () => {
+  // Don’t fetch items if we’re editing an existing QC
+  if (!gpId || editingQC) {
+    return;
+  }
+  try {
+    setItemsLoading(true);
+    const res = await axios.get(`${GATEPASS_URL}/${gpId}`);
+    const data = res.data;
+    const items =
+      data?.withPO?.items?.length > 0
+        ? data.withPO.items
+        : data?.withoutPO?.items?.length > 0
+        ? data.withoutPO.items
+        : [];
+    setGatePassListItems(data);
+    setItemsList(items);  // only set itemsList when adding new QC
+  } catch (error) {
+    console.error("Failed to fetch gate pass", error);
+  } finally {
+    setItemsLoading(false);
+  }
+}, [gpId, editingQC]);
 
-      // ✅ Normalize items from withPO or withoutPO
-      const items =
-        data?.withPO?.items?.length > 0
-          ? data.withPO.items
-          : data?.withoutPO?.items?.length > 0
-          ? data.withoutPO.items
-          : [];
-
-      setGatePassListItems(data);
-      setItemsList(items); // ✅ now itemsList always has correct array
-      console.log("gate pass id items", items);
-    } catch (error) {
-      console.error("Failed to Gate pass", error);
-    } finally {
-      setItemsLoading(false);
-    }
-  }, [gpId]);
 
   useEffect(() => {
-    fetchGatePassInnItems();
+   
+      fetchGatePassInnItems();
+    
   }, [fetchGatePassInnItems]);
 
   // reset QC ID
@@ -172,6 +154,7 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
     setQcId(""); // reset QC ID
     setDate("");
     setItemsList([]);
+    setGpId('')
     setItemName("");
     setItemQuantity("");
     setDescription("");
@@ -189,15 +172,22 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   };
 
   const handleEditClick = (qc) => {
-    console.log({qc});
-    
+
+    console.log("Editing QC:", qc);
+
     setEditingQC(qc);
     setQcId(qc.qcId);
-    setDate(qc.date);
-    setItemsList(qc.items);
-    setDescription(qc.description);
-    setRemarks(qc.remarks);
-    setResult(qc.result);
+    setGpId(qc.gatePassIn?._id || "");
+    setDate(qc.date ? qc.date.split("T")[0] : "");
+    setItemsList(
+      (qc.items || []).map((i) => ({
+        ...i,
+        result: i.action, // normalize action -> result for consistency
+      }))
+    );
+    setDescription(qc.description || "");
+    setRemarks(qc.remarks || "");
+    setResult(qc.result || "");
     setIsSliderOpen(true);
   };
 
@@ -252,7 +242,7 @@ const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-const { token } = userInfo || {};
+    const { token } = userInfo || {};
     const headers = {
       Authorization: `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -265,19 +255,17 @@ const { token } = userInfo || {};
       items: itemsList.map((i) => ({
         itemName: i.itemName || i.name,
         quantity: i.quantity || i.qty,
-        action: i.action || i.result || "",
+       action: i.result || i.action || "",
         remarks: i.remarks || "",
       })),
     };
-  console.log(newQC);
-  
-
+    console.log(newQC);
 
     try {
       if (editingQC) {
         // Update existing
         await api.put(`/qualityCheck/${editingQC._id}`, newQC, {
-         headers
+          headers,
         });
 
         Swal.fire(
@@ -285,19 +273,13 @@ const { token } = userInfo || {};
           "Quality Checking updated successfully.",
           "success"
         );
-
-        setQualityChecks(
-          qualityChecks.map((q) => (q._id === editingQC._id ? newQC : q))
-        );
       } else {
         // Create new
-        await api.post("/qualityCheck", newQC, {headers});
+        await api.post("/qualityCheck", newQC, { headers });
 
         Swal.fire("Added!", "Quality Checking added successfully.", "success");
-
-       
       }
-      fetchQualityCheckInn()
+      fetchQualityCheckInn();
       resetForm();
     } catch (error) {
       console.error("Error saving quality checking", error);
@@ -315,12 +297,21 @@ const { token } = userInfo || {};
       icon: "warning",
       showCancelButton: true,
       confirmButtonText: "Yes, delete it!",
-    }).then((result) => {
+    }).then(async (result) => {
       if (result.isConfirmed) {
+        const { token } = userInfo || {};
+        const headers = {
+          Authorization: `Bearer ${token}`,
+        };
+        await api.delete(`/qualityCheck/${id}`, { headers });
         setQualityChecks(qualityChecks.filter((q) => q._id !== id));
         Swal.fire("Deleted!", "Record has been deleted.", "success");
       }
     });
+  };
+  const handleView = (qc) => {
+    setSelectedGatepass(qc);
+    setIsView(true);
   };
 
   return (
@@ -394,15 +385,23 @@ const { token } = userInfo || {};
                       <div className="flex gap-2 justify-end">
                         <button
                           onClick={() => handleEditClick(qc)}
-                          className="text-blue-600 hover:bg-blue-50 p-1 rounded"
+                          className="text-blue-600 hover:bg-blue-50 py-1 rounded"
                         >
                           <SquarePen size={18} />
                         </button>
                         <button
                           onClick={() => handleDelete(qc._id)}
-                          className="text-red-600 hover:bg-red-50 p-1 rounded"
+                          className=" py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                          title="Delete"
                         >
                           <Trash2 size={18} />
+                        </button>
+                        <button
+                          onClick={() => handleView(qc)}
+                          className="py-1 text-sm text-amber-600 hover:bg-amber-50"
+                          title="View"
+                        >
+                          <Eye size={18} />
                         </button>
                       </div>
                     </div>
@@ -418,7 +417,7 @@ const { token } = userInfo || {};
           <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50">
             <div
               ref={sliderRef}
-              className="w-full md:w-[500px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
+              className="w-full md:w-[650px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
@@ -469,86 +468,99 @@ const { token } = userInfo || {};
                   </div>
                 </div>
 
-                {/* Gate Pass In ID */}
-                <div>
-                  <label className="block text-gray-700 font-medium mb-1">
-                    Gate Pass In Id <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={gpId}
-                    onChange={(e) => setGpId(e.target.value)}
-                    className="w-full p-3 border rounded-md"
-                    required
-                  >
-                    <option value="">Select Gate Pass</option>
-                    {gatePassList?.map((gatepass) => (
-                      <option key={gatepass._id} value={gatepass._id}>
-                        {gatepass.gatePassId}
-                      </option>
+                {/* Section */}
+                <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
+                  {/* Gate Pass In ID */}
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-1">
+                      Gate Pass In Id <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={gpId}
+                      onChange={(e) => setGpId(e.target.value)}
+                      className="w-full p-3 border rounded-md"
+                      required
+                    >
+                      <option value="">Select Gate Pass</option>
+                      {gatePassList?.map((gatepass) => (
+                        <option key={gatepass._id} value={gatepass._id}>
+                          {gatepass.gatePassId}
+                        </option>
+                      ))}
+                    </select>
+
+                    {errors.gpId && (
+                      <p className="text-red-500 text-xs">{errors.gpId}</p>
+                    )}
+                  </div>
+
+                  {gpId &&
+                    (itemsLoading ? (
+                      <div className="flex justify-center py-4">
+                        <Loader size={24} className="animate-spin" />
+                      </div>
+                    ) : itemsList.length > 0 ? (
+                      <div className="border border-gray-200 rounded-lg overflow-hidden">
+                        <table className="w-full border-collapse">
+                          <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                            <tr>
+                              <th className="border border-gray-300 p-2">
+                                Item
+                              </th>
+                              <th className="border border-gray-300 p-2">
+                                Quantity
+                              </th>
+                              <th className="border border-gray-300 p-2">
+                                Action
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {itemsList.map((item, idx) => (
+                              <tr
+                                key={idx}
+                                className="bg-gray-100 text-center border border-gray-300"
+                              >
+                                <td className="border border-gray-300 p-2">
+                                  {item.itemName || item.name}
+                                </td>
+                                <td className="border border-gray-300 p-2">
+                                  {item.quantity || item.qty} {item.unit || ""}
+                                </td>
+                                <td className="border border-gray-300 p-2 text-center">
+                                  {item.result === "Upto Standard" ? (
+                                    <div
+                                      className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
+                                      onClick={() => openQcModal(item, idx)}
+                                    >
+                                      ✓
+                                    </div>
+                                  ) : item.result === "Damage" ||
+                                    item.result === "Rejected" ? (
+                                    <div
+                                      className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
+                                      onClick={() => openQcModal(item, idx)}
+                                    >
+                                      ✕
+                                    </div>
+                                  ) : (
+                                    <div
+                                      className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
+                                      onClick={() => openQcModal(item, idx)}
+                                    />
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    ) : (
+                      <div className="text-center py-4 text-gray-500">
+                        No items found
+                      </div>
                     ))}
-                  </select>
-
-                  {errors.gpId && (
-                    <p className="text-red-500 text-xs">{errors.gpId}</p>
-                  )}
                 </div>
-
-                {gpId &&
-                  (itemsLoading ? (
-                    <div className="flex justify-center py-4">
-                      <Loader size={24} className="animate-spin" />
-                    </div>
-                  ) : itemsList.length > 0 ? (
-                    <table className="w-full border mt-4">
-                      <thead className="bg-gray-100">
-                        <tr>
-                          <th className="border p-2">Item</th>
-                          <th className="border p-2">Quantity</th>
-                          <th className="border p-2">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {itemsList.map((item, idx) => (
-                          <tr key={idx} className="text-center">
-                            <td className="border p-2">
-                              {item.itemName || item.name}
-                            </td>
-                            <td className="border p-2">
-                              {item.quantity || item.qty} {item.unit || ""}
-                            </td>
-                            <td className="border p-2 text-center">
-                              {item.result === "Upto Standard" ? (
-                                <div
-                                  className="w-6 h-6 mx-auto rounded-full bg-green-500 text-white cursor-pointer"
-                                  onClick={() => openQcModal(item, idx)}
-                                >
-                                  ✓
-                                </div>
-                              ) : item.result === "Damage" ||
-                                item.result === "Rejected" ? (
-                                <div
-                                  className="w-6 h-6 mx-auto rounded-full bg-red-500 text-white cursor-pointer"
-                                  onClick={() => openQcModal(item, idx)}
-                                >
-                                  ✕
-                                </div>
-                              ) : (
-                                <div
-                                  className="w-6 h-6 border rounded-full cursor-pointer mx-auto"
-                                  onClick={() => openQcModal(item, idx)}
-                                />
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      No items found
-                    </div>
-                  ))}
-
                 <div>
                   <label className="block text-gray-700 font-medium mb-1">
                     Description
@@ -608,7 +620,7 @@ const { token } = userInfo || {};
                     type="radio"
                     name="qcResult"
                     value="Upto Standard"
-                   checked={modalResult === "Upto Standard"}
+                    checked={modalResult === "Upto Standard"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Upto Standard
@@ -618,7 +630,7 @@ const { token } = userInfo || {};
                     type="radio"
                     name="qcResult"
                     value="Damage"
-                    checked={modalResult === "Damage"} 
+                    checked={modalResult === "Damage"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Damage
@@ -628,7 +640,7 @@ const { token } = userInfo || {};
                     type="radio"
                     name="qcResult"
                     value="Rejected"
-                    checked={modalResult === "Rejected"} 
+                    checked={modalResult === "Rejected"}
                     onChange={(e) => setModalResult(e.target.value)}
                   />
                   Rejected
@@ -653,6 +665,13 @@ const { token } = userInfo || {};
           </div>
         )}
       </div>
+      {isView && selectedGatepass && (
+        <ViewModel
+          data={selectedGatepass}
+          type="qualityCheck"
+          onClose={() => setIsView(false)}
+        />
+      )}
     </div>
   );
 };
