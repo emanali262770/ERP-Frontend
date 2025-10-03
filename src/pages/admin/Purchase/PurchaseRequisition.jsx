@@ -17,6 +17,7 @@ const PurchaseRequisition = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [requisitionId, setRequisitionId] = useState("");
+  const [itemNameList, setItemNameList] = useState([]);
   const [date, setDate] = useState("");
   const [department, setDepartment] = useState("");
   const [employee, setEmployee] = useState("");
@@ -59,6 +60,29 @@ const PurchaseRequisition = () => {
     setItemName("");
     setQuantity("");
   };
+  // Fetch purchase orders
+  useEffect(() => {
+  if (!category || !category.categoryName) {
+    setItemNameList([]);
+    return;
+  }
+
+  const fetchRawCategories = async () => {
+    try {
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-details/raw-materials/${category.categoryName}`
+      );
+      setItemNameList(res.data);
+    } catch (error) {
+      console.error("Failed to fetch purchase orders", error);
+    }
+  };
+
+  fetchRawCategories();
+}, [category]);
+
+
+  console.log({ itemNameList });
 
   useEffect(() => {
     if (requisitions.length > 0) {
@@ -95,7 +119,7 @@ const PurchaseRequisition = () => {
     setDate(formatDate(requisition.date));
     setDepartment(requisition.department?._id || "");
     setEmployee(requisition.employee?._id || "");
-    setCategory(requisition.category?._id || "");
+    
     setRequirement(requisition.requirements || "");
     setDetails(requisition.details || "");
     setItemsList(requisition.items || []);
@@ -137,9 +161,11 @@ const PurchaseRequisition = () => {
       employee,
       requirements: requirement,
       details,
-      category,
+      category:category._id,
       items: itemsList,
     };
+    console.log({newRequisition});
+    
 
     try {
       if (editingRequisition) {
@@ -558,8 +584,20 @@ const PurchaseRequisition = () => {
                           Category <span className="text-red-500">*</span>
                         </label>
                         <select
-                          value={category}
-                          onChange={(e) => setCategory(e.target.value)}
+                          value={category?._id || ""}
+                          onChange={(e) => {
+                            const selected = categoryList.find(
+                              (cat) => cat._id === e.target.value
+                            );
+                            setCategory(
+                              selected
+                                ? {
+                                    _id: selected._id,
+                                    categoryName: selected.categoryName,
+                                  }
+                                : ""
+                            );
+                          }}
                           className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                           required
                         >
@@ -576,13 +614,18 @@ const PurchaseRequisition = () => {
                           <label className="block text-gray-700 font-medium mb-2">
                             Item Name
                           </label>
-                          <input
-                            type="text"
+                          <select
                             value={itemName}
                             onChange={(e) => setItemName(e.target.value)}
                             className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                            placeholder="Enter item name"
-                          />
+                          >
+                            <option value="">Select Item Name</option>
+                            {itemNameList.map((item) => (
+                              <option key={item._id} value={item.itemName}>
+                                {item.itemName}
+                              </option>
+                            ))}
+                          </select>
                         </div>
 
                         <div>
