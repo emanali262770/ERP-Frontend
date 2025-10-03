@@ -585,290 +585,284 @@ const Quotation = () => {
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                {/* Section */}
-                <div className="space-y-8">
-                  <div className="border p-4 rounded-lg bg-formBgGray space-y-4 px-4 py-8">
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Quotation No. <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={
-                            editingQuotation
-                              ? quotationNo
-                              : `QuotNo-${nextQuatation}`
-                          }
-                          readOnly
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.quotationNo
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter quotation number"
-                          required
-                        />
-                        {errors.quotationNo && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.quotationNo}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Supplier <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={supplier}
-                          onChange={(e) => setSupplier(e.target.value)}
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.supplier
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          required
-                        >
-                          <option value="">Select Supplier</option>
-                          {supplierList?.map((supplier) => (
-                            <option key={supplier._id} value={supplier._id}>
-                              {supplier?.supplierName}
-                            </option>
-                          ))}
-                        </select>
-                        {errors.supplier && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.supplier}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          For Demand <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={forDemand}
-                          onChange={(e) => setForDemand(e.target.value)}
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.forDemand
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          required
-                        >
-                          <option value="">Select Demand Item</option>
-                          {demandList?.map((demand) => (
-                            <option key={demand._id} value={demand._id}>
-                              {demand?.demandItem}
-                            </option>
-                          ))}
-                        </select>
-                        {errors.forDemand && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.forDemand}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Person <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={person}
-                          onChange={(e) => setPerson(e.target.value)}
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.person
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter person name"
-                          required
-                        />
-                        {errors.person && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.person}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Created By <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={createdBy}
-                          readOnly
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.createdBy
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter created by"
-                          required
-                        />
-                        {errors.createdBy && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.createdBy}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Designation <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={designation}
-                          onChange={(e) => setDesignation(e.target.value)}
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.designation
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter designation"
-                          required
-                        />
-                        {errors.designation && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.designation}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border p-4 rounded-lg bg-formBgGray space-y-4 px-4 py-8">
-                    <div className="flex gap-4">
-                      <div className="flex gap-4 items-end">
-                        <div className="flex-1 min-w-0">
-                          <label className="block text-gray-700 font-medium mb-2">
-                            Item Name <span className="text-red-500">*</span>
-                          </label>
-                          <select
-                            value={selectedItem}
-                            onChange={(e) => setSelectedItem(e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                          >
-                            <option value="">Select item</option>
-                            {demandItems.map((item) => (
-                              <option key={item._id} value={item._id}>
-                                {item.itemName}
-                              </option>
-                            ))}
-                          </select>
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <label className="block text-gray-700 font-medium mb-2">
-                            Item Quantity{" "}
-                            <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            value={demandItemQuantity}
-                            readOnly
-                            placeholder="Quantity"
-                            className="w-full p-3 border border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex gap-4 items-end">
-                        <div className="flex-1">
-                          <label className="block text-gray-700 font-medium mb-2">
-                            Price <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            value={price}
-                            onChange={(e) => setPrice(e.target.value)}
-                            className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                            placeholder="Enter price"
-                            min="0"
-                            step="0.01"
-                          />
-                        </div>
-                        <div className="flex-1">
-                          <label className="block text-gray-700 font-medium mb-2">
-                            Total <span className="text-red-500">*</span>
-                          </label>
-                          <input
-                            type="number"
-                            value={totalAmount}
-                            readOnly
-                            placeholder="Total"
-                            className="w-full p-3 border border-gray-300 rounded-md"
-                          />
-                        </div>
-                      </div>
-                      <div className="flex items-end justify-end">
-                        <button
-                          type="button"
-                          onClick={handleAddItem}
-                          className="px-6 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex items-center justify-center gap-2"
-                        >
-                          <span>+</span> Add
-                        </button>
-                      </div>
-                    </div>
-
-                    {itemsList.length > 0 && (
-                      <div className="border border-gray-200 rounded-lg overflow-hidden">
-                        <table className="w-full border-collapse">
-                          <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
-                            <tr>
-                              <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
-                                Sr #
-                              </th>
-                              <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
-                                Item Name
-                              </th>
-                              <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
-                                Quantity
-                              </th>
-                              <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
-                                Price
-                              </th>
-                              <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
-                                Total
-                              </th>
-                              <th className="px-6 py-2 whitespace-nowrap border border-gray-300">
-                                Remove
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="text-gray-700 text-sm">
-                            {itemsList.map((item, idx) => (
-                              <tr key={idx} className="hover:bg-gray-50">
-                                <td className="px-4 py-2 border-b text-center">
-                                  {idx + 1}
-                                </td>
-                                <td className="px-4 py-2 text-center border border-gray-300">
-                                  {item.itemName}
-                                </td>
-                                <td className="px-4 py-2 border border-gray-300 text-center">
-                                  {item.qty}
-                                </td>
-                                <td className="px-4 py-2 border border-gray-300 text-center">
-                                  {item.price}
-                                </td>
-                                <td className="px-4 py-2 border border-gray-300 text-center">
-                                  {item.total}
-                                </td>
-                                <td className="px-4 py-2 border-b text-center">
-                                  <button onClick={() => handleRemoveItem(idx)}>
-                                    <X size={18} className="text-red-600" />
-                                  </button>
-                                </td>
-                              </tr>
-                            ))}
-                          </tbody>
-                        </table>
-                      </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Quotation No. <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={
+                        editingQuotation
+                          ? quotationNo
+                          : `QuotNo-${nextQuatation}`
+                      }
+                      readOnly
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.quotationNo
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter quotation number"
+                      required
+                    />
+                    {errors.quotationNo && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.quotationNo}
+                      </p>
                     )}
                   </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Supplier <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={supplier}
+                      onChange={(e) => setSupplier(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.supplier
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="">Select Supplier</option>
+                      {supplierList?.map((supplier) => (
+                        <option key={supplier._id} value={supplier._id}>
+                          {supplier?.supplierName}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.supplier && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.supplier}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      For Demand <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      value={forDemand}
+                      onChange={(e) => setForDemand(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.forDemand
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      required
+                    >
+                      <option value="">Select Demand Item</option>
+                      {demandList?.map((demand) => (
+                        <option key={demand._id} value={demand._id}>
+                          {demand?.demandItem}
+                        </option>
+                      ))}
+                    </select>
+                    {errors.forDemand && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.forDemand}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Person <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={person}
+                      onChange={(e) => setPerson(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.person
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter person name"
+                      required
+                    />
+                    {errors.person && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.person}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="flex gap-4">
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Created By <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={createdBy}
+                      readOnly
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.createdBy
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter created by"
+                      required
+                    />
+                    {errors.createdBy && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.createdBy}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Designation <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={designation}
+                      onChange={(e) => setDesignation(e.target.value)}
+                      className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                        errors.designation
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
+                      }`}
+                      placeholder="Enter designation"
+                      required
+                    />
+                    {errors.designation && (
+                      <p className="text-red-500 text-xs mt-1">
+                        {errors.designation}
+                      </p>
+                    )}
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  <div className="flex gap-4 mb-4">
+                    <div className="flex gap-4 items-end">
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Item Name <span className="text-red-500">*</span>
+                        </label>
+                        <select
+                          value={selectedItem}
+                          onChange={(e) => setSelectedItem(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        >
+                          <option value="">Select item</option>
+                          {demandItems.map((item) => (
+                            <option key={item._id} value={item._id}>
+                              {item.itemName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Item Quantity <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={demandItemQuantity}
+                          readOnly
+                          placeholder="Quantity"
+                          className="w-full p-3 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-4 items-end">
+                      <div className="flex-1">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Price <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={price}
+                          onChange={(e) => setPrice(e.target.value)}
+                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                          placeholder="Enter price"
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="block text-gray-700 font-medium mb-2">
+                          Total <span className="text-red-500">*</span>
+                        </label>
+                        <input
+                          type="number"
+                          value={totalAmount}
+                          readOnly
+                          placeholder="Total"
+                          className="w-full p-3 border border-gray-300 rounded-md"
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-end justify-end">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="px-6 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex items-center justify-center gap-2"
+                      >
+                        <span>+</span> Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {itemsList.length > 0 && (
+                    <div className="overflow-x-auto overflow-y-auto max-h-64 custom-scrollbar">
+                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                          <tr>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Sr #
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Item Name
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Quantity
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Price
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Total
+                            </th>
+                            <th className="px-6 py-2 whitespace-nowrap border-b">
+                              Remove
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-gray-700 text-sm">
+                          {itemsList.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 border-b text-center">
+                                {idx + 1}
+                              </td>
+                              <td className="px-4 py-2 text-center border-b">
+                                {item.itemName}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.qty}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.price}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.total}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                <button onClick={() => handleRemoveItem(idx)}>
+                                  <X size={18} className="text-red-600" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
                 </div>
                 <button
                   type="submit"

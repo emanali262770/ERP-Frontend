@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import gsap from "gsap";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
-import { SquarePen, Trash2, X } from "lucide-react";
+import { SquarePen, X } from "lucide-react";
 import TableSkeleton from "../Skeleton";
 
 const PurchaseReturn = () => {
@@ -19,6 +19,7 @@ const PurchaseReturn = () => {
   const [poId, setPoId] = useState("");
   const [items, setItems] = useState([]);
 
+  // Item states
   const [itemName, setItemName] = useState("");
   const [qty, setQty] = useState("");
   const [priceQty, setPriceQty] = useState("");
@@ -38,13 +39,7 @@ const PurchaseReturn = () => {
     }
   }, [isSliderOpen]);
 
-  // Handlers
-  const handleAddReturn = () => {
-    resetForm();
-    setIsSliderOpen(true);
-    setIsEdit(false);
-  };
-
+  // Reset form
   const resetForm = () => {
     setReturnId("");
     setDate("");
@@ -55,18 +50,27 @@ const PurchaseReturn = () => {
     setItemName("");
     setQty("");
     setPriceQty("");
+    setSelectedItemIndex(null);
+    setIsItemSelected(false);
     setEditId(null);
   };
 
-  // Add items
+  // Add return
+  const handleAddReturn = () => {
+    resetForm();
+    setIsSliderOpen(true);
+    setIsEdit(false);
+  };
+
+  // Add / Update items
   const handleAddItem = () => {
     if (!itemName || !qty) return;
 
     const newItem = {
       id: Date.now(),
       name: itemName,
-      qty: parseInt(qty),
-      price: parseInt(priceQty) || 0,
+      qty: parseFloat(qty),
+      price: parseFloat(priceQty) || 0,
     };
 
     if (selectedItemIndex !== null) {
@@ -74,9 +78,11 @@ const PurchaseReturn = () => {
       const updatedItems = [...items];
       updatedItems[selectedItemIndex] = newItem;
       setItems(updatedItems);
+      Swal.fire("Updated!", "Item updated successfully", "success");
     } else {
       // Add new item
       setItems([...items, newItem]);
+      Swal.fire("Added!", "Item added successfully", "success");
     }
 
     // Reset inputs
@@ -87,6 +93,7 @@ const PurchaseReturn = () => {
     setIsItemSelected(false);
   };
 
+  // Save return
   const handleSave = () => {
     const newReturn = {
       id: isEdit ? editId : Date.now(),
@@ -110,6 +117,7 @@ const PurchaseReturn = () => {
     resetForm();
   };
 
+  // Edit return
   const handleEdit = (ret) => {
     setIsEdit(true);
     setIsSliderOpen(true);
@@ -122,14 +130,12 @@ const PurchaseReturn = () => {
     setItems(ret.items);
   };
 
-  function handleRemoveItem(index) {
-    setItems(items.filter((_, i) => i !== index));
-  }
-
-  function handleRemoveItem(idx) {
+  // Remove item
+  const handleRemoveItem = (idx) => {
     const updatedItems = items.filter((_, index) => index !== idx);
     setItems(updatedItems);
-  }
+  };
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <CommanHeader />
@@ -212,7 +218,10 @@ const PurchaseReturn = () => {
               </h2>
               <button
                 className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
-                onClick={() => setIsSliderOpen(false)}
+                onClick={() => {
+                  setIsSliderOpen(false);
+                  resetForm();
+                }}
               >
                 ×
               </button>
@@ -240,6 +249,7 @@ const PurchaseReturn = () => {
                   />
                 </div>
               </div>
+
               <div className="flex gap-4">
                 <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">
@@ -251,7 +261,6 @@ const PurchaseReturn = () => {
                       const selectedGatePass = e.target.value;
                       setGatePass(selectedGatePass);
 
-                      // Example: auto-fill Supplier & PO ID based on selected gate pass
                       if (selectedGatePass === "GP001") {
                         setSupplier("ABC Supplier");
                         setPoId("PO12345");
@@ -270,7 +279,7 @@ const PurchaseReturn = () => {
                     value={supplier}
                     onChange={(e) => setSupplier(e.target.value)}
                     className="w-full p-2 border rounded"
-                    disabled={!gatePass} // disabled if no gatePass selected
+                    disabled={!gatePass}
                   />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -280,22 +289,22 @@ const PurchaseReturn = () => {
                     value={poId}
                     onChange={(e) => setPoId(e.target.value)}
                     className="w-full p-2 border rounded"
-                    disabled={!gatePass} // disabled if no gatePass selected
+                    disabled={!gatePass}
                   />
                 </div>
               </div>
+
+              {/* Items Section */}
               <div className="flex gap-4">
-                {/* Items Section */}
                 <div className="flex-1 min-w-0">
                   <label className="text-gray-700 font-medium">Item Name</label>
                   <select
-                    value={itemName} // make sure select shows the current itemName
+                    value={itemName}
                     onChange={(e) => {
                       const value = e.target.value;
-                      setItemName(value); // update state
-                      setIsItemSelected(value !== ""); // enable inputs
+                      setItemName(value);
+                      setIsItemSelected(value !== "");
 
-                      // Auto-fill qty & price if item exists in items list
                       const existingItem = items.find(
                         (it) => it.name === value
                       );
@@ -319,23 +328,10 @@ const PurchaseReturn = () => {
                 </div>
               </div>
 
-              {/* Items Section Inputs*/}
-
+              {/* Items Section Inputs */}
               <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
-
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
-
                 <div className="flex gap-4 mb-3">
-                  <div className="flex-1 min-w-0">
-                    <input
-                      type="text"
-                      placeholder="Item Name"
-                      value={itemName}
-                      onChange={(e) => setItemName(e.target.value)}
-                      className="w-full p-2 border rounded"
-                      disabled={!isItemSelected}
-                    />
-                  </div>
                   <div className="flex-1 min-w-0">
                     <input
                       type="number"
@@ -360,77 +356,74 @@ const PurchaseReturn = () => {
                     <button
                       type="button"
                       onClick={handleAddItem}
-                      className="px-3 bg-newPrimary hover:bg-blue-600 text-white rounded flex items-center h-full w-full justify-center flex-1 min-w-0 text-sm whitespace-nowrap"
+                      className="px-3 bg-newPrimary hover:bg-blue-600 text-white rounded flex items-center h-full justify-center flex-1 min-w-0 text-sm whitespace-nowrap"
                     >
-                      Update Item
+                      {selectedItemIndex !== null ? "Update Item" : "Add Item"}
                     </button>
                   </div>
                 </div>
-                {/* Items Table */}
-                {items.length > 0 && (
-                  <div className="overflow-x-auto">
-                    <div className="border border-gray-200 rounded-lg overflow-hidden">
-                      <table className="w-full border-collapse text-sm">
-
-                        <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
-
-                          <tr>
-                            <th className="border border-gray-300 px-2 py-1">
-                              Item
-                            </th>
-                            <th className="border border-gray-300 px-2 py-1">
-                              Qty
-                            </th>
-                            <th className="border border-gray-300 px-2 py-1">
-                              Price
-                            </th>
-                            <th className="border border-gray-300 px-2 py-1">
-                              Remove
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {items.map((it, idx) => (
-                            <tr
-                              key={it.id}
-                              onClick={() => {
-                                setItemName(it.name);
-                                setQty(it.qty);
-                                setPriceQty(it.price);
-
-                                setSelectedItemIndex(idx);
-                                setIsItemSelected(true);
-                              }}
-                              className="cursor-pointer hover:bg-gray-100"
-                            >
-                              <td className="border border-gray-300 text-center px-2 py-1">
-                                {it.name}
-                              </td>
-                              <td className="border border-gray-300 text-center px-2 py-1">
-                                {it.qty}
-                              </td>
-                              <td className="border border-gray-300 text-center px-2 py-1">
-                                {it.price}
-                              </td>
-
-                              <td className="px-4 py-2 border-b border-gray-300 text-center">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation(); // prevent row click from triggering edit
-                                    handleRemoveItem(idx);
-                                  }}
-                                >
-                                  <X size={18} className="text-red-600 " />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
               </div>
+
+              {/* Items Table */}
+              {items.length > 0 && (
+                <div className="overflow-x-auto">
+                  <div className="border border-gray-200 rounded-lg overflow-hidden">
+                    <table className="w-full border-collapse text-sm">
+                      <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
+                        <tr>
+                          <th className="border border-gray-300 px-2 py-1">
+                            Item
+                          </th>
+                          <th className="border border-gray-300 px-2 py-1">
+                            Qty
+                          </th>
+                          <th className="border border-gray-300 px-2 py-1">
+                            Price
+                          </th>
+                          <th className="border border-gray-300 px-2 py-1">
+                            Remove
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {items.map((it, idx) => (
+                          <tr
+                            key={it.id}
+                            onClick={() => {
+                              setItemName(it.name);
+                              setQty(it.qty);
+                              setPriceQty(it.price);
+                              setSelectedItemIndex(idx);
+                              setIsItemSelected(true);
+                            }}
+                            className="cursor-pointer hover:bg-gray-100"
+                          >
+                            <td className="border border-gray-300 text-center px-2 py-1">
+                              {it.name}
+                            </td>
+                            <td className="border border-gray-300 text-center px-2 py-1">
+                              {it.qty}
+                            </td>
+                            <td className="border border-gray-300 text-center px-2 py-1">
+                              {it.price}
+                            </td>
+                            <td className="px-4 py-2 border-b border-gray-300 text-center">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleRemoveItem(idx);
+                                }}
+                              >
+                                <X size={18} className="text-red-600 " />
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
 
               {/* Save Button */}
               <button
