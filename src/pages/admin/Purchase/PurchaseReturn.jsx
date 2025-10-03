@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import gsap from "gsap";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
-import { SquarePen, Trash2, X } from "lucide-react";
+import { Eye, SquarePen, Trash2, X } from "lucide-react";
 import TableSkeleton from "../Skeleton";
-
+import { api } from "../../../context/ApiService";
 const PurchaseReturn = () => {
   const [returnList, setReturnList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [editId, setEditId] = useState(null);
-
+  const [loading, setLoading] = useState(true);
+  const [gatepasses, setGatepasses] = useState([]);
   // Form states
   const [returnId, setReturnId] = useState("");
   const [date, setDate] = useState("");
@@ -24,7 +25,7 @@ const PurchaseReturn = () => {
   const [priceQty, setPriceQty] = useState("");
   const [isItemSelected, setIsItemSelected] = useState(false);
   const [selectedItemIndex, setSelectedItemIndex] = useState(null);
-
+  const [nextPurchaseReturnId, setNextPurchaseReturnId] = useState("001");
   const sliderRef = useRef(null);
 
   // Animate Slider
@@ -37,6 +38,56 @@ const PurchaseReturn = () => {
       );
     }
   }, [isSliderOpen]);
+
+  //  Fetch Purchase Return
+  const fetchReturnPurchase = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await api.get("/returnPurchase");
+      setReturnList(res);
+      console.log("item unit ", res);
+    } catch (error) {
+      console.error("Failed to fetch item unit", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchReturnPurchase();
+  }, [fetchReturnPurchase]);
+
+  // next gass pass id creation
+  useEffect(() => {
+    if (returnList.length > 0) {
+      const maxNo = Math.max(
+        ...returnList.map((r) => {
+          const match = r.returnId?.match(/RETURN-(\d+)/);
+          return match ? parseInt(match[1], 10) : 0;
+        })
+      );
+      setNextPurchaseReturnId((maxNo + 1).toString().padStart(3, "0"));
+    } else {
+      setNextPurchaseReturnId("001");
+    }
+  }, [returnList]);
+
+  // gate pass inn fetch
+  const fetchGatePassInn = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await api.get(`/gatePassIn`);
+      setGatepasses(res); // store actual categories array
+      console.log("gate pass Inn  ", res);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchGatePassInn();
+  }, [fetchGatePassInn]);
 
   // Handlers
   const handleAddReturn = () => {
@@ -130,6 +181,12 @@ const PurchaseReturn = () => {
     const updatedItems = items.filter((_, index) => index !== idx);
     setItems(updatedItems);
   }
+  const handleView = (gatepass) => {
+    setSelectedGatepass(gatepass);
+    setIsView(true);
+  };
+  console.log({ returnList });
+
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
       <CommanHeader />
@@ -157,38 +214,59 @@ const PurchaseReturn = () => {
         <div className="overflow-x-auto">
           <div className="min-w-[1000px]">
             {/* Table Header */}
-            <div className="hidden lg:grid grid-cols-[120px_120px_150px_150px_150px_auto] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase">
+            <div className="hidden lg:grid grid-cols-5 gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase">
               <div>Return ID</div>
               <div>Date</div>
-              <div>Gate Pass</div>
-              <div>Supplier</div>
-              <div>PO ID</div>
-              <div className="text-right">Actions</div>
+              <div>Gate Pass ID</div>
+              <div>Total Items</div>
+              <div className={`${loading ? "" : "text-right"}`}>Actions</div>
             </div>
 
             {/* Table Body */}
-            <div className="flex flex-col divide-y divide-gray-100 max-h-[400px] overflow-y-auto">
-              {returnList.length === 0 ? (
+
+            <div className="flex flex-col divide-y divide-gray-100 max-h-screen overflow-y-auto">
+              {loading ? (
+                <TableSkeleton
+                  rows={returnList.length || 5}
+                  cols={5}
+                  className="lg:grid-cols-5"
+                />
+              ) : returnList.length === 0 ? (
                 <div className="text-center py-4 text-gray-500 bg-white">
                   No returns found.
                 </div>
               ) : (
                 returnList.map((r) => (
                   <div
-                    key={r.id}
-                    className="hidden lg:grid grid-cols-[120px_120px_150px_150px_150px_auto] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50"
+                    key={r._id}
+                    className="hidden lg:grid grid-cols-5 items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50"
                   >
                     <div>{r.returnId}</div>
-                    <div>{r.date}</div>
-                    <div>{r.gatePass}</div>
-                    <div>{r.supplier}</div>
-                    <div>{r.poId}</div>
-                    <div className="flex justify-end gap-3">
+                    <div>{new Date(r.date).toLocaleDateString()}</div>
+                    <div>{r.gatePassId || "N/A"}</div>
+                    <div>{r.items?.length || 0}</div>
+                    <div
+                      className={`${loading ? "" : "flex justify-end gap-3"}`}
+                    >
                       <button
                         onClick={() => handleEdit(r)}
                         className="text-blue-600 hover:underline"
                       >
                         <SquarePen size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleDelete(r._id)}
+                        className=" py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
+                        title="Delete"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                      <button
+                        onClick={() => handleView(r)}
+                        className="py-1 text-sm text-amber-600 hover:bg-amber-50"
+                        title="View"
+                      >
+                        <Eye size={18} />
                       </button>
                     </div>
                   </div>
@@ -225,7 +303,7 @@ const PurchaseReturn = () => {
                   <label className="text-gray-700 font-medium">Return ID</label>
                   <input
                     type="text"
-                    value={returnId}
+                    value={editId ? returnId : `RETURN-${nextPurchaseReturnId}`}
                     onChange={(e) => setReturnId(e.target.value)}
                     className="w-full p-2 border rounded"
                   />
@@ -248,19 +326,16 @@ const PurchaseReturn = () => {
                   <select
                     value={gatePass}
                     onChange={(e) => {
-                      const selectedGatePass = e.target.value;
-                      setGatePass(selectedGatePass);
-
-                      // Example: auto-fill Supplier & PO ID based on selected gate pass
-                      if (selectedGatePass === "GP001") {
-                        setSupplier("ABC Supplier");
-                        setPoId("PO12345");
-                      }
+                      setGatePass(e.target.value);
                     }}
                     className="w-full p-2 border rounded"
                   >
                     <option value="">Select Gate Pass</option>
-                    <option value="GP001">GP001</option>
+                    {gatepasses?.map((gatepass) => (
+                      <option key={gatepass._id} value={gatepass._id}>
+                        {gatepass.gatePassId}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div className="flex-1 min-w-0">
@@ -322,7 +397,6 @@ const PurchaseReturn = () => {
               {/* Items Section Inputs*/}
 
               <div className="border p-4 rounded-lg bg-formBgGray space-y-4">
-
                 <h3 className="font-semibold text-gray-800 mb-2">Items</h3>
 
                 <div className="flex gap-4 mb-3">
@@ -371,9 +445,7 @@ const PurchaseReturn = () => {
                   <div className="overflow-x-auto">
                     <div className="border border-gray-200 rounded-lg overflow-hidden">
                       <table className="w-full border-collapse text-sm">
-
                         <thead className="bg-gray-200 text-gray-600 text-sm border border-gray-300">
-
                           <tr>
                             <th className="border border-gray-300 px-2 py-1">
                               Item

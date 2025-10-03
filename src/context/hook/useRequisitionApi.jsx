@@ -59,7 +59,7 @@ export const useCategories = () => {
     const fetchCategories = async () => {
       try {
         setLoading(true);
-        const data = await api.get("/categories/list");
+        const data = await api.get("/categories");
         setCategories(data);
       } catch (error) {
         console.error("Failed to fetch Categories", error);
