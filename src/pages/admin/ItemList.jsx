@@ -11,6 +11,7 @@ import CommanHeader from "../../components/CommanHeader";
 
 const ItemList = () => {
   const [categoryList, setCategoryList] = useState([]);
+  const [nextItemCategoryId, setNextItemCategoryId] = useState("001");
   const [itemUnitList, setItemUnitList] = useState([]);
   const [manufacturerList, setManufacturerList] = useState([]);
   const [supplierList, setSupplierList] = useState([]);
@@ -25,6 +26,8 @@ const ItemList = () => {
   const [itemKind, setItemKind] = useState("");
   const [itemType, setItemType] = useState("");
   const [itemName, setItemName] = useState("");
+  const [itemCategoryId, setItemCategoryId] = useState("");
+  const [primaryBarcode, setPrimaryBarcode] = useState("");
   const [details, setDetails] = useState("");
   const [manufacture, setManufacture] = useState("");
   const [supplier, setSupplier] = useState("");
@@ -47,6 +50,14 @@ const ItemList = () => {
   const [itemTypeList, setItemTypeList] = useState([]);
 
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+
+  // Utility to generate random barcode string
+const generateRandomBarcode = () => {
+  const prefix = "PBC"; // you can change prefix
+  const randomPart = Math.random().toString(36).substring(2, 10).toUpperCase();
+  return `${prefix}-${randomPart}`;
+};
 
   // GSAP Animation for Modal
   useEffect(() => {
@@ -93,6 +104,22 @@ const ItemList = () => {
   useEffect(() => {
     fetchData();
   }, [fetchData]);
+
+  // next gass pass id creation
+   useEffect(() => {
+  if (itemList.length > 0) {
+    const maxNo = Math.max(
+      ...itemList.map((r) => {
+        const match = r.itemId?.match(/ITEM-(\d+)/); 
+        return match ? parseInt(match[1], 10) : 0;
+      })
+    );
+    setNextItemCategoryId((maxNo + 1).toString().padStart(3, "0"));
+  } else {
+    setNextItemCategoryId("001");
+  }
+}, [itemList]);
+
 
   // CategoryList Fetch
   const fetchCategoryList = useCallback(async () => {
@@ -235,6 +262,7 @@ const ItemList = () => {
     setImagePreview(null);
     setExpiryOption("NoExpiry");
     setExpiryDay("");
+    setPrimaryBarcode(generateRandomBarcode());
   };
   // form validation
   const validateForm = () => {
@@ -277,6 +305,7 @@ const ItemList = () => {
 
     const formData = new FormData();
 
+    formData.append("itemId", editId? itemCategoryId: `ITEM-${nextItemCategoryId}`);
     formData.append("itemName", itemName);
     formData.append("itemCategory", itemCategory.id);
     formData.append("manufacturer", manufacture);
@@ -290,6 +319,7 @@ const ItemList = () => {
     formData.append("perUnit", parseInt(perUnit) || 0);
     formData.append("reorder", parseInt(reorder) || 0);
     formData.append("isEnable", enabled);
+    formData.append("primaryBarcode", primaryBarcode);
     formData.append("secondaryBarcode", barcode);
     formData.append("itemKind", itemKind);
     // ✅ expiry logic
@@ -377,7 +407,7 @@ const ItemList = () => {
     setShelveLocation(item?.shelveLocation?._id || "");
     setItemUnit(item?.itemUnit?._id || "");
     setItemType(item?.itemType?._id || "");
-
+  setItemCategoryId(item.itemId)
     // Normal fields
     setItemName(item.itemName || "");
     setPerUnit(item.perUnit ? item.perUnit.toString() : "");
@@ -387,6 +417,7 @@ const ItemList = () => {
     setBarcode(item.secondaryBarcode || "");
     setReorder(item.reorder ? item.reorder.toString() : "");
     setItemKind(item.itemKind || "");
+    setPrimaryBarcode(item.primaryBarcode || generateRandomBarcode());
 
     // ✅ Expiry fields
     if (item.noHasExpiray) {
@@ -700,6 +731,39 @@ const ItemList = () => {
             <div className="p-4 md:p-6 bg-white rounded-xl shadow-md space-y-4">
               <div className="space-y-8">
                 {/* Section 1 */}
+                <div className="space-y-4">
+                  <div className="flex gap-5">
+                    {/* Item Category ID */}
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium">
+                        Item Category ID <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={editId ? itemCategoryId: `ITEM-${nextItemCategoryId}`}
+                        onChange={(e) => setItemCategoryId(e.target.value)}
+                        required
+                        className="w-full p-2 border rounded"
+                        placeholder="Enter Category ID"
+                      />
+                    </div>
+
+                    {/* Primary Barcode */}
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium">
+                        Primary Barcode <span className="text-red-500">*</span>
+                      </label>
+                    
+                      {/* Show barcode preview only if entered */}
+                      {primaryBarcode && (
+                        <div className="">
+                          <Barcode value={primaryBarcode} height={30} />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+                {/* Section 2 */}
                 <div className="border px-4 py-8 rounded-lg bg-formBgGray space-y-4">
                   <div className="flex gap-5">
                     {/* Item Category */}
@@ -860,8 +924,22 @@ const ItemList = () => {
                         ))}
                       </select>
                     </div>
-                    {/* Purchase */}
+
+                      {/* Per Unit */}
                     <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium">
+                        Per Unit
+                      </label>
+                      <input
+                        type="number"
+                        value={perUnit}
+                        onChange={(e) => setPerUnit(e.target.value)}
+                        className="w-full p-2 border rounded"
+                      />
+                    </div>
+
+                    {/* Purchase */}
+                    <div className="flex-1 block min-w-0">
                       <label className="block text-gray-700 font-medium">
                         Purchase <span className="text-red-500">*</span>
                       </label>
@@ -890,18 +968,7 @@ const ItemList = () => {
                       />
                     </div>
 
-                    {/* Per Unit */}
-                    <div className="flex-1 min-w-0">
-                      <label className="block text-gray-700 font-medium">
-                        Per Unit
-                      </label>
-                      <input
-                        type="number"
-                        value={perUnit}
-                        onChange={(e) => setPerUnit(e.target.value)}
-                        className="w-full p-2 border rounded"
-                      />
-                    </div>
+                  
                     {/* Stock */}
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium">
@@ -944,7 +1011,7 @@ const ItemList = () => {
                         className="w-full p-2 border rounded"
                         placeholder="e.g. BAR1234567890"
                         minLength={5}
-                        maxLength={20}
+                        maxLength={14}
                         onBlur={(e) => setBarcode(e.target.value)} // update on blur
                       />
 

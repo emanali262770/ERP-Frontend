@@ -32,19 +32,25 @@ const PurchasePage = () => {
     <div className="p-6">
       <CommanHeader />
       <h1 className="text-2xl font-bold mb-6">Purchase Module</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+        {/* Without cards */}
+
         {purchaseChildren.map((item) => (
           <NavLink
             key={item.to}
             to={item.to}
-            className="flex flex-col h-56 items-center justify-center p-6 rounded-xl text-black bg-white shadow-md hover:no-underline group hover:shadow-lg hover:-translate-y-2 hover:scale-105 transition-all duration-300"
+            className="flex flex-col items-center justify-center text-black hover:no-underline group transition-all duration-300 hover:bg-emerald-100 h-40 w-60 rounded-2xl"
+
           >
-            <div className="text-4xl mb-3 text-black group-hover:text-green-500 transition-colors duration-300">
+            <div className="text-4xl mb-2 text-black group-hover:text-green-500 transition-colors duration-300">
               {item.icon}
             </div>
-            <h2 className="text-lg font-semibold text-center">{item.label}</h2>
+            <h2 className="text-base font-medium text-center group-hover:text-green-600">
+              {item.label}
+            </h2>
           </NavLink>
         ))}
+
       </div>
     </div>
   );

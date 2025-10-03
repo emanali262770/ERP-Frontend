@@ -66,6 +66,7 @@ import CustomerList from "./pages/admin/SetUp/Customer.jsx";
 import Tax from "./pages/admin/SetUp/Tax.jsx";
 import PurchasePage from "./pages/admin/Purchase/PurchasePage.jsx";
 import SalesPage from "./pages/admin/Sales/SalesPage.jsx";
+import Test from "./pages/admin/Purchase/api.jsx";
 
 
 function AppContent() {
@@ -98,6 +99,7 @@ function AppContent() {
             <Route path="supplier" element={<SupplierList />} />
               <Route path="purchase" element={<PurchasePage />} />
                <Route path="sales" element={<SalesPage />} />
+               <Route path="api" element={<Test />} />
 
             <Route path="manufacture" element={<Manufacture />} />
             <Route path="item-barcode" element={<ItemBarcode />} />

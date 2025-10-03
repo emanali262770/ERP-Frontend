@@ -20,7 +20,11 @@ const ViewModel = ({ data, type, onClose }) => {
                 ? "Purchase Order"
                 : type === "gatepass"
                 ? "Gatepass In"
-                : "Quality Check"
+                : type === "qualityCheck"
+                ? "Quality Check"
+                : type === "grn"
+                ? "Goods Received Note"
+                : ""
             }
           </title>
           <style>
@@ -61,7 +65,11 @@ const ViewModel = ({ data, type, onClose }) => {
               ? "Purchase Order"
               : type === "gatepass"
               ? "Gatepass In"
-              : "Quality Check"}
+              : type === "qualityCheck"
+              ? "Quality Check"
+              : type === "grn"
+              ? "Goods Received Note"
+              : ""}
           </h2>
 
           {/* Info Section */}
@@ -120,6 +128,17 @@ const ViewModel = ({ data, type, onClose }) => {
                 </div>
               </>
             )}
+
+            {type === "grn" && (
+              <>
+                <div><strong>GRN ID:</strong> {data.grnId}</div>
+                <div><strong>Date:</strong> {new Date(data.date).toLocaleDateString()}</div>
+                <div><strong>QC ID:</strong> {data.qcId}</div>
+                <div><strong>Supplier:</strong> {data.supplier?.supplierName}</div>
+                <div><strong>Address:</strong> {data.supplier?.address}</div>
+                <div><strong>Phone:</strong> {data.supplier?.phoneNumber}</div>
+              </>
+            )}
           </div>
 
           {/* Items Table */}
@@ -134,6 +153,13 @@ const ViewModel = ({ data, type, onClose }) => {
                 {type === "purchaseOrder" && <th className="border px-2 py-1">Price</th>}
                 {type === "purchaseOrder" && <th className="border px-2 py-1">Total</th>}
                 {type === "gatepass" && <th className="border px-2 py-1">Unit</th>}
+                {type === "grn" && (
+                  <>
+                    <th className="border px-2 py-1">Action</th>
+                    <th className="border px-2 py-1">Remarks</th>
+                    <th className="border px-2 py-1">Description</th>
+                  </>
+                )}
               </tr>
             </thead>
             <tbody>
@@ -143,6 +169,8 @@ const ViewModel = ({ data, type, onClose }) => {
                 ? data.type === "withPO"
                   ? data.withPO?.items || []
                   : data.withoutPO?.items || []
+                : type === "grn"
+                ? data.items || []
                 : data.items || []
               ).map((item, idx) => (
                 <tr key={idx} className="text-center">
@@ -166,6 +194,14 @@ const ViewModel = ({ data, type, onClose }) => {
 
                   {type === "gatepass" && (
                     <td className="border px-2 py-1">{item.unit || item.unitName || "-"}</td>
+                  )}
+
+                  {type === "grn" && (
+                    <>
+                      <td className="border px-2 py-1">{item.action}</td>
+                      <td className="border px-2 py-1">{item.remarks}</td>
+                      <td className="border px-2 py-1">{item.description}</td>
+                    </>
                   )}
                 </tr>
               ))}

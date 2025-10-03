@@ -179,9 +179,8 @@ const QualityChecking = () => {
   };
 
   const handleEditClick = (qc) => {
-
-    console.log("Editing QC:", qc);
-
+    console.log({qc});
+    
     setEditingQC(qc);
     setQcId(qc.qcId);
     setGpId(qc.gatePassIn?._id || "");
