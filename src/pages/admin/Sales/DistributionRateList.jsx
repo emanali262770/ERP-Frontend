@@ -3,95 +3,55 @@ import { SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
+import gsap from "gsap";
+import axios from "axios";
+import { toast } from "react-toastify";
 
+let userInfo = null;
+const formatDate = (date) => {
+  if (!date) return "";
+  return new Date(date).toISOString().split("T")[0];
+};
+try {
+  userInfo = JSON.parse(localStorage.getItem("userInfo"));
+} catch (e) {
+  userInfo = null;
+}
 const DistributionRateList = () => {
-  const [rateLists, setRateLists] = useState([
-    {
-      _id: "1",
-      distributor: "Tech Distributors Inc.",
-      type: "Electronics",
-      productCode: "ELC-001",
-      itemName: "Laptop",
-      packSize: "1 Unit",
-      specifications: "16GB RAM, 512GB SSD",
-      salePrice: 1200,
-    },
-    {
-      _id: "2",
-      distributor: "Global Tech Supplies",
-      type: "Accessories",
-      productCode: "ACC-001",
-      itemName: "Mouse",
-      packSize: "1 Piece",
-      specifications: "Wireless, Optical",
-      salePrice: 25,
-    },
-    {
-      _id: "3",
-      distributor: "ElectroMart",
-      type: "Peripherals",
-      productCode: "ACC-002",
-      itemName: "Keyboard",
-      packSize: "1 Piece",
-      specifications: "Mechanical, RGB",
-      salePrice: 75,
-    },
-  ]);
+  const [itemTypeList, setItemTypeList] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
+  const [distributiveRateLists, setDistributiveRateLists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [distributor, setDistributor] = useState("");
-  const [type, setType] = useState("");
-  const [itemName, setItemName] = useState("");
+  const [productName, setProductName] = useState("");
+  const [itemTypeName, setItemTypeName] = useState("");
   const [productCode, setProductCode] = useState("");
   const [packSize, setPackSize] = useState("");
   const [specifications, setSpecifications] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
+  const [details, setDetails] = useState(null);
+  const [selectedItemType, setSelectedItemType] = useState({ id: "", name: "" });
+  const [selectedProduct, setSelectedProduct] = useState({ id: "", name: "" });
+
   const [editingRateList, setEditingRateList] = useState(null);
   const [errors, setErrors] = useState({});
-  const [itemList, setItemList] = useState([
-    {
-      _id: "item1",
-      itemName: "Laptop",
-      productCode: "ELC-001",
-      packSize: "1 Unit",
-      specifications: "16GB RAM, 512GB SSD",
-      type: "Electronics",
-    },
-    {
-      _id: "item2",
-      itemName: "Mouse",
-      productCode: "ACC-001",
-      packSize: "1 Piece",
-      specifications: "Wireless, Optical",
-      type: "Accessories",
-    },
-    {
-      _id: "item3",
-      itemName: "Keyboard",
-      productCode: "ACC-002",
-      packSize: "1 Piece",
-      specifications: "Mechanical, RGB",
-      type: "Peripherals",
-    },
-  ]);
-  const [distributors] = useState([
-    "Tech Distributors Inc.",
-    "Global Tech Supplies",
-    "ElectroMart",
-    "Prime Electronics",
-  ]);
-  const [types] = useState(["Electronics", "Accessories", "Peripherals"]);
+  const [itemList, setItemList] = useState([]);
+  const [distributors] = useState([]);
+  const [types] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showPreviewTable, setShowPreviewTable] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
 
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/distributorRates`;
   // Simulate fetching rate list
-  const fetchRateList = useCallback(async () => {
+  const fetchDistributiveRateList = useCallback(async () => {
     try {
-      setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      console.log("Rate List: ", res.data);
+      setDistributiveRateLists(res.data);
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
     } finally {
@@ -102,39 +62,91 @@ const DistributionRateList = () => {
   }, []);
 
   useEffect(() => {
+    fetchDistributiveRateList();
+  }, [fetchDistributiveRateList]);
+
+  const fetchRateList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/rateList`);
+      setRateLists(res.data);
+      setFilteredRateLists(res.data); // Initialize filtered list
+    } catch (error) {
+      console.error("Failed to fetch rate lists", error);
+      toast.error("Failed to fetch rate lists");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
     fetchRateList();
   }, [fetchRateList]);
+  const fetchItemtypeList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`);
+      setItemTypeList(res.data); // store actual categories array
+      console.log("Item   ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchItemtypeList();
+  }, [fetchItemtypeList]);
 
+
+
+const fetchItemDetails = useCallback(async () => {
+  if (!selectedItemType.id) return;
+  try {
+    setLoading(true);
+    const res = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/item-details/rateList/${selectedItemType.name}`
+    );
+    setItemList(res.data);
+  } catch (error) {
+    console.error("Failed to fetch item details", error);
+  } finally {
+    setTimeout(() => setLoading(false), 1000);
+  }
+}, [selectedItemType.name]);
+useEffect(() => {
+  fetchItemDetails();
+}, [fetchItemDetails]);
   // Rate list search
   useEffect(() => {
     if (!searchTerm) {
-      fetchRateList();
+      fetchDistributiveRateList();
       return;
     }
 
     const delayDebounce = setTimeout(() => {
       try {
         setLoading(true);
-        const filtered = rateLists.filter((rate) =>
+        const filtered = distributorRates.filter((rate) =>
           rate.productCode.toUpperCase().includes(searchTerm.toUpperCase())
         );
-        setRateLists(filtered);
+        setDistributiveRateLists(filtered);
       } catch (error) {
         console.error("Search rate list failed:", error);
-        setRateLists([]);
+        setDistributiveRateLists([]);
       } finally {
         setLoading(false);
       }
     }, 1000);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchRateList, rateLists]);
+  }, [searchTerm, fetchDistributiveRateList, distributiveRateLists]);
 
   // Reset form fields
   const resetForm = () => {
     setDistributor("");
-    setType("");
-    setItemName("");
+    setItemTypeName("");
+    setProductName("");
     setProductCode("");
     setPackSize("");
     setSpecifications("");
@@ -150,36 +162,38 @@ const DistributionRateList = () => {
   const validateForm = () => {
     const newErrors = {};
     const trimmedDistributor = distributor.trim();
-    const trimmedType = type.trim();
-    const trimmedItemName = itemName.trim();
-    const trimmedSalePrice = salePrice.trim();
+    const trimmedItemTypeName = itemTypeName.trim();
+    const trimmedProductName = productName.trim();
+    // ✅ No .trim() for number
     const parsedSalePrice = parseFloat(salePrice);
-
-    if (!trimmedDistributor) newErrors.distributor = "Distributor is required";
-    if (!trimmedType) newErrors.type = "Type is required";
-    if (!trimmedItemName) newErrors.itemName = "Product Name is required";
-    if (!trimmedSalePrice || isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
+    if (!trimmedItemTypeName) newErrors.itemTypeName = "Item Type Name is required";
+    if (!trimmedProductName) newErrors.productName = "Product Name is required";
+    if (isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
       newErrors.salePrice = "Sale Price must be a positive number";
     }
-
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   // Handle Product Name selection
-  const handleProductChange = (selectedItemName) => {
-    setItemName(selectedItemName);
-    const selectedItem = itemList.find((item) => item.itemName === selectedItemName);
+  const handleProductChange = (selectedProductId) => {
+    const selectedItem = itemList.find(
+      (item) => item.productName._id === selectedProductId
+    );
+
     if (selectedItem) {
-      setProductCode(selectedItem.productCode);
-      setPackSize(selectedItem.packSize);
-      setSpecifications(selectedItem.specifications);
-      setType(selectedItem.type);
+      setProductName(selectedItem.productName._id); // store product id
+      setProductCode(selectedItem.productName.primaryBarcode || "");
+      setPackSize(selectedItem.productName.itemUnit || "");
+      setSpecifications(selectedItem.productName.details || "");
+      // if you also need type auto-fill
+      setItemTypeName(selectedItem.type?.itemTypeName || "");
     } else {
+      setProductName("");
       setProductCode("");
       setPackSize("");
       setSpecifications("");
-      setType("");
+      setItemTypeName("");
     }
   };
 
@@ -189,32 +203,34 @@ const DistributionRateList = () => {
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (rateList) => {
-    setEditingRateList(rateList);
-    setDistributor(rateList.distributor || "");
-    setType(rateList.type || "");
-    setItemName(rateList.itemName || "");
-    setProductCode(rateList.productCode || "");
-    setPackSize(rateList.packSize || "");
-    setSpecifications(rateList.specifications || "");
-    setSalePrice(rateList.salePrice || "");
-    setErrors({});
-    setShowPreviewTable(false);
-    setPreviewData(null);
+  const handleEditClick = (distributorRates) => {
+    setEditingRateList(distributorRates);
+    setDistributor(distributorRates?.distributorId?._id || "");
+    setItemTypeName(distributorRates?.type?._id || "");
+    setProductName(distributorRates?.productName?._id || "");
+    setProductCode(distributorRates?.productName?.primaryBarcode || "");
+    setPackSize(distributorRates?.productName?.itemUnit || ""); // string ID unless populated
+    setSpecifications(distributorRates?.productName?.details || "");
+    setSalePrice(distributorRates?.salePrice || "");
     setIsSliderOpen(true);
   };
+
 
   const handleAddClick = (e) => {
     e.preventDefault();
     if (validateForm()) {
+      const selectedItem = itemList.find((item) => item._id === productName);
+      const selectedType = itemTypeList.find((type) => type._id === itemTypeName);
       const newPreviewData = {
         distributor: distributor.trim(),
-        type: type.trim(),
-        productCode: productCode.trim(),
-        itemName: itemName.trim(),
-        packSize: packSize.trim(),
+        type: itemTypeName, // ✅ store type ID
+        productName: productName, // ✅ store product ID
         salePrice: parseFloat(salePrice),
-        specifications: specifications.trim(),
+        itemTypeLabel: selectedType?.itemTypeName || "",
+        productNameLabel: selectedItem?.itemName || "",
+        productCode: selectedItem?.primaryBarcode || "",
+        packSize: selectedItem?.itemUnit?.unitName || "",
+        specifications: selectedItem?.details || "",
       };
       setPreviewData(newPreviewData);
       setShowPreviewTable(true);
@@ -238,27 +254,33 @@ const DistributionRateList = () => {
       return;
     }
 
+   const payload = {
+  type: selectedItemType.id,
+  productName: selectedProduct.id,
+  salePrice: previewData.salePrice,
+};
+
+
+    console.log("Submitting Payload:", payload);
+
     try {
       if (editingRateList) {
-        setRateLists((prev) =>
-          prev.map((r) => (r._id === editingRateList._id ? { ...r, ...previewData, _id: r._id } : r))
+        await axios.put(
+          `${API_URL}/${editingRateList._id}`,
+          payload,
+          { headers: { Authorization: `Bearer ${userInfo?.token}` } }
         );
-        Swal.fire({
-          icon: "success",
-          title: "Updated!",
-          text: "Rate List updated successfully.",
-          confirmButtonColor: "#3085d6",
-        });
+        Swal.fire({ icon: "success", title: "Updated!", text: "Rate List updated successfully." });
       } else {
-        setRateLists((prev) => [...prev, { ...previewData, _id: `temp-${Date.now()}` }]);
-        Swal.fire({
-          icon: "success",
-          title: "Added!",
-          text: "Rate List added successfully.",
-          confirmButtonColor: "#3085d6",
-        });
+        await axios.post(
+          API_URL,
+          payload,
+          { headers: { Authorization: `Bearer ${userInfo?.token}` } }
+        );
+        Swal.fire({ icon: "success", title: "Added!", text: "Rate List added successfully." });
       }
-      fetchRateList();
+
+      fetchDistributiveRateList();
       resetForm();
     } catch (error) {
       console.error("Error saving rate list:", error);
@@ -271,7 +293,7 @@ const DistributionRateList = () => {
     }
   };
 
-  const handleDelete = (id) => {
+  const handleDelete = async (id) => {
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {
         actions: "space-x-2",
@@ -296,7 +318,16 @@ const DistributionRateList = () => {
       .then(async (result) => {
         if (result.isConfirmed) {
           try {
-            setRateLists((prev) => prev.filter((r) => r._id !== id));
+            await axios.delete(
+              `${API_URL}/${id}`,
+              {
+                headers: { Authorization: `Bearer ${userInfo?.token}` },
+              }
+            );
+
+            setDistributiveRateLists(prev => prev.filter((r) => r._id !== id));
+            setFilteredRateLists(prev => prev.filter((r) => r._id !== id));
+
             swalWithTailwindButtons.fire(
               "Deleted!",
               "Rate List deleted successfully.",
@@ -323,8 +354,8 @@ const DistributionRateList = () => {
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = rateLists.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(rateLists.length / recordsPerPage);
+  const currentRecords = distributiveRateLists.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(distributiveRateLists.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -384,29 +415,29 @@ const DistributionRateList = () => {
                     No rate lists found.
                   </div>
                 ) : (
-                  currentRecords.map((rateList, index) => (
+                  currentRecords.map((distributorRates, index) => (
                     <div
-                      key={rateList._id}
+                      key={distributorRates._id}
                       className="grid grid-cols-1 lg:grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1.5fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
                       <div className="text-gray-600">{indexOfFirstRecord + index + 1}</div>
-                      <div className="text-gray-600">{rateList.distributor}</div>
-                      <div className="text-gray-600">{rateList.type}</div>
-                      <div className="text-gray-600">{rateList.itemName}</div>
-                      <div className="text-gray-600">{rateList.productCode}</div>
-                      <div className="text-gray-600">{rateList.packSize}</div>
-                      <div className="text-gray-600">{rateList.specifications}</div>
-                      <div className="text-gray-600">{rateList.salePrice}</div>
+                      <div className="text-gray-600">{distributorRates?.distributorId?.distributorName}</div>
+                      <div className="text-gray-600">{distributorRates?.type?.itemTypeName}</div>
+                      <div className="text-gray-600">{distributorRates?.productName?.itemName}</div>
+                      <div className="text-gray-600">{distributorRates?.productName?.primaryBarcode}</div>
+                      <div className="text-gray-600">{distributorRates?.productName?.itemUnit?.unitName}</div>
+                      <div className="text-gray-600">{distributorRates?.productName?.details}</div>
+                      <div className="text-gray-600">{distributorRates?.salePrice}</div>
                       <div className="flex gap-3 justify-start">
                         <button
-                          onClick={() => handleEditClick(rateList)}
+                          onClick={() => handleEditClick(distributorRates)}
                           className="py-1 text-sm rounded text-blue-600 hover:bg-blue-50 transition-colors"
                           title="Edit"
                         >
                           <SquarePen size={18} />
                         </button>
                         <button
-                          onClick={() => handleDelete(rateList._id)}
+                          onClick={() => handleDelete(distributorRates._id)}
                           className="py-1 text-sm rounded text-red-600 hover:bg-red-50 transition-colors"
                           title="Delete"
                         >
@@ -425,16 +456,16 @@ const DistributionRateList = () => {
             <div className="flex justify-between my-4 px-10">
               <div className="text-sm text-gray-600">
                 Showing {indexOfFirstRecord + 1} to{" "}
-                {Math.min(indexOfLastRecord, rateLists.length)} of{" "}
-                {rateLists.length} records
+                {Math.min(indexOfLastRecord, distributorRates.length)} of{" "}
+                {distributorRates.length} records
               </div>
               <div className="flex gap-2">
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
                   className={`px-3 py-1 rounded-md ${currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
                     }`}
                 >
                   Previous
@@ -443,8 +474,8 @@ const DistributionRateList = () => {
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
                   className={`px-3 py-1 rounded-md ${currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
                     }`}
                 >
                   Next
@@ -483,17 +514,18 @@ const DistributionRateList = () => {
                         value={distributor}
                         onChange={(e) => setDistributor(e.target.value)}
                         className={`w-60 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.distributor
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
                           }`}
                         required
                       >
                         <option value="">Select Distributor</option>
                         {distributors.map((dist) => (
-                          <option key={dist} value={dist}>
-                            {dist}
+                          <option key={dist._id} value={dist._id}>
+                            {dist.distributorName}
                           </option>
                         ))}
+
                       </select>
                       {errors.distributor && (
                         <p className="text-red-500 text-xs mt-1">{errors.distributor}</p>
@@ -508,18 +540,21 @@ const DistributionRateList = () => {
                         Type <span className="text-red-500">*</span>
                       </label>
                       <select
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
+                        value={selectedItemType.id}
+                        onChange={(e) => {
+                          const selected = itemTypeList.find((item) => item._id === e.target.value);
+                          setSelectedItemType({ id: selected._id, name: selected.itemTypeName });
+                        }}
                         className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.type
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
                           }`}
                         required
                       >
-                        <option value="">Select Type</option>
-                        {types.map((typeOption) => (
-                          <option key={typeOption} value={typeOption}>
-                            {typeOption}
+                        <option value="">-- Select Item Type --</option>
+                        {itemTypeList.map((item) => (
+                          <option key={item._id} value={item._id}>
+                            {item.itemTypeName}
                           </option>
                         ))}
                       </select>
@@ -532,17 +567,23 @@ const DistributionRateList = () => {
                         Product Name <span className="text-red-500">*</span>
                       </label>
                       <select
-                        value={itemName}
-                        onChange={(e) => handleProductChange(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.itemName
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
+                        value={selectedProduct.id}
+                        onChange={(e) => {
+                          const selected = itemList.find((item) => item.productName._id === e.target.value);
+                          setSelectedProduct({
+                            id: selected._id,
+                            name: selected.itemName,
+                          });
+                        }}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.productName
+                          ? "border-red-500 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-newPrimary"
                           }`}
                         required
                       >
-                        <option value="">Select Product</option>
+                        <option value="">-- Select Product --</option>
                         {itemList.map((item) => (
-                          <option key={item._id} value={item.itemName}>
+                          <option key={item._id} value={item._id}>
                             {item.itemName}
                           </option>
                         ))}
@@ -561,7 +602,7 @@ const DistributionRateList = () => {
                         type="text"
                         value={productCode}
                         readOnly
-                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
+                        className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Product Code"
                       />
                     </div>
@@ -587,7 +628,7 @@ const DistributionRateList = () => {
                         type="text"
                         value={specifications}
                         readOnly
-                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
+                        className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Specifications"
                       />
                     </div>
@@ -601,8 +642,8 @@ const DistributionRateList = () => {
                           value={salePrice}
                           onChange={(e) => setSalePrice(e.target.value)}
                           className={`w-full p-3 border rounded-md focus:outline-none bg-white focus:ring-2 ${errors.salePrice
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
                             }`}
                           placeholder="Enter sale price"
                           min="0"
@@ -639,12 +680,13 @@ const DistributionRateList = () => {
                         <div>Remove</div>
                       </div>
                       <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white">
-                        <div className="text-gray-600">{editingRateList ? rateLists.findIndex(r => r._id === editingRateList._id) + 1 : rateLists.length + 1}</div>
+                        <div className="text-gray-600">{editingRateList ? distributorRates.findIndex(r => r._id === editingRateList._id) + 1 : distributorRates.length + 1}</div>
                         <div className="text-gray-600">{previewData.distributor}</div>
-                        <div className="text-gray-600">{previewData.type}</div>
+                        <div className="text-gray-600">{previewData.itemTypeLabel}</div>
                         <div className="text-gray-600">{previewData.productCode}</div>
-                        <div className="text-gray-600">{previewData.itemName}</div>
+                        <div className="text-gray-600">{previewData.productNameLabel}</div>
                         <div className="text-gray-600">{previewData.packSize}</div>
+                        <div className="text-gray-600">{previewData.specifications}</div>
                         <div className="text-gray-600">{previewData.salePrice}</div>
                         <div className="flex justify-start">
                           <button
