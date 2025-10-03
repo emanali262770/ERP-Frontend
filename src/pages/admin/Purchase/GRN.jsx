@@ -302,11 +302,11 @@ const handleSubmit = async (e) => {
             const { token } = userInfo || {};
             const headers = {
               Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
+            
             };
 
             await axios.delete(
-              `${import.meta.env.VITE_API_BASE_URL}/grns/${id}`,
+              `${import.meta.env.VITE_API_BASE_URL}/grn/${id}`,
               { headers }
             );
 
@@ -363,6 +363,7 @@ setItemsList([]);
       setItemOptions(qcItems); // Only QC items will show in dropdown
     }
   };
+console.log(grns);
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">
@@ -737,9 +738,14 @@ setItemsList([]);
             </div>
           </div>
         )}
-        {isView && selectedGrn && (
-          <ViewModel grn={selectedGrn} onClose={() => setIsView(false)} />
-        )}
+       {isView && selectedGrn && (
+  <ViewModel
+    data={selectedGrn}
+    type="grn"
+    onClose={() => setIsView(false)}
+  />
+)}
+
 
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {
