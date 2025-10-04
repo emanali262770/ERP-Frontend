@@ -168,12 +168,37 @@ const DistributionRateList = () => {
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (distributorRates) => {
-    setEditingRateList(distributorRates);
-    // setDistributor(distributorRates?.distributorId?._id || "");
-    setSalePrice(distributorRates?.salePrice || "");
-    setIsSliderOpen(true);
-  };
+// ✅ Handle Edit
+const handleEditClick = (rateList) => {
+  setEditingRateList(rateList);
+  setIsSliderOpen(true);
+
+  // Pre-fill distributor
+  setDistributorName(rateList?.distributorId?._id || "");
+
+  // Pre-fill item type
+  setSelectedItemType({
+    id: rateList?.type?._id || "",
+    name: rateList?.type?.itemTypeName || "",
+  });
+
+  // Pre-fill product
+  setSelectedProduct({
+    id: rateList?.productName?._id || "",
+    name: rateList?.productName?.itemName || "",
+  });
+
+  // Pre-fill sale price
+  setSalePrice(rateList?.salePrice || "");
+
+  // Auto-fill product item details
+  setProductItem({
+    primaryCode: rateList?.productName?.primaryBarcode || "",
+    unitName: rateList?.productName?.itemUnit?.unitName || "",
+    details: rateList?.productName?.details || "",
+  });
+};
+
 
 
 
@@ -222,63 +247,63 @@ const DistributionRateList = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const swalWithTailwindButtons = Swal.mixin({
-      customClass: {
-        actions: "space-x-2",
-        confirmButton:
-          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-        cancelButton:
-          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-      },
-      buttonsStyling: false,
-    });
+// ✅ Handle Delete
+const handleDelete = async (id) => {
+  const swalWithTailwindButtons = Swal.mixin({
+    customClass: {
+      actions: "space-x-2",
+      confirmButton:
+        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+      cancelButton:
+        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+    },
+    buttonsStyling: false,
+  });
 
-    swalWithTailwindButtons
-      .fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel!",
-        reverseButtons: true,
-      })
-      .then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            await axios.delete(
-              `${API_URL}/${id}`,
-              {
-                headers: { Authorization: `Bearer ${userInfo?.token}` },
-              }
-            );
+  const result = await swalWithTailwindButtons.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "No, cancel!",
+    reverseButtons: true,
+  });
 
-            setDistributiveRateLists(prev => prev.filter((r) => r._id !== id));
-            setFilteredRateLists(prev => prev.filter((r) => r._id !== id));
-
-            swalWithTailwindButtons.fire(
-              "Deleted!",
-              "Rate List deleted successfully.",
-              "success"
-            );
-          } catch (error) {
-            console.error("Delete error:", error);
-            swalWithTailwindButtons.fire(
-              "Error!",
-              "Failed to delete rate list.",
-              "error"
-            );
-          }
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithTailwindButtons.fire(
-            "Cancelled",
-            "Rate List is safe 🙂",
-            "error"
-          );
-        }
+  if (result.isConfirmed) {
+    try {
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${userInfo?.token}` },
       });
-  };
+
+      // ✅ Option 1: Remove deleted item locally
+      setDistributiveRateLists((prev) => prev.filter((r) => r._id !== id));
+
+      // ✅ Option 2 (recommended): Re-fetch full list for consistency
+      await fetchDistributiveRateList();
+
+      swalWithTailwindButtons.fire(
+        "Deleted!",
+        "Rate List deleted successfully.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Delete error:", error);
+      swalWithTailwindButtons.fire(
+        "Error!",
+        "Failed to delete rate list.",
+        "error"
+      );
+    }
+  } else if (result.dismiss === Swal.DismissReason.cancel) {
+    swalWithTailwindButtons.fire(
+      "Cancelled",
+      "Rate List is safe 🙂",
+      "error"
+    );
+  }
+};
+
 
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
