@@ -3,32 +3,19 @@ import { SquarePen, Trash2 } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
+import gsap from "gsap";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const RateList = () => {
-  const [rateLists, setRateLists] = useState([
-    {
-      _id: "1",
-      type: "Electronics",
-      productCode: "ELC-001",
-      itemName: "Laptop",
-      packSize: "1 Unit",
-      specifications: "16GB RAM, 512GB SSD",
-      salePrice: 1200,
-    },
-    {
-      _id: "2",
-      type: "Accessories",
-      productCode: "ACC-001",
-      itemName: "Mouse",
-      packSize: "1 Piece",
-      specifications: "Wireless, Optical",
-      salePrice: 25,
-    },
-  ]);
+
+  const [itemTypeList, setItemTypeList] = useState([]);
+  const [rateLists, setRateLists] = useState([]);
+  const [filteredRateLists, setFilteredRateLists] = useState([]);
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [type, setType] = useState("");
-  const [itemName, setItemName] = useState("");
+  const [productName, setProductName] = useState("");
+  const [itemTypeName, setItemTypeName] = useState("");
   const [productCode, setProductCode] = useState("");
   const [packSize, setPackSize] = useState("");
   const [specifications, setSpecifications] = useState("");
@@ -36,85 +23,117 @@ const RateList = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [editingRateList, setEditingRateList] = useState(null);
   const [errors, setErrors] = useState({});
-  const [itemList, setItemList] = useState([
-    {
-      _id: "item1",
-      itemName: "Laptop",
-      productCode: "ELC-001",
-      packSize: "1 Unit",
-      specifications: "16GB RAM, 512GB SSD",
-      type: "Electronics",
-    },
-    {
-      _id: "item2",
-      itemName: "Mouse",
-      productCode: "ACC-001",
-      packSize: "1 Piece",
-      specifications: "Wireless, Optical",
-      type: "Accessories",
-    },
-    {
-      _id: "item3",
-      itemName: "Keyboard",
-      productCode: "ACC-002",
-      packSize: "1 Piece",
-      specifications: "Mechanical, RGB",
-      type: "Accessories",
-    },
-  ]);
-  const [types] = useState(["Electronics", "Accessories", "Peripherals"]);
+  const [itemList, setItemList] = useState([]);
+  const [types] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showPreviewTable, setShowPreviewTable] = useState(false);
   const [previewData, setPreviewData] = useState(null);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
 
-  // Simulate fetching rate list
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/rateList`;
+  let userInfo = null;
+  const formatDate = (date) => {
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
+  };
+  try {
+    userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  } catch (e) {
+    userInfo = null;
+  }
+
+
+  // Fetch rate list
   const fetchRateList = useCallback(async () => {
     try {
       setLoading(true);
+      const res = await axios.get(`${API_URL}`);
+      console.log("Rate List: ", res.data);
+      setRateLists(res.data);
+      setFilteredRateLists(res.data); // Initialize filtered list
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
+      toast.error("Failed to fetch rate lists");
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
+      setLoading(false);
     }
-  }, []);
+  }, [API_URL]);
 
   useEffect(() => {
     fetchRateList();
   }, [fetchRateList]);
 
-  // Rate list search
+  const fetchItemtypeList = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`);
+      setItemTypeList(res.data); // store actual categories array
+      console.log("Item   ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch Supplier", error);
+    } finally {
+      setTimeout(() => setLoading(false), 2000);
+    }
+  }, []);
+  useEffect(() => {
+    fetchItemtypeList();
+  }, [fetchItemtypeList]);
+
+  const fetchItemDetails = useCallback(async () => {
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-details/rateList/${itemTypeName}`
+      );
+      setItemList(res.data); // store actual categories array
+      console.log("Item Details ", res.data);
+    } catch (error) {
+      console.error("Failed to fetch item details", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  }, [itemTypeName]);
+  useEffect(() => {
+    fetchItemDetails();
+  }, [fetchItemDetails]);
+
+  // Rate list search - Fixed version
   useEffect(() => {
     if (!searchTerm) {
-      fetchRateList();
+      setFilteredRateLists(rateLists);
       return;
     }
 
     const delayDebounce = setTimeout(() => {
       try {
-        setLoading(true);
         const filtered = rateLists.filter((rate) =>
-          rate.productCode.toUpperCase().includes(searchTerm.toUpperCase())
+          rate.productCode?.toUpperCase().includes(searchTerm.toUpperCase())
         );
-        setRateLists(filtered);
+        setFilteredRateLists(filtered);
+        setCurrentPage(1); // Reset to first page when searching
       } catch (error) {
         console.error("Search rate list failed:", error);
-        setRateLists([]);
-      } finally {
-        setLoading(false);
+        setFilteredRateLists([]);
       }
-    }, 1000);
+    }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchRateList, rateLists]);
+  }, [searchTerm, rateLists]);
 
+  // Add this useEffect to debug your itemList data
+  // useEffect(() => {
+  //   console.log("Item List Data:", itemList);
+  //   if (itemList.length > 0) {
+  //     console.log("First item structure:", itemList[0]);
+  //     console.log("First item details:", itemList[0]?.details);
+  //     console.log("First item unitName:", itemList[0]?.itemUnit?.unitName);
+  //   }
+  // }, [itemList]);
   // Reset form fields
   const resetForm = () => {
-    setType("");
-    setItemName("");
+    setItemTypeName("");
+    setProductName("");
     setProductCode("");
     setPackSize("");
     setSpecifications("");
@@ -127,39 +146,40 @@ const RateList = () => {
   };
 
   // Validate form fields
-  const validateForm = () => {
-    const newErrors = {};
-    const trimmedType = type.trim();
-    const trimmedItemName = itemName.trim();
-    const trimmedSalePrice = salePrice.trim();
-    const parsedSalePrice = parseFloat(salePrice);
+const validateForm = () => {
+  const newErrors = {};
+  const trimmedItemTypeName = itemTypeName.trim();
+  const trimmedProductName = productName.trim();
+  // ✅ No .trim() for number
+  const parsedSalePrice = parseFloat(salePrice);
+  if (!trimmedItemTypeName) newErrors.itemTypeName = "Item Type Name is required";
+  if (!trimmedProductName) newErrors.productName = "Product Name is required";
+  if (isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
+    newErrors.salePrice = "Sale Price must be a positive number";
+  }
+  setErrors(newErrors);
+  return Object.keys(newErrors).length === 0;
+};
 
-    if (!trimmedType) newErrors.type = "Type is required";
-    if (!trimmedItemName) newErrors.itemName = "Product Name is required";
-    if (!trimmedSalePrice || isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
-      newErrors.salePrice = "Sale Price must be a positive number";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
   // Handle Product Name selection
-  const handleProductChange = (selectedItemName) => {
-    setItemName(selectedItemName);
-    const selectedItem = itemList.find((item) => item.itemName === selectedItemName);
+  const handleProductChange = (id) => {
+    const selectedItem = itemList.find((item) => item._id === id);
     if (selectedItem) {
-      setProductCode(selectedItem.productCode);
-      setPackSize(selectedItem.packSize);
-      setSpecifications(selectedItem.specifications);
-      setType(selectedItem.type);
+      setProductName(selectedItem._id); // keep id in state for dropdown
+      setProductCode(selectedItem.primaryBarcode || "");
+      setPackSize(selectedItem.itemUnit?.unitName || "");
+      setSpecifications(selectedItem.details || "");
+      // setItemTypeName(selectedItem.itemTypeName || "");
     } else {
+      setProductName("");
       setProductCode("");
       setPackSize("");
       setSpecifications("");
-      setType("");
+      // setItemTypeName();
     }
   };
+  console.log("Product Name State:", packSize);
 
   // Handlers for form and table actions
   const handleAddRateList = () => {
@@ -169,33 +189,43 @@ const RateList = () => {
 
   const handleEditClick = (rateList) => {
     setEditingRateList(rateList);
-    setType(rateList.type || "");
-    setItemName(rateList.itemName || "");
-    setProductCode(rateList.productCode || "");
-    setPackSize(rateList.packSize || "");
-    setSpecifications(rateList.specifications || "");
-    setSalePrice(rateList.salePrice || "");
-    setErrors({});
-    setShowPreviewTable(false);
-    setPreviewData(null);
+    setItemTypeName(rateList?.type?.itemTypeName || "");
+    setProductName(rateList?.productName?._id || "");
+    setProductCode(rateList?.productName?.primaryBarcode || "");
+    setPackSize(rateList?.productName?.unitName || "");     // ✅ now works
+    setSpecifications(rateList?.productName?.details || "");// ✅ now works
+    setSalePrice(rateList?.salePrice || "");
     setIsSliderOpen(true);
   };
+
+
 
   const handleAddClick = (e) => {
     e.preventDefault();
     if (validateForm()) {
+      const selectedItem = itemList.find((item) => item._id === productName);
+      const selectedType = itemTypeList.find((type) => type._id === itemTypeName);
+
       const newPreviewData = {
-        type: type.trim(),
-        productCode: productCode.trim(),
-        itemName: itemName.trim(),
-        packSize: packSize.trim(),
+        type: itemTypeName, // ✅ store type ID
+        productName: productName, // ✅ store product ID
         salePrice: parseFloat(salePrice),
-        specifications: specifications.trim(),
+
+        // for showing preview
+        itemTypeLabel: selectedType?.itemTypeName || "",
+        productNameLabel: selectedItem?.itemName || "",
+        productCode: selectedItem?.primaryBarcode || "",
+        packSize: selectedItem?.itemUnit?.unitName || "",
+        specifications: selectedItem?.details || "",
       };
+
       setPreviewData(newPreviewData);
       setShowPreviewTable(true);
     }
   };
+
+
+
 
   const handleRemovePreview = () => {
     setPreviewData(null);
@@ -214,26 +244,31 @@ const RateList = () => {
       return;
     }
 
+    const payload = {
+      type: previewData.type, // ID
+      productName: previewData.productName, // ID
+      salePrice: previewData.salePrice,
+    };
+
+    console.log("Submitting Payload:", payload);
+
     try {
       if (editingRateList) {
-        setRateLists((prev) =>
-          prev.map((r) => (r._id === editingRateList._id ? { ...r, ...previewData, _id: r._id } : r))
+        await axios.put(
+          `${API_URL}/${editingRateList._id}`,
+          payload,
+          { headers: { Authorization: `Bearer ${userInfo?.token}` } }
         );
-        Swal.fire({
-          icon: "success",
-          title: "Updated!",
-          text: "Rate List updated successfully.",
-          confirmButtonColor: "#3085d6",
-        });
+        Swal.fire({ icon: "success", title: "Updated!", text: "Rate List updated successfully." });
       } else {
-        setRateLists((prev) => [...prev, { ...previewData, _id: `temp-${Date.now()}` }]);
-        Swal.fire({
-          icon: "success",
-          title: "Added!",
-          text: "Rate List added successfully.",
-          confirmButtonColor: "#3085d6",
-        });
+        await axios.post(
+          API_URL,
+          payload,
+          { headers: { Authorization: `Bearer ${userInfo?.token}` } }
+        );
+        Swal.fire({ icon: "success", title: "Added!", text: "Rate List added successfully." });
       }
+
       fetchRateList();
       resetForm();
     } catch (error) {
@@ -241,66 +276,75 @@ const RateList = () => {
       Swal.fire({
         icon: "error",
         title: "Error!",
-        text: "Failed to save rate list.",
-        confirmButtonColor: "#d33",
+        text: error.response?.data?.message || "Failed to save rate list.",
       });
     }
   };
 
-  const handleDelete = (id) => {
-    const swalWithTailwindButtons = Swal.mixin({
-      customClass: {
-        actions: "space-x-2",
-        confirmButton:
-          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-        cancelButton:
-          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-      },
-      buttonsStyling: false,
-    });
 
-    swalWithTailwindButtons
-      .fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel!",
-        reverseButtons: true,
-      })
-      .then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            setRateLists((prev) => prev.filter((r) => r._id !== id));
-            swalWithTailwindButtons.fire(
-              "Deleted!",
-              "Rate List deleted successfully.",
-              "success"
-            );
-          } catch (error) {
-            console.error("Delete error:", error);
-            swalWithTailwindButtons.fire(
-              "Error!",
-              "Failed to delete rate list.",
-              "error"
-            );
-          }
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
+const handleDelete = async (id) => {
+  const swalWithTailwindButtons = Swal.mixin({
+    customClass: {
+      actions: "space-x-2",
+      confirmButton:
+        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+      cancelButton:
+        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+    },
+    buttonsStyling: false,
+  });
+
+  swalWithTailwindButtons
+    .fire({
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "No, cancel!",
+      reverseButtons: true,
+    })
+    .then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          await axios.delete(
+            `${API_URL}/${id}`,
+            {
+              headers: { Authorization: `Bearer ${userInfo?.token}` },
+            }
+          );
+
+          setRateLists(prev => prev.filter((r) => r._id !== id));
+          setFilteredRateLists(prev => prev.filter((r) => r._id !== id));
+
           swalWithTailwindButtons.fire(
-            "Cancelled",
-            "Rate List is safe 🙂",
+            "Deleted!",
+            "Rate List deleted successfully.",
+            "success"
+          );
+        } catch (error) {
+          console.error("Delete error:", error);
+          swalWithTailwindButtons.fire(
+            "Error!",
+            "Failed to delete rate list.",
             "error"
           );
         }
-      });
-  };
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        swalWithTailwindButtons.fire(
+          "Cancelled",
+          "Rate List is safe 🙂",
+          "error"
+        );
+      }
+    });
+};
 
-  // Pagination logic
+  // Pagination logic - use filteredRateLists instead of rateLists
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = rateLists.slice(indexOfFirstRecord, indexOfLastRecord);
-  const totalPages = Math.ceil(rateLists.length / recordsPerPage);
+  const currentRecords = filteredRateLists.slice(indexOfFirstRecord, indexOfLastRecord);
+  const totalPages = Math.ceil(filteredRateLists.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -365,12 +409,12 @@ const RateList = () => {
                       className="grid grid-cols-1 lg:grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1.5fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                     >
                       <div className="text-gray-600">{indexOfFirstRecord + index + 1}</div>
-                      <div className="text-gray-600">{rateList.type}</div>
-                      <div className="text-gray-600">{rateList.itemName}</div>
-                      <div className="text-gray-600">{rateList.productCode}</div>
-                      <div className="text-gray-600">{rateList.packSize}</div>
-                      <div className="text-gray-600">{rateList.specifications}</div>
-                      <div className="text-gray-600">{rateList.salePrice}</div>
+                      <div className="text-gray-600">{rateList?.type?.itemTypeName}</div>
+                      <div className="text-gray-600">{rateList?.productName?.itemName}</div>
+                      <div className="text-gray-600">{rateList?.productName?.primaryBarcode}</div>
+                      <div className="text-gray-600">{rateList.productName?.itemUnit?.unitName}</div>
+                      <div className="text-gray-600">{rateList?.productName?.details}</div>
+                      <div className="text-gray-600">{rateList?.salePrice}</div>
                       <div className="flex gap-3 justify-start">
                         <button
                           onClick={() => handleEditClick(rateList)}
@@ -399,8 +443,8 @@ const RateList = () => {
             <div className="flex justify-between my-4 px-10">
               <div className="text-sm text-gray-600">
                 Showing {indexOfFirstRecord + 1} to{" "}
-                {Math.min(indexOfLastRecord, rateLists.length)} of{" "}
-                {rateLists.length} records
+                {Math.min(indexOfLastRecord, filteredRateLists.length)} of{" "}
+                {filteredRateLists.length} records
               </div>
               <div className="flex gap-2">
                 <button
@@ -457,23 +501,22 @@ const RateList = () => {
                         Type <span className="text-red-500">*</span>
                       </label>
                       <select
-                        value={type}
-                        onChange={(e) => setType(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.type
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
+                        value={itemTypeName}
+                        onChange={(e) => setItemTypeName(e.target.value)} // store ID here
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.itemTypeName ? "border-red-500 focus:ring-red-500" : "border-gray-300 focus:ring-newPrimary"
                           }`}
                         required
                       >
-                        <option value="">Select Type</option>
-                        {types.map((typeOption) => (
-                          <option key={typeOption} value={typeOption}>
-                            {typeOption}
+                        <option value="">-- Select Item Type --</option>
+                        {itemTypeList.map((item) => (
+                          <option key={item._id} value={item._id}>
+                            {item.itemTypeName}
                           </option>
                         ))}
                       </select>
-                      {errors.type && (
-                        <p className="text-red-500 text-xs mt-1">{errors.type}</p>
+
+                      {errors.itemTypeName && (
+                        <p className="text-red-500 text-xs mt-1">{errors.itemTypeName}</p>
                       )}
                     </div>
 
@@ -482,9 +525,9 @@ const RateList = () => {
                         Product Name <span className="text-red-500">*</span>
                       </label>
                       <select
-                        value={itemName}
+                        value={productName}
                         onChange={(e) => handleProductChange(e.target.value)}
-                        className={`w-full p-3  border rounded-md focus:outline-none focus:ring-2 ${errors.itemName
+                        className={`w-full p-3  border rounded-md focus:outline-none focus:ring-2 ${errors.productName
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
                           }`}
@@ -492,9 +535,10 @@ const RateList = () => {
                       >
                         <option value="">Select Product</option>
                         {itemList.map((item) => (
-                          <option key={item._id} value={item.itemName}>
+                          <option key={item._id} value={item._id}>
                             {item.itemName}
                           </option>
+
                         ))}
                       </select>
                       {errors.itemName && (
@@ -514,12 +558,8 @@ const RateList = () => {
                         value={productCode}
                         readOnly
                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
-
-
-
                         placeholder="Product Code"
                       />
-
                     </div>
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -603,11 +643,14 @@ const RateList = () => {
                             ? rateLists.findIndex((r) => r._id === editingRateList._id) + 1
                             : rateLists.length + 1}
                         </div>
-                        <div className="text-gray-600">{previewData.type}</div>
+                        <div className="text-gray-600">{previewData.itemTypeLabel}</div>
                         <div className="text-gray-600">{previewData.productCode}</div>
-                        <div className="text-gray-600">{previewData.itemName}</div>
+                        <div className="text-gray-600">{previewData.productNameLabel}</div>
                         <div className="text-gray-600">{previewData.packSize}</div>
+                        <div className="text-gray-600">{previewData.specifications}</div>
                         <div className="text-gray-600">{previewData.salePrice}</div>
+
+
                         <div className="flex justify-start">
                           <button
                             onClick={handleRemovePreview}
@@ -632,7 +675,6 @@ const RateList = () => {
             </div>
           </div>
         )}
-
 
         <style jsx>{`
           .custom-scrollbar::-webkit-scrollbar {
