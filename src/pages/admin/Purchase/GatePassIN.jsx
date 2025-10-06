@@ -48,7 +48,7 @@ const GatepassIn = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setGatepasses(res.data); // store actual categories array
-      console.log("gate pass Inn  ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -100,7 +100,7 @@ const GatepassIn = () => {
         `${import.meta.env.VITE_API_BASE_URL}/categories`
       );
       setCategories(res.data);
-      console.log("Category ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Category", error);
     } finally {
@@ -120,7 +120,7 @@ const GatepassIn = () => {
         `${import.meta.env.VITE_API_BASE_URL}/suppliers`
       );
       setSupplierList(res.data);
-      console.log("supplier ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch supplier", error);
     } finally {
@@ -144,7 +144,7 @@ const GatepassIn = () => {
         }`
       );
       setItemNameList(res.data);
-      console.log("ItemName ", res.data);
+
     } catch (error) {
       console.error("Failed to fetch ItemName", error);
     } finally {
@@ -164,7 +164,7 @@ const GatepassIn = () => {
         `${import.meta.env.VITE_API_BASE_URL}/item-unit`
       );
       setItemUnitsList(res.data);
-      console.log("item unit ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch item unit", error);
     } finally {
@@ -267,7 +267,7 @@ const GatepassIn = () => {
     setGatepassId(gatepass.gatePassId || "");
     setDate(formatDateForInput(gatepass.date));
     setStatus(gatepass.status || "Permanent");
-    console.log(gatepass.withoutPO?.items, "data");
+  
 
     if (gatepass.type === "withPO") {
       setPoType("withPO");
@@ -753,8 +753,7 @@ const GatepassIn = () => {
                             const selectedPO = purchaseOrders.find(
                               (po) => po._id === selectedId
                             );
-                            console.log({ selectedPO });
-
+                          
                             if (selectedPO) {
                               // supplier is nested inside -> estimation.demandItem.supplier.supplierName
                               setSupplier(

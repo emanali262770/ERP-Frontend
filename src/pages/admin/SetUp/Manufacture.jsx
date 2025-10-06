@@ -62,7 +62,7 @@ const Manufacture = () => {
         `${import.meta.env.VITE_API_BASE_URL}/manufacturers`
       );
       setManufacturerList(res.data); // store actual categories array
-      console.log("Manufacturers  ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -100,7 +100,7 @@ const Manufacture = () => {
       email,
       status,
     };
-    console.log("Form Data ", formData);
+
 
     try {
       const { token } = userInfo || {};

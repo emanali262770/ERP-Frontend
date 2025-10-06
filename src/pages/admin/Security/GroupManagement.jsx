@@ -34,7 +34,7 @@ const GroupManagement = () => {
   const getUserInfo = () => {
     try {
       const info = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      // console.log("Parsed userInfo:", info);
+    
       return info;
     } catch (error) {
       console.error("Error parsing userInfo:", error);
@@ -176,7 +176,7 @@ const GroupManagement = () => {
         functionalities: selectedFunctionalities.map((f) => f.name), // send names to backend
       };
 
-      console.log("Payload ", payload);
+   
 
       if (isEdit && editId) {
         await axios.put(
@@ -212,7 +212,7 @@ const GroupManagement = () => {
 
   // Edit Group
   const handleEdit = (group) => {
-    console.log("Edit", group);
+ 
 
     setIsEdit(true);
     setEditId(group._id);

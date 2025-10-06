@@ -50,7 +50,7 @@ const ExpenseVoucher = () => {
 
   // Token
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  // console.log("Admin", userInfo?.isAdmin);
+
 
   // Fetch Expense Voucher Data
   const fetchExpenseVoucherData = useCallback(async () => {
@@ -58,7 +58,7 @@ const ExpenseVoucher = () => {
       setLoading(true);
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/voucher`);
       const result = await response.json();
-      console.log("Expense Vouchers ", result);
+
       setExpenseVoucherList(result);
     } catch (error) {
       console.error("Error fetching expense voucher data:", error);
@@ -71,15 +71,14 @@ const ExpenseVoucher = () => {
     fetchExpenseVoucherData();
   }, [fetchExpenseVoucherData]);
 
-  // console.log("Expense Voucher Data", expenseVoucherList);
-
+  
   // Fetch Expense Head Data
   const fetchExpenseHeadData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/heads`);
       const result = await response.json();
-      console.log("Expense Heads ", result);
+     
       setExpenseHeadList(result);
     } catch (error) {
       console.error("Error fetching expense head data:", error);
@@ -101,9 +100,7 @@ const ExpenseVoucher = () => {
         return;
       }
 
-      // Find the _id of the selected head
-      console.log("Current head value:", head); // Debug log
-      console.log("Expense Head List:", expenseHeadList); // Debug log
+  
       const selectedHead = expenseHeadList.find(headItem => headItem.head === head);
       const headId = selectedHead ? selectedHead._id : null;
 
@@ -119,7 +116,7 @@ const ExpenseVoucher = () => {
         amount: Number(amount),
       };
 
-      console.log("Saving voucher with payload:", payload);
+   
 
       let response;
       if (isEdit && editId) {
@@ -149,7 +146,7 @@ const ExpenseVoucher = () => {
         toast.success("Voucher saved successfully!");
       }
 
-      console.log("API Response:", response.data);
+     
 
       fetchExpenseVoucherData();
 
@@ -169,7 +166,7 @@ const ExpenseVoucher = () => {
 
   // Edit Expense Voucher
   const handleEdit = (voucher) => {
-    // console.log("Voucher ", voucher);
+   
 
     setIsEdit(true);
     setEditId(voucher._id);
@@ -182,7 +179,7 @@ const ExpenseVoucher = () => {
     setDetails(voucher.details || "");
     setAmount(voucher.amount || "");
     setIsSliderOpen(true);
-    // console.log("Editing Expense Voucher Data", voucher);
+    
   };
 
   // Delete Expense Voucher

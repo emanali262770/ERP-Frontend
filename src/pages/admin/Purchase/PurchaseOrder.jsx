@@ -137,7 +137,7 @@ const PurchaseOrder = () => {
         `${import.meta.env.VITE_API_BASE_URL}/purchaseOrder`
       );
       setPurchaseOrders(res.data);
-      console.log("Purchase ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch purchase orders", error);
     } finally {
@@ -225,7 +225,7 @@ const PurchaseOrder = () => {
   };
 
   const handleEditClick = (order) => {
-    console.log("Edit ", order);
+   
     setEditingPurchaseOrder(order);
     setPoNo(order.purchaseOrderId);
     setPurchaseOrderId(order.purchaseOrderId);
@@ -327,7 +327,7 @@ const PurchaseOrder = () => {
   };
 
   const handleDelete = async (id) => {
-    console.log("Delete ", id);
+ 
 
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {

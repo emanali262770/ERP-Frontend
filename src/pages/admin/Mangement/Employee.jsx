@@ -64,7 +64,7 @@ const Employee = () => {
       setLoading(true);
       const res = await axios.get(`${DEPARTMENT_URL}`);
       setDepartmentList(res?.data);
-      console.log("Designation  ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -83,7 +83,7 @@ const Employee = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setEmployeeList(res?.data);
-      console.log("EmployeeList  ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {

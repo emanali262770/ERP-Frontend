@@ -55,7 +55,7 @@ const ShelveLocation = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setShelveLocationList(res.data); // store actual categories array
-      console.log("Location  ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -83,7 +83,7 @@ const ShelveLocation = () => {
       shelfNameCode: shelfName,
       description,
     };
-    console.log("Form data", formData);
+  
 
     try {
       const { token } = userInfo || {};

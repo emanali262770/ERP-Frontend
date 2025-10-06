@@ -54,7 +54,7 @@ const Tax = () => {
       setLoading(true);
       const data = await api.get("/taxes");
       setTaxes(data);
-      console.log("====", data);
+ 
     } catch (error) {
       console.error("Error fetching module data:", error);
       setTaxes([]); // fallback to empty array
@@ -105,7 +105,7 @@ const Tax = () => {
 
     setLoading(true);
     const payload = { taxName, value };
-    console.log("Payload", payload);
+  
     try {
       let res;
       if (editingTax) {
@@ -159,7 +159,7 @@ const Tax = () => {
   };
 
   const handleDelete = (id) => {
-    console.log("id", id);
+   
 
     const swalWithTailwindButtons = Swal.mixin({
       customClass: {

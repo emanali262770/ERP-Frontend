@@ -136,7 +136,7 @@ const PurchaseApproval = () => {
 
   // Status change API call
   async function handleStatusChangeApiCall(id, newStatus) {
-    console.log({ id, newStatus });
+ 
 
     try {
       const { token } = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -158,7 +158,7 @@ const PurchaseApproval = () => {
       );
       setCurrentPage(1); // Reset to first page after status change
       Swal.fire("✅ Success", `Status updated to ${newStatus}`, "success");
-      console.log("Status updated:", res.data);
+     
     } catch (error) {
       console.error("Status update failed:", error);
       Swal.fire("❌ Error", "Failed to update status", "error");

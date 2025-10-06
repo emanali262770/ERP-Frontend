@@ -22,26 +22,22 @@ const DistributionRateList = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
   const [distributiveRateLists, setDistributiveRateLists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [distributor, setDistributor] = useState("");
-  const [productName, setProductName] = useState("");
-  const [itemTypeName, setItemTypeName] = useState("");
-  const [productCode, setProductCode] = useState("");
-  const [packSize, setPackSize] = useState("");
-  const [specifications, setSpecifications] = useState("");
+  const [distributorsName, setDistributorList] = useState('');
+  const [distributorId, setDistributorName] = useState("");
   const [salePrice, setSalePrice] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
-  const [details, setDetails] = useState(null);
   const [selectedItemType, setSelectedItemType] = useState({ id: "", name: "" });
   const [selectedProduct, setSelectedProduct] = useState({ id: "", name: "" });
-
   const [editingRateList, setEditingRateList] = useState(null);
   const [errors, setErrors] = useState({});
   const [itemList, setItemList] = useState([]);
-  const [distributors] = useState([]);
-  const [types] = useState([]);
+  const [productItem, setProductItem] = useState({
+    primaryCode: '',
+    unitName: '',
+    details: ''
+  });
+
   const [currentPage, setCurrentPage] = useState(1);
-  const [showPreviewTable, setShowPreviewTable] = useState(false);
-  const [previewData, setPreviewData] = useState(null);
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
 
@@ -50,7 +46,7 @@ const DistributionRateList = () => {
   const fetchDistributiveRateList = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}`);
-      console.log("Rate List: ", res.data);
+     
       setDistributiveRateLists(res.data);
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
@@ -65,29 +61,34 @@ const DistributionRateList = () => {
     fetchDistributiveRateList();
   }, [fetchDistributiveRateList]);
 
-  const fetchRateList = useCallback(async () => {
+  const fetchDistributor = useCallback(async () => {
     try {
-      setLoading(true);
-      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/rateList`);
-      setRateLists(res.data);
-      setFilteredRateLists(res.data); // Initialize filtered list
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/distributors`);
+     
+      setDistributorList(res.data);
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
-      toast.error("Failed to fetch rate lists");
     } finally {
-      setLoading(false);
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   }, []);
 
   useEffect(() => {
-    fetchRateList();
-  }, [fetchRateList]);
+    fetchDistributor();
+  }, [fetchDistributor]);
+
+
+
+
+  // fetch item Type Name
   const fetchItemtypeList = useCallback(async () => {
     try {
       setLoading(true);
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`);
       setItemTypeList(res.data); // store actual categories array
-      console.log("Item   ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -100,102 +101,66 @@ const DistributionRateList = () => {
 
 
 
-const fetchItemDetails = useCallback(async () => {
-  if (!selectedItemType.id) return;
-  try {
-    setLoading(true);
-    const res = await axios.get(
-      `${import.meta.env.VITE_API_BASE_URL}/item-details/rateList/${selectedItemType.name}`
-    );
-    setItemList(res.data);
-  } catch (error) {
-    console.error("Failed to fetch item details", error);
-  } finally {
-    setTimeout(() => setLoading(false), 1000);
-  }
-}, [selectedItemType.name]);
-useEffect(() => {
-  fetchItemDetails();
-}, [fetchItemDetails]);
-  // Rate list search
+  // Item on rate List
   useEffect(() => {
-    if (!searchTerm) {
-      fetchDistributiveRateList();
-      return;
-    }
-
-    const delayDebounce = setTimeout(() => {
+    const fetchItemDetails = async () => {
+      if (!selectedItemType.id) return;
       try {
         setLoading(true);
-        const filtered = distributorRates.filter((rate) =>
-          rate.productCode.toUpperCase().includes(searchTerm.toUpperCase())
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/item-details/rateList/${selectedItemType.name}`
         );
-        setDistributiveRateLists(filtered);
+        setItemList(res.data);
       } catch (error) {
-        console.error("Search rate list failed:", error);
-        setDistributiveRateLists([]);
+        console.error("Failed to fetch item details", error);
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 1000);
       }
-    }, 1000);
+    };
 
-    return () => clearTimeout(delayDebounce);
-  }, [searchTerm, fetchDistributiveRateList, distributiveRateLists]);
+    fetchItemDetails();
+  }, [selectedItemType]);
+
+
+  // fetch product item
+  const fetchProductItem = useCallback(async () => {
+    if (!selectedItemType.id) return;
+    try {
+      setLoading(true);
+      const res = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/item-details/productName/${selectedProduct.name}`
+      );
+      const item = Array.isArray(res.data) ? res.data[0] : res.data;
+
+      setProductItem({
+        primaryCode: item?.primaryBarcode || '',
+        unitName: item?.itemUnit?.unitName || '',
+        details: item?.details || ''
+      });
+
+    } catch (error) {
+      console.error("Failed to fetch item details", error);
+    } finally {
+      setTimeout(() => setLoading(false), 1000);
+    }
+  }, [selectedProduct]);
+
+  useEffect(() => {
+    fetchProductItem();
+  }, [fetchProductItem]);
 
   // Reset form fields
   const resetForm = () => {
-    setDistributor("");
-    setItemTypeName("");
-    setProductName("");
-    setProductCode("");
-    setPackSize("");
-    setSpecifications("");
+    setDistributorName("");
     setSalePrice("");
     setEditingRateList(null);
     setErrors({});
-    setShowPreviewTable(false);
-    setPreviewData(null);
     setIsSliderOpen(false);
   };
 
-  // Validate form fields
-  const validateForm = () => {
-    const newErrors = {};
-    const trimmedDistributor = distributor.trim();
-    const trimmedItemTypeName = itemTypeName.trim();
-    const trimmedProductName = productName.trim();
-    // ✅ No .trim() for number
-    const parsedSalePrice = parseFloat(salePrice);
-    if (!trimmedItemTypeName) newErrors.itemTypeName = "Item Type Name is required";
-    if (!trimmedProductName) newErrors.productName = "Product Name is required";
-    if (isNaN(parsedSalePrice) || parsedSalePrice <= 0) {
-      newErrors.salePrice = "Sale Price must be a positive number";
-    }
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
 
-  // Handle Product Name selection
-  const handleProductChange = (selectedProductId) => {
-    const selectedItem = itemList.find(
-      (item) => item.productName._id === selectedProductId
-    );
 
-    if (selectedItem) {
-      setProductName(selectedItem.productName._id); // store product id
-      setProductCode(selectedItem.productName.primaryBarcode || "");
-      setPackSize(selectedItem.productName.itemUnit || "");
-      setSpecifications(selectedItem.productName.details || "");
-      // if you also need type auto-fill
-      setItemTypeName(selectedItem.type?.itemTypeName || "");
-    } else {
-      setProductName("");
-      setProductCode("");
-      setPackSize("");
-      setSpecifications("");
-      setItemTypeName("");
-    }
-  };
+
 
   // Handlers for form and table actions
   const handleAddRateList = () => {
@@ -203,66 +168,55 @@ useEffect(() => {
     setIsSliderOpen(true);
   };
 
-  const handleEditClick = (distributorRates) => {
-    setEditingRateList(distributorRates);
-    setDistributor(distributorRates?.distributorId?._id || "");
-    setItemTypeName(distributorRates?.type?._id || "");
-    setProductName(distributorRates?.productName?._id || "");
-    setProductCode(distributorRates?.productName?.primaryBarcode || "");
-    setPackSize(distributorRates?.productName?.itemUnit || ""); // string ID unless populated
-    setSpecifications(distributorRates?.productName?.details || "");
-    setSalePrice(distributorRates?.salePrice || "");
-    setIsSliderOpen(true);
-  };
+// ✅ Handle Edit
+const handleEditClick = (rateList) => {
+  setEditingRateList(rateList);
+  setIsSliderOpen(true);
 
+  // Pre-fill distributor
+  setDistributorName(rateList?.distributorId?._id || "");
 
-  const handleAddClick = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      const selectedItem = itemList.find((item) => item._id === productName);
-      const selectedType = itemTypeList.find((type) => type._id === itemTypeName);
-      const newPreviewData = {
-        distributor: distributor.trim(),
-        type: itemTypeName, // ✅ store type ID
-        productName: productName, // ✅ store product ID
-        salePrice: parseFloat(salePrice),
-        itemTypeLabel: selectedType?.itemTypeName || "",
-        productNameLabel: selectedItem?.itemName || "",
-        productCode: selectedItem?.primaryBarcode || "",
-        packSize: selectedItem?.itemUnit?.unitName || "",
-        specifications: selectedItem?.details || "",
-      };
-      setPreviewData(newPreviewData);
-      setShowPreviewTable(true);
-    }
-  };
+  // Pre-fill item type
+  setSelectedItemType({
+    id: rateList?.type?._id || "",
+    name: rateList?.type?.itemTypeName || "",
+  });
 
-  const handleRemovePreview = () => {
-    setPreviewData(null);
-    setShowPreviewTable(false);
-  };
+  // Pre-fill product
+  setSelectedProduct({
+    id: rateList?.productName?._id || "",
+    name: rateList?.productName?.itemName || "",
+  });
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!previewData) {
-      Swal.fire({
-        icon: "error",
-        title: "Error!",
-        text: "Please click Add to preview the data before saving.",
-        confirmButtonColor: "#d33",
-      });
-      return;
-    }
+  // Pre-fill sale price
+  setSalePrice(rateList?.salePrice || "");
 
-   const payload = {
-  type: selectedItemType.id,
-  productName: selectedProduct.id,
-  salePrice: previewData.salePrice,
+  // Auto-fill product item details
+  setProductItem({
+    primaryCode: rateList?.productName?.primaryBarcode || "",
+    unitName: rateList?.productName?.itemUnit?.unitName || "",
+    details: rateList?.productName?.details || "",
+  });
 };
 
 
-    console.log("Submitting Payload:", payload);
 
+
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+
+    const payload = {
+      distributorId,
+      type: selectedItemType.id,
+      productName: selectedProduct.id,
+      salePrice,
+    };
+
+
+  
+    
     try {
       if (editingRateList) {
         await axios.put(
@@ -293,63 +247,63 @@ useEffect(() => {
     }
   };
 
-  const handleDelete = async (id) => {
-    const swalWithTailwindButtons = Swal.mixin({
-      customClass: {
-        actions: "space-x-2",
-        confirmButton:
-          "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
-        cancelButton:
-          "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
-      },
-      buttonsStyling: false,
-    });
+// ✅ Handle Delete
+const handleDelete = async (id) => {
+  const swalWithTailwindButtons = Swal.mixin({
+    customClass: {
+      actions: "space-x-2",
+      confirmButton:
+        "bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-300",
+      cancelButton:
+        "bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-300",
+    },
+    buttonsStyling: false,
+  });
 
-    swalWithTailwindButtons
-      .fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Yes, delete it!",
-        cancelButtonText: "No, cancel!",
-        reverseButtons: true,
-      })
-      .then(async (result) => {
-        if (result.isConfirmed) {
-          try {
-            await axios.delete(
-              `${API_URL}/${id}`,
-              {
-                headers: { Authorization: `Bearer ${userInfo?.token}` },
-              }
-            );
+  const result = await swalWithTailwindButtons.fire({
+    title: "Are you sure?",
+    text: "You won't be able to revert this!",
+    icon: "warning",
+    showCancelButton: true,
+    confirmButtonText: "Yes, delete it!",
+    cancelButtonText: "No, cancel!",
+    reverseButtons: true,
+  });
 
-            setDistributiveRateLists(prev => prev.filter((r) => r._id !== id));
-            setFilteredRateLists(prev => prev.filter((r) => r._id !== id));
-
-            swalWithTailwindButtons.fire(
-              "Deleted!",
-              "Rate List deleted successfully.",
-              "success"
-            );
-          } catch (error) {
-            console.error("Delete error:", error);
-            swalWithTailwindButtons.fire(
-              "Error!",
-              "Failed to delete rate list.",
-              "error"
-            );
-          }
-        } else if (result.dismiss === Swal.DismissReason.cancel) {
-          swalWithTailwindButtons.fire(
-            "Cancelled",
-            "Rate List is safe 🙂",
-            "error"
-          );
-        }
+  if (result.isConfirmed) {
+    try {
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: { Authorization: `Bearer ${userInfo?.token}` },
       });
-  };
+
+      // ✅ Option 1: Remove deleted item locally
+      setDistributiveRateLists((prev) => prev.filter((r) => r._id !== id));
+
+      // ✅ Option 2 (recommended): Re-fetch full list for consistency
+      await fetchDistributiveRateList();
+
+      swalWithTailwindButtons.fire(
+        "Deleted!",
+        "Rate List deleted successfully.",
+        "success"
+      );
+    } catch (error) {
+      console.error("Delete error:", error);
+      swalWithTailwindButtons.fire(
+        "Error!",
+        "Failed to delete rate list.",
+        "error"
+      );
+    }
+  } else if (result.dismiss === Swal.DismissReason.cancel) {
+    swalWithTailwindButtons.fire(
+      "Cancelled",
+      "Rate List is safe 🙂",
+      "error"
+    );
+  }
+};
+
 
   // Pagination logic
   const indexOfLastRecord = currentPage * recordsPerPage;
@@ -511,8 +465,8 @@ useEffect(() => {
                         Distributor <span className="text-red-500">*</span>
                       </label>
                       <select
-                        value={distributor}
-                        onChange={(e) => setDistributor(e.target.value)}
+                        value={distributorId}
+                        onChange={(e) => setDistributorName(e.target.value)}
                         className={`w-60 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.distributor
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
@@ -520,13 +474,13 @@ useEffect(() => {
                         required
                       >
                         <option value="">Select Distributor</option>
-                        {distributors.map((dist) => (
+                        {distributorsName?.map((dist) => (
                           <option key={dist._id} value={dist._id}>
                             {dist.distributorName}
                           </option>
                         ))}
-
                       </select>
+
                       {errors.distributor && (
                         <p className="text-red-500 text-xs mt-1">{errors.distributor}</p>
                       )}
@@ -569,12 +523,15 @@ useEffect(() => {
                       <select
                         value={selectedProduct.id}
                         onChange={(e) => {
-                          const selected = itemList.find((item) => item.productName._id === e.target.value);
-                          setSelectedProduct({
-                            id: selected._id,
-                            name: selected.itemName,
-                          });
+                          const selected = itemList.find((item) => item._id === e.target.value);
+                          if (selected) {
+                            setSelectedProduct({
+                              id: selected._id,
+                              name: selected.itemName,
+                            });
+                          }
                         }}
+
                         className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.productName
                           ? "border-red-500 focus:ring-red-500"
                           : "border-gray-300 focus:ring-newPrimary"
@@ -600,7 +557,7 @@ useEffect(() => {
                       </label>
                       <input
                         type="text"
-                        value={productCode}
+                        value={productItem.primaryCode}
                         readOnly
                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Product Code"
@@ -612,7 +569,7 @@ useEffect(() => {
                       </label>
                       <input
                         type="text"
-                        value={packSize}
+                        value={productItem.unitName}
                         readOnly
                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Pack Size"
@@ -626,7 +583,7 @@ useEffect(() => {
                       </label>
                       <input
                         type="text"
-                        value={specifications}
+                        value={productItem.details}
                         readOnly
                         className="w-full p-3 rounded-md border border-gray-300/80 bg-white/40 text-black placeholder-gray-500 focus:outline-none"
                         placeholder="Specifications"
@@ -650,65 +607,27 @@ useEffect(() => {
                           step="0.01"
                           required
                         />
-                        <button
-                          type="button"
-                          onClick={handleAddClick}
-                          disabled={loading}
-                          className="bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
-                        >
-                          Add
-                        </button>
+
                       </div>
                       {errors.salePrice && (
                         <p className="text-red-500 text-xs mt-1">{errors.salePrice}</p>
                       )}
+
                     </div>
                   </div>
+
                 </div>
-                {showPreviewTable && previewData && (
-                  <div className="mt-4">
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">Preview</h3>
-                    <div className="rounded-lg shadow border border-gray-200 overflow-hidden">
-                      <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1fr_0.5fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase">
-                        <div>SR#</div>
-                        <div>Distributor</div>
-                        <div>Type</div>
-                        <div>Code</div>
-                        <div>Item</div>
-                        <div>Pack Size</div>
-                        <div>Sale Price</div>
-                        <div>Remove</div>
-                      </div>
-                      <div className="grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1fr_0.5fr] items-center gap-4 px-6 py-4 text-sm bg-white">
-                        <div className="text-gray-600">{editingRateList ? distributorRates.findIndex(r => r._id === editingRateList._id) + 1 : distributorRates.length + 1}</div>
-                        <div className="text-gray-600">{previewData.distributor}</div>
-                        <div className="text-gray-600">{previewData.itemTypeLabel}</div>
-                        <div className="text-gray-600">{previewData.productCode}</div>
-                        <div className="text-gray-600">{previewData.productNameLabel}</div>
-                        <div className="text-gray-600">{previewData.packSize}</div>
-                        <div className="text-gray-600">{previewData.specifications}</div>
-                        <div className="text-gray-600">{previewData.salePrice}</div>
-                        <div className="flex justify-start">
-                          <button
-                            onClick={handleRemovePreview}
-                            className=" text-xl flex-shrink-0 text-red-500 transition-colors"
-                            title="Remove"
-                          >
-                            ×
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="mt-4 w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
-                    >
-                      {loading ? "Saving..." : "Save Rate List"}
-                    </button>
-                  </div>
-                )}
+
+
               </form>
+              <button
+                type="button"
+                className="flex justify-center  items-center w-50 bg-newPrimary text-white px-4 py-2 rounded-lg hover:bg-newPrimary/80"
+                onClick={handleSubmit}
+              >
+                Save Distributor Rate List
+              </button>
+
             </div>
           </div>
         )}

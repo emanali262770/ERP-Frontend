@@ -67,7 +67,7 @@ const SupplierList = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setSupplierList(res.data); // store actual categories array
-      console.log("Suppliers  ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -100,7 +100,7 @@ const SupplierList = () => {
   };
 
   const validateEmail = (email) => {
-    console.log("Emmm", email);
+   
 
     const re = /^\S+@\S+\.\S+$/;
     return re.test(email);
@@ -138,7 +138,7 @@ const SupplierList = () => {
       status,
     };
 
-    console.log("From Data ", formData);
+ 
 
     try {
       const { token } = userInfo || {};
@@ -271,7 +271,7 @@ const SupplierList = () => {
   //     </div>
   //   );
   // }
-  console.log({ supplierList });
+ 
 
   return (
     <div className="p-6 bg-gray-50 min-h-screen">
