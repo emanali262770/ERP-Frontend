@@ -17,7 +17,7 @@ import Estimation from "./pages/admin/Purchase/Estimation";
 import GatePassIN from "./pages/admin/Purchase/GatePassIN.jsx";
 import QualityCheck from "./pages/admin/Purchase/QualityChecking.jsx";
 import GRN from "./pages/admin/Purchase/GRN.jsx";
-// import ProtectedRoute from "./components/ProtectedRoute";
+import ProtectedRoute from "./components/ProtectedRoute";
 import SupplierList from "./pages/admin/SetUp/Supplier.jsx";
 import Manufacture from "./pages/admin/SetUp/Manufacture.jsx";
 import ItemBarcode from "./pages/admin/ItemBarcode";
@@ -68,7 +68,6 @@ import PurchasePage from "./pages/admin/Purchase/PurchasePage.jsx";
 import SalesPage from "./pages/admin/Sales/SalesPage.jsx";
 import Test from "./pages/admin/Purchase/api.jsx";
 
-
 function AppContent() {
   return (
     <div className="max-h-screen flex flex-col bg-gray-50">
@@ -84,9 +83,9 @@ function AppContent() {
           <Route
             path="/admin/*"
             element={
-              // <ProtectedRoute>
-              <AdminLayout />
-              // </ProtectedRoute>
+              <ProtectedRoute>
+                <AdminLayout />
+              </ProtectedRoute>
             }
           >
             <Route index element={<AdminDashboard />} />
@@ -97,9 +96,9 @@ function AppContent() {
             <Route path="shelve-location" element={<ShelveLocation />} />
             <Route path="category-item" element={<CategoryItem />} />
             <Route path="supplier" element={<SupplierList />} />
-              <Route path="purchase" element={<PurchasePage />} />
-               <Route path="sales" element={<SalesPage />} />
-               <Route path="api" element={<Test />} />
+            <Route path="purchase" element={<PurchasePage />} />
+            <Route path="sales" element={<SalesPage />} />
+            <Route path="api" element={<Test />} />
 
             <Route path="manufacture" element={<Manufacture />} />
             <Route path="item-barcode" element={<ItemBarcode />} />
@@ -120,7 +119,7 @@ function AppContent() {
             />
             <Route path="purchase-approval" element={<PurchaseApproval />} />
             <Route path="purchase-return" element={<PurchaseReturn />} />
-            <Route path="purchase-order" element={<PurchaseOrder/>} />
+            <Route path="purchase-order" element={<PurchaseOrder />} />
             <Route path="quotation" element={<Quotation />} />
             <Route path="estimation" element={<Estimation />} />
             <Route path="gatepass-in" element={<GatePassIN />} />
@@ -129,12 +128,21 @@ function AppContent() {
             <Route path="grn" element={<GRN />} />
             <Route path="gatepass-out" element={<GatePassOut />} />
             <Route path="rate-list" element={<RateList />} />
-            <Route path="distributor-rate-list" element={<DistributionRateList />} />
+            <Route
+              path="distributor-rate-list"
+              element={<DistributionRateList />}
+            />
             <Route path="booking-orders" element={<BookingOrders />} />
             <Route path="delivery-challan" element={<DeliveryChallan />} />
-            <Route path="store-acknowledgement" element={<StoreAcknowledgement />} />
+            <Route
+              path="store-acknowledgement"
+              element={<StoreAcknowledgement />}
+            />
             <Route path="sales-invoices" element={<SalesInvoices />} />
-            <Route path="payment-receipt-voucher" element={<PaymentReceiptVoucher />} />
+            <Route
+              path="payment-receipt-voucher"
+              element={<PaymentReceiptVoucher />}
+            />
             <Route path="customer-ledger" element={<CustomerLedger />} />
             <Route path="receivable" element={<Receivable />} />
             <Route path="sales-return" element={<SalesReturn />} />
