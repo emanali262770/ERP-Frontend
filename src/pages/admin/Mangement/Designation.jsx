@@ -53,7 +53,7 @@ const Designation = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setDesignationList(res.data);
-      console.log("Designation  ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {

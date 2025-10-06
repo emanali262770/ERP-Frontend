@@ -94,7 +94,7 @@ const generateRandomBarcode = () => {
         `${import.meta.env.VITE_API_BASE_URL}/item-details`
       );
       setItemList(res.data); // store actual categories array
-      console.log("Item Details ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch item details", error);
     } finally {
@@ -129,7 +129,7 @@ const generateRandomBarcode = () => {
         `${import.meta.env.VITE_API_BASE_URL}/categories`
       );
       setCategoryList(res.data); // store actual categories array
-      console.log("Categories ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch categories", error);
     } finally {
@@ -143,7 +143,7 @@ const generateRandomBarcode = () => {
   // Fetch itemTypes when category changes
   useEffect(() => {
     if (!itemCategory) return; // only call when category selected
-    console.log(itemCategory);
+  
 
     const fetchItemTypes = async () => {
       try {
@@ -169,7 +169,7 @@ const generateRandomBarcode = () => {
         `${import.meta.env.VITE_API_BASE_URL}/item-unit`
       );
       setItemUnitList(res.data); // store actual categories array
-      console.log("Item Unit ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch item unit", error);
     } finally {
@@ -188,7 +188,7 @@ const generateRandomBarcode = () => {
         `${import.meta.env.VITE_API_BASE_URL}/manufacturers/list`
       );
       setManufacturerList(res.data); // store actual categories array
-      console.log("Manufacturer ", res.data);
+
     } catch (error) {
       console.error("Failed to fetch Manufacturer", error);
     } finally {
@@ -207,7 +207,7 @@ const generateRandomBarcode = () => {
         `${import.meta.env.VITE_API_BASE_URL}/suppliers/list`
       );
       setSupplierList(res.data); // store actual categories array
-      console.log("Supplier ", res.data);
+
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -226,7 +226,7 @@ const generateRandomBarcode = () => {
         `${import.meta.env.VITE_API_BASE_URL}/shelves`
       );
       setShelvesList(res.data); // store actual categories array
-      console.log("Shelves ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Shelves", error);
     } finally {
@@ -292,7 +292,7 @@ const generateRandomBarcode = () => {
 
   // Save or Update Item
   const handleSave = async () => {
-    // console.log("Item ", itemCategory);
+   
     const errors = validateForm();
     if (errors.length > 0) {
       Swal.fire({
@@ -333,7 +333,7 @@ const generateRandomBarcode = () => {
       formData.append("itemImage", image);
     }
 
-    console.log("Form Data", [...formData.entries()]);
+
 
     try {
       const headers = {
@@ -393,7 +393,7 @@ const generateRandomBarcode = () => {
   };
   // Edit Item
   const handleEdit = (item) => {
-    console.log("Item", item.hasExpiray);
+
     setIsEdit(true);
     setEditId(item._id);
 

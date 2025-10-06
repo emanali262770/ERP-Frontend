@@ -31,7 +31,7 @@ const OpeningBalance = () => {
           `${import.meta.env.VITE_API_BASE_URL}/item-details`
         );
         setItemNameList(res.data);
-        console.log("All items on page load:", res.data);
+      
       } catch (error) {
         console.error("Failed to fetch all items", error);
       } finally {
@@ -50,7 +50,7 @@ const OpeningBalance = () => {
         `${import.meta.env.VITE_API_BASE_URL}/categories`
       );
       setCategoryList(res.data); // store actual categories array
-      console.log("Categories ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch categories", error);
     } finally {
@@ -71,7 +71,7 @@ const OpeningBalance = () => {
           `${import.meta.env.VITE_API_BASE_URL}/item-type/category/${itemCategory}`
         );
         setItemTypeList(res.data);
-        console.log("itemTypeList ", res.data);
+      
 
       } catch (error) {
         console.error("Failed to fetch item types", error);
@@ -85,7 +85,7 @@ const OpeningBalance = () => {
   useEffect(() => {
     if (!itemType) return;
 
-    console.log("itemName", itemType);
+  
 
 
     const fetchItems = async () => {
@@ -93,9 +93,9 @@ const OpeningBalance = () => {
         const res = await axios.get(
           `${import.meta.env.VITE_API_BASE_URL}/item-details/item-type/${itemType}`
         );
-        console.log("Items under this type:", res.data);
+       
         setItemNameList(res.data);
-        console.log("Data.... ", res.data);
+       
 
       } catch (error) {
         console.error("Failed to fetch items", error);

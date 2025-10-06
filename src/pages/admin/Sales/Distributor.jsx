@@ -95,7 +95,7 @@ const DistributorList = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setDistributorList(res.data);
-      console.log("Distributors ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Distributors", error);
     } finally {

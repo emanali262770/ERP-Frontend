@@ -176,7 +176,7 @@ const GRN = () => {
   };
 
  const handleEditClick = (grn) => {
-  console.log("Editing GRN:", grn);
+ 
 
   setEditingGrn(grn);
   setGrnId(grn.grnId);
@@ -363,7 +363,7 @@ setItemsList([]);
       setItemOptions(qcItems); // Only QC items will show in dropdown
     }
   };
-console.log(grns);
+
 
   return (
     <div className="p-4 bg-gray-50 min-h-screen">

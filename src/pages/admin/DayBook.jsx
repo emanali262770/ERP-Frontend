@@ -18,7 +18,7 @@ const DayBook = () => {
       setLoading(true);
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/dayBook`);
       const result = await response.json();
-      console.log("Day Book ", result);
+     
       setDayBookList(result);
     } catch (error) {
       console.error("Error fetching day book data:", error);

@@ -41,7 +41,7 @@ const Login = () => {
   
       // ✅ Toast and redirect
       toast.success("Logged in successfully 🎉");
-      console.log("Stored userInfo:", userInfo);
+      
   
       if (user.isAdmin === true || user.isAdmin === false) {
         navigate("/admin");

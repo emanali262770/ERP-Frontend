@@ -90,7 +90,7 @@ const QualityChecking = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setQualityChecks(res.data); // store actual categories array
-      console.log("qualtity check  ", res.data);
+     
     } catch (error) {
       console.error("Failed to qualtity check ", error);
     } finally {
@@ -107,7 +107,7 @@ const QualityChecking = () => {
       setLoading(true);
       const res = await axios.get(`${GATEPASS_URL}`);
       setGatePassList(res.data); // store actual categories array
-      console.log("gate pass", res.data);
+     
     } catch (error) {
       console.error("Failed to Gate pass", error);
     } finally {
@@ -179,7 +179,7 @@ const QualityChecking = () => {
   };
 
   const handleEditClick = (qc) => {
-    console.log({qc});
+
     
     setEditingQC(qc);
     setQcId(qc.qcId);
@@ -265,7 +265,7 @@ const QualityChecking = () => {
         remarks: i.remarks || "",
       })),
     };
-    console.log(newQC);
+  
 
     try {
       if (editingQC) {
