@@ -46,7 +46,7 @@ const DistributionRateList = () => {
   const fetchDistributiveRateList = useCallback(async () => {
     try {
       const res = await axios.get(`${API_URL}`);
-      console.log("Rate List: ", res.data);
+     
       setDistributiveRateLists(res.data);
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
@@ -64,7 +64,7 @@ const DistributionRateList = () => {
   const fetchDistributor = useCallback(async () => {
     try {
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/distributors`);
-      // console.log("Distributors List: ", res.data);
+     
       setDistributorList(res.data);
     } catch (error) {
       console.error("Failed to fetch rate lists", error);
@@ -88,7 +88,7 @@ const DistributionRateList = () => {
       setLoading(true);
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`);
       setItemTypeList(res.data); // store actual categories array
-      // console.log("Item   ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -190,7 +190,7 @@ const DistributionRateList = () => {
     };
 
 
-    console.log("Submitting Payload:", payload);
+  
     
     try {
       if (editingRateList) {

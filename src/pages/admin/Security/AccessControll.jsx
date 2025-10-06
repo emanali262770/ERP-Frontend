@@ -179,7 +179,7 @@ const ModulesFunctionalities = () => {
 
         functionalities: selectedFunctionalities
       }
-      console.log("payload", payload);
+    
 
       if (isEdit && editId) {
         // Update existing functionality

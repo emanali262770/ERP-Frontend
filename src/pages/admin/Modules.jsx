@@ -46,15 +46,14 @@ const Modules = () => {
 
   // Token
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  console.log("Admin", userInfo?.isAdmin);
-
+  
   // Fetch Module Data
   const fetchModuleData = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`${import.meta.env.VITE_API_BASE_URL}/modules`);
       const result = await response.json();
-      console.log("Modules ", result);
+     
       setModuleList(result.length > 0 ? result : staticModuleData); // Use API data if available, else static data
     } catch (error) {
       console.error("Error fetching module data:", error);
@@ -68,7 +67,7 @@ const Modules = () => {
     fetchModuleData();
   }, [fetchModuleData]);
 
-  console.log("Module Data", moduleList);
+
 
   // Save Module Data
   const handleSave = async () => {
@@ -130,7 +129,7 @@ const Modules = () => {
     setModuleName(module.moduleName || "");
     setDescription(module.description || "");
     setIsSliderOpen(true);
-    console.log("Editing Module Data", module);
+   
   };
 
   // Delete Module

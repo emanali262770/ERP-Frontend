@@ -82,7 +82,7 @@ const ItemBarcode = () => {
   const getUserInfo = () => {
     try {
       const info = JSON.parse(localStorage.getItem("userInfo") || "{}");
-      // console.log("Parsed userInfo:", info);
+     
       return info;
     } catch (error) {
       console.error("Error parsing userInfo:", error);
@@ -207,7 +207,7 @@ const ItemBarcode = () => {
       );
       if (!res.ok) throw new Error("Failed to fetch barcodes");
       const result = await res.json();
-      console.log("Result", result);
+     
 
       setItemBarcodeList(result);
     } catch (error) {
@@ -263,8 +263,7 @@ const ItemBarcode = () => {
       reorderLevel: parseInt(reorderLevel),
       salePrice: parseFloat(salePrice),
     };
-    // console.log("New item", newItem);
-
+    
     try {
       const token = userInfo?.token;
       if (!token) {

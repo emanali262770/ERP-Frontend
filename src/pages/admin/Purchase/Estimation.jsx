@@ -35,7 +35,7 @@ const Estimation = () => {
         `${import.meta.env.VITE_API_BASE_URL}/quotations`
       );
       setQuotations(res.data);
-      console.log("quotations", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch quotations", error);
     } finally {
@@ -91,7 +91,7 @@ const Estimation = () => {
         `${import.meta.env.VITE_API_BASE_URL}/estimations`
       );
       setEstimations(res.data);
-      console.log("estimations", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch estimations", error);
     } finally {

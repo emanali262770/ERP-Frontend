@@ -44,7 +44,7 @@ const Company = () => {
 
   // Token
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
-  console.log("Admin", userInfo.isAdmin);
+ 
 
   // Fetch Company Data
   const fetchCompanyData = useCallback(async () => {
@@ -54,7 +54,7 @@ const Company = () => {
         `${import.meta.env.VITE_API_BASE_URL}/companies`
       );
       const result = await response.json();
-      console.log("Companies ", result);
+     
       setCompanyList(result);
     } catch (error) {
       console.error("Error fetching company data:", error);
@@ -75,7 +75,7 @@ const Company = () => {
         `${import.meta.env.VITE_API_BASE_URL}/users`
       );
       const result = await response.json();
-      console.log("Users ", result);
+    
       setUserList(result.data || []);
     } catch (error) {
       console.error("Error fetching user data:", error);
@@ -88,7 +88,7 @@ const Company = () => {
     fetchUserData();
   }, [fetchUserData]);
 
-  console.log("Company Data", companyList);
+ 
 
   // Save Company Data
   const handleSave = async () => {
@@ -96,7 +96,7 @@ const Company = () => {
     formData.append("name", companyName);
     formData.append("users", users);
 
-    console.log("Form Data", formData);
+   
 
     try {
       const { token } = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -143,7 +143,7 @@ const Company = () => {
     setCompanyName(company.name || "");
     setUsers(company.users || "");
     setIsSliderOpen(true);
-    console.log("Editing Company Data", company);
+   
   };
 
   // Delete Company

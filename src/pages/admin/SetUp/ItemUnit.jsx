@@ -74,7 +74,7 @@ const ItemUnit = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setItemUnitList(res.data); // store actual categories array
-      console.log("Item Unit  ", res.data);
+     
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -136,7 +136,7 @@ const ItemUnit = () => {
 
   // Edit Manufacturer
   const handleEdit = (item) => {
-    // console.log(item);
+   
     setIsEdit(true);
     setEditId(item._id);
     setManufacturerName(item.unitName);

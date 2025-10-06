@@ -82,7 +82,7 @@ const PurchaseRequisition = () => {
 }, [category]);
 
 
-  console.log({ itemNameList });
+ 
 
   useEffect(() => {
     if (requisitions.length > 0) {
@@ -164,7 +164,6 @@ const PurchaseRequisition = () => {
       category:category._id,
       items: itemsList,
     };
-    console.log({newRequisition});
     
 
     try {

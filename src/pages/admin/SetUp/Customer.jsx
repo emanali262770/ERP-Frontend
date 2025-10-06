@@ -95,7 +95,7 @@ const CustomerList = () => {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
       setCustomerList(res.data);
-      console.log("Customers ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Customers", error);
     } finally {

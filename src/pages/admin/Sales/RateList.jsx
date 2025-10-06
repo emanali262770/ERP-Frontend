@@ -49,7 +49,7 @@ const RateList = () => {
     try {
       setLoading(true);
       const res = await axios.get(`${API_URL}`);
-      console.log("Rate List: ", res.data);
+     
       setRateLists(res.data);
       setFilteredRateLists(res.data); // Initialize filtered list
     } catch (error) {
@@ -69,7 +69,7 @@ const RateList = () => {
       setLoading(true);
       const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/item-type`);
       setItemTypeList(res.data); // store actual categories array
-      console.log("Item   ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Supplier", error);
     } finally {
@@ -87,7 +87,7 @@ const RateList = () => {
         `${import.meta.env.VITE_API_BASE_URL}/item-details/rateList/${itemTypeName}`
       );
       setItemList(res.data); // store actual categories array
-      console.log("Item Details ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch item details", error);
     } finally {

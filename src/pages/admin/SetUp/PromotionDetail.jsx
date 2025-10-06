@@ -33,7 +33,7 @@ const Promotion = () => {
       setLoading(true);
       const res = await axios.get(API_URL);
       setPromotions(res.data);
-      console.log("Promotion List  ", res.data);
+    
     } catch (error) {
       console.error("Failed to fetch Promotion", error);
       // Fallback to static data if API fails
