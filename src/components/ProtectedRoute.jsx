@@ -10,7 +10,7 @@ const ProtectedRoute = ({ children, role }) => {
   const API_URL = "https://erp-backend-drab.vercel.app/api/token/check";
 
   useEffect(() => {
-    const vercelCheck = async () => {
+    const checkTokenValidOrNot = async () => {
       if (!user || !user.token) {
         setisValid(false);
         return;
@@ -20,7 +20,7 @@ const ProtectedRoute = ({ children, role }) => {
         const response = await axios.get(API_URL, {
           headers: { Authorization: `Bearer ${user.token}` },
         });
-        console.log({ response });
+        // console.log({ response });
 
         if (response.data.success === false) {
           localStorage.clear();
@@ -34,7 +34,7 @@ const ProtectedRoute = ({ children, role }) => {
         setisValid(false);
       }
     };
-    vercelCheck();
+    checkTokenValidOrNot();
   }, []);
   if (isValid === null) return null;
   if (!user || !isValid) return <Navigate to="/" replace />;
