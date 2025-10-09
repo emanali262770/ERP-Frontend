@@ -18,6 +18,7 @@ import {
   FaUserCog,
   FaShoppingCart,
 } from "react-icons/fa";
+import { FaUserGroup } from "react-icons/fa6";
 
 import { FcSalesPerformance } from "react-icons/fc";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
@@ -80,6 +81,8 @@ const links = [
     icon: <FaCogs />,
     children: [
       { to: "/admin/customers-list", label: "Customers", icon: <FaTags /> },
+      { to: "/admin/group", label: "Group", icon: <FaUserGroup /> },
+      { to: "/admin/company", label: "Company", icon: <FaTags /> },
       {
         to: "/admin/category-item",
         label: "Item Categories",
