@@ -28,7 +28,7 @@ import BookingOrder from "./pages/admin/BookingOrder";
 import GatePassOut from "./pages/admin/Purchase/GatePassOUT.jsx";
 import ItemUnit from "./pages/admin/SetUp/ItemUnit.jsx";
 
-import Company from "./pages/admin/Company";
+
 import Users from "./pages/admin/Security/Users.jsx";
 import GroupManagement from "./pages/admin/Security/GroupManagement.jsx";
 // import AccessRights from "./pages/admin/AccessControl";
@@ -67,6 +67,9 @@ import Tax from "./pages/admin/SetUp/Tax.jsx";
 import PurchasePage from "./pages/admin/Purchase/PurchasePage.jsx";
 import SalesPage from "./pages/admin/Sales/SalesPage.jsx";
 import Test from "./pages/admin/Purchase/api.jsx";
+import Group from "./pages/admin/SetUp/Group.jsx";
+import Company from "./pages/admin/SetUp/Company.jsx";
+
 
 function AppContent() {
   return (
@@ -100,6 +103,8 @@ function AppContent() {
             <Route path="sales" element={<SalesPage />} />
             <Route path="api" element={<Test />} />
 
+            <Route path="group" element={<Group />} />
+          
             <Route path="manufacture" element={<Manufacture />} />
             <Route path="item-barcode" element={<ItemBarcode />} />
             <Route path="sales-invoice" element={<SalesInvoice />} />
