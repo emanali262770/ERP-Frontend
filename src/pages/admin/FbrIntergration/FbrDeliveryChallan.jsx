@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import { SquarePen, Trash2, CheckCircle, XCircle } from "lucide-react";
+import { SquarePen, Trash2, CheckCircle, XCircle, X } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 import Swal from "sweetalert2";
@@ -86,6 +86,36 @@ const FbrDeliveryChallan = () => {
   const [loading, setLoading] = useState(true);
   const [dcNo, setDcNo] = useState("");
   const [date, setDate] = useState("");
+  const [productList, setProductList] = useState([]);
+  const [product, setProduct] = useState("");
+  const [rate, setRate] = useState("");
+  const [inStock, setInStock] = useState("");
+  const [specification, setSpecification] = useState("");
+  const [itemsList, setItemsList] = useState([]);
+  const [totalWeight, setTotalWeight] = useState("");
+  const [totalAmount, setTotalAmount] = useState("");
+  const [qty, setQty] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  const handleAddItem = () => {
+    if (!product) return;
+    const newItem = {
+      product,
+      specification,
+      weight: 0,
+      packing: "",
+      inStock,
+      qty: 1,
+      rate,
+      total: rate,
+    };
+    setItemsList([...itemsList, newItem]);
+  };
+
+  const handleRemoveItem = (idx) => {
+    setItemsList(itemsList.filter((_, i) => i !== idx));
+  };
+
   const [orderNo, setOrderNo] = useState("");
   const [orderDate, setOrderDate] = useState("");
   const [orderDetails, setOrderDetails] = useState({
@@ -124,6 +154,7 @@ const FbrDeliveryChallan = () => {
   const [activeTab, setActiveTab] = useState("orderDetails");
   const [nextDcNo, setNextDcNo] = useState("003");
   const [currentPage, setCurrentPage] = useState(1);
+
   const recordsPerPage = 10;
   const sliderRef = useRef(null);
   const userInfo = JSON.parse(localStorage.getItem("userInfo")) || {};
@@ -145,6 +176,11 @@ const FbrDeliveryChallan = () => {
   useEffect(() => {
     fetchDeliveryChallans();
   }, [fetchDeliveryChallans]);
+
+  useEffect(() => {
+    const totalValue = (parseFloat(rate) || 0) * (parseInt(qty) || 0);
+    setTotal(totalValue.toFixed(2));
+  }, [rate, qty]);
 
   // Delivery challan search
   useEffect(() => {
@@ -617,6 +653,7 @@ const FbrDeliveryChallan = () => {
               ref={sliderRef}
               className="w-full md:w-[900px] bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]"
             >
+              {/* Header */}
               <div className="flex justify-between items-center p-4 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
                   {editingChallan
@@ -631,10 +668,12 @@ const FbrDeliveryChallan = () => {
                 </button>
               </div>
 
+              {/* ================= FORM ================= */}
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
-                <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
+                {/* 1️⃣ SECTION — BASIC INFO */}
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
                   <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
                         DC No <span className="text-red-500">*</span>
                       </label>
@@ -642,21 +681,11 @@ const FbrDeliveryChallan = () => {
                         type="text"
                         value={editingChallan ? dcNo : `DC-${nextDcNo}`}
                         readOnly
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.dcNo
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        placeholder="Enter DC No"
-                        required
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       />
-                      {errors.dcNo && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.dcNo}
-                        </p>
-                      )}
                     </div>
-                    <div className="flex-1 min-w-0">
+
+                    <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
                         Date <span className="text-red-500">*</span>
                       </label>
@@ -664,44 +693,29 @@ const FbrDeliveryChallan = () => {
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.date
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        required
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       />
-                      {errors.date && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.date}
-                        </p>
-                      )}
                     </div>
                   </div>
+
                   <div className="flex gap-4">
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
-                        Order No <span className="text-red-500">*</span>
+                        Booking Order <span className="text-red-500">*</span>
                       </label>
-                      <input
-                        type="text"
+                      <select
                         value={orderNo}
                         onChange={(e) => setOrderNo(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.orderNo
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        placeholder="Enter Order No"
-                        required
-                      />
-                      {errors.orderNo && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.orderNo}
-                        </p>
-                      )}
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      >
+                        <option value="">Select Booking Order</option>
+                        <option value="001">001</option>
+                        <option value="002">002</option>
+                      
+                      </select>
                     </div>
-                    <div className="flex-1 min-w-0">
+
+                    <div className="flex-1">
                       <label className="block text-gray-700 font-medium mb-2">
                         Order Date <span className="text-red-500">*</span>
                       </label>
@@ -709,695 +723,263 @@ const FbrDeliveryChallan = () => {
                         type="date"
                         value={orderDate}
                         onChange={(e) => setOrderDate(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                          errors.orderDate
-                            ? "border-red-500 focus:ring-red-500"
-                            : "border-gray-300 focus:ring-newPrimary"
-                        }`}
-                        required
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
                       />
-                      {errors.orderDate && (
-                        <p className="text-red-500 text-xs mt-1">
-                          {errors.orderDate}
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
-                <div className="flex gap-4 mb-4">
-                  <div className="flex-1">
-                    <button
-                      type="button"
-                      className={`w-full py-2 rounded-md ${
-                        activeTab === "orderDetails"
-                          ? "bg-newPrimary text-white"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                      onClick={() => setActiveTab("orderDetails")}
-                    >
-                      Order Details
-                    </button>
-                  </div>
-                  <div className="flex-1">
-                    <button
-                      type="button"
-                      className={`w-full py-2 rounded-md ${
-                        activeTab === "vehicleDetails"
-                          ? "bg-newPrimary text-white"
-                          : "bg-gray-200 text-gray-700"
-                      }`}
-                      onClick={() => setActiveTab("vehicleDetails")}
-                    >
-                      Vehicle Details
-                    </button>
-                  </div>
-                </div>
-              
-                {activeTab === "orderDetails" && (
-                  <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
-                  <div className="space-y-4">
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Customer <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={orderDetails.customer}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              customer: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.customer
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Customer"
-                          required
-                        />
-                        {errors.customer && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.customer}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Person <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={orderDetails.person}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              person: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.person
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Person"
-                          required
-                        />
-                        {errors.person && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.person}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Phone <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={orderDetails.phone}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              phone: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.phone
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Phone"
-                          required
-                        />
-                        {errors.phone && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.phone}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Address <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={orderDetails.address}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              address: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.address
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Address"
-                          required
-                        />
-                        {errors.address && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.address}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Order Type <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={orderDetails.orderType}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              orderType: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.orderType
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          required
-                        >
-                          <option value="">Select Order Type</option>
-                          <option value="Standard">Standard</option>
-                          <option value="Express">Express</option>
-                        </select>
-                        {errors.orderType && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.orderType}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Mode <span className="text-red-500">*</span>
-                        </label>
-                        <select
-                          value={orderDetails.mode}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              mode: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.mode
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          required
-                        >
-                          <option value="">Select Mode</option>
-                          <option value="Truck">Truck</option>
-                          <option value="Van">Van</option>
-                        </select>
-                        {errors.mode && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.mode}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Total Weight <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={orderDetails.totalWeight}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              totalWeight: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.totalWeight
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Total Weight"
-                          min="0"
-                          step="0.01"
-                          required
-                        />
-                        {errors.totalWeight && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.totalWeight}
-                          </p>
-                        )}
-                      </div>
 
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Delivery Date <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="date"
-                          value={orderDetails.deliveryDate}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              deliveryDate: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.deliveryDate
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          required
-                        />
-                        {errors.deliveryDate && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.deliveryDate}
-                          </p>
-                        )}
-                      </div>
+                {/* 2️⃣ SECTION — CUSTOMER / DELIVERY DETAILS */}
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Customer <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={orderDetails.customer}
+                        onChange={(e) =>
+                          setOrderDetails({
+                            ...orderDetails,
+                            customer: e.target.value,
+                          })
+                        }
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      />
                     </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Delivery Address{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={orderDetails.deliveryAddress}
-                          onChange={(e) =>
-                            setOrderDetails({
-                              ...orderDetails,
-                              deliveryAddress: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.deliveryAddress
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Delivery Address"
-                          required
-                        />
-                        {errors.deliveryAddress && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.deliveryAddress}
-                          </p>
-                        )}
-                      </div>
+
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Phone Number <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={orderDetails.phone}
+                        onChange={(e) =>
+                          setOrderDetails({
+                            ...orderDetails,
+                            phone: e.target.value,
+                          })
+                        }
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      />
                     </div>
                   </div>
+
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      value={orderDetails.address}
+                      onChange={(e) =>
+                        setOrderDetails({
+                          ...orderDetails,
+                          address: e.target.value,
+                        })
+                      }
+                      className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                    />
                   </div>
-                )}
-            
-              
-                  {activeTab === "vehicleDetails" && (
-                    <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
-                  <div className="space-y-4">
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Truck No <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.truckNo}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              truckNo: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.truckNo
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Truck No"
-                          required
-                        />
-                        {errors.truckNo && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.truckNo}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Driver Name <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.driverName}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              driverName: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.driverName
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Driver Name"
-                          required
-                        />
-                        {errors.driverName && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.driverName}
-                          </p>
-                        )}
-                      </div>
+
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Date <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="date"
+                        value={orderDetails.deliveryDate}
+                        onChange={(e) =>
+                          setOrderDetails({
+                            ...orderDetails,
+                            deliveryDate: e.target.value,
+                          })
+                        }
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      />
                     </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Father <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.father}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              father: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.father
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Father's Name"
-                          required
-                        />
-                        {errors.father && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.father}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          CNIC <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.cnic}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              cnic: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.cnic
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter CNIC"
-                          required
-                        />
-                        {errors.cnic && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.cnic}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Mobile No <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.mobileNo}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              mobileNo: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.mobileNo
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Mobile No"
-                          required
-                        />
-                        {errors.mobileNo && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.mobileNo}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Container No 1 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.containerNo1}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              containerNo1: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.containerNo1
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Container No 1"
-                          required
-                        />
-                        {errors.containerNo1 && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.containerNo1}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Batch No 1 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.batchNo1}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              batchNo1: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.batchNo1
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Batch No 1"
-                          required
-                        />
-                        {errors.batchNo1 && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.batchNo1}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          For Location 1 <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.forLocation1}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              forLocation1: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.forLocation1
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter For Location 1"
-                          required
-                        />
-                        {errors.forLocation1 && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.forLocation1}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Container No 2
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.containerNo2}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              containerNo2: e.target.value,
-                            })
-                          }
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                          placeholder="Enter Container No 2"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Batch No 2
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.batchNo2}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              batchNo2: e.target.value,
-                            })
-                          }
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                          placeholder="Enter Batch No 2"
-                        />
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          For Location 2
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.forLocation2}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              forLocation2: e.target.value,
-                            })
-                          }
-                          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                          placeholder="Enter For Location 2"
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          First Weight <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="number"
-                          value={vehicleDetails.firstWeight}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              firstWeight: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.firstWeight
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter First Weight"
-                          min="0"
-                          step="0.01"
-                          required
-                        />
-                        {errors.firstWeight && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.firstWeight}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                    <div className="flex gap-4">
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Weight Bridge Name{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.weightBridgeName}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              weightBridgeName: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.weightBridgeName
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Weight Bridge Name"
-                          required
-                        />
-                        {errors.weightBridgeName && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.weightBridgeName}
-                          </p>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <label className="block text-gray-700 font-medium mb-2">
-                          Weight Bridge Slip No{" "}
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={vehicleDetails.weightBridgeSlipNo}
-                          onChange={(e) =>
-                            setVehicleDetails({
-                              ...vehicleDetails,
-                              weightBridgeSlipNo: e.target.value,
-                            })
-                          }
-                          className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
-                            errors.weightBridgeSlipNo
-                              ? "border-red-500 focus:ring-red-500"
-                              : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                          placeholder="Enter Weight Bridge Slip No"
-                          required
-                        />
-                        {errors.weightBridgeSlipNo && (
-                          <p className="text-red-500 text-xs mt-1">
-                            {errors.weightBridgeSlipNo}
-                          </p>
-                        )}
-                      </div>
+
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Delivery Address <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={orderDetails.deliveryAddress}
+                        onChange={(e) =>
+                          setOrderDetails({
+                            ...orderDetails,
+                            deliveryAddress: e.target.value,
+                          })
+                        }
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      />
                     </div>
                   </div>
+                </div>
+
+                {/* 3️⃣ SECTION — PRODUCT ITEMS */}
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  {/* Line 1 */}
+                  <div className="flex gap-4">
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Product
+                      </label>
+                      <select
+                        value={product}
+                        onChange={(e) => setProduct(e.target.value)}
+                        className="w-full p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                      >
+                        <option value="">Select Product</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="Mobile">Mobile</option>
+                      </select>
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Rate
+                      </label>
+                      <input
+                        type="number"
+                        value={rate}
+                        onChange={(e) => setRate(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter rate"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Qty
+                      </label>
+                      <input
+                        type="number"
+                        min="1"
+                        value={qty}
+                        onChange={(e) => setQty(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter quantity"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Total
+                      </label>
+                      <input
+                        type="text"
+                        value={total}
+                        readOnly
+                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
+                      />
+                    </div>
                   </div>
-                )}
-              
-              
-              <div className="space-y-3 border p-4 pb-6 rounded-lg bg-gray-100">
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+
+                  {/* Line 2 */}
+                  <div className="flex gap-4 items-end">
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        In Stock
+                      </label>
+                      <input
+                        type="text"
+                        value={inStock}
+                        onChange={(e) => setInStock(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter in stock"
+                      />
+                    </div>
+
+                    <div className="flex-1">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Specifications
+                      </label>
+                      <input
+                        type="text"
+                        value={specification}
+                        onChange={(e) => setSpecification(e.target.value)}
+                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
+                        placeholder="Enter specifications"
+                      />
+                    </div>
+
+                    <div className="flex items-end">
+                      <button
+                        type="button"
+                        onClick={handleAddItem}
+                        className="w-24 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
+                      >
+                        + Add
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Table */}
+                  {itemsList.length > 0 && (
+                    <div className="overflow-x-auto">
+                      <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
+                        <thead className="bg-gray-100 text-gray-600 text-sm">
+                          <tr>
+                            <th className="px-4 py-2 border-b">Sr #</th>
+                            <th className="px-4 py-2 border-b">Item</th>
+                            <th className="px-4 py-2 border-b">
+                              Specifications
+                            </th>
+
+                            <th className="px-4 py-2 border-b">Stock</th>
+                            <th className="px-4 py-2 border-b">Qty</th>
+                            <th className="px-4 py-2 border-b">Rate</th>
+                            <th className="px-4 py-2 border-b">Total</th>
+                            <th className="px-4 py-2 border-b">Remove</th>
+                          </tr>
+                        </thead>
+                        <tbody className="text-gray-700 text-sm">
+                          {itemsList.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-gray-50">
+                              <td className="px-4 py-2 border-b text-center">
+                                {idx + 1}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {productList.find((p) => p._id === item.product)
+                                  ?.productName || "N/A"}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.specification}
+                              </td>
+
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.inStock}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.qty}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.rate}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                {item.total}
+                              </td>
+                              <td className="px-4 py-2 border-b text-center">
+                                <button onClick={() => handleRemoveItem(idx)}>
+                                  <X size={18} className="text-red-500" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* 4️⃣ SECTION — REMARKS */}
+                <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  <div>
                     <label className="block text-gray-700 font-medium mb-2">
                       Remarks
                     </label>
@@ -1409,9 +991,8 @@ const FbrDeliveryChallan = () => {
                       rows="3"
                     />
                   </div>
-                </div>
-                <div className="flex gap-4">
-                  <div className="flex-1 min-w-0">
+
+                  <div>
                     <label className="block text-gray-700 font-medium mb-2">
                       Approval Remarks
                     </label>
@@ -1424,7 +1005,8 @@ const FbrDeliveryChallan = () => {
                     />
                   </div>
                 </div>
-                </div>
+
+                {/* SUBMIT BUTTON */}
                 <button
                   type="submit"
                   disabled={loading}

@@ -94,16 +94,65 @@ const FbrBookingOrders = () => {
   const [totalAmount, setTotalAmount] = useState(0);
   const [remarks, setRemarks] = useState("");
   const [editingOrder, setEditingOrder] = useState(null);
+  
   const [errors, setErrors] = useState({});
   const [customerList, setCustomerList] = useState([
-    { _id: "cust1", customerName: "Tech Corp", contactPerson: "John Doe", phone: "123-456-7890", address: "123 Tech St", balance: 500 },
-    { _id: "cust2", customerName: "Retail Inc", contactPerson: "Jane Smith", phone: "987-654-3210", address: "789 Retail Ave", balance: 200 },
-    { _id: "cust3", customerName: "Global Traders", contactPerson: "Alice Brown", phone: "555-123-4567", address: "456 Global Rd", balance: 1000 },
+    {
+      _id: "cust1",
+      customerName: "Tech Corp",
+      contactPerson: "John Doe",
+      phone: "123-456-7890",
+      address: "123 Tech St",
+      balance: 500,
+    },
+    {
+      _id: "cust2",
+      customerName: "Retail Inc",
+      contactPerson: "Jane Smith",
+      phone: "987-654-3210",
+      address: "789 Retail Ave",
+      balance: 200,
+    },
+    {
+      _id: "cust3",
+      customerName: "Global Traders",
+      contactPerson: "Alice Brown",
+      phone: "555-123-4567",
+      address: "456 Global Rd",
+      balance: 1000,
+    },
   ]);
   const [productList, setProductList] = useState([
-    { _id: "prod1", productName: "Laptop", rate: 1000, weight: 2.5, packing: "Box", inStock: 10, total: 1000, specification: "15-inch, 16GB RAM" },
-    { _id: "prod2", productName: "Mouse", rate: 20, weight: 0.2, packing: "Plastic", inStock: 50, total: 20, specification: "Wireless" },
-    { _id: "prod3", productName: "Keyboard", rate: 50, weight: 0.8, packing: "Box", inStock: 30, total: 50, specification: "Mechanical" },
+    {
+      _id: "prod1",
+      productName: "Laptop",
+      rate: 1000,
+      weight: 2.5,
+      packing: "Box",
+      inStock: 10,
+      total: 1000,
+      specification: "15-inch, 16GB RAM",
+    },
+    {
+      _id: "prod2",
+      productName: "Mouse",
+      rate: 20,
+      weight: 0.2,
+      packing: "Plastic",
+      inStock: 50,
+      total: 20,
+      specification: "Wireless",
+    },
+    {
+      _id: "prod3",
+      productName: "Keyboard",
+      rate: 50,
+      weight: 0.8,
+      packing: "Box",
+      inStock: 30,
+      total: 50,
+      specification: "Mechanical",
+    },
   ]);
   const [nextOrderNo, setNextOrderNo] = useState("003");
   const [currentPage, setCurrentPage] = useState(1);
@@ -193,8 +242,14 @@ const FbrBookingOrders = () => {
   }, [product, productList]);
 
   const calculateTotals = () => {
-    const weightSum = itemsList.reduce((sum, item) => sum + parseFloat(item.weight || 0), 0);
-    const amountSum = itemsList.reduce((sum, item) => sum + parseFloat(item.total || 0), 0);
+    const weightSum = itemsList.reduce(
+      (sum, item) => sum + parseFloat(item.weight || 0),
+      0
+    );
+    const amountSum = itemsList.reduce(
+      (sum, item) => sum + parseFloat(item.total || 0),
+      0
+    );
     setTotalWeight(weightSum.toFixed(2));
     setTotalAmount(amountSum.toFixed(2));
   };
@@ -204,7 +259,15 @@ const FbrBookingOrders = () => {
   }, [itemsList]);
 
   const handleAddItem = () => {
-    if (!product || !rate || !weight || !packing || !inStock || !total || !specification) {
+    if (
+      !product ||
+      !rate ||
+      !weight ||
+      !packing ||
+      !inStock ||
+      !total ||
+      !specification
+    ) {
       Swal.fire({
         icon: "warning",
         title: "Missing Fields",
@@ -273,12 +336,14 @@ const FbrBookingOrders = () => {
     if (!orderNo && !editingOrder) newErrors.orderNo = "Order No is required";
     if (!orderDate) newErrors.orderDate = "Order Date is required";
     if (!customer) newErrors.customer = "Customer is required";
-    if (!deliveryAddress) newErrors.deliveryAddress = "Delivery Address is required";
+    if (!deliveryAddress)
+      newErrors.deliveryAddress = "Delivery Address is required";
     if (!orderType) newErrors.orderType = "Order Type is required";
     if (!deliveryDate) newErrors.deliveryDate = "Delivery Date is required";
     if (!mode) newErrors.mode = "Mode is required";
     if (!paymentMethod) newErrors.paymentMethod = "Payment Method is required";
-    if (itemsList.length === 0) newErrors.items = "At least one item is required";
+    if (itemsList.length === 0)
+      newErrors.items = "At least one item is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -340,7 +405,9 @@ const FbrBookingOrders = () => {
     try {
       if (editingOrder) {
         setBookingOrders((prev) =>
-          prev.map((o) => (o._id === editingOrder._id ? { ...o, ...newOrder, _id: o._id } : o))
+          prev.map((o) =>
+            o._id === editingOrder._id ? { ...o, ...newOrder, _id: o._id } : o
+          )
         );
         Swal.fire({
           icon: "success",
@@ -349,7 +416,10 @@ const FbrBookingOrders = () => {
           confirmButtonColor: "#3085d6",
         });
       } else {
-        setBookingOrders((prev) => [...prev, { ...newOrder, _id: `temp-${Date.now()}` }]);
+        setBookingOrders((prev) => [
+          ...prev,
+          { ...newOrder, _id: `temp-${Date.now()}` },
+        ]);
         Swal.fire({
           icon: "success",
           title: "Added!",
@@ -421,7 +491,10 @@ const FbrBookingOrders = () => {
 
   const indexOfLastRecord = currentPage * recordsPerPage;
   const indexOfFirstRecord = indexOfLastRecord - recordsPerPage;
-  const currentRecords = bookingOrders.slice(indexOfFirstRecord, indexOfLastRecord);
+  const currentRecords = bookingOrders.slice(
+    indexOfFirstRecord,
+    indexOfLastRecord
+  );
   const totalPages = Math.ceil(bookingOrders.length / recordsPerPage);
 
   const handlePageChange = (pageNumber) => {
@@ -487,7 +560,8 @@ const FbrBookingOrders = () => {
                     >
                       <div className="text-gray-600">{order.orderNo}</div>
                       <div className="text-gray-600">
-                        {customerList.find((c) => c._id === order.customer)?.customerName || "N/A"}
+                        {customerList.find((c) => c._id === order.customer)
+                          ?.customerName || "N/A"}
                       </div>
                       <div className="text-gray-600">{order.orderDate}</div>
                       <div className="text-gray-600">{order.deliveryDate}</div>
@@ -527,20 +601,22 @@ const FbrBookingOrders = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${currentPage === 1
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                    }`}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === 1
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
                 >
                   Previous
                 </button>
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                    }`}
+                  className={`px-3 py-1 rounded-md ${
+                    currentPage === totalPages
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                  }`}
                 >
                   Next
                 </button>
@@ -557,7 +633,9 @@ const FbrBookingOrders = () => {
             >
               <div className="flex justify-between items-center p-6 border-b sticky top-0 bg-white rounded-t-2xl">
                 <h2 className="text-xl font-bold text-newPrimary">
-                  {editingOrder ? "Update Booking Order" : "Add a New Booking Order"}
+                  {editingOrder
+                    ? "Update Booking Order"
+                    : "Add a New Booking Order"}
                 </h2>
                 <button
                   className="text-2xl text-gray-500 hover:text-gray-700"
@@ -580,15 +658,18 @@ const FbrBookingOrders = () => {
                         type="text"
                         value={editingOrder ? orderNo : `ORD-${nextOrderNo}`}
                         readOnly
-                        className={`w-44 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.orderNo
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-44 p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.orderNo
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         placeholder="Enter order number"
                         required
                       />
                       {errors.orderNo && (
-                        <p className="text-red-500 text-xs mt-1">{errors.orderNo}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.orderNo}
+                        </p>
                       )}
                     </div>
 
@@ -601,18 +682,20 @@ const FbrBookingOrders = () => {
                         type="date"
                         value={orderDate}
                         onChange={(e) => setOrderDate(e.target.value)}
-                        className={`w-50 p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.orderDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-50 p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.orderDate
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         required
                       />
                       {errors.orderDate && (
-                        <p className="text-red-500 text-xs mt-1">{errors.orderDate}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.orderDate}
+                        </p>
                       )}
                     </div>
                   </div>
-
                 </div>
                 <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
                   <div className="flex gap-4">
@@ -623,10 +706,11 @@ const FbrBookingOrders = () => {
                       <select
                         value={customer}
                         onChange={(e) => setCustomer(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.customer
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.customer
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         required
                       >
                         <option value="">Select Customer</option>
@@ -637,7 +721,9 @@ const FbrBookingOrders = () => {
                         ))}
                       </select>
                       {errors.customer && (
-                        <p className="text-red-500 text-xs mt-1">{errors.customer}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.customer}
+                        </p>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -654,7 +740,6 @@ const FbrBookingOrders = () => {
                     </div>
                   </div>
                   <div className="flex gap-4">
-
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
                         Phone
@@ -679,7 +764,6 @@ const FbrBookingOrders = () => {
                         placeholder="Balance"
                       />
                     </div>
-
                   </div>
                   <div className="flex gap-4">
                     <div className="flex-1 min-w-0">
@@ -694,12 +778,11 @@ const FbrBookingOrders = () => {
                         placeholder="Address"
                       />
                     </div>
-
-
                   </div>
                 </div>
                 <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
                   <div className="flex gap-4">
+                    {/* Order Type */}
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
                         Order Type <span className="text-red-500">*</span>
@@ -707,10 +790,11 @@ const FbrBookingOrders = () => {
                       <select
                         value={orderType}
                         onChange={(e) => setOrderType(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.orderType
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.orderType
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         required
                       >
                         <option value="">Select Order Type</option>
@@ -718,9 +802,13 @@ const FbrBookingOrders = () => {
                         <option value="Express">Express</option>
                       </select>
                       {errors.orderType && (
-                        <p className="text-red-500 text-xs mt-1">{errors.orderType}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.orderType}
+                        </p>
                       )}
                     </div>
+
+                    {/* Mode */}
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
                         Mode <span className="text-red-500">*</span>
@@ -728,10 +816,11 @@ const FbrBookingOrders = () => {
                       <select
                         value={mode}
                         onChange={(e) => setMode(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.mode
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.mode
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         required
                       >
                         <option value="">Select Mode</option>
@@ -739,15 +828,13 @@ const FbrBookingOrders = () => {
                         <option value="Pickup">Pickup</option>
                       </select>
                       {errors.mode && (
-                        <p className="text-red-500 text-xs mt-1">{errors.mode}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.mode}
+                        </p>
                       )}
                     </div>
 
-
-
-
-                  </div>
-                  <div className="flex gap-4">
+                    {/* Payment Method */}
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
                         Payment Method <span className="text-red-500">*</span>
@@ -755,10 +842,11 @@ const FbrBookingOrders = () => {
                       <select
                         value={paymentMethod}
                         onChange={(e) => setPaymentMethod(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.paymentMethod
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.paymentMethod
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         required
                       >
                         <option value="">Select Payment Method</option>
@@ -767,34 +855,14 @@ const FbrBookingOrders = () => {
                         <option value="Online">Online</option>
                       </select>
                       {errors.paymentMethod && (
-                        <p className="text-red-500 text-xs mt-1">{errors.paymentMethod}</p>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Product <span className="text-red-500">*</span>
-                      </label>
-                      <select
-                        value={product}
-                        onChange={(e) => setProduct(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.product
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
-                        required
-                      >
-                        <option value="">Select Product</option>
-                        {productList.map((prod) => (
-                          <option key={prod._id} value={prod._id}>
-                            {prod.productName}
-                          </option>
-                        ))}
-                      </select>
-                      {errors.product && (
-                        <p className="text-red-500 text-xs mt-1">{errors.product}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.paymentMethod}
+                        </p>
                       )}
                     </div>
                   </div>
+                 
+
                   <div className="flex gap-4">
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
@@ -804,14 +872,17 @@ const FbrBookingOrders = () => {
                         type="date"
                         value={deliveryDate}
                         onChange={(e) => setDeliveryDate(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.deliveryDate
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.deliveryDate
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         required
                       />
                       {errors.deliveryDate && (
-                        <p className="text-red-500 text-xs mt-1">{errors.deliveryDate}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.deliveryDate}
+                        </p>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -822,23 +893,54 @@ const FbrBookingOrders = () => {
                         type="text"
                         value={deliveryAddress}
                         onChange={(e) => setDeliveryAddress(e.target.value)}
-                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${errors.deliveryAddress
-                          ? "border-red-500 focus:ring-red-500"
-                          : "border-gray-300 focus:ring-newPrimary"
-                          }`}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.deliveryAddress
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
                         placeholder="Enter delivery address"
                         required
                       />
                       {errors.deliveryAddress && (
-                        <p className="text-red-500 text-xs mt-1">{errors.deliveryAddress}</p>
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.deliveryAddress}
+                        </p>
                       )}
                     </div>
-
                   </div>
                 </div>
 
                 <div className="border bg-gray-100 p-4 rounded-lg space-y-4">
+                  {/* Line 1: Product, Rate, Qty, Total */}
                   <div className="flex gap-4">
+                    <div className="flex-1 min-w-0">
+                      <label className="block text-gray-700 font-medium mb-2">
+                        Product
+                      </label>
+                      <select
+                        value={product}
+                        onChange={(e) => setProduct(e.target.value)}
+                        className={`w-full p-3 border rounded-md focus:outline-none focus:ring-2 ${
+                          errors.product
+                            ? "border-red-500 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-newPrimary"
+                        }`}
+                        required
+                      >
+                        <option value="">Select Product</option>
+                        {productList.map((prod) => (
+                          <option key={prod._id} value={prod._id}>
+                            {prod.productName}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.product && (
+                        <p className="text-red-500 text-xs mt-1">
+                          {errors.product}
+                        </p>
+                      )}
+                    </div>
+
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
                         Rate
@@ -851,32 +953,37 @@ const FbrBookingOrders = () => {
                         placeholder="Rate"
                       />
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
-                        Weight
+                        Qty
                       </label>
                       <input
-                        type="text"
-                        value={weight}
+                        type="number"
+                        min="1"
+                        value="1"
                         readOnly
                         className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                        placeholder="Weight"
+                        placeholder="Qty"
                       />
                     </div>
+
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
-                        Packing
+                        Total
                       </label>
                       <input
                         type="text"
-                        value={packing}
+                        value={total}
                         readOnly
                         className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                        placeholder="Packing"
+                        placeholder="Total"
                       />
                     </div>
                   </div>
-                  <div className="flex gap-4">
+
+                  {/* Line 2: In Stock, Specification, Add Button */}
+                  <div className="flex gap-4 items-end">
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
                         In Stock
@@ -891,41 +998,28 @@ const FbrBookingOrders = () => {
                     </div>
                     <div className="flex-1 min-w-0">
                       <label className="block text-gray-700 font-medium mb-2">
-                        Total
-                      </label>
-                      <input
-                        type="text"
-                        value={total}
-                        readOnly
-                        className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                        placeholder="Total"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex gap-4 mb-4">
-                    <div className="flex-1 min-w-0">
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Specification
+                        Specifications
                       </label>
                       <input
                         type="text"
                         value={specification}
                         readOnly
                         className="w-full p-3 border border-gray-300 rounded-md bg-gray-100"
-                        placeholder="Specification"
+                        placeholder="Specifications"
                       />
                     </div>
                     <div className="flex items-end">
                       <button
                         type="button"
                         onClick={handleAddItem}
-                        className="w-20 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
+                        className="w-24 h-12 bg-newPrimary text-white rounded-lg hover:bg-newPrimary/80 transition flex justify-center items-center gap-2"
                       >
-                        <span>+</span> Add
+                        + Add
                       </button>
                     </div>
                   </div>
                 </div>
+
                 {itemsList.length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full border border-gray-200 rounded-lg overflow-hidden">
@@ -946,20 +1040,39 @@ const FbrBookingOrders = () => {
                       <tbody className="text-gray-700 text-sm">
                         {itemsList.map((item, idx) => (
                           <tr key={idx} className="hover:bg-gray-50">
-                            <td className="px-4 py-2 border-b text-center">{idx + 1}</td>
                             <td className="px-4 py-2 border-b text-center">
-                              {productList.find((p) => p._id === item.product)?.productName || "N/A"}
+                              {idx + 1}
                             </td>
-                            <td className="px-4 py-2 border-b text-center">{item.specification}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.weight}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.packing}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.inStock}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.qty}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.rate}</td>
-                            <td className="px-4 py-2 border-b text-center">{item.total}</td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {productList.find((p) => p._id === item.product)
+                                ?.productName || "N/A"}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.specification}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.weight}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.packing}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.inStock}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.qty}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.rate}
+                            </td>
+                            <td className="px-4 py-2 border-b text-center">
+                              {item.total}
+                            </td>
                             <td className="px-4 py-2 border-b text-center">
                               <button onClick={() => handleRemoveItem(idx)}>
-                                <X size={18} className=" text-xl flex-shrink-0 text-red-500 transition-colors"
+                                <X
+                                  size={18}
+                                  className=" text-xl flex-shrink-0 text-red-500 transition-colors"
                                 />
                               </button>
                             </td>
@@ -1014,7 +1127,11 @@ const FbrBookingOrders = () => {
                   disabled={loading}
                   className="w-full bg-newPrimary text-white px-4 py-3 rounded-lg hover:bg-newPrimary/80 transition-colors disabled:bg-blue-300"
                 >
-                  {loading ? "Saving..." : editingOrder ? "Update Booking Order" : "Save Booking Order"}
+                  {loading
+                    ? "Saving..."
+                    : editingOrder
+                    ? "Update Booking Order"
+                    : "Save Booking Order"}
                 </button>
               </form>
             </div>
