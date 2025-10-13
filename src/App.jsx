@@ -69,6 +69,17 @@ import SalesPage from "./pages/admin/Sales/SalesPage.jsx";
 import Test from "./pages/admin/Purchase/api.jsx";
 import Group from "./pages/admin/SetUp/Group.jsx";
 import Company from "./pages/admin/SetUp/Company.jsx";
+import FbrCompany from "./pages/admin/FbrIntergration/FbrCompany.jsx";
+import FbrCustomers from "./pages/admin/FbrIntergration/FbrCustomers.jsx";
+import FbrProduct from "./pages/admin/FbrIntergration/FbrProduct.jsx";
+import FbrBookingOrders from "./pages/admin/FbrIntergration/FbrBookingOrders.jsx";
+import FbrDeliveryChallan from "./pages/admin/FbrIntergration/FbrDeliveryChallan.jsx";
+import FbrSalesInvoices from "./pages/admin/FbrIntergration/FbrSalesInvoices.jsx";
+import FbrSalesReturn from "./pages/admin/FbrIntergration/FbrSalesReturn.jsx";
+import FbrPaymentReceipt from "./pages/admin/FbrIntergration/FbrPaymentReceipt.jsx";
+import FbrLedger from "./pages/admin/FbrIntergration/FbrLedger.jsx";
+import FbrReceivable from "./pages/admin/FbrIntergration/FbrReceivable.jsx";
+import FbrPage from "./pages/admin/FbrIntergration/FbrPage.jsx";
 
 
 function AppContent() {
@@ -99,9 +110,11 @@ function AppContent() {
             <Route path="shelve-location" element={<ShelveLocation />} />
             <Route path="category-item" element={<CategoryItem />} />
             <Route path="supplier" element={<SupplierList />} />
-            <Route path="purchase" element={<PurchasePage />} />
-            <Route path="sales" element={<SalesPage />} />
-            <Route path="api" element={<Test />} />
+              <Route path="purchase" element={<PurchasePage />} />
+               <Route path="sales" element={<SalesPage />} />
+               <Route path="fbr-integration" element={<FbrPage />} />
+               <Route path="api" element={<Test />} />
+
 
             <Route path="group" element={<Group />} />
           
@@ -152,6 +165,17 @@ function AppContent() {
             <Route path="receivable" element={<Receivable />} />
             <Route path="sales-return" element={<SalesReturn />} />
             <Route path="distributor" element={<DistributorList />} />
+            {/* fbr */}
+             <Route path="fbr-company" element={<FbrCompany />} />
+             <Route path="fbr-customers" element={<FbrCustomers />} />
+             <Route path="fbr-products" element={<FbrProduct />} />
+             <Route path="fbr-booking-orders" element={<FbrBookingOrders />} />
+             <Route path="fbr-delivery-challan" element={<FbrDeliveryChallan />} />
+             <Route path="fbr-sale-invoice" element={<FbrSalesInvoices />} />
+             <Route path="fbr-sales-return" element={<FbrSalesReturn />} />
+             <Route path="fbr-payment-receipt" element={<FbrPaymentReceipt />} />
+             <Route path="fbr-ledger" element={<FbrLedger />} />
+             <Route path="fbr-receivable" element={<FbrReceivable />} />
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />

@@ -19,7 +19,7 @@ import {
   FaShoppingCart,
 } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
-
+import { MdOutlineIntegrationInstructions } from "react-icons/md";
 import { FcSalesPerformance } from "react-icons/fc";
 import { RiLogoutBoxRLine, RiDashboardFill } from "react-icons/ri";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
@@ -43,6 +43,11 @@ const links = [
     to: "/admin/sales",
     label: "Sales ",
     icon: <FcSalesPerformance color="#1d4ed8"/>,
+  },
+   {
+    to: "/admin/fbr-integration",
+    label: "Fbr Integration ",
+    icon: <MdOutlineIntegrationInstructions  />,
   },
   {
     to: "/admin/sales-invoice",
