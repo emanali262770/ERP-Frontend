@@ -7,7 +7,7 @@ import { Navigate } from "react-router-dom";
 const ProtectedRoute = ({ children, role }) => {
   const [isValid, setisValid] = useState(null);
   const user = JSON.parse(localStorage.getItem("userInfo"));
-  const API_URL = "https://erp-backend-drab.vercel.app/api/token/check";
+  const API_URL = `${import.meta.env.VITE_API_BASE_URL}/token/check`;
 
   useEffect(() => {
     const checkTokenValidOrNot = async () => {
