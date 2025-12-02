@@ -17,6 +17,7 @@ import {
   FaBalanceScale,
   FaUserCog,
   FaShoppingCart,
+  FaStore,
 } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { MdOutlineIntegrationInstructions } from "react-icons/md";
@@ -81,6 +82,7 @@ const links = [
     key: "isSettings",
   },
   { to: "/admin/report", label: "Report", icon: <FaChartBar />, key: "isReports" },
+  { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
   {
     label: "Setup",
     icon: <FaCogs />,
