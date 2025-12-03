@@ -1,10 +1,12 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaStore } from "react-icons/fa";
+import { FaListAlt, FaFileInvoice, FaShoppingCart } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
 const storeChildren = [
-    { to: "/admin/item-defination", label: "Item Definition", icon: <FaStore /> },
+    { to: "/admin/item-defination", label: "Item Definition", icon: <FaListAlt /> },
+    { to: "/admin/item-quotation", label: "Quotation", icon: <FaFileInvoice /> },
+    { to: "/admin/purchase-grn", label: "Purchase (GRN)", icon: <FaShoppingCart /> },
 ];
 
 const StorePage = () => {
@@ -24,7 +26,7 @@ const StorePage = () => {
                         <div className="text-4xl mb-2 text-black group-hover:text-blue-500 transition-colors duration-300">
                             {item.icon}
                         </div>
-                        <h2 className="text-base font-medium text-center group-hover:text-blue-600">
+                        <h2 className="text-lg font-semibold text-center group-hover:text-blue-600">
                             {item.label}
                         </h2>
                     </NavLink>

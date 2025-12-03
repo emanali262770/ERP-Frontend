@@ -80,8 +80,10 @@ import FbrPaymentReceipt from "./pages/admin/FbrIntergration/FbrPaymentReceipt.j
 import FbrLedger from "./pages/admin/FbrIntergration/FbrLedger.jsx";
 import FbrReceivable from "./pages/admin/FbrIntergration/FbrReceivable.jsx";
 import FbrPage from "./pages/admin/FbrIntergration/FbrPage.jsx";
-import ItemDefination from "./pages/admin/Store/ItemDefination.jsx"
+import StoreItemDefination from "./pages/admin/Store/ItemDefination.jsx"
 import StorePage from "./pages/admin/Store/StorePage.jsx"
+import StoreQutation from "./pages/admin/Store/Quotation.jsx"
+import StorePurchase from "./pages/admin/Store/PurchaseGRN.jsx"
 
 
 function AppContent() {
@@ -170,7 +172,9 @@ function AppContent() {
 
             {/* Reports */}
             <Route path="store" element={<StorePage />} />
-            <Route path="item-defination" element={<ItemDefination />} />
+            <Route path="item-defination" element={<StoreItemDefination />} />
+            <Route path="item-quotation" element={<StoreQutation />} />
+            <Route path="purchase-grn" element={<StorePurchase />} />
 
             {/* fbr */}
             <Route path="fbr-company" element={<FbrCompany />} />

@@ -3,6 +3,7 @@ import { SquarePen, Trash2, Eye, Plus } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
+import ItemDefinitionView from "./ViewModels/ItemDefinitionView";
 
 const ItemDefinition = () => {
   const [isSliderOpen, setIsSliderOpen] = useState(false);
@@ -16,7 +17,8 @@ const ItemDefinition = () => {
       model: "Dell XPS 15",
       unit: "Piece",
       price: 1299.99,
-      description: "High-performance laptop for professionals"
+      description: "High-performance laptop for professionals",
+      requireMonthlyDemand: true
     },
     {
       id: 2,
@@ -26,7 +28,8 @@ const ItemDefinition = () => {
       model: "ErgoPro 300",
       unit: "Piece",
       price: 299.99,
-      description: "Ergonomic office chair with lumbar support"
+      description: "Ergonomic office chair with lumbar support",
+      requireMonthlyDemand: false
     },
     {
       id: 3,
@@ -178,6 +181,15 @@ const ItemDefinition = () => {
   const [instituteName, setInstituteName] = useState("");
   const [reorderLevel, setReorderLevel] = useState("");
   const [requireMonthlyDemand, setRequireMonthlyDemand] = useState("");
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  // View Item Definition Modal State
+  const handleView = (item) => {
+    setSelectedItem(item);
+    setViewModalOpen(true);
+  };
+
 
   // Categories for dropdown
   const categories = [
@@ -222,6 +234,21 @@ const ItemDefinition = () => {
     setModelSpec(item.model || "");
     setStockUnit(item.unit || "");
     setPurchasePrice(item.price || "");
+
+    // NEW: Set the checkbox value
+    setRequireMonthlyDemand(item.requireMonthlyDemand || false);
+
+    // If you have additional data fields, set them too
+    if (item.additionalData) {
+      setManufacturer(item.additionalData.manufacturer || "");
+      setStockLoose(item.additionalData.stockLoose || "");
+      setSupplier(item.additionalData.supplier || "");
+      setLedgerPageNo(item.additionalData.ledgerPageNo || "");
+      setInstituteName(item.additionalData.instituteName || "");
+      setReorderLevel(item.additionalData.reorderLevel || "");
+      // Checkbox is already set above
+    }
+
     setIsSliderOpen(true);
   };
 
@@ -240,17 +267,27 @@ const ItemDefinition = () => {
     }
 
     if (editingItem) {
-      // Update existing item (keep old structure for table compatibility)
+      // Update existing item
       setItems(items.map(item =>
         item.id === editingItem.id
           ? {
-              ...item,
-              category: itemCategory,
-              itemName: itemName,
-              model: modelSpec,
-              unit: stockUnit,
-              price: parseFloat(purchasePrice),
+            ...item,
+            category: itemCategory,
+            itemName: itemName,
+            model: modelSpec,
+            unit: stockUnit,
+            price: parseFloat(purchasePrice),
+            requireMonthlyDemand: requireMonthlyDemand, // Save checkbox value
+            additionalData: {
+              manufacturer,
+              stockLoose: stockLoose ? parseInt(stockLoose) : 0,
+              supplier,
+              ledgerPageNo,
+              instituteName,
+              reorderLevel: reorderLevel ? parseInt(reorderLevel) : 0,
+              requireMonthlyDemand: requireMonthlyDemand // Also save in additionalData
             }
+          }
           : item
       ));
       Swal.fire("Updated!", "Item updated successfully.", "success");
@@ -264,8 +301,8 @@ const ItemDefinition = () => {
         model: modelSpec,
         unit: stockUnit,
         price: parseFloat(purchasePrice),
+        requireMonthlyDemand: requireMonthlyDemand, // Save checkbox value
         description: `Manufacturer: ${manufacturer}, Supplier: ${supplier}`,
-        // Store additional fields in description for now
         additionalData: {
           manufacturer,
           stockLoose: stockLoose ? parseInt(stockLoose) : 0,
@@ -273,7 +310,7 @@ const ItemDefinition = () => {
           ledgerPageNo,
           instituteName,
           reorderLevel: reorderLevel ? parseInt(reorderLevel) : 0,
-          requireMonthlyDemand: requireMonthlyDemand ? parseInt(requireMonthlyDemand) : 0
+          requireMonthlyDemand: requireMonthlyDemand // Also save here
         }
       };
       setItems([...items, newItem]);
@@ -296,7 +333,7 @@ const ItemDefinition = () => {
     setItemName("");
     setInstituteName("");
     setReorderLevel("");
-    setRequireMonthlyDemand("");
+    setRequireMonthlyDemand(false); // Reset to false
     setEditingItem(null);
   };
 
@@ -382,10 +419,10 @@ const ItemDefinition = () => {
             {/* Search Input */}
             <input
               type="text"
-              placeholder="Search by item name, model or category..."
+              placeholder="Search by item name, category or model..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
+              className="w-[300px] px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-newPrimary"
             />
 
             <button
@@ -403,7 +440,7 @@ const ItemDefinition = () => {
             <div className="max-h-screen overflow-y-auto custom-scrollbar">
               <div className="inline-block w-full align-middle">
                 {/* Table Header - Showing only original fields */}
-                <div className="hidden lg:grid grid-cols-[80px,200px,200px,200px,120px,120px,150px] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                <div className="hidden lg:grid grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1fr] gap-6 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
                   <div>SR#</div>
                   <div>Category</div>
                   <div>Item</div>
@@ -418,7 +455,7 @@ const ItemDefinition = () => {
                     <TableSkeleton
                       rows={recordsPerPage}
                       cols={7}
-                      className="lg:grid-cols-[80px,200px,200px,200px,120px,120px,150px]"
+                      className="lg:grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1fr]"
                     />
                   ) : currentRecords.length === 0 ? (
                     <div className="text-center py-4 text-gray-500 bg-white">
@@ -428,7 +465,7 @@ const ItemDefinition = () => {
                     currentRecords.map((item, index) => (
                       <div
                         key={item.id}
-                        className="grid grid-cols-1 lg:grid-cols-[80px,200px,200px,200px,120px,120px,150px] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                        className="grid grid-cols-1 lg:grid-cols-[0.5fr_1fr_1fr_1fr_1fr_1fr_1fr] items-center gap-6 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
                       >
                         <div className="font-medium text-gray-900">
                           {item.sr}
@@ -464,6 +501,7 @@ const ItemDefinition = () => {
                             <Trash2 size={18} />
                           </button>
                           <button
+                            onClick={() => handleView(item)}
                             className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50"
                             title="View"
                           >
@@ -493,11 +531,10 @@ const ItemDefinition = () => {
                 <button
                   onClick={() => handlePageChange(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === 1
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === 1
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Previous
                 </button>
@@ -505,11 +542,10 @@ const ItemDefinition = () => {
                 <button
                   onClick={() => handlePageChange(currentPage + 1)}
                   disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md ${
-                    currentPage === totalPages
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-newPrimary text-white hover:bg-newPrimary/80"
-                  }`}
+                  className={`px-3 py-1 rounded-md ${currentPage === totalPages
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-newPrimary text-white hover:bg-newPrimary/80"
+                    }`}
                 >
                   Next
                 </button>
@@ -540,7 +576,7 @@ const ItemDefinition = () => {
               <form onSubmit={handleSubmit} className="space-y-4 p-4 md:p-6">
                 <div className="space-y-4 border p-4 rounded-lg bg-gray-50 px-4 py-6">
                   {/* First Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Item Category <span className="text-red-500">*</span>
@@ -572,7 +608,9 @@ const ItemDefinition = () => {
                         placeholder="Enter manufacturer name"
                       />
                     </div>
+                  </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Stock Unit <span className="text-red-500">*</span>
@@ -591,10 +629,7 @@ const ItemDefinition = () => {
                         ))}
                       </select>
                     </div>
-                  </div>
 
-                  {/* Second Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Stock Loose
@@ -608,7 +643,11 @@ const ItemDefinition = () => {
                         min="0"
                       />
                     </div>
-
+                  </div>
+                </div>
+                {/* Second Row */}
+                <div className="space-y-4 border p-4 rounded-lg bg-gray-50 px-4 py-6">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Supplier
@@ -637,7 +676,7 @@ const ItemDefinition = () => {
                   </div>
 
                   {/* Third Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Ledger Page No.
@@ -666,7 +705,10 @@ const ItemDefinition = () => {
                         required
                       />
                     </div>
+                  </div>
 
+                  {/* Fourth Row */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Item Name <span className="text-red-500">*</span>
@@ -680,10 +722,6 @@ const ItemDefinition = () => {
                         required
                       />
                     </div>
-                  </div>
-
-                  {/* Fourth Row */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Institute Name
@@ -710,20 +748,20 @@ const ItemDefinition = () => {
                         min="0"
                       />
                     </div>
-
-                    <div>
-                      <label className="block text-gray-700 font-medium mb-2">
-                        Require Monthly Demand
-                      </label>
-                      <input
-                        type="number"
-                        value={requireMonthlyDemand}
-                        onChange={(e) => setRequireMonthlyDemand(e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-newPrimary"
-                        placeholder="Enter monthly demand"
-                        min="0"
-                      />
-                    </div>
+                  </div>
+                </div>
+                {/* Fifth Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="checkbox"
+                      checked={requireMonthlyDemand}
+                      onChange={(e) => setRequireMonthlyDemand(e.target.checked)}
+                      className="h-5 w-5 cursor-pointer"
+                    />
+                    <label className="text-gray-700 font-medium">
+                      Require Monthly Demand
+                    </label>
                   </div>
                 </div>
 
@@ -736,6 +774,13 @@ const ItemDefinition = () => {
               </form>
             </div>
           </div>
+        )}
+
+        {viewModalOpen && (
+          <ItemDefinitionView
+            item={selectedItem}
+            onClose={() => setViewModalOpen(false)}
+          />
         )}
 
         <style jsx>{`
