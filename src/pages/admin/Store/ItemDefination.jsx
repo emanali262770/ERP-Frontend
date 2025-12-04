@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SquarePen, Trash2, Eye, Plus } from "lucide-react";
+import { SquarePen, Trash2, Eye, Plus, X } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -563,13 +563,13 @@ const ItemDefinition = () => {
                   {editingItem ? "Update Item" : "Add New Item"}
                 </h2>
                 <button
-                  className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+                  className="w-7 h-7 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                   onClick={() => {
                     setIsSliderOpen(false);
                     resetForm();
                   }}
                 >
-                  ×
+                  <X size={18} />
                 </button>
               </div>
 

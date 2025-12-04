@@ -84,6 +84,10 @@ import StoreItemDefination from "./pages/admin/Store/ItemDefination.jsx"
 import StorePage from "./pages/admin/Store/StorePage.jsx"
 import StoreQutation from "./pages/admin/Store/Quotation.jsx"
 import StorePurchase from "./pages/admin/Store/PurchaseGRN.jsx"
+import StoreProductsOpeningBalance from "./pages/admin/Store/ProductsOpeningBalances.jsx"
+import MonthlyStoreDemand from "./pages/admin/Store/MonthlyStoreDemand.jsx"
+import StoreComparativeStatement from "./pages/admin/Store/ComparativeStatement.jsx"
+import StoreItemsReturn from "./pages/admin/Store/ItemsReturn.jsx"
 
 
 function AppContent() {
@@ -170,11 +174,15 @@ function AppContent() {
             <Route path="sales-return" element={<SalesReturn />} />
             <Route path="distributor" element={<DistributorList />} />
 
-            {/* Reports */}
+            {/* Store */}
             <Route path="store" element={<StorePage />} />
             <Route path="item-defination" element={<StoreItemDefination />} />
             <Route path="item-quotation" element={<StoreQutation />} />
             <Route path="purchase-grn" element={<StorePurchase />} />
+            <Route path="products-opening-balances" element={<StoreProductsOpeningBalance />} />
+            <Route path="monthly-store-demand" element={<MonthlyStoreDemand />} />
+            <Route path="comparative-statement" element={<StoreComparativeStatement />} />
+            <Route path="items-return" element={<StoreItemsReturn />} />
 
             {/* fbr */}
             <Route path="fbr-company" element={<FbrCompany />} />
