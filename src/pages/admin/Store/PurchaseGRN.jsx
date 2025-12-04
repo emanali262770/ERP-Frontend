@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SquarePen, Trash2, Eye, Plus, Search } from "lucide-react";
+import { SquarePen, Trash2, Eye, Plus, Search, X } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -437,7 +437,7 @@ const Purchases = () => {
                                 setIsSliderOpen(true);
                             }}
                         >
-                            <Plus size={20} />
+                            <Plus size={18} />
                             Add GRN
                         </button>
                     </div>
@@ -609,7 +609,7 @@ const Purchases = () => {
                                     {editingGrn ? "Update GRN" : "Add New GRN"}
                                 </h2>
                                 <button
-                                    className="w-8 h-8 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
+                                    className="w-7 h-7 bg-newPrimary text-white rounded-full flex items-center justify-center hover:bg-newPrimary/70"
                                     onClick={() => {
                                         setIsSliderOpen(false);
                                         // Reset form completely when closing
@@ -625,7 +625,7 @@ const Purchases = () => {
                                         setEditingGrn(null);
                                     }}
                                 >
-                                    ×
+                                    <X size={18} />
                                 </button>
                             </div>
 

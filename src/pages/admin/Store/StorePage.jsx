@@ -1,12 +1,16 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaListAlt, FaFileInvoice, FaShoppingCart } from "react-icons/fa";
+import { FaListAlt, FaFileInvoice, FaShoppingCart, FaWallet, FaChartLine, FaBalanceScale, FaUndo } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
 const storeChildren = [
     { to: "/admin/item-defination", label: "Item Definition", icon: <FaListAlt /> },
     { to: "/admin/item-quotation", label: "Quotation", icon: <FaFileInvoice /> },
     { to: "/admin/purchase-grn", label: "Purchase (GRN)", icon: <FaShoppingCart /> },
+    { to: "/admin/products-opening-balances", label: "Products Opening Balances", icon: <FaWallet /> },
+    { to: "/admin/monthly-store-demand", label: "Monthly Store Demand", icon: <FaChartLine /> },
+    { to: "/admin/comparative-statement", label: "Comparative Statement", icon: <FaBalanceScale /> },
+    { to: "/admin/items-return", label: "Items Return", icon: <FaUndo /> },
 ];
 
 const StorePage = () => {
