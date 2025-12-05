@@ -88,6 +88,8 @@ import StoreProductsOpeningBalance from "./pages/admin/Store/ProductsOpeningBala
 import MonthlyStoreDemand from "./pages/admin/Store/MonthlyStoreDemand.jsx"
 import StoreComparativeStatement from "./pages/admin/Store/ComparativeStatement.jsx"
 import StoreItemsReturn from "./pages/admin/Store/ItemsReturn.jsx"
+import StoreCashPaymentVoucher from "./pages/admin/Store/CashPaymentVoucher.jsx"
+import StoreTransferFromUnits from "./pages/admin/Store/TransferFromUnits.jsx"
 
 
 function AppContent() {
@@ -183,6 +185,8 @@ function AppContent() {
             <Route path="monthly-store-demand" element={<MonthlyStoreDemand />} />
             <Route path="comparative-statement" element={<StoreComparativeStatement />} />
             <Route path="items-return" element={<StoreItemsReturn />} />
+            <Route path="cash-payment-voucher" element={<StoreCashPaymentVoucher />} />
+            <Route path="transfer-from-units" element={<StoreTransferFromUnits />} />
 
             {/* fbr */}
             <Route path="fbr-company" element={<FbrCompany />} />

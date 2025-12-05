@@ -1,156 +1,176 @@
-import React, { useRef } from "react";
-import { useReactToPrint } from "react-to-print";
+import React, { useEffect, useRef } from "react";
 
 const ReturnPrint = ({ returnItem, onClose }) => {
-    const componentRef = useRef();
-    const handlePrint = useReactToPrint({
-        content: () => componentRef.current,
-        documentTitle: `Return_${returnItem.returnId}`,
-        onAfterPrint: () => onClose && onClose(),
-    });
+    const iframeRef = useRef(null);
 
-    // Auto-print when component mounts
-    React.useEffect(() => {
-        handlePrint();
-    }, []);
+    useEffect(() => {
+        if (!returnItem) return;
 
-    if (!returnItem) return null;
-
-    return (
-        <div className="hidden">
-            <div ref={componentRef} className="p-8 bg-white">
-                {/* Print Styles */}
-                <style>{`
-                    @media print {
-                        body * {
-                            visibility: hidden;
-                        }
-                        #print-content, #print-content * {
-                            visibility: visible;
-                        }
-                        #print-content {
-                            position: absolute;
-                            left: 0;
-                            top: 0;
-                            width: 100%;
-                        }
+        // Create print content
+        const printContent = `
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Return ${returnItem.returnId}</title>
+                <style>
+                    @page { margin: 20mm; }
+                    body { 
+                        font-family: Arial, sans-serif; 
+                        margin: 0; 
+                        padding: 20px; 
+                        color: #000; 
                     }
-                `}</style>
-
-                <div id="print-content">
-                    {/* Header */}
-                    <div className="text-center mb-8 border-b pb-4">
-                        <h1 className="text-2xl font-bold text-gray-800">Return Request</h1>
-                        <div className="flex justify-between items-center mt-4 text-sm text-gray-600">
-                            <div className="text-left">
-                                <p><strong>Return ID:</strong> {returnItem.returnId}</p>
-                                <p><strong>Date:</strong> {returnItem.returnDate}</p>
-                            </div>
-                            <div className="text-right">
-                                <p><strong>Status:</strong> {returnItem.status}</p>
-                                {returnItem.approvedBy && (
-                                    <p><strong>Approved By:</strong> {returnItem.approvedBy}</p>
-                                )}
-                            </div>
+                    .header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #000; padding-bottom: 10px; }
+                    .section { margin-bottom: 15px; }
+                    table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 12px; }
+                    th, td { border: 1px solid #000; padding: 6px; text-align: left; }
+                    th { background-color: #f5f5f5; }
+                    .footer { margin-top: 30px; padding-top: 15px; border-top: 1px solid #ccc; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <h1>Return Request</h1>
+                    <p>Inventory Management System</p>
+                    <div style="display: flex; justify-content: space-between; margin-top: 15px;">
+                        <div style="text-align: left;">
+                            <p><strong>Return ID:</strong> ${returnItem.returnId}</p>
+                            <p><strong>Date:</strong> ${returnItem.returnDate}</p>
                         </div>
-                    </div>
-
-                    {/* Company Info (if needed) */}
-                    <div className="mb-6 text-center">
-                        <h2 className="text-xl font-semibold">Company Name</h2>
-                        <p className="text-gray-600">Inventory Management System</p>
-                    </div>
-
-                    {/* Requester Information */}
-                    <div className="mb-6">
-                        <h3 className="text-lg font-semibold mb-3 border-b pb-2">Requester Information</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                            <div>
-                                <p><strong>Department:</strong> {returnItem.department}</p>
-                                <p><strong>Employee:</strong> {returnItem.employee}</p>
-                            </div>
-                            <div>
-                                <p><strong>Employee ID:</strong> {returnItem.employeeId}</p>
-                                <p><strong>Return Reason:</strong> {returnItem.reason}</p>
-                            </div>
+                        <div style="text-align: right;">
+                            <p><strong>Status:</strong> ${returnItem.status}</p>
+                            ${returnItem.approvedBy ? `<p><strong>Approved By:</strong> ${returnItem.approvedBy}</p>` : ''}
                         </div>
-                    </div>
-
-                    {/* Items Table */}
-                    <div className="mb-6">
-                        <h3 className="text-lg font-semibold mb-3 border-b pb-2">Return Items</h3>
-                        <table className="w-full border-collapse border">
-                            <thead>
-                                <tr className="bg-gray-100">
-                                    <th className="border p-2 text-left">SR#</th>
-                                    <th className="border p-2 text-left">Item</th>
-                                    <th className="border p-2 text-left">Specifications</th>
-                                    <th className="border p-2 text-left">Quantity</th>
-                                    <th className="border p-2 text-left">In Stock</th>
-                                    <th className="border p-2 text-left">Return Type</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {returnItem.items.map((item, index) => (
-                                    <tr key={item.id}>
-                                        <td className="border p-2">{index + 1}</td>
-                                        <td className="border p-2">{item.item}</td>
-                                        <td className="border p-2">{item.details}</td>
-                                        <td className="border p-2 text-center">{item.quantity}</td>
-                                        <td className="border p-2 text-center">{item.inStock}</td>
-                                        <td className="border p-2">{item.returnType}</td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                        <div className="mt-4 flex justify-between items-center">
-                            <div></div>
-                            <div className="text-right">
-                                <p><strong>Total Items:</strong> {returnItem.items.reduce((sum, item) => sum + item.quantity, 0)}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Notes */}
-                    {returnItem.notes && (
-                        <div className="mb-6">
-                            <h3 className="text-lg font-semibold mb-2">Additional Notes</h3>
-                            <div className="border p-4 rounded">
-                                <p className="text-gray-700">{returnItem.notes}</p>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Footer */}
-                    <div className="mt-8 pt-6 border-t">
-                        <div className="grid grid-cols-2 gap-8">
-                            <div>
-                                <p className="mb-4 border-t pt-4 text-center">_______________________</p>
-                                <p className="text-center">Prepared By</p>
-                                <p className="text-center text-sm text-gray-600">{returnItem.employee}</p>
-                            </div>
-                            <div>
-                                {returnItem.approvedBy && (
-                                    <>
-                                        <p className="mb-4 border-t pt-4 text-center">_______________________</p>
-                                        <p className="text-center">Approved By</p>
-                                        <p className="text-center text-sm text-gray-600">{returnItem.approvedBy}</p>
-                                        <p className="text-center text-xs text-gray-500">{returnItem.approvalDate}</p>
-                                    </>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Print timestamp */}
-                    <div className="mt-8 text-center text-xs text-gray-500">
-                        <p>Printed on: {new Date().toLocaleDateString()} {new Date().toLocaleTimeString()}</p>
-                        <p>Document ID: {returnItem.returnId}</p>
                     </div>
                 </div>
-            </div>
-        </div>
-    );
+
+                <div class="section">
+                    <h3>Requester Information</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <p><strong>Department:</strong> ${returnItem.department}</p>
+                            <p><strong>Employee:</strong> ${returnItem.employee}</p>
+                        </div>
+                        <div>
+                            <p><strong>Employee ID:</strong> ${returnItem.employeeId}</p>
+                            <p><strong>Return Reason:</strong> ${returnItem.reason}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <h3>Return Items</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>SR#</th>
+                                <th>Item</th>
+                                <th>Specifications</th>
+                                <th>Quantity</th>
+                                <th>In Stock</th>
+                                <th>Return Type</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${returnItem.items.map((item, index) => `
+                                <tr>
+                                    <td>${index + 1}</td>
+                                    <td>${item.item}</td>
+                                    <td>${item.details}</td>
+                                    <td style="text-align: center">${item.quantity}</td>
+                                    <td style="text-align: center">${item.inStock}</td>
+                                    <td>${item.returnType}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <p><strong>Total Items:</strong> ${returnItem.items.reduce((sum, item) => sum + item.quantity, 0)}</p>
+                    </div>
+                </div>
+
+                ${returnItem.notes ? `
+                <div class="section">
+                    <h3>Additional Notes</h3>
+                    <div style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        ${returnItem.notes}
+                    </div>
+                </div>
+                ` : ''}
+
+                <div class="footer">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 40px;">
+                        <div>
+                            <div style="border-top: 1px solid #000; width: 200px; margin: 30px auto 10px;"></div>
+                            <p style="text-align: center">Prepared By</p>
+                            <p style="text-align: center; font-weight: bold;">${returnItem.employee}</p>
+                        </div>
+                        <div>
+                            <div style="border-top: 1px solid #000; width: 200px; margin: 30px auto 10px;"></div>
+                            <p style="text-align: center">${returnItem.approvedBy ? 'Approved By' : 'Received By'}</p>
+                            <p style="text-align: center; font-weight: bold;">${returnItem.approvedBy || '________________'}</p>
+                            ${returnItem.approvalDate ? `<p style="text-align: center; font-size: 11px;">Date: ${returnItem.approvalDate}</p>` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 30px; text-align: center; font-size: 10px; color: #666;">
+                        <p>Printed on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        <p>Document ID: ${returnItem.returnId}</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+        `;
+
+        // Create iframe if it doesn't exist
+        let iframe = iframeRef.current;
+        if (!iframe) {
+            iframe = document.createElement('iframe');
+            iframe.style.position = 'fixed';
+            iframe.style.right = '0';
+            iframe.style.bottom = '0';
+            iframe.style.width = '0';
+            iframe.style.height = '0';
+            iframe.style.border = 'none';
+            iframe.style.opacity = '0';
+            iframe.style.pointerEvents = 'none';
+            document.body.appendChild(iframe);
+            iframeRef.current = iframe;
+        }
+
+        // Write content to iframe
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(printContent);
+        iframeDoc.close();
+
+        // Print when iframe is loaded
+        iframe.onload = () => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
+            // Clean up and close modal
+            setTimeout(() => {
+                if (iframe && iframe.parentNode) {
+                    iframe.parentNode.removeChild(iframe);
+                }
+                iframeRef.current = null;
+                if (onClose) onClose();
+            }, 500);
+        };
+
+        // Cleanup function
+        return () => {
+            if (iframeRef.current && iframeRef.current.parentNode) {
+                iframeRef.current.parentNode.removeChild(iframeRef.current);
+                iframeRef.current = null;
+            }
+        };
+
+    }, [returnItem, onClose]);
+
+    // This component doesn't render anything visible
+    return null;
 };
 
 export default ReturnPrint;

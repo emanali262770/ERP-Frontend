@@ -201,7 +201,172 @@ const ReturnViewModal = ({ returnItem, onClose }) => {
                             Close
                         </button>
                         <button
-                            onClick={() => window.print()}
+                            onClick={() => {
+                                // Create a print-only version of the content
+                                const printContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Return ${returnItem.returnId}</title>
+                    <style>
+                        @page {
+                            size: A4;
+                            margin: 0.5in;
+                        }
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 20px;
+                            color: #000;
+                        }
+                        .header {
+                            text-align: center;
+                            margin-bottom: 30px;
+                            border-bottom: 2px solid #000;
+                            padding-bottom: 15px;
+                        }
+                        .section {
+                            margin-bottom: 20px;
+                            page-break-inside: avoid;
+                        }
+                        table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 15px 0;
+                            font-size: 12px;
+                        }
+                        th, td {
+                            border: 1px solid #000;
+                            padding: 8px;
+                            text-align: left;
+                        }
+                        th {
+                            background-color: #f0f0f0;
+                        }
+                        .footer {
+                            margin-top: 50px;
+                        }
+                        .signature {
+                            margin-top: 60px;
+                        }
+                        @media print {
+                            body {
+                                -webkit-print-color-adjust: exact;
+                            }
+                        }
+                    </style>
+                </head>
+                <body>
+                  <div class="header">
+    <h1>RETURN REQUEST DETAILS</h1>
+    <p><strong>Company Inventory System</strong></p>
+    <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+        <div style="text-align: left; padding-left: 0;">
+            <p style="margin: 5px 0; text-align: left;"><strong>Return ID:</strong> ${returnItem.returnId}</p>
+            <p style="margin: 5px 0; text-align: left;"><strong>Date:</strong> ${returnItem.returnDate}</p>
+        </div>
+        <div style="text-align: right; padding-right: 0;">
+            <p style="margin: 5px 0; text-align: right;"><strong>Status:</strong> ${returnItem.status}</p>
+            ${returnItem.approvedBy ? `<p style="margin: 5px 0; text-align: right;"><strong>Approved By:</strong> ${returnItem.approvedBy}</p>` : ''}
+        </div>
+    </div>
+</div>
+
+                    <div class="section">
+                        <h3>REQUESTER INFORMATION</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                            <div>
+                                <p><strong>Department:</strong> ${returnItem.department}</p>
+                                <p><strong>Employee:</strong> ${returnItem.employee}</p>
+                            </div>
+                            <div>
+                                <p><strong>Employee ID:</strong> ${returnItem.employeeId}</p>
+                                <p><strong>Return Reason:</strong> ${returnItem.reason}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h3>RETURN ITEMS (${returnItem.items.length})</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>SR#</th>
+                                    <th>Item Name</th>
+                                    <th>Specifications</th>
+                                    <th>Quantity</th>
+                                    <th>In Stock</th>
+                                    <th>Return Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${returnItem.items.map((item, index) => `
+                                    <tr>
+                                        <td>${index + 1}</td>
+                                        <td>${item.item}</td>
+                                        <td>${item.details}</td>
+                                        <td style="text-align: center">${item.quantity}</td>
+                                        <td style="text-align: center">${item.inStock}</td>
+                                        <td>${item.returnType}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                        <div style="text-align: right; margin-top: 10px;">
+                            <p><strong>Total Items:</strong> ${returnItem.items.reduce((sum, item) => sum + item.quantity, 0)}</p>
+                        </div>
+                    </div>
+
+                    ${returnItem.notes ? `
+                    <div class="section">
+                        <h3>ADDITIONAL NOTES</h3>
+                        <div style="padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                            ${returnItem.notes}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div class="footer">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-top: 30px;">
+                            <div class="signature">
+                                <div style="border-top: 1px solid #000; width: 200px; margin: 40px auto 10px;"></div>
+                                <p style="text-align: center">Prepared By</p>
+                                <p style="text-align: center; font-weight: bold;">${returnItem.employee}</p>
+                            </div>
+                            <div class="signature">
+                                <div style="border-top: 1px solid #000; width: 200px; margin: 40px auto 10px;"></div>
+                                <p style="text-align: center">${returnItem.approvedBy ? 'Approved By' : 'Received By'}</p>
+                                <p style="text-align: center; font-weight: bold;">${returnItem.approvedBy || '________________'}</p>
+                                ${returnItem.approvalDate ? `<p style="text-align: center; font-size: 11px;">Date: ${returnItem.approvalDate}</p>` : ''}
+                            </div>
+                        </div>
+                        
+                        <div style="margin-top: 40px; text-align: center; font-size: 10px; color: #666;">
+                            <p>Printed on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                            <p>Document ID: ${returnItem.returnId}</p>
+                        </div>
+                    </div>
+                </body>
+                </html>
+            `;
+
+                                // Open new window for printing
+                                const printWindow = window.open('', '_blank');
+                                printWindow.document.open();
+                                printWindow.document.write(printContent);
+                                printWindow.document.close();
+
+                                // Wait for content to load and print
+                                printWindow.onload = function () {
+                                    printWindow.focus();
+                                    printWindow.print();
+
+                                    // Close the print window after printing
+                                    setTimeout(() => {
+                                        printWindow.close();
+                                    }, 500);
+                                };
+                            }}
                             className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
                         >
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
