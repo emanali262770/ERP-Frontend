@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SquarePen, Trash2, Eye, Plus, Search, X } from "lucide-react";
+import { SquarePen, Trash2, Eye, Plus, Search, X, CheckCircle } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -398,10 +398,13 @@ const Purchases = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary">
-                            Purchases (GRN)
-                        </h1>
+                    <div className="flex items-center gap-3">
+                        <CheckCircle size={28} className="text-newPrimary" />
+                        <div>
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Purchases (GRN)
+                            </h1>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
                         {/* Search Input */}

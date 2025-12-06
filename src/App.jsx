@@ -90,7 +90,7 @@ import StoreComparativeStatement from "./pages/admin/Store/ComparativeStatement.
 import StoreItemsReturn from "./pages/admin/Store/ItemsReturn.jsx"
 import StoreCashPaymentVoucher from "./pages/admin/Store/CashPaymentVoucher.jsx"
 import StoreTransferFromUnits from "./pages/admin/Store/TransferFromUnits.jsx"
-
+import StoreItemsIssue from "./pages/admin/Store/ItemsIssue.jsx"
 
 function AppContent() {
   return (
@@ -187,6 +187,7 @@ function AppContent() {
             <Route path="items-return" element={<StoreItemsReturn />} />
             <Route path="cash-payment-voucher" element={<StoreCashPaymentVoucher />} />
             <Route path="transfer-from-units" element={<StoreTransferFromUnits />} />
+            <Route path="items-issue" element={<StoreItemsIssue />} />
 
             {/* fbr */}
             <Route path="fbr-company" element={<FbrCompany />} />

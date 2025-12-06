@@ -435,10 +435,13 @@ const CashPaymentVoucher = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary">
-                            Cash Payment Vouchers
-                        </h1>
+                    <div className="flex flex-col">
+                        <div className="flex gap-2">
+                            <DollarSign size={28} className="text-newPrimary" />
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Cash Payment Vouchers
+                            </h1>
+                        </div>
                         <p className="text-gray-600 mt-1">Manage cash payments and expense tracking</p>
                     </div>
                     <div className="flex items-center gap-3">

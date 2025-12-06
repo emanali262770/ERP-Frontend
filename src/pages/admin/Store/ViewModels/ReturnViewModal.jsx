@@ -28,8 +28,8 @@ const ReturnViewModal = ({ returnItem, onClose }) => {
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50 p-4">
             <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-y-auto max-h-[90vh]">
                 {/* Header */}
-                <div className="sticky top-0 bg-white border-b rounded-t-2xl">
-                    <div className="flex justify-between items-center p-6">
+                <div className="sticky top-0 bg-gray-100 border-b rounded-t-2xl">
+                    <div className="flex justify-between items-center p-4">
                         <div>
                             <h2 className="text-2xl font-bold text-gray-800">Return Request Details</h2>
                             <p className="text-gray-600 mt-1">View complete information about this return request</p>
