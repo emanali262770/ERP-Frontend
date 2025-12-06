@@ -581,172 +581,174 @@ const ItemsReturn = () => {
                 </div>
 
                 <div className="rounded-xl shadow border border-gray-200 overflow-hidden">
-                    <div className="overflow-x-auto">
-                        <div className="max-h-screen overflow-y-auto custom-scrollbar">
-                            <div className="inline-block w-full align-middle">
-                                {/* Table Header */}
-                                <div className="hidden lg:grid grid-cols-[0.5fr_0.8fr_1fr_1fr_1fr_2fr_1.5fr_1.5fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
-                                    <div>SR#</div>
-                                    <div>Return ID</div>
-                                    <div>Department</div>
-                                    <div>Employee</div>
-                                    <div>Reason</div>
-                                    <div>Items</div>
-                                    <div>Status</div>
-                                    <div className="text-center">Actions</div>
-                                </div>
+                    <div className="overflow-x-auto w-full">
+                        <div className="min-w-[1200px]">
+                            <div className="max-h-screen overflow-y-auto custom-scrollbar">
+                                <div className="inline-block w-full align-middle">
+                                    {/* Table Header */}
+                                    <div className="hidden lg:grid grid-cols-[0.5fr_0.8fr_1fr_1fr_1fr_2fr_1.5fr_1.5fr] gap-4 bg-gray-100 py-3 px-6 text-xs font-semibold text-gray-600 uppercase sticky top-0 z-10 border-b border-gray-200">
+                                        <div>SR#</div>
+                                        <div>Return ID</div>
+                                        <div>Department</div>
+                                        <div>Employee</div>
+                                        <div>Reason</div>
+                                        <div>Items</div>
+                                        <div>Status</div>
+                                        <div className="text-center">Actions</div>
+                                    </div>
 
-                                <div className="flex flex-col divide-y divide-gray-100">
-                                    {loading ? (
-                                        <TableSkeleton
-                                            rows={recordsPerPage}
-                                            cols={8}
-                                            className="lg:grid-cols-[0.5fr_1.5fr_1fr_1fr_1fr_2fr_1.5fr_1fr]"
-                                        />
-                                    ) : currentRecords.length === 0 ? (
-                                        <div className="text-center py-4 text-gray-500 bg-white">
-                                            No return requests found.
-                                        </div>
-                                    ) : (
-                                        currentRecords.map((ret) => {
-                                            const itemList = ret.items.map(item =>
-                                                `${item.item} (${item.quantity})`
-                                            ).join(", ");
+                                    <div className="flex flex-col divide-y divide-gray-100">
+                                        {loading ? (
+                                            <TableSkeleton
+                                                rows={recordsPerPage}
+                                                cols={8}
+                                                className="lg:grid-cols-[0.5fr_1.5fr_1fr_1fr_1fr_2fr_1.5fr_1fr]"
+                                            />
+                                        ) : currentRecords.length === 0 ? (
+                                            <div className="text-center py-4 text-gray-500 bg-white">
+                                                No return requests found.
+                                            </div>
+                                        ) : (
+                                            currentRecords.map((ret) => {
+                                                const itemList = ret.items.map(item =>
+                                                    `${item.item} (${item.quantity})`
+                                                ).join(", ");
 
-                                            const itemDetails = ret.items.map(item =>
-                                                `${item.details}`
-                                            ).join(", ");
+                                                const itemDetails = ret.items.map(item =>
+                                                    `${item.details}`
+                                                ).join(", ");
 
-                                            return (
-                                                <div
-                                                    key={ret.id}
-                                                    className="grid grid-cols-1 lg:grid-cols-[0.5fr_0.8fr_1fr_1fr_1fr_2fr_1.5fr_1.5fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
-                                                >
-                                                    <div className="font-medium text-gray-900">
-                                                        {ret.sr}
-                                                    </div>
-                                                    <div className="text-gray-900 font-medium">
-                                                        {ret.returnId}
-                                                        <div className="text-xs text-gray-500">
-                                                            {ret.returnDate}
+                                                return (
+                                                    <div
+                                                        key={ret.id}
+                                                        className="grid grid-cols-1 lg:grid-cols-[0.5fr_0.8fr_1fr_1fr_1fr_2fr_1.5fr_1.5fr] items-center gap-4 px-6 py-4 text-sm bg-white hover:bg-gray-50 transition"
+                                                    >
+                                                        <div className="font-medium text-gray-900">
+                                                            {ret.sr}
                                                         </div>
-                                                    </div>
-                                                    <div className="text-gray-600">
-                                                        {ret.department}
-                                                    </div>
-                                                    <div className="text-gray-600">
-                                                        <div>{ret.employee}</div>
-                                                        <div className="text-xs text-gray-500">{ret.employeeId}</div>
-                                                    </div>
-                                                    <div className="text-gray-600">
-                                                        {ret.reason}
-                                                    </div>
-                                                    <div className="text-gray-600">
-                                                        <div className="font-medium">{itemList}</div>
-                                                        <div className="text-xs text-gray-500 truncate">{itemDetails}</div>
-                                                    </div>
-                                                    <div>
-                                                        <StatusBadge status={ret.status} />
-                                                    </div>
-                                                    <div className="flex justify-end gap-2">
-                                                        <div className="flex justify-end gap-3">
-                                                            {/* Edit Button */}
-                                                            <button
-                                                                onClick={() => handleEditClick(ret)}
-                                                                className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50"
-                                                                title="Edit Return"
-                                                            >
-                                                                <SquarePen size={18} />
-                                                            </button>
-
-                                                            {/* Status Buttons - Only show for Pending items */}
-                                                            {ret.status === 'Pending' ? (
-                                                                <>
-                                                                    {/* Approve Button */}
-                                                                    <button
-                                                                        onClick={() => handleStatusUpdate(ret.id, 'Approved')}
-                                                                        className="p-1.5 rounded-lg text-green-600 hover:bg-green-50"
-                                                                        title="Approve Return"
-                                                                    >
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    </button>
-
-                                                                    {/* Reject Button */}
-                                                                    <button
-                                                                        onClick={() => handleStatusUpdate(ret.id, 'Rejected')}
-                                                                        className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
-                                                                        title="Reject Return"
-                                                                    >
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    </button>
-                                                                </>
-                                                            ) : (
-                                                                // Show status-specific icons for non-pending items
+                                                        <div className="text-gray-900 font-medium">
+                                                            {ret.returnId}
+                                                            <div className="text-xs text-gray-500">
+                                                                {ret.returnDate}
+                                                            </div>
+                                                        </div>
+                                                        <div className="text-gray-600">
+                                                            {ret.department}
+                                                        </div>
+                                                        <div className="text-gray-600">
+                                                            <div>{ret.employee}</div>
+                                                            <div className="text-xs text-gray-500">{ret.employeeId}</div>
+                                                        </div>
+                                                        <div className="text-gray-600">
+                                                            {ret.reason}
+                                                        </div>
+                                                        <div className="text-gray-600 w-[300px] whitespace-normal break-words">
+                                                            <div className="font-medium">{itemList}</div>
+                                                            <div className="text-xs text-gray-500 truncate">{itemDetails}</div>
+                                                        </div>
+                                                        <div>
+                                                            <StatusBadge status={ret.status} />
+                                                        </div>
+                                                        <div className="flex justify-end gap-2">
+                                                            <div className="flex justify-end gap-3">
+                                                                {/* Edit Button */}
                                                                 <button
-                                                                    className="p-1.5 rounded-lg cursor-default"
-                                                                    title={`Status: ${ret.status}`}
+                                                                    onClick={() => handleEditClick(ret)}
+                                                                    className="p-1.5 rounded-lg text-blue-600 hover:bg-blue-50"
+                                                                    title="Edit Return"
                                                                 >
-                                                                    {ret.status === 'Approved' ? (
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    ) : ret.status === 'Rejected' ? (
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    ) : ret.status === 'Processed' ? (
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    ) : ret.status === 'Completed' ? (
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    ) : (
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                                                                        </svg>
-                                                                    )}
+                                                                    <SquarePen size={18} />
                                                                 </button>
-                                                            )}
 
-                                                            {/* View Details Button */}
-                                                            <button
-                                                                onClick={() => handleViewClick(ret)}
-                                                                className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50"
-                                                                title="View Details"
-                                                            >
-                                                                <Eye size={18} />
-                                                            </button>
+                                                                {/* Status Buttons - Only show for Pending items */}
+                                                                {ret.status === 'Pending' ? (
+                                                                    <>
+                                                                        {/* Approve Button */}
+                                                                        <button
+                                                                            onClick={() => handleStatusUpdate(ret.id, 'Approved')}
+                                                                            className="p-1.5 rounded-lg text-green-600 hover:bg-green-50"
+                                                                            title="Approve Return"
+                                                                        >
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        </button>
+
+                                                                        {/* Reject Button */}
+                                                                        <button
+                                                                            onClick={() => handleStatusUpdate(ret.id, 'Rejected')}
+                                                                            className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
+                                                                            title="Reject Return"
+                                                                        >
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        </button>
+                                                                    </>
+                                                                ) : (
+                                                                    // Show status-specific icons for non-pending items
+                                                                    <button
+                                                                        className="p-1.5 rounded-lg cursor-default"
+                                                                        title={`Status: ${ret.status}`}
+                                                                    >
+                                                                        {ret.status === 'Approved' ? (
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        ) : ret.status === 'Rejected' ? (
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        ) : ret.status === 'Processed' ? (
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        ) : ret.status === 'Completed' ? (
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        ) : (
+                                                                            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-yellow-500" viewBox="0 0 20 20" fill="currentColor">
+                                                                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
+                                                                            </svg>
+                                                                        )}
+                                                                    </button>
+                                                                )}
+
+                                                                {/* View Details Button */}
+                                                                <button
+                                                                    onClick={() => handleViewClick(ret)}
+                                                                    className="p-1.5 rounded-lg text-amber-600 hover:bg-amber-50"
+                                                                    title="View Details"
+                                                                >
+                                                                    <Eye size={18} />
+                                                                </button>
 
 
-                                                            {/* Print Button */}
-                                                            {/* <button
-                                                                onClick={() => handlePrintClick(ret)}
-                                                                className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-100"
-                                                                title="Print"
-                                                            >
-                                                                <Printer size={18} />
-                                                            </button> */}
+                                                                {/* Print Button */}
+                                                                <button
+                                                                    onClick={() => handlePrintClick(ret)}
+                                                                    className="p-1.5 rounded-lg text-gray-600 hover:bg-gray-100"
+                                                                    title="Print"
+                                                                >
+                                                                    <Printer size={18} />
+                                                                </button>
 
-                                                            {/* Delete Button */}
-                                                            <button
-                                                                onClick={() => handleDelete(ret.id)}
-                                                                className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
-                                                                title="Delete"
-                                                            >
-                                                                <Trash2 size={18} />
-                                                            </button>
+                                                                {/* Delete Button */}
+                                                                <button
+                                                                    onClick={() => handleDelete(ret.id)}
+                                                                    className="p-1.5 rounded-lg text-red-600 hover:bg-red-50"
+                                                                    title="Delete"
+                                                                >
+                                                                    <Trash2 size={18} />
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-                                            );
-                                        })
-                                    )}
+                                                );
+                                            })
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>
