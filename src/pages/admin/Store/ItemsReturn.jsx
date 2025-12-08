@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Search, Plus, Eye, SquarePen, Trash2, ChevronDown, MoreVertical, Printer, Download, Filter, X } from "lucide-react";
+import { Search, Plus, Eye, SquarePen, Trash2, ChevronDown, MoreVertical, Printer, Download, Filter, X, Undo2 } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -527,10 +527,13 @@ const ItemsReturn = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary">
-                            Items Return
-                        </h1>
+                    <div className="flex items-center gap-3">
+                        <Undo2 size={28} className="text-newPrimary" />
+                        <div>
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Items Return
+                            </h1>
+                        </div>
                     </div>
                     <div className="flex items-center gap-3">
                         {/* Search Input */}

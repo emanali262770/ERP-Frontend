@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { SquarePen, Trash2, Eye, Plus, Search, X } from "lucide-react";
+import { SquarePen, Trash2, Eye, Plus, Search, X, Calendar } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -454,10 +454,13 @@ const MonthlyStoreDemand = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary">
-                            Monthly Store Demand
-                        </h1>
+                    <div className="flex flex-col">
+                        <div className="flex gap-2">
+                            <Calendar size={28} className="text-newPrimary" />
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Monthly Store Demand
+                            </h1>
+                        </div>
                         <p className="text-gray-600 mt-1">
                             Manage monthly store demands and requirements
                         </p>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search, Award, Filter, Download, Printer } from "lucide-react";
+import { Search, Award, Filter, Download, Printer, GitCompare } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -338,10 +338,13 @@ const ComparativeStatement = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary">
-                            Comparative Statement
-                        </h1>
+                    <div className="flex flex-col">
+                        <div className="flex gap-2">
+                            <GitCompare size={28} className="text-newPrimary" />
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Comparative Statement
+                            </h1>
+                        </div>
                         <p className="text-gray-600 mt-1">
                             Compare supplier quotations and make award decisions
                         </p>

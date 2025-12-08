@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { FaListAlt, FaFileInvoice, FaShoppingCart, FaWallet, FaChartLine, FaBalanceScale, FaUndo, FaMoneyBillWave, FaExchangeAlt } from "react-icons/fa";
+import { FaListAlt, FaFileInvoice, FaShoppingCart, FaWallet, FaChartLine, FaBalanceScale, FaUndo, FaMoneyBillWave, FaExchangeAlt, FaShareSquare } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
 const storeChildren = [
@@ -13,6 +13,7 @@ const storeChildren = [
     { to: "/admin/items-return", label: "Items Return", icon: <FaUndo /> },
     { to: "/admin/cash-payment-voucher", label: "Cash Payment Voucher", icon: <FaMoneyBillWave /> },
     { to: "/admin/transfer-from-units", label: "Transfer From Units", icon: <FaExchangeAlt /> },
+    { to: "/admin/items-issue", label: "Items Issue", icon: <FaShareSquare /> },
 ];
 
 const StorePage = () => {

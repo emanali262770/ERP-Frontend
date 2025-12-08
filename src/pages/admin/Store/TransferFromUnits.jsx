@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SquarePen, Trash2, Eye, Plus, Search, X, Package, ArrowRight, Building, Calendar, Filter, Box } from "lucide-react";
+import { SquarePen, Trash2, Eye, Plus, Search, X, Package, ArrowRight, Building, Calendar, Filter, Box, ArrowRightLeft } from "lucide-react";
 import Swal from "sweetalert2";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
@@ -472,11 +472,13 @@ const TransferFromUnits = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary flex items-center gap-2">
-                            <ArrowRight size={24} />
-                            Transfer From Units
-                        </h1>
+                    <div className="flex flex-col">
+                        <div className="flex gap-2">
+                            <ArrowRightLeft size={28} className="text-newPrimary" />
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Transfer From Units
+                            </h1>
+                        </div>
                         <p className="text-gray-600 mt-1">Manage inter-unit inventory transfers</p>
                     </div>
                     <div className="flex items-center gap-3">
@@ -831,7 +833,7 @@ const TransferFromUnits = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                            <div className="md:col-span-2">
+                                            <div>
                                                 <label className="block text-gray-700 font-medium mb-2 text-sm">
                                                     Specifications
                                                 </label>
@@ -870,16 +872,16 @@ const TransferFromUnits = () => {
                                                     ))}
                                                 </select>
                                             </div>
-                                        </div>
-                                        <div className="flex justify-end mb-4">
-                                            <button
-                                                type="button"
-                                                onClick={handleAddItem}
-                                                className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 flex items-center justify-center gap-2 text-sm"
-                                            >
-                                                <Plus size={16} />
-                                                {editingItemId ? "Update Item" : "Add Item"}
-                                            </button>
+                                            <div className="mt-7">
+                                                <button
+                                                    type="button"
+                                                    onClick={handleAddItem}
+                                                    className="bg-green-500 w-full text-white px-4 py-2 rounded-md hover:bg-green-600 flex items-center justify-center gap-2 text-sm"
+                                                >
+                                                    <Plus size={16} />
+                                                    {editingItemId ? "Update Item" : "Add Item"}
+                                                </button>
+                                            </div>
                                         </div>
 
                                         {/* Items Table */}

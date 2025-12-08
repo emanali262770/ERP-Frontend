@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, Scale, Database } from "lucide-react";
 import CommanHeader from "../../../components/CommanHeader";
 import TableSkeleton from "../Skeleton";
 
@@ -182,13 +182,17 @@ const ProductsOpeningBalances = () => {
             <CommanHeader />
             <div className="px-6 mx-auto">
                 <div className="flex justify-between items-center mb-6">
-                    <div>
-                        <h1 className="text-2xl font-bold text-newPrimary">
-                            Products Opening Balances
-                        </h1>
+                    <div className="flex flex-col">
+                        <div className="flex gap-2">
+                            <Database size={28} className="text-newPrimary" />
+                            <h1 className="text-2xl font-bold text-newPrimary">
+                                Products Opening Balances
+                            </h1>
+                        </div>
                         <p className="text-gray-600 mt-1">
                             View and manage opening stock balances for products
                         </p>
+
                     </div>
                 </div>
 

@@ -43,8 +43,7 @@ const CPVViewModal = ({ cpv, onClose, onEdit }) => {
 
     return (
         <div className="fixed inset-0 bg-gray-600/50 flex items-center justify-center z-50 p-4">
-            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl 
-     max-h-[85vh] overflow-y-auto">
+            <div className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl max-h-[85vh] overflow-y-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center p-4 border-b bg-gray-100 rounded-t-2x sticky top-0 z-10">
                     <div className="flex items-center gap-3">
