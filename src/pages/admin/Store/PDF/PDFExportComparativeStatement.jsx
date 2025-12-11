@@ -325,7 +325,7 @@ const PDFExportComparativeStatement = ({ statements, filters, onClose }) => {
 
                         <div className="mt-8 text-center text-xs text-gray-400">
                             <p>This is a computer-generated comparative statement report.</p>
-                            <p className="mt-1">© {new Date().getFullYear()} ERP Management System - All Rights Reserved</p>
+                            <p className="mt-1">© {new Date().getFullYear()}Inifinity Byte ERP Management System - All Rights Reserved</p>
                         </div>
                     </div>
                 </div>
