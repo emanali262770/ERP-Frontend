@@ -255,8 +255,8 @@ const PrintComparativeStatement = ({ statements, filters, onClose }) => {
 
                     {/* Footer */}
                     <div className="mt-12 pt-6 border-t text-center text-sm text-gray-500">
-                        <p>ERP Statement Report - Generated on {new Date().toLocaleDateString()}</p>
-                        <p className="mt-1">© {new Date().getFullYear()} ERP Management System</p>
+                        <p>Inifinity Byte ERP Statement Report - Generated on {new Date().toLocaleDateString()}</p>
+                        <p className="mt-1">© {new Date().getFullYear()}Inifinity Byte  ERP Management System</p>
                     </div>
                 </div>
             </div>
