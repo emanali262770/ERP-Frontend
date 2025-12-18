@@ -29,11 +29,11 @@ import GatePassOut from "./pages/admin/Purchase/GatePassOUT.jsx";
 import ItemUnit from "./pages/admin/SetUp/ItemUnit.jsx";
 
 
-import Users from "./pages/admin/Security/Users.jsx";
-import GroupManagement from "./pages/admin/Security/GroupManagement.jsx";
+import Users from "./pages/admin/security/Users.jsx";
+import GroupManagement from "./pages/admin/security/GroupManagement.jsx";
 // import AccessRights from "./pages/admin/AccessControl";
 import Modules from "./pages/admin/Modules";
-import AccessControll from "./pages/admin/Security/AccessControll.jsx";
+import AccessControll from "./pages/admin/security/AccessControll.jsx";
 import ExpenseHead from "./pages/admin/ExpenseHead.jsx";
 import ExpenseVoucher from "./pages/admin/ExpenseVoucher.jsx";
 import DayBook from "./pages/admin/DayBook.jsx";
@@ -48,15 +48,15 @@ import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
 import PurchaseOrder from "./pages/admin/Purchase/PurchaseOrder.jsx";
 
-import RateList from "./pages/admin/Sales/RateList.jsx";
-import DistributionRateList from "./pages/admin/Sales/DistributionRateList.jsx";
-import BookingOrders from "./pages/admin/Sales/BookingOrders.jsx";
-import DeliveryChallan from "./pages/admin/Sales/DeliveryChallan.jsx";
-import SalesInvoices from "./pages/admin/Sales/SalesInvoices.jsx";
-import PaymentReceiptVoucher from "./pages/admin/Sales/PaymentReceiptVoucher.jsx";
-import CustomerLedger from "./pages/admin/Sales/CustomerLedger.jsx";
-import Receivable from "./pages/admin/Sales/Receivable.jsx";
-import SalesReturn from "./pages/admin/Sales/SalesReturn.jsx";
+import RateList from "./pages/admin/sales/RateList.jsx";
+import DistributionRateList from "./pages/admin/sales/DistributionRateList.jsx";
+import BookingOrders from "./pages/admin/sales/BookingOrders.jsx";
+import DeliveryChallan from "./pages/admin/sales/DeliveryChallan.jsx";
+import SalesInvoices from "./pages/admin/sales/SalesInvoices.jsx";
+import PaymentReceiptVoucher from "./pages/admin/sales/PaymentReceiptVoucher.jsx";
+import CustomerLedger from "./pages/admin/sales/CustomerLedger.jsx";
+import Receivable from "./pages/admin/sales/Receivable.jsx";
+import SalesReturn from "./pages/admin/sales/SalesReturn.jsx";
 import StoreAcknowledgement from "./pages/admin/Sales/StoreAcknowledgement.jsx";
 import Profile from "./components/Profile.jsx";
 import PurchaseReturn from "./pages/admin/Purchase/PurchaseReturn.jsx";
@@ -69,17 +69,17 @@ import SalesPage from "./pages/admin/Sales/SalesPage.jsx";
 import Test from "./pages/admin/Purchase/api.jsx";
 import Group from "./pages/admin/SetUp/Group.jsx";
 import Company from "./pages/admin/SetUp/Company.jsx";
-import FbrCompany from "./pages/admin/FbrIntergration/FbrCompany.jsx";
-import FbrCustomers from "./pages/admin/FbrIntergration/FbrCustomers.jsx";
-import FbrProduct from "./pages/admin/FbrIntergration/FbrProduct.jsx";
-import FbrBookingOrders from "./pages/admin/FbrIntergration/FbrBookingOrders.jsx";
-import FbrDeliveryChallan from "./pages/admin/FbrIntergration/FbrDeliveryChallan.jsx";
-import FbrSalesInvoices from "./pages/admin/FbrIntergration/FbrSalesInvoices.jsx";
-import FbrSalesReturn from "./pages/admin/FbrIntergration/FbrSalesReturn.jsx";
-import FbrPaymentReceipt from "./pages/admin/FbrIntergration/FbrPaymentReceipt.jsx";
-import FbrLedger from "./pages/admin/FbrIntergration/FbrLedger.jsx";
-import FbrReceivable from "./pages/admin/FbrIntergration/FbrReceivable.jsx";
-import FbrPage from "./pages/admin/FbrIntergration/FbrPage.jsx";
+// import FbrCompany from "./pages/admin/FbrIntergration/FbrCompany.jsx";
+// import FbrCustomers from "./pages/admin/FbrIntergration/FbrCustomers.jsx";
+// import FbrProduct from "./pages/admin/FbrIntergration/FbrProduct.jsx";
+// import FbrBookingOrders from "./pages/admin/FbrIntergration/FbrBookingOrders.jsx";
+// import FbrDeliveryChallan from "./pages/admin/FbrIntergration/FbrDeliveryChallan.jsx";
+// import FbrSalesInvoices from "./pages/admin/FbrIntergration/FbrSalesInvoices.jsx";
+// import FbrSalesReturn from "./pages/admin/FbrIntergration/FbrSalesReturn.jsx";
+// import FbrPaymentReceipt from "./pages/admin/FbrIntergration/FbrPaymentReceipt.jsx";
+// import FbrLedger from "./pages/admin/FbrIntergration/FbrLedger.jsx";
+// import FbrReceivable from "./pages/admin/FbrIntergration/FbrReceivable.jsx";
+// import FbrPage from "./pages/admin/FbrIntergration/FbrPage.jsx";
 import StoreItemDefination from "./pages/admin/Store/ItemDefination.jsx"
 import StorePage from "./pages/admin/Store/StorePage.jsx"
 import StoreQutation from "./pages/admin/Store/Quotation.jsx"
@@ -122,7 +122,7 @@ function AppContent() {
             <Route path="supplier" element={<SupplierList />} />
             <Route path="purchase" element={<PurchasePage />} />
             <Route path="sales" element={<SalesPage />} />
-            <Route path="fbr-integration" element={<FbrPage />} />
+            {/* <Route path="fbr-integration" element={<FbrPage />} /> */}
             <Route path="api" element={<Test />} />
 
 
@@ -190,7 +190,7 @@ function AppContent() {
             <Route path="items-issue" element={<StoreItemsIssue />} />
 
             {/* fbr */}
-            <Route path="fbr-company" element={<FbrCompany />} />
+            {/* <Route path="fbr-company" element={<FbrCompany />} />
             <Route path="fbr-customers" element={<FbrCustomers />} />
             <Route path="fbr-products" element={<FbrProduct />} />
             <Route path="fbr-booking-orders" element={<FbrBookingOrders />} />
@@ -199,7 +199,7 @@ function AppContent() {
             <Route path="fbr-sales-return" element={<FbrSalesReturn />} />
             <Route path="fbr-payment-receipt" element={<FbrPaymentReceipt />} />
             <Route path="fbr-ledger" element={<FbrLedger />} />
-            <Route path="fbr-receivable" element={<FbrReceivable />} />
+            <Route path="fbr-receivable" element={<FbrReceivable />} /> */}
             {/* <Route path="modules-functionalities" element={<ModulesFunctionalities />} /> */}
             <Route path="expense-head" element={<ExpenseHead />} />
             <Route path="expense-voucher" element={<ExpenseVoucher />} />
