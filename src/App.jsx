@@ -4,7 +4,6 @@ import Login from "./pages/admin/Login";
 import Signup from "./pages/admin/Signup";
 import AdminLayout from "./pages/admin/AdminLayout";
 import AdminDashboard from "./pages/admin/AdminDashboard";
-import ItemList from "./pages/admin/ItemList.jsx";
 import CustomerData from "./pages/admin/CustomerData";
 import { ToastContainer } from "react-toastify";
 import ShelveLocation from "./pages/admin/SetUp/ShelveLocation.jsx";
@@ -28,7 +27,6 @@ import BookingOrder from "./pages/admin/BookingOrder";
 import GatePassOut from "./pages/admin/Purchase/GatePassOUT.jsx";
 import ItemUnit from "./pages/admin/SetUp/ItemUnit.jsx";
 
-
 import Users from "./pages/admin/security/Users.jsx";
 import GroupManagement from "./pages/admin/security/GroupManagement.jsx";
 // import AccessRights from "./pages/admin/AccessControl";
@@ -43,7 +41,6 @@ import PromotionItem from "./pages/admin/SetUp/PromotionItem.jsx";
 import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
 import ScrollToTop from "./helper/ScrollToTop.jsx";
 import Designation from "./pages/admin/Mangement/Designation.jsx";
-  
 
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
@@ -81,21 +78,54 @@ import Company from "./pages/admin/SetUp/Company.jsx";
 // import FbrLedger from "./pages/admin/FbrIntergration/FbrLedger.jsx";
 // import FbrReceivable from "./pages/admin/FbrIntergration/FbrReceivable.jsx";
 // import FbrPage from "./pages/admin/FbrIntergration/FbrPage.jsx";
-import StoreItemDefination from "./pages/admin/Store/ItemDefination.jsx"
-import StorePage from "./pages/admin/Store/StorePage.jsx"
-import StoreQutation from "./pages/admin/Store/Quotation.jsx"
-import StorePurchase from "./pages/admin/Store/PurchaseGRN.jsx"
-import StoreProductsOpeningBalance from "./pages/admin/Store/ProductsOpeningBalances.jsx"
-import MonthlyStoreDemand from "./pages/admin/Store/MonthlyStoreDemand.jsx"
-import StoreComparativeStatement from "./pages/admin/Store/ComparativeStatement.jsx"
-import StoreItemsReturn from "./pages/admin/Store/ItemsReturn.jsx"
-import StoreCashPaymentVoucher from "./pages/admin/Store/CashPaymentVoucher.jsx"
-import StoreTransferFromUnits from "./pages/admin/Store/TransferFromUnits.jsx"
-import StoreItemsIssue from "./pages/admin/Store/ItemsIssue.jsx"
+import StoreItemDefination from "./pages/admin/Store/ItemDefination.jsx";
+import StorePage from "./pages/admin/Store/StorePage.jsx";
+import StoreQutation from "./pages/admin/Store/Quotation.jsx";
+import StorePurchase from "./pages/admin/Store/PurchaseGRN.jsx";
+import StoreProductsOpeningBalance from "./pages/admin/Store/ProductsOpeningBalances.jsx";
+import MonthlyStoreDemand from "./pages/admin/Store/MonthlyStoreDemand.jsx";
+import StoreComparativeStatement from "./pages/admin/Store/ComparativeStatement.jsx";
+import StoreItemsReturn from "./pages/admin/Store/ItemsReturn.jsx";
+import StoreCashPaymentVoucher from "./pages/admin/Store/CashPaymentVoucher.jsx";
+import StoreTransferFromUnits from "./pages/admin/Store/TransferFromUnits.jsx";
+import StoreItemsIssue from "./pages/admin/Store/ItemsIssue.jsx";
 import TaskMangementPage from "./pages/admin/taskManagement/TaskMangementPage.jsx";
 import PayrolePage from "./pages/admin/payRoll/PayrolePage.jsx";
 import FinancialPage from "./pages/admin/financial/FinancialPage.jsx";
 import SoftwareSecurity from "./pages/admin/security/SoftwareSecurity.jsx";
+import ComplainMangementPage from "./pages/admin/complaintManagement/ComplainMangementPage.jsx"
+
+// Stock Pages
+import StockPage from "./pages/admin/stock/StockPage.jsx";
+import StockItemList from "./pages/admin/stock/functionalities/ItemList.jsx";
+import StockDefinationPromotion from "./pages/admin/stock/functionalities/DefinePromotions.jsx";
+import StockIssueOtherUnits from "./pages/admin/stock/functionalities/IssueOtherUnits.jsx";
+import StockOpeningStockItems from "./pages/admin/stock/functionalities/OpeningStockItems.jsx";
+import StockReturnOtherUnits from "./pages/admin/stock/functionalities/ReturnOtherUnits.jsx";
+import StockItemLedger from "./pages/admin/stock/reports/ItemLedger.jsx";
+import StockLowLevel from "./pages/admin/stock/reports/LowLevelStock.jsx";
+import StockPriceList from "./pages/admin/stock/reports/PriceList.jsx";
+import StockPosition from "./pages/admin/stock/reports/StockPosition.jsx";
+import StockPrice from "./pages/admin/stock/reports/StockPrice.jsx";
+import StockItemCategory from "./pages/admin/stock/setup/ItemCategory.jsx";
+import StocListCategories from "./pages/admin/stock/setup/ListCategories.jsx";
+import StockListSubCategories from "./pages/admin/stock/setup/ListSubCategories.jsx";
+import StockLocationList from "./pages/admin/stock/setup/LocationList.jsx";
+import StockManufactures from "./pages/admin/stock/setup/Manufactures.jsx";
+import StockUnitList from "./pages/admin/stock/setup/UnitList.jsx";
+
+// Production Pages
+import ProductionPage from "./pages/admin/production/ProductionPage.jsx";
+import AnalysisProductionReport from "./pages/admin/production/functionalities/AnalysisProductionReport.jsx";
+import AreaProduction from "./pages/admin/production/functionalities/AreaProduction.jsx";
+import CalculateRawMaterialProduction from "./pages/admin/production/functionalities/CalculateRawMaterialProduction.jsx";
+import DataSheetManufacturedItems from "./pages/admin/production/functionalities/DataSheetManufacuredItems.jsx";
+import Destruction from "./pages/admin/production/functionalities/Destruction.jsx";
+import FinishedGoodsTransfer from "./pages/admin/production/functionalities/FinishedGoodsTransfer.jsx";
+import IssueRawMaterialProduction from "./pages/admin/production/functionalities/IssueRawMaterialProduction.jsx";
+import ProductionBatches from "./pages/admin/production/functionalities/ProductionBatches.jsx";
+import ProductionOrderManufacturing from "./pages/admin/production/functionalities/ProductionOrderManufacturing.jsx";
+import RecordProductionEachPhase from "./pages/admin/production/functionalities/RecordProductionEachPhase.jsx";
 
 function AppContent() {
   return (
@@ -120,7 +150,55 @@ function AppContent() {
             <Route index element={<AdminDashboard />} />
             <Route path="dashboard" element={<AdminDashboard />} />
             <Route path="profile" element={<Profile />} />
-            <Route path="item-details" element={<ItemList />} />
+
+            {/* Stock Routes */}
+            <Route path="stock" element={<StockPage />} />
+            <Route path="item-details" element={<StockItemList />} />
+            <Route
+              path="defination-promotion"
+              element={<StockDefinationPromotion />}
+            />
+            <Route
+              path="issue-other-units"
+              element={<StockIssueOtherUnits />}
+            />
+            <Route
+              path="opening-stock-items"
+              element={<StockOpeningStockItems />}
+            />
+            <Route
+              path="return-other-units"
+              element={<StockReturnOtherUnits />}
+            />
+            <Route path="item-ledger" element={<StockItemLedger />} />
+            <Route path="low-level" element={<StockLowLevel />} />
+            <Route path="price-list" element={<StockPriceList />} />
+            <Route path="stock-position" element={<StockPosition />} />
+            <Route path="stock-price" element={<StockPrice />} />
+            <Route path="item-category" element={<StockItemCategory />} />
+            <Route path="list-categories" element={<StocListCategories />} />
+            <Route
+              path="list-sub-categories"
+              element={<StockListSubCategories />}
+            />
+            <Route path="location-list" element={<StockLocationList />} />
+            <Route path="manufactures" element={<StockManufactures />} />
+            <Route path="unit-list" element={<StockUnitList />} />
+
+            {/* Production Routes */}
+            <Route path="production" element={<ProductionPage />} />
+            <Route path="analysis-production-report" element={<AnalysisProductionReport />} />
+            <Route path="area-production" element={<AreaProduction />} />
+            <Route path="calculate-raw-material-production" element={<CalculateRawMaterialProduction />} />
+            <Route path="data-sheet-manufactured-items" element={<DataSheetManufacturedItems />} />
+            <Route path="destruction" element={<Destruction />} />
+            <Route path="finished-goods-transfer" element={<FinishedGoodsTransfer />} />
+            <Route path="issue-raw-material-production" element={<IssueRawMaterialProduction />} />
+            <Route path="production-batches" element={<ProductionBatches />} />
+            <Route path="production-order-manufacturing" element={<ProductionOrderManufacturing />} />
+            <Route path="record-production-each-phase" element={<RecordProductionEachPhase />} />
+
+
             <Route path="customers" element={<CustomerData />} />
             <Route path="shelve-location" element={<ShelveLocation />} />
             <Route path="category-item" element={<CategoryItem />} />
@@ -129,7 +207,6 @@ function AppContent() {
             <Route path="sales" element={<SalesPage />} />
             {/* <Route path="fbr-integration" element={<FbrPage />} /> */}
             <Route path="api" element={<Test />} />
-
 
             <Route path="group" element={<Group />} />
 
@@ -186,20 +263,35 @@ function AppContent() {
             <Route path="item-defination" element={<StoreItemDefination />} />
             <Route path="item-quotation" element={<StoreQutation />} />
             <Route path="purchase-grn" element={<StorePurchase />} />
-            <Route path="products-opening-balances" element={<StoreProductsOpeningBalance />} />
-            <Route path="monthly-store-demand" element={<MonthlyStoreDemand />} />
-            <Route path="comparative-statement" element={<StoreComparativeStatement />} />
+            <Route
+              path="products-opening-balances"
+              element={<StoreProductsOpeningBalance />}
+            />
+            <Route
+              path="monthly-store-demand"
+              element={<MonthlyStoreDemand />}
+            />
+            <Route
+              path="comparative-statement"
+              element={<StoreComparativeStatement />}
+            />
             <Route path="items-return" element={<StoreItemsReturn />} />
-            <Route path="cash-payment-voucher" element={<StoreCashPaymentVoucher />} />
-            <Route path="transfer-from-units" element={<StoreTransferFromUnits />} />
+            <Route
+              path="cash-payment-voucher"
+              element={<StoreCashPaymentVoucher />}
+            />
+            <Route
+              path="transfer-from-units"
+              element={<StoreTransferFromUnits />}
+            />
             <Route path="items-issue" element={<StoreItemsIssue />} />
             {/* Task managment */}
             <Route path="task-management" element={<TaskMangementPage />} />
-              {/* payrole */}
+            {/* payrole */}
             <Route path="payrole" element={<PayrolePage />} />
-              {/* finance */}
+            {/* finance */}
             <Route path="financial" element={<FinancialPage />} />
-              {/* security */}
+            {/* security */}
             <Route path="security" element={<SoftwareSecurity />} />
             {/* fbr */}
             {/* <Route path="fbr-company" element={<FbrCompany />} />
@@ -225,6 +317,9 @@ function AppContent() {
             <Route path="item-type" element={<ItemType />} />
             <Route path="tax" element={<Tax />} />
             <Route path="customers-list" element={<CustomerList />} />
+
+            {/* Complaint Management */}
+            <Route path="complaint-management" element={<ComplainMangementPage />} />
           </Route>
         </Routes>
       </main>

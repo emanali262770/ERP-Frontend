@@ -21,6 +21,7 @@ import {
   FaCalculator,
   FaTasks,
   FaMoneyBillWave,
+  FaExclamationCircle,
 } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { MdOutlineIntegrationInstructions } from "react-icons/md";
@@ -32,10 +33,9 @@ import { NavLink, useLocation, useNavigate } from "react-router-dom";
 const links = [
   { to: "/admin", label: "Dashboard", icon: <RiDashboardFill /> },
   {
-    to: "/admin/item-details",
-    label: "Item Details",
-    icon: <FaBox />,
-    key: "isItemDetails",
+    to: "/admin/stock",
+    label: "Stock",
+    icon: <FaWarehouse />,
   },
   {
     to: "/admin/purchase",
@@ -48,7 +48,17 @@ const links = [
     label: "Sales ",
     icon: <FcSalesPerformance color="#1d4ed8"/>,
   },
-  
+  {
+    to: "/admin/production",
+    label: "Production",
+    icon: <FaIndustry />,
+  },
+  {
+    to: "/admin/complaint-management",
+    label: "Complaint Management",
+    icon: <FaExclamationCircle />,
+  },
+
   { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
   { to: "/admin/task-management", label: "Task Management", icon: <FaTasks />, key: "isTaskMangement" },
   { to: "/admin/payrole", label: "PayRole", icon: <FaCalculator />, key: "isPayrole" },
