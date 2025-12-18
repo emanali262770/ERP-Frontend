@@ -17,6 +17,11 @@ const Login = () => {
   const [eyeOpen, setEyeclose] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const fillDemoCredentials = () => {
+    setEmail("admin@gmail.com");
+    setPassword("admin123");
+  };
+
 
   useEffect(() => {
     gsap.from(".login-box", { opacity: 0, y: 50, duration: 1 });
@@ -30,25 +35,25 @@ const Login = () => {
         `${import.meta.env.VITE_API_BASE_URL}/auth/login`,
         { email, password }
       );
-  
+
       const { token, user } = response.data;
-  
+
       // ✅ Merge token with user and save as userInfo
       const userInfo = { ...user, token };
-  
+
       // ✅ Store in Redux (will also store in localStorage via authSlice)
       dispatch(loginSuccess(userInfo));
-  
+
       // ✅ Toast and redirect
       toast.success("Logged in successfully 🎉");
-      
-  
+
+
       if (user.isAdmin === true || user.isAdmin === false) {
         navigate("/admin");
       } else {
         navigate("/");
       }
-  
+
       setTimeout(() => {
         window.location.reload();
       }, 100);
@@ -59,11 +64,11 @@ const Login = () => {
         "Login failed. Please try again."
       );
     }
-    finally{
+    finally {
       setLoding(false)
     }
   };
-  
+
 
   return (
     // <div className="min-h-screen flex flex-col lg:flex-row">
@@ -122,75 +127,85 @@ const Login = () => {
     //     />
     //   </div>
     // </div>
-<div className="min-h-screen relative bg-[url('/images/erpImage.png')] bg-cover bg-center py-6 flex flex-col justify-center sm:py-12">
-  {/* Overlay for opacity */}
-  <div className="absolute inset-0 bg-black/70"></div> 
+    <div className="min-h-screen relative bg-[url('/images/erpImage.png')] bg-cover bg-center py-6 flex flex-col justify-center sm:py-12">
+      {/* Overlay for opacity */}
+      <div className="absolute inset-0 bg-black/70"></div>
 
-  <div className="relative py-3 px-4 sm:px-0 sm:max-w-xl sm:mx-auto">
-    {/* Gradient background layer */}
-    <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-newPrimary to-blue-400 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
+      <div className="relative py-3 px-4 sm:px-0 sm:max-w-xl sm:mx-auto">
+        {/* Gradient background layer */}
+        <div className="hidden sm:block absolute inset-0 bg-gradient-to-r from-newPrimary to-blue-400 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 sm:rounded-3xl"></div>
 
-    {/* Main card */}
-   <div className="relative px-8 py-14 bg-white shadow-lg sm:rounded-3xl sm:p-20 max-w-2xl w-full">
+        {/* Main card */}
+        <div className="relative px-8 py-14 bg-white shadow-lg sm:rounded-3xl sm:p-20 max-w-2xl w-full">
 
-      <div className="max-w-md mx-auto">
-        <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
-          Welcome Back
-        </h1>
+          <div className="max-w-md mx-auto">
+            <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center">
+              Welcome Back
+            </h1>
 
-        <form onSubmit={handleLogin} className="space-y-6">
-          {/* Email */}
-          <div className="relative">
-            <FiMail className="absolute left-3 top-3 text-gray-400 text-lg" />
-            <input
-              type="email"
-              placeholder="Enter E-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="peer pl-10 h-12 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-500"
-            />
+            <form onSubmit={handleLogin} className="space-y-6">
+              {/* Email */}
+              <div className="relative">
+                <FiMail className="absolute left-3 top-3 text-gray-400 text-lg" />
+                <input
+                  type="email"
+                  placeholder="Enter E-mail"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="peer pl-10 h-12 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              {/* Password */}
+              <div className="relative">
+                <FiLock
+                  onClick={() => setEyeclose((p) => !p)}
+                  className="absolute left-3 top-3 text-gray-400 text-lg cursor-pointer hover:text-cyan-600"
+                />
+                <input
+                  type={eyeOpen ? "text" : "password"}
+                  placeholder="Enter Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  className="peer pl-10 h-12 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-500"
+                />
+              </div>
+
+              {/* Demo Button */}
+              <button
+                type="button"
+                onClick={fillDemoCredentials}
+                className="w-full border border-cyan-500 text-cyan-600 font-semibold py-3 rounded-lg hover:bg-cyan-50 transition"
+              >
+                Use Demo Admin
+              </button>
+
+
+              {/* Button */}
+              <button
+                type="submit"
+                className="w-full bg-gradient-to-r flex justify-center from-newPrimary to-blue-400 text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition"
+              >
+                {loding ? <span className="animate-spin"><Loader size={18} /></span> : "Login"}
+              </button>
+            </form>
+
+            {/* Signup link */}
+            <p className="mt-6 text-center text-sm text-gray-500">
+              Don't have an account?{" "}
+              <Link
+                to="/signup"
+                className="text-cyan-600 font-medium hover:underline"
+              >
+                Create
+              </Link>
+            </p>
           </div>
-
-          {/* Password */}
-          <div className="relative">
-            <FiLock
-              onClick={() => setEyeclose((p) => !p)}
-              className="absolute left-3 top-3 text-gray-400 text-lg cursor-pointer hover:text-cyan-600"
-            />
-            <input
-              type={eyeOpen ? "text" : "password"}
-              placeholder="Enter Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="peer pl-10 h-12 w-full border-b-2 border-gray-300 text-gray-900 focus:outline-none focus:border-cyan-500"
-            />
-          </div>
-
-          {/* Button */}
-          <button
-            type="submit"
-            className="w-full bg-gradient-to-r flex justify-center from-newPrimary to-blue-400 text-white font-semibold py-3 rounded-lg shadow-md hover:opacity-90 transition"
-          >
-            {loding ? <span className="animate-spin"><Loader size={18} /></span> : "Login"}
-          </button>
-        </form>
-
-        {/* Signup link */}
-        <p className="mt-6 text-center text-sm text-gray-500">
-          Don't have an account?{" "}
-          <Link
-            to="/signup"
-            className="text-cyan-600 font-medium hover:underline"
-          >
-            Create
-          </Link>
-        </p>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
 
 
