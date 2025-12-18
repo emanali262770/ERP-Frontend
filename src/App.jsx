@@ -43,6 +43,7 @@ import PromotionItem from "./pages/admin/SetUp/PromotionItem.jsx";
 import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
 import ScrollToTop from "./helper/ScrollToTop.jsx";
 import Designation from "./pages/admin/Mangement/Designation.jsx";
+  
 
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
