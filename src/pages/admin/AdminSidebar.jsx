@@ -18,6 +18,9 @@ import {
   FaUserCog,
   FaShoppingCart,
   FaStore,
+  FaCalculator,
+  FaTasks,
+  FaMoneyBillWave,
 } from "react-icons/fa";
 import { FaUserGroup } from "react-icons/fa6";
 import { MdOutlineIntegrationInstructions } from "react-icons/md";
@@ -47,6 +50,9 @@ const links = [
   },
   
   { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
+  { to: "/admin/task-management", label: "Task Management", icon: <FaTasks />, key: "isTaskMangement" },
+  { to: "/admin/payrole", label: "PayRole", icon: <FaCalculator />, key: "isPayrole" },
+  { to: "/admin/financial", label: "Financial", icon: <FaMoneyBillWave/>, key: "isPayrole" },
   {
     label: "Setup",
     icon: <FaCogs />,
@@ -104,24 +110,25 @@ const links = [
     ],
   },
   {
+     to: "/admin/security",
     label: "Security",
     key: "isSecurity",
     icon: <FaUserShield />,
-    children: [
-      {
-        to: "/admin/groups",
-        label: "Group Management",
-        icon: <FaUsersCog />,
-        key: "isGroupManagement",
-      },
-      { to: "/admin/users", label: "Users", icon: <FaUserCog />, key: "isUsers" },
-      {
-        to: "/admin/access-rights",
-        label: "Access Control",
-        icon: <FaUserShield />,
-        key: "isAccessControl",
-      },
-    ],
+    // children: [
+    //   {
+    //     to: "/admin/groups",
+    //     label: "Group Management",
+    //     icon: <FaUsersCog />,
+    //     key: "isGroupManagement",
+    //   },
+    //   { to: "/admin/users", label: "Users", icon: <FaUserCog />, key: "isUsers" },
+    //   {
+    //     to: "/admin/access-rights",
+    //     label: "Access Control",
+    //     icon: <FaUserShield />,
+    //     key: "isAccessControl",
+    //   },
+    // ],
   },
 
 ];

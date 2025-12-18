@@ -6,52 +6,192 @@ import {
   FaCommentsDollar,
   FaCalculator,
   FaFileInvoiceDollar,
-  FaSignInAlt,
   FaCheckDouble,
-  FaFileInvoice,
-  FaUndoAlt,
-  FaSignOutAlt,
+  FaChevronRight,
+  FaChartLine,
+  FaCogs,
+  FaFileContract,
+  FaProjectDiagram,
+  FaTasks,
+  FaUsers,
+  FaCalendarCheck,
+  FaUserCheck,
+  FaClipboardCheck
 } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
-const purchaseChildren = [
-  { to: "/admin/purchase-requisition", label: "Purchase Requisition", icon: <FaFileAlt /> },
-  { to: "/admin/purchase-approval", label: "Purchase Approval", icon: <FaCheckCircle /> },
-  { to: "/admin/quotation", label: "Market Quotation", icon: <FaCommentsDollar /> },
-  { to: "/admin/estimation", label: "Estimation", icon: <FaCalculator /> },
-  { to: "/admin/purchase-order", label: "Purchase Order", icon: <FaFileInvoiceDollar /> },
-  { to: "/admin/gatepass-in", label: "GatePass IN", icon: <FaSignInAlt /> },
-  { to: "/admin/quality-checking", label: "Quality Checking", icon: <FaCheckDouble /> },
-  { to: "/admin/grn", label: "Goods Receipt Note", icon: <FaFileInvoice /> },
-  { to: "/admin/purchase-return", label: "Purchase Return", icon: <FaUndoAlt /> },
-  { to: "/admin/gatepass-out", label: "GatePass OUT", icon: <FaSignOutAlt /> },
+/* ================= FUNCTIONALITY ================= */
+const functionalityChildren = [
+  {
+    to: "/admin/projects",
+    label: "List Of Projects",
+    icon: <FaProjectDiagram size={30} />,
+  },
+  {
+    to: "/admin/tasks",
+    label: "List Of Tasks",
+    icon: <FaTasks size={30} />,
+  },
+  {
+    to: "/admin/staff",
+    label: "List Of Staff",
+    icon: <FaUsers size={30} />,
+  },
 ];
+
+/* ================= REPORTS ================= */
+const reportChildren = [
+  {
+    to: "/admin/task-schedule",
+    label: "Task Schedule",
+    icon: <FaCalendarCheck size={30} />,
+  },
+  {
+    to: "/admin/task-assigned",
+    label: "Task Assigned To Staff",
+    icon: <FaUserCheck size={30} />,
+  },
+  {
+    to: "/admin/task-completion",
+    label: "Task Completion Note",
+    icon: <FaClipboardCheck size={30} />,
+  },
+];
+
+/* ================= DEFINITION (EMPTY) ================= */
+const definitionChildren = [];
 
 const TaskMangementPage = () => {
   return (
-    <div className="p-6">
+    <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       <CommanHeader />
-      <h1 className="text-2xl font-bold mb-6">Purchase Module</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
-        {/* Without cards */}
 
-        {purchaseChildren.map((item) => (
-          <NavLink
-            key={item.to}
-            to={item.to}
-            className="flex flex-col items-center justify-center text-black hover:no-underline group transition-all duration-300 hover:bg-emerald-100 h-40 w-60 rounded-2xl"
-
-          >
-            <div className="text-4xl mb-2 text-black group-hover:text-green-500 transition-colors duration-300">
-              {item.icon}
-            </div>
-            <h2 className="text-base font-medium text-center group-hover:text-green-600">
-              {item.label}
-            </h2>
-          </NavLink>
-        ))}
-
+      {/* Header Section */}
+      <div className="mb-8">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="h-8 w-1 bg-gradient-to-b from-funcationlityColor to-teal-600 rounded-full"></div>
+          <h1 className="text-2xl font-semibold text-gray-700">Task Management</h1>
+        </div>
+        <p className="text-gray-500 ml-4">Manage projects, tasks, and staff assignments</p>
       </div>
+
+      {/* ================= FUNCTIONALITY SECTION ================= */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-gradient-to-r from-funcationlityColor to-teal-500 text-white shadow-lg">
+            <FaCogs size={20} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">Functionality</h2>
+          <div className="flex-1 h-px bg-gradient-to-r from-emerald-200 to-transparent"></div>
+          <span className="text-sm font-medium text-funcationlityColor bg-emerald-50 px-3 py-1 rounded-full">
+            {functionalityChildren.length} modules
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {functionalityChildren.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200 overflow-hidden"
+            >
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-lg bg-gradient-to-br from-emerald-50 to-teal-50 group-hover:from-emerald-100 group-hover:to-teal-100 transition-colors">
+                    <div className="text-funcationlityColor group-hover:text-funcationlityColor/90 transition-colors">
+                      {item.icon}
+                    </div>
+                  </div>
+                  <FaChevronRight className="text-gray-300 group-hover:text-funcationlityColor transition-colors mt-1" />
+                </div>
+                <h2 className="font-semibold text-gray-800 group-hover:text-funcationlityColor/90 transition-colors text-sm leading-tight">
+                  {item.label}
+                </h2>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 to-teal-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </NavLink>
+          ))}
+        </div>
+      </div>
+
+      {/* ================= REPORT SECTION ================= */}
+      <div className="mb-10">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="p-2 rounded-xl bg-gradient-to-r from-reportColor to-indigo-500 text-white shadow-lg">
+            <FaChartLine size={20} />
+          </div>
+          <h2 className="text-xl font-bold text-gray-800">Reports & Analytics</h2>
+          <div className="flex-1 h-px bg-gradient-to-r from-blue-200 to-transparent"></div>
+          <span className="text-sm font-medium text-reportColor bg-blue-50 px-3 py-1 rounded-full">
+            {reportChildren.length} reports
+          </span>
+        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {reportChildren.map((item) => (
+            <NavLink
+              key={item.to}
+              to={item.to}
+              className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200 overflow-hidden"
+            >
+              <div className="p-5">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="p-3 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 group-hover:from-blue-100 group-hover:to-indigo-100 transition-colors">
+                    <div className="text-reportColor group-hover:text-reportColor/90 transition-colors">
+                      {item.icon}
+                    </div>
+                  </div>
+                  <FaChevronRight className="text-gray-300 group-hover:text-reportColor transition-colors mt-1" />
+                </div>
+                <h2 className="font-semibold text-gray-800 group-hover:text-reportColor/90 transition-colors text-sm leading-tight">
+                  {item.label}
+                </h2>
+              </div>
+              <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+            </NavLink>
+          ))}
+        </div>
+      </div>
+
+      {/* ================= DEFINITION SECTION ================= */}
+      {definitionChildren.length > 0 && (
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-xl bg-gradient-to-r from-setupColor to-violet-500 text-white shadow-lg">
+              <FaFileContract size={20} />
+            </div>
+            <h2 className="text-xl font-bold text-gray-800">Definitions & Settings</h2>
+            <div className="flex-1 h-px bg-gradient-to-r from-purple-200 to-transparent"></div>
+            <span className="text-sm font-medium text-setupColor bg-purple-50 px-3 py-1 rounded-full">
+              {definitionChildren.length} settings
+            </span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+            {definitionChildren.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                className="group relative bg-white rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-gray-200 overflow-hidden"
+              >
+                <div className="p-5">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="p-3 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50 group-hover:from-purple-100 group-hover:to-violet-100 transition-colors">
+                      <div className="text-setupColor group-hover:text-setupColor/90 transition-colors">
+                        {item.icon}
+                      </div>
+                    </div>
+                    <FaChevronRight className="text-gray-300 group-hover:text-setupColor transition-colors mt-1" />
+                  </div>
+                  <h2 className="font-semibold text-gray-800 group-hover:text-setupColor/90 transition-colors text-sm leading-tight">
+                    {item.label}
+                  </h2>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-purple-400 to-violet-400 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
+              </NavLink>
+            ))}
+          </div>
+        </div>
+      )}
+
+    
     </div>
   );
 };
