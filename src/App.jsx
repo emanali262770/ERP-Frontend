@@ -92,6 +92,10 @@ import StoreItemsReturn from "./pages/admin/Store/ItemsReturn.jsx"
 import StoreCashPaymentVoucher from "./pages/admin/Store/CashPaymentVoucher.jsx"
 import StoreTransferFromUnits from "./pages/admin/Store/TransferFromUnits.jsx"
 import StoreItemsIssue from "./pages/admin/Store/ItemsIssue.jsx"
+import TaskMangementPage from "./pages/admin/taskManagement/TaskMangementPage.jsx";
+import PayrolePage from "./pages/admin/payRoll/PayrolePage.jsx";
+import FinancialPage from "./pages/admin/financial/FinancialPage.jsx";
+import SoftwareSecurity from "./pages/admin/security/SoftwareSecurity.jsx";
 
 function AppContent() {
   return (
@@ -189,7 +193,14 @@ function AppContent() {
             <Route path="cash-payment-voucher" element={<StoreCashPaymentVoucher />} />
             <Route path="transfer-from-units" element={<StoreTransferFromUnits />} />
             <Route path="items-issue" element={<StoreItemsIssue />} />
-
+            {/* Task managment */}
+            <Route path="task-management" element={<TaskMangementPage />} />
+              {/* payrole */}
+            <Route path="payrole" element={<PayrolePage />} />
+              {/* finance */}
+            <Route path="financial" element={<FinancialPage />} />
+              {/* security */}
+            <Route path="security" element={<SoftwareSecurity />} />
             {/* fbr */}
             {/* <Route path="fbr-company" element={<FbrCompany />} />
             <Route path="fbr-customers" element={<FbrCustomers />} />

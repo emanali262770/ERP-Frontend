@@ -13,6 +13,9 @@ export default {
         accent: "#e94560",
         newPrimary: "#84CF16",
         secondary: "#58C5A0",
+        funcationlityColor: '#059669',
+         reportColor: '#2563eb',
+        setupColor: '#9333ea',
         Green: "#2B9943",
       formBG: "#f5faf8",
       formBgGray: "#f9fafb"

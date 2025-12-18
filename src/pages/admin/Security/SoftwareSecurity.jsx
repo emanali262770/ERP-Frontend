@@ -11,56 +11,92 @@ import {
   FaChartLine,
   FaCogs,
   FaFileContract,
-  FaUsers,
-  FaUserClock,
-  FaCalendarAlt,
-  FaPlane,
+  FaBuilding,
   FaUserPlus,
-  FaListAlt,
-  FaRegFileAlt
+  FaKey,
+  FaUsers,
+  FaUserLock,
+  FaClipboardList,
+  FaHistory,
+  FaUserCheck,
+  FaShieldAlt,
+  FaCog
 } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
 /* ================= FUNCTIONALITY ================= */
 const functionalityChildren = [
-  { to: "/admin/employee-info", label: "Employee Information", icon: <FaUsers size={30} /> },
-  { to: "/admin/attendance-manual", label: "Attendance Manually", icon: <FaUserClock size={30} /> },
-  { to: "/admin/leave-application", label: "Leave Application", icon: <FaCalendarAlt size={30} /> },
-  { to: "/admin/cpl-entry", label: "CPL Entry", icon: <FaFileAlt size={30} /> },
-  { to: "/admin/mark-absent", label: "Mark Absent", icon: <FaUsers size={30} /> },
-  { to: "/admin/official-holiday", label: "Official Holiday", icon: <FaCalendarAlt size={30} /> },
-  { to: "/admin/travel-request", label: "Travel Request", icon: <FaPlane size={30} /> },
-  { to: "/admin/leaves-approval", label: "Leaves Approvals", icon: <FaCheckCircle size={30} /> },
-  { to: "/admin/new-hiring", label: "Requisition for New Hiring", icon: <FaUserPlus size={30} /> },
-  { to: "/admin/cv-collection", label: "Collection of CV", icon: <FaListAlt size={30} /> },
-  { to: "/admin/cv-comparison", label: "CV Comparison", icon: <FaFileAlt size={30} /> },
-  { to: "/admin/job-offer-letter", label: "Job Offer Letter", icon: <FaRegFileAlt size={30} /> },
+  {
+    to: "/admin/define-company",
+    label: "Define Company",
+    icon: <FaBuilding size={30} />,
+  },
+  {
+    to: "/admin/create-software-user",
+    label: "Create Software User",
+    icon: <FaUserPlus size={30} />,
+  },
+  {
+    to: "/admin/change-password",
+    label: "Change Password",
+    icon: <FaKey size={30} />,
+  },
+  {
+    to: "/admin/create-software-groups",
+    label: "Create Software Groups",
+    icon: <FaUsers size={30} />,
+  },
+  {
+    to: "/admin/assign-rights",
+    label: "Assign Rights to Users & Groups",
+    icon: <FaUserLock size={30} />,
+  },
 ];
 
 /* ================= REPORTS ================= */
 const reportChildren = [
-  { to: "/admin/employee-list", label: "Employee List", icon: <FaUsers size={30} /> },
-  { to: "/admin/employee-info-report", label: "Employee Information", icon: <FaFileAlt size={30} /> },
-  { to: "/admin/employee-attendance", label: "Employee Attendance", icon: <FaUserClock size={30} /> },
-  { to: "/admin/department-attendance", label: "Departmentwise Attendance", icon: <FaUsers size={30} /> },
-  { to: "/admin/date-attendance", label: "Datewise Attendance", icon: <FaCalendarAlt size={30} /> },
-  { to: "/admin/late-comings", label: "Datewise Late Comings", icon: <FaUserClock size={30} /> },
-  { to: "/admin/staff-overtime", label: "Datewise Staff Overtime", icon: <FaCalculator size={30} /> },
-  { to: "/admin/staff-leaves", label: "Datewise Staff Leaves", icon: <FaCalendarAlt size={30} /> },
-  { to: "/admin/monthly-attendance", label: "Monthly Attendance", icon: <FaUserClock size={30} /> },
-  { to: "/admin/monthly-salary", label: "Monthly Salary Sheet", icon: <FaFileInvoiceDollar size={30} /> },
+  {
+    to: "/admin/software-users",
+    label: "List of Software Users",
+    icon: <FaClipboardList size={30} />,
+  },
+  {
+    to: "/admin/group-rights",
+    label: "Rights Assigned to Software Group",
+    icon: <FaUserCheck size={30} />,
+  },
+  {
+    to: "/admin/datewise-usage",
+    label: "Datewise Software Usage Log",
+    icon: <FaHistory size={30} />,
+  },
+  {
+    to: "/admin/userwise-usage",
+    label: "Userwise Software Usage Log",
+    icon: <FaHistory size={30} />,
+  },
+  {
+    to: "/admin/functionality-usage",
+    label: "Functionality-wise Usage Log",
+    icon: <FaChartLine size={30} />,
+  },
 ];
 
 /* ================= DEFINITIONS ================= */
 const definitionChildren = [
-  { to: "/admin/departments", label: "Departments", icon: <FaUsers size={30} /> },
-  { to: "/admin/designations", label: "Designations", icon: <FaUserClock size={30} /> },
-  { to: "/admin/duty-shifts", label: "Duty Shifts", icon: <FaCalendarAlt size={30} /> },
-  { to: "/admin/leave-types", label: "Leave Types", icon: <FaFileAlt size={30} /> },
-  { to: "/admin/allowance-deduction", label: "Allowances / Deduction Heads", icon: <FaCalculator size={30} /> },
+  {
+    to: "/admin/define-functionalities",
+    label: "Define List of Functionalities",
+    icon: <FaShieldAlt size={30} />,
+  },
+  {
+    to: "/admin/form-operations",
+    label: "Modes of Form Operations",
+    icon: <FaCog size={30} />,
+  },
 ];
 
-const PayrolePage = () => {
+const SoftwareSecurity = () => {
   return (
     <div className="p-6 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
       <CommanHeader />
@@ -69,9 +105,9 @@ const PayrolePage = () => {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <div className="h-8 w-1 bg-gradient-to-b from-funcationlityColor to-teal-600 rounded-full"></div>
-          <h1 className="text-2xl font-semibold text-gray-700">Payroll & Human Resource Management</h1>
+          <h1 className="text-2xl font-semibold text-gray-700">Software Security</h1>
         </div>
-        <p className="text-gray-500 ml-4">Manage employee data, attendance, leaves, and payroll operations</p>
+        <p className="text-gray-500 ml-4">Manage user access, permissions, and system security settings</p>
       </div>
 
       {/* ================= FUNCTIONALITY ================= */}
@@ -188,9 +224,9 @@ const PayrolePage = () => {
         </div>
       </div>
 
-    
+      
     </div>
   );
 };
 
-export default PayrolePage;
+export default SoftwareSecurity;
