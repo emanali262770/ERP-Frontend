@@ -45,43 +45,7 @@ const links = [
     label: "Sales ",
     icon: <FcSalesPerformance color="#1d4ed8"/>,
   },
-   {
-    to: "/admin/fbr-integration",
-    label: "Fbr Integration ",
-    icon: <MdOutlineIntegrationInstructions  />,
-  },
-  {
-    to: "/admin/sales-invoice",
-    label: "Sales Invoice",
-    icon: <FaReceipt />,
-    key: "isSales",
-  },
-  {
-    to: "/admin/customers",
-    label: "Customers",
-    icon: <FaUsers />,
-    key: "isCustomer",
-  },
-  {
-    to: "/admin/customers-booking",
-    label: "Booking Customer",
-    icon: <FaUsers />,
-    key: "isBookingCustomer",
-  },
-  {
-    to: "/admin/item-barcode",
-    label: "Item Barcode",
-    icon: <FaBarcode />,
-    key: "isInventory",
-  },
-  { to: "/admin/open-balance", label: "Opening Balance", icon: <FaBarcode /> },
-  {
-    to: "/admin/expiry-tags",
-    label: "Expiry Tags",
-    icon: <FaTags />,
-    key: "isSettings",
-  },
-  { to: "/admin/report", label: "Report", icon: <FaChartBar />, key: "isReports" },
+  
   { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
   {
     label: "Setup",
