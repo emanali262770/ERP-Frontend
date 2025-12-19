@@ -28,10 +28,10 @@ import GatePassOut from "./pages/admin/Purchase/GatePassOUT.jsx";
 import ItemUnit from "./pages/admin/SetUp/ItemUnit.jsx";
 
 
-import GroupManagement from "./pages/admin/security/GroupManagement.jsx";
+import GroupManagement from "./pages/admin/Security/GroupManagement.jsx";
 // import AccessRights from "./pages/admin/AccessControl";
 import Modules from "./pages/admin/Modules";
-import AccessControll from "./pages/admin/security/AccessControll.jsx";
+import AccessControll from "./pages/admin/Security/AccessControll.jsx";
 import ExpenseHead from "./pages/admin/ExpenseHead.jsx";
 import ExpenseVoucher from "./pages/admin/ExpenseVoucher.jsx";
 import DayBook from "./pages/admin/DayBook.jsx";
@@ -41,7 +41,7 @@ import PromotionItem from "./pages/admin/SetUp/PromotionItem.jsx";
 import OpeningBalance from "./pages/admin/OpeningBalance.jsx";
 import ScrollToTop from "./helper/ScrollToTop.jsx";
 import Designation from "./pages/admin/Mangement/Designation.jsx";
-import Users from './pages/admin/security/Users.jsx'
+import Users from './pages/admin/Security/Users.jsx'
 import Departments from "./pages/admin/Mangement/Departments.jsx";
 import Employee from "./pages/admin/Mangement/Employee.jsx";
 import PurchaseOrder from "./pages/admin/Purchase/PurchaseOrder.jsx";
