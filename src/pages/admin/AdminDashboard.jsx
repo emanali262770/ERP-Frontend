@@ -839,7 +839,7 @@ const AdminDashboard = () => {
                       </defs>
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-5xl font-semibold text-gray-900">
+                      <span className="text-4xl font-semibold text-gray-900">
                         70%
                       </span>
                       <span className="text-sm text-gray-600">Completed</span>
