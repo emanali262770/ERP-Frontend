@@ -92,7 +92,7 @@ import StoreItemsIssue from "./pages/admin/Store/ItemsIssue.jsx";
 import TaskMangementPage from "./pages/admin/taskManagement/TaskMangementPage.jsx";
 import PayrolePage from "./pages/admin/payRoll/PayrolePage.jsx";
 import FinancialPage from "./pages/admin/financial/FinancialPage.jsx";
-import SoftwareSecurity from "./pages/admin/security/SoftwareSecurity.jsx";
+import SoftwareSecurity from "./pages/admin/Security/SoftwareSecurity.jsx";
 import ComplainMangementPage from "./pages/admin/complaintManagement/ComplainMangementPage.jsx"
 
 // Stock Pages
