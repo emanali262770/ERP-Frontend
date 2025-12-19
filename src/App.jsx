@@ -126,6 +126,12 @@ import IssueRawMaterialProduction from "./pages/admin/production/functionalities
 import ProductionBatches from "./pages/admin/production/functionalities/ProductionBatches.jsx";
 import ProductionOrderManufacturing from "./pages/admin/production/functionalities/ProductionOrderManufacturing.jsx";
 import RecordProductionEachPhase from "./pages/admin/production/functionalities/RecordProductionEachPhase.jsx";
+import EmployeList from "./pages/admin/taskManagement/EmployeList.jsx";
+import TaskList from "./pages/admin/taskManagement/TaskList.jsx";
+import AssignTaskToStaff from "./pages/admin/taskManagement/AssignTaskToStaff.jsx";
+import MonthlyWorkingSheet from "./pages/admin/taskManagement/MontlyWorkingSheet.jsx";
+import TaskProgress from "./pages/admin/taskManagement/TaskProgress.jsx";
+import TaskCompleted from "./pages/admin/taskManagement/TaskCompleted.jsx";
 
 function AppContent() {
   return (
@@ -287,6 +293,13 @@ function AppContent() {
             <Route path="items-issue" element={<StoreItemsIssue />} />
             {/* Task managment */}
             <Route path="task-management" element={<TaskMangementPage />} />
+            <Route path="create-employee-list" element={<EmployeList />} />
+            <Route path="create-task-list" element={<TaskList />} />
+            <Route path="assign-task" element={<AssignTaskToStaff />} />
+            <Route path="monthly-working-sheet" element={<MonthlyWorkingSheet />} />
+            <Route path="task-progress" element={<TaskProgress />} />
+            <Route path="task-completed" element={<TaskCompleted />} />
+
             {/* payrole */}
             <Route path="payrole" element={<PayrolePage />} />
             {/* finance */}
