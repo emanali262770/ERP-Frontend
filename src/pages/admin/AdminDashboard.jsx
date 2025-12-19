@@ -461,14 +461,14 @@ const AdminDashboard = () => {
       color: "bg-amber-100 text-amber-600",
       border: "border-l-4 border-amber-500",
     },
-    {
-      name: "Total Revenue",
-      value: `$${revenue.toLocaleString()}`,
-      icon: <DollarSign size={24} />,
-      change: "+15%",
-      color: "bg-emerald-100 text-emerald-600",
-      border: "border-l-4 border-emerald-500",
-    },
+    // {
+    //   name: "Total Revenue",
+    //   value: `$${revenue.toLocaleString()}`,
+    //   icon: <DollarSign size={24} />,
+    //   change: "+15%",
+    //   color: "bg-emerald-100 text-emerald-600",
+    //   border: "border-l-4 border-emerald-500",
+    // },
     {
       name: "Bookings",
       value: booking,
@@ -523,147 +523,456 @@ const AdminDashboard = () => {
       {loading ? (
         <SummaryCardSkeleton />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
           {summaryData.map((item, index) => (
             <div
               key={index}
-              className={`bg-white rounded-xl shadow-sm p-4 border border-gray-100 hover:shadow-md transition-all duration-300 transform hover:-translate-y-1 ${item.border}`}
-              style={{ animation: `fadeIn 0.5s ease-out ${index * 0.1}s both` }}
+              className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+              style={{
+                animation: `cardEntrance 0.6s cubic-bezier(0.21, 0.61, 0.35, 1) ${
+                  index * 0.08
+                }s both`,
+                willChange: "transform, box-shadow",
+              }}
             >
-              <div className="flex justify-between items-start">
-                <div className={`p-2 rounded-lg ${item.color}`}>
-                  {item.icon}
-                </div>
-                <span className="text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full">
+              {/* Premium gradient border effect */}
+              <div className="absolute inset-0 border-2 border-transparent rounded-2xl bg-gradient-to-br from-blue-400/0 via-newPrimary/0 to-green-400/0 group-hover:from-blue-400/10 group-hover:via-newPrimary/10 group-hover:to-green-400/10 transition-all duration-700 pointer-events-none"></div>
+
+              {/* Animated accent glow */}
+              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-newPrimary to-emerald-500 rounded-2xl opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-700"></div>
+
+              {/* Status indicator ribbon */}
+              <div
+                className={`absolute top-4 right-4 z-10 ${
+                  item.change.includes("+")
+                    ? "bg-gradient-to-r from-emerald-50 to-green-50"
+                    : "bg-gradient-to-r from-rose-50 to-red-50"
+                } border ${
+                  item.change.includes("+")
+                    ? "border-emerald-200"
+                    : "border-rose-200"
+                } rounded-lg px-3 py-1.5 shadow-sm`}
+              >
+                <span
+                  className={`text-xs font-bold ${
+                    item.change.includes("+")
+                      ? "text-emerald-700"
+                      : "text-rose-700"
+                  } flex items-center gap-1`}
+                >
+                  {item.change.includes("+") ? (
+                    <svg
+                      className="w-3 h-3"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  ) : (
+                    <svg
+                      className="w-3 h-3"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M14.707 10.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 12.586V5a1 1 0 012 0v7.586l2.293-2.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
                   {item.change}
                 </span>
               </div>
-              <div className="mt-4">
-                <div className="text-2xl font-bold text-gray-800">
-                  {item.value}
+
+              <div className="relative p-6 z-20">
+                <div className="flex items-center gap-4 mb-6">
+                  <div
+                    className={`p-3.5 rounded-2xl ${item.color} shadow-lg group-hover:scale-110 transition-transform duration-500`}
+                  >
+                    <div className="w-7 h-7 flex items-center justify-center text-newPrimary-800">
+                      {item.icon}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-3xl font-bold text-gray-900 tracking-tight mb-1">
+                      {item.value}
+                    </div>
+                    <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
+                      {item.name}
+                    </div>
+                  </div>
                 </div>
-                <div className="text-sm text-gray-500 mt-1">{item.name}</div>
+
+                {/* Animated progress indicator */}
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                      Performance
+                    </span>
+                    <span
+                      className={`text-sm font-bold ${
+                        item.change.includes("+")
+                          ? "text-emerald-600"
+                          : "text-rose-600"
+                      }`}
+                    >
+                      {item.change.includes("+") ? "▲ Growth" : "▼ Decline"}
+                    </span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000 ease-out"
+                      style={{
+                        width: `${Math.min(100, 15 + index * 14)}%`,
+                        background: item.change.includes("+")
+                          ? "linear-gradient(90deg, #059669, #10b981, #34d399)"
+                          : "linear-gradient(90deg, #dc2626, #ef4444, #f87171)",
+                        animation: `progressFill 1.2s ease-out ${
+                          index * 0.1 + 0.5
+                        }s both`,
+                      }}
+                    ></div>
+                  </div>
+                </div>
               </div>
+
+              {/* Subtle hover glow */}
+              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-emerald-500/0 group-hover:from-blue-500/5 group-hover:to-emerald-500/5 transition-all duration-700 pointer-events-none"></div>
             </div>
           ))}
         </div>
       )}
       {/* Charts Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-8">
         {loading ? (
           <>
             {/* Sales Overview Skeleton */}
             <ChartSkeleton type="line" />
 
-            {/* Order Status Skeleton with legend shimmer */}
-            <ChartSkeleton type="bar" />
+            
           </>
         ) : (
           <>
-            {/* Revenue Chart */}
-            <div
-              className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
-              style={{ animation: "slideInLeft 0.5s ease-out" }}
-            >
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
-                <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
-                  Sales Overview
-                </h2>
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => fetchSalesChart("weekly")}
-                    className="px-3 py-1 text-xs bg-newPrimary/10 text-newPrimary rounded-full"
-                  >
-                    Weekly
-                  </button>
-                  <button
-                    onClick={() => fetchSalesChart("monthly")}
-                    className="px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded-full"
-                  >
-                    Monthly
-                  </button>
-                  <button
-                    onClick={() => fetchSalesChart("yearly")}
-                    className="px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 rounded-full"
-                  >
-                    Yearly
-                  </button>
+            {/* Charts and Tables Section */}
+            <div className=" grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* 1. Sales Chart (8 Months View) */}
+              <div className="bg-white rounded-xl shadow p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Sales Overview
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                      February to August 2024
+                    </p>
+                  </div>
+                  <select className="text-sm border border-gray-300 rounded-lg px-3 py-1.5 bg-white">
+                    <option>Last 7 months</option>
+                    <option>Last 8 months</option>
+                    <option>This year</option>
+                  </select>
+                </div>
+
+                {/* Chart Container with Y-axis */}
+                <div className="h-full">
+                  <div className="flex items-start h-80">
+                    {/* Y-axis Labels */}
+                    <div className="w-8 mr-2 flex flex-col justify-between h-full text-xs text-gray-400">
+                      <span>100K</span>
+                      <span>75K</span>
+                      <span>50K</span>
+                      <span>25K</span>
+                      <span>0</span>
+                    </div>
+
+                    {/* Chart Area */}
+                    <div className="flex-1 flex items-end justify-between h-full">
+                      {[
+                        {
+                          month: "Feb",
+                          value: 65,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                        {
+                          month: "Mar",
+                          value: 80,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                        {
+                          month: "Apr",
+                          value: 75,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                        {
+                          month: "May",
+                          value: 55,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                        {
+                          month: "Jun",
+                          value: 90,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                        {
+                          month: "Jul",
+                          value: 60,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                        {
+                          month: "Aug",
+                          value: 85,
+                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                        },
+                      ].map((item, index) => (
+                        <div
+                          key={index}
+                          className="flex flex-col items-center flex-1 h-full"
+                          >
+                          {/* Bar Container */}
+                          <div className="h-full flex flex-col justify-end items-center relative group">
+                            {/* Bar Value Label (shown on hover) */}
+                            <div className="mb-1 text-xs font-medium text-gray-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                              ${item.value}K
+                            </div>
+
+                            {/* Bar */}
+                            <div
+                              className={`${item.color} lg:w-9 rounded-t-lg transition-all duration-300 hover:shadow-lg hover:-translate-y-2 cursor-pointer`}
+                              style={{ height: `${item.value}%` }}
+                            ></div>
+                          </div>
+
+                          {/* Month Label */}
+                          <span className="text-xs font-medium text-gray-600 mt-2">
+                            {item.month}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Chart Stats */}
+                  <div className="flex justify-between items-center mt-6 pt-4 border-t border-gray-100">
+                    <div>
+                      <p className="text-sm text-gray-600">Total Sales</p>
+                      <p className="text-xl font-bold text-gray-900">$510K</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Average Monthly</p>
+                      <p className="text-lg font-bold text-gray-900">$72.9K</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-600">Growth</p>
+                      <p className="text-lg font-semibold text-green-600">
+                        +12.8%
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={data}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="day" />
-                    <YAxis domain={[30, 210]} />
-                    <Tooltip content={<CustomTooltip />} />
-                    <Legend />
-                    <Line
-                      type="monotone"
-                      dataKey="thisWeek"
-                      stroke="#84cf16"
-                      strokeWidth={3}
-                      dot={{ r: 4 }}
-                      activeDot={{ r: 6 }}
-                      name="This Week"
-                    />
-                    <Line
-                      type="monotone"
-                      dataKey="lastWeek"
-                      stroke="#6b7280"
-                      strokeWidth={2}
-                      dot={{ r: 3 }}
-                      name="Last Week"
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
 
-            {/* Order Status Bar Chart */}
-            <div
-              className="bg-white rounded-xl shadow-sm p-6 border border-gray-100"
-              style={{ animation: "slideInRight 0.5s ease-out" }}
-            >
-              <h2 className="text-lg font-semibold text-gray-800 mb-6">
-                Order Status
-              </h2>
-              <div className="flex justify-center items-center h-64">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart
-                    data={pieData}
-                    margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                    <XAxis dataKey="month" />
-                    <YAxis
-                      tickFormatter={(value) => `$${value / 1000}k`}
-                      domain={[0, 3000]}
-                    />
-                    <Tooltip
-                      formatter={(value) => [`$${value}`, "Orders"]}
-                      cursor={{ fill: "rgba(0,0,0,0.05)" }}
-                    />
-                    <Bar dataKey="thisYear" fill="#84cf16" barSize={40} />
-                    <Bar dataKey="lastYear" fill="#d1d5db" barSize={40} />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
+              {/* 2. Summary with Circle Progress */}
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-100 rounded-xl shadow-lg p-6 border border-blue-100 items-center justify-center">
+                <h2 className="text-lg font-semibold text-gray-900 mb-6 border-b border-blue-200/50 pb-3">
+                  Project Summary
+                </h2>
 
-              {/* Legend */}
-              <div className="flex flex-wrap justify-center gap-4 mt-4">
-                {pieData.map((entry, index) => (
-                  <div key={index} className="flex items-center">
-                    <div
-                      className="w-3 h-3 rounded-full mr-2"
-                      style={{ backgroundColor: entry.color }}
-                    ></div>
-                    <span className="text-sm text-gray-600">{entry.name}</span>
+                <div className="flex items-center justify-center mt-10">
+                  {/* Left: Circular Progress with Gradient */}
+                  <div className="relative w-50 h-50">
+                    <svg className="w-full h-full" viewBox="0 0 100 100">
+                      {/* Background Circle */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="none"
+                        stroke="#e0e7ff"
+                        strokeWidth="10"
+                      />
+                      {/* Progress Circle with Gradient */}
+                      <circle
+                        cx="50"
+                        cy="50"
+                        r="40"
+                        fill="none"
+                        stroke="url(#progressGradient)"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                        strokeDasharray="251.2"
+                        strokeDashoffset="75.36"
+                        transform="rotate(-90 50 50)"
+                      />
+                      <defs>
+                        <linearGradient
+                          id="progressGradient"
+                          x1="0%"
+                          y1="0%"
+                          x2="100%"
+                          y2="100%"
+                        >
+                          <stop offset="0%" stopColor="#3b82f6" />
+                          <stop offset="100%" stopColor="#8b5cf6" />
+                        </linearGradient>
+                      </defs>
+                    </svg>
+                    <div className="absolute inset-0 flex flex-col items-center justify-center">
+                      <span className="text-5xl font-semibold text-gray-900">
+                        70%
+                      </span>
+                      <span className="text-sm text-gray-600">Completed</span>
+                    </div>
                   </div>
-                ))}
+
+                  {/* Right: Status List */}
+                  <div className="ml-6 flex-1">
+                    {[
+                      {
+                        label: "In Progress",
+                        value: 12,
+                        color: "bg-gradient-to-r from-blue-500 to-blue-600",
+                        textColor: "text-blue-700",
+                      },
+                      {
+                        label: "Completed",
+                        value: 28,
+                        color: "bg-gradient-to-r from-green-500 to-emerald-600",
+                        textColor: "text-green-700",
+                      },
+                      {
+                        label: "Pending",
+                        value: 8,
+                        color: "bg-gradient-to-r from-yellow-500 to-amber-600",
+                        textColor: "text-amber-700",
+                      },
+                      {
+                        label: "On Hold",
+                        value: 4,
+                        color: "bg-gradient-to-r from-red-500 to-rose-600",
+                        textColor: "text-rose-700",
+                      },
+                      {
+                        label: "Not Started",
+                        value: 6,
+                        color: "bg-gradient-to-r from-gray-400 to-gray-500",
+                        textColor: "text-gray-700",
+                      },
+                    ].map((item, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center justify-between hover:bg-white/50 rounded-lg transition-colors"
+                      >
+                        <div className="flex items-center">
+                          <div
+                            className={`mb-3 mt-3 w-3 h-3 ${item.color} rounded-full mr-3 shadow-sm`}
+                          ></div>
+                          <span
+                            className={`mb-3 mt-3 text-sm font-medium ${item.textColor}`}
+                          >
+                            {item.label}
+                          </span>
+                        </div>
+                        <span className="text-sm mb-3 mt-3 font-bold text-gray-900 px-2 py-1 rounded">
+                          {item.value}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Summary Footer */}
+                <div className="mt-6 pt-4 border-t border-blue-200/50">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-bold text-gray-900 text-lg">58</span>{" "}
+                    total projects
+                  </p>
+                </div>
+              </div>
+
+              {/* 3. Customer Progress */}
+              <div className="bg-white rounded-xl shadow p-6">
+                <div className="flex justify-start items-center mb-6 border-b border-blue-200/50 pb-3">
+                  <h2 className="text-lg font-semibold text-gray-900">
+                    Customer Progress
+                  </h2>
+                </div>
+
+                <div className="space-y-5">
+                  {[
+                    {
+                      name: "Nestle Pakistan",
+                      progress: 85,
+                      status: "Order fulfillment in progress",
+                      color: "bg-blue-500",
+                    },
+                    {
+                      name: "Nestle Pakistan",
+                      progress: 30,
+                      status: "Order fulfillment in progress",
+                      color: "bg-pink-500",
+                    },
+                    {
+                      name: "Unilever Ltd",
+                      progress: 65,
+                      status: "Product delivery scheduled",
+                      color: "bg-green-500",
+                    },
+                    {
+                      name: "PepsiCo Inc",
+                      progress: 45,
+                      status: "Contract negotiation phase",
+                      color: "bg-yellow-500",
+                    },
+                    {
+                      name: "Engro Foods",
+                      progress: 92,
+                      status: "Project nearing completion",
+                      color: "bg-purple-500",
+                    },
+                  ].map((customer, index) => (
+                    <div
+                      key={index}
+                      className=" border-gray-100 last:border-0 last:pb-0"
+                    >
+                      {/* Customer Name */}
+                      <div className="flex justify-between items-center mb-4">
+                        <h3 className="font-medium text-gray-900">
+                          {customer.name}
+                        </h3>
+                        <span className="text-sm font-semibold text-gray-700">
+                          {customer.progress}%
+                        </span>
+                      </div>
+
+                      {/* Progress Line */}
+                      <div className="w-full bg-white rounded-full h-2.5 mb-2 shadow-inner">
+                        <div
+                          className={`${customer.color} h-2.5 rounded-full shadow-md`}
+                          style={{ width: `${customer.progress}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Customer Stats */}
+                <div className="mt-6 pt-4 border-t border-gray-100">
+                  <div className="flex justify-between text-sm">
+                    <div>
+                      <p className="text-gray-600">Active Customers</p>
+                      <p className="font-semibold text-gray-900">24</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-gray-600">Satisfaction</p>
+                      <p className="font-semibold text-green-600">94%</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </>
