@@ -59,7 +59,7 @@ const links = [
     icon: <FaExclamationCircle />,
   },
 
-  { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
+  // { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
   { to: "/admin/task-management", label: "Task Management", icon: <FaTasks />, key: "isTaskMangement" },
   { to: "/admin/payrole", label: "PayRole", icon: <FaCalculator />, key: "isPayrole" },
   { to: "/admin/financial", label: "Financial", icon: <FaMoneyBillWave/>, key: "isPayrole" },
