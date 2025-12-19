@@ -1,65 +1,68 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FaFileAlt,
+
   FaCheckCircle,
-  FaCommentsDollar,
-  FaCalculator,
-  FaFileInvoiceDollar,
-  FaCheckDouble,
+
   FaChevronRight,
   FaChartLine,
   FaCogs,
   FaFileContract,
-  FaProjectDiagram,
-  FaTasks,
-  FaUsers,
-  FaCalendarCheck,
-  FaUserCheck,
-  FaClipboardCheck
+
+  FaUsersCog,
+  FaUserPlus,
+  FaSpinner,
+  FaCalendarAlt,
+  FaClipboardList
 } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
 /* ================= FUNCTIONALITY ================= */
+
 const functionalityChildren = [
   {
-    to: "/admin/projects",
-    label: "List Of Projects",
-    icon: <FaProjectDiagram size={30} />,
+    to: "/admin/assign-task",
+    label: "Assign Task To Staff",
+    icon: <FaUserPlus size={30} />,
   },
-  {
-    to: "/admin/tasks",
-    label: "List Of Tasks",
-    icon: <FaTasks size={30} />,
-  },
-  {
-    to: "/admin/staff",
-    label: "List Of Staff",
-    icon: <FaUsers size={30} />,
-  },
+
 ];
+
 
 /* ================= REPORTS ================= */
 const reportChildren = [
   {
-    to: "/admin/task-schedule",
-    label: "Task Schedule",
-    icon: <FaCalendarCheck size={30} />,
+    to: "/admin/monthly-working-sheet",
+    label: "Monthly Working Sheet",
+    icon: <FaCalendarAlt size={30} />,
   },
   {
-    to: "/admin/task-assigned",
-    label: "Task Assigned To Staff",
-    icon: <FaUserCheck size={30} />,
+    to: "/admin/task-progress",
+    label: "Task Progress",
+    icon: <FaSpinner size={30} />,
   },
   {
-    to: "/admin/task-completion",
-    label: "Task Completion Note",
-    icon: <FaClipboardCheck size={30} />,
+    to: "/admin/task-completed",
+    label: "Task Completed",
+    icon: <FaCheckCircle size={30} />,
   },
 ];
 
-/* ================= DEFINITION (EMPTY) ================= */
-const definitionChildren = [];
+
+/* ================= DEFINITION ================= */
+const definitionChildren = [
+  {
+    to: "/admin/create-task-list",
+    label: "Create Task List",
+    icon: <FaClipboardList size={30} />,
+  },
+  {
+    to: "/admin/create-employee-list",
+    label: "Create Employee List",
+    icon: <FaUsersCog size={30} />,
+  },
+];
+
 
 const TaskMangementPage = () => {
   return (
@@ -191,7 +194,7 @@ const TaskMangementPage = () => {
         </div>
       )}
 
-    
+
     </div>
   );
 };
