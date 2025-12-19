@@ -523,42 +523,41 @@ const AdminDashboard = () => {
       {loading ? (
         <SummaryCardSkeleton />
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-5 mb-10">
           {summaryData.map((item, index) => (
             <div
               key={index}
-              className="group relative bg-white rounded-2xl shadow-lg border border-gray-100 hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden"
+              className="group relative bg-white rounded-xl border border-gray-200/60 hover:border-gray-300 shadow-[0_2px_12px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-all duration-300 hover:-translate-y-1 overflow-hidden"
               style={{
-                animation: `cardEntrance 0.6s cubic-bezier(0.21, 0.61, 0.35, 1) ${
-                  index * 0.08
-                }s both`,
-                willChange: "transform, box-shadow",
+                animation: `slideIn 0.5s ease-out ${index * 0.06}s both`,
               }}
             >
-              {/* Premium gradient border effect */}
-              <div className="absolute inset-0 border-2 border-transparent rounded-2xl bg-gradient-to-br from-blue-400/0 via-newPrimary/0 to-green-400/0 group-hover:from-blue-400/10 group-hover:via-newPrimary/10 group-hover:to-green-400/10 transition-all duration-700 pointer-events-none"></div>
-
-              {/* Animated accent glow */}
-              <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 via-newPrimary to-emerald-500 rounded-2xl opacity-0 group-hover:opacity-20 blur-sm transition-opacity duration-700"></div>
-
-              {/* Status indicator ribbon */}
+              {/* Professional top accent border */}
               <div
-                className={`absolute top-4 right-4 z-10 ${
+                className={`absolute top-0 left-0 right-0 h-1 ${
                   item.change.includes("+")
-                    ? "bg-gradient-to-r from-emerald-50 to-green-50"
-                    : "bg-gradient-to-r from-rose-50 to-red-50"
-                } border ${
+                    ? "bg-gradient-to-r from-emerald-500 to-emerald-400"
+                    : "bg-gradient-to-r from-rose-500 to-rose-400"
+                }`}
+              ></div>
+
+              {/* Subtle background texture */}
+              <div className="absolute inset-0 bg-gradient-to-br from-gray-50/30 to-white opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+              {/* Status badge - Professional style */}
+              <div
+                className={`absolute top-3 right-3 z-10 backdrop-blur-sm ${
                   item.change.includes("+")
-                    ? "border-emerald-200"
-                    : "border-rose-200"
-                } rounded-lg px-3 py-1.5 shadow-sm`}
+                    ? "bg-emerald-500/10 border border-emerald-200/50"
+                    : "bg-rose-500/10 border border-rose-200/50"
+                } rounded-lg px-2.5 py-1.5`}
               >
                 <span
-                  className={`text-xs font-bold ${
+                  className={`text-xs font-semibold flex items-center gap-1 ${
                     item.change.includes("+")
                       ? "text-emerald-700"
                       : "text-rose-700"
-                  } flex items-center gap-1`}
+                  }`}
                 >
                   {item.change.includes("+") ? (
                     <svg
@@ -589,60 +588,67 @@ const AdminDashboard = () => {
                 </span>
               </div>
 
-              <div className="relative p-6 z-20">
-                <div className="flex items-center gap-4 mb-6">
+              <div className="relative p-5 z-20">
+                {/* Icon and value section */}
+                <div className="flex items-start gap-4 mb-5">
                   <div
-                    className={`p-3.5 rounded-2xl ${item.color} shadow-lg group-hover:scale-110 transition-transform duration-500`}
+                    className={`p-3 rounded-xl ${
+                      item.change.includes("+") ? "bg-emerald-50" : "bg-rose-50"
+                    } border ${
+                      item.change.includes("+")
+                        ? "border-emerald-100"
+                        : "border-rose-100"
+                    } group-hover:scale-105 transition-transform duration-300`}
                   >
-                    <div className="w-7 h-7 flex items-center justify-center text-newPrimary-800">
-                      {item.icon}
-                    </div>
-                  </div>
-                  <div className="flex-1">
-                    <div className="text-3xl font-bold text-gray-900 tracking-tight mb-1">
-                      {item.value}
-                    </div>
-                    <div className="text-sm font-semibold text-gray-500 uppercase tracking-wider">
-                      {item.name}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Animated progress indicator */}
-                <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
-                      Performance
-                    </span>
-                    <span
-                      className={`text-sm font-bold ${
+                    <div
+                      className={`w-6 h-6 ${
                         item.change.includes("+")
                           ? "text-emerald-600"
                           : "text-rose-600"
                       }`}
                     >
-                      {item.change.includes("+") ? "▲ Growth" : "▼ Decline"}
+                      {item.icon}
+                    </div>
+                  </div>
+                  <div className="flex-1">
+                    <div className="text-2xl font-bold text-gray-900 mb-0.5">
+                      {item.value}
+                    </div>
+                    <div className="text-sm font-medium text-gray-500">
+                      {item.name}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Progress indicator - Professional style */}
+                <div className="space-y-2.5 pt-4 border-t border-gray-100">
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs font-medium text-gray-400">
+                      TREND
                     </span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full rounded-full transition-all duration-1000 ease-out"
+                      className="h-full rounded-full transition-all duration-700 ease-out"
                       style={{
                         width: `${Math.min(100, 15 + index * 14)}%`,
                         background: item.change.includes("+")
-                          ? "linear-gradient(90deg, #059669, #10b981, #34d399)"
-                          : "linear-gradient(90deg, #dc2626, #ef4444, #f87171)",
-                        animation: `progressFill 1.2s ease-out ${
-                          index * 0.1 + 0.5
-                        }s both`,
+                          ? "linear-gradient(90deg, #059669, #10b981)"
+                          : "linear-gradient(90deg, #dc2626, #ef4444)",
                       }}
                     ></div>
                   </div>
                 </div>
               </div>
 
-              {/* Subtle hover glow */}
-              <div className="absolute inset-0 bg-gradient-to-br from-blue-500/0 via-transparent to-emerald-500/0 group-hover:from-blue-500/5 group-hover:to-emerald-500/5 transition-all duration-700 pointer-events-none"></div>
+              {/* Hover effect overlay */}
+              <div
+                className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none ${
+                  item.change.includes("+")
+                    ? "bg-gradient-to-br from-emerald-50/20 via-transparent to-transparent"
+                    : "bg-gradient-to-br from-rose-50/20 via-transparent to-transparent"
+                }`}
+              ></div>
             </div>
           ))}
         </div>
@@ -650,12 +656,16 @@ const AdminDashboard = () => {
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-1 gap-6 mb-8">
         {loading ? (
-          <>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Sales Overview Skeleton */}
-            <ChartSkeleton type="line" />
+            <ChartSkeleton type="sales" count={1} />
 
-            
-          </>
+            {/* Summary with Circle Progress Skeleton */}
+            <ChartSkeleton type="summary" count={1} />
+
+            {/* Customer Progress Skeleton */}
+            <ChartSkeleton type="progress" count={1} />
+          </div>
         ) : (
           <>
             {/* Charts and Tables Section */}
@@ -680,7 +690,7 @@ const AdminDashboard = () => {
 
                 {/* Chart Container with Y-axis */}
                 <div className="h-full">
-                  <div className="flex items-start h-80">
+                  <div className="flex items-start h-60">
                     {/* Y-axis Labels */}
                     <div className="w-8 mr-2 flex flex-col justify-between h-full text-xs text-gray-400">
                       <span>100K</span>
@@ -696,43 +706,50 @@ const AdminDashboard = () => {
                         {
                           month: "Feb",
                           value: 65,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                         {
                           month: "Mar",
                           value: 80,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                         {
                           month: "Apr",
                           value: 75,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                         {
                           month: "May",
                           value: 55,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                         {
                           month: "Jun",
                           value: 90,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                         {
                           month: "Jul",
                           value: 60,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                         {
                           month: "Aug",
                           value: 85,
-                          color: "bg-gradient-to-t from-blue-600 to-blue-500",
+                          color:
+                            "bg-gradient-to-t from-emerald-400 to-newPrimary",
                         },
                       ].map((item, index) => (
                         <div
                           key={index}
                           className="flex flex-col items-center flex-1 h-full"
-                          >
+                        >
                           {/* Bar Container */}
                           <div className="h-full flex flex-col justify-end items-center relative group">
                             {/* Bar Value Label (shown on hover) */}
@@ -784,7 +801,7 @@ const AdminDashboard = () => {
 
                 <div className="flex items-center justify-center mt-10">
                   {/* Left: Circular Progress with Gradient */}
-                  <div className="relative w-50 h-50">
+                  <div className="relative w-[250] h-[250px]">
                     <svg className="w-full h-full" viewBox="0 0 100 100">
                       {/* Background Circle */}
                       <circle
@@ -822,7 +839,7 @@ const AdminDashboard = () => {
                       </defs>
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-5xl font-semibold text-gray-900">
+                      <span className="text-4xl font-semibold text-gray-900">
                         70%
                       </span>
                       <span className="text-sm text-gray-600">Completed</span>
@@ -902,19 +919,13 @@ const AdminDashboard = () => {
                   </h2>
                 </div>
 
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {[
                     {
                       name: "Nestle Pakistan",
                       progress: 85,
                       status: "Order fulfillment in progress",
                       color: "bg-blue-500",
-                    },
-                    {
-                      name: "Nestle Pakistan",
-                      progress: 30,
-                      status: "Order fulfillment in progress",
-                      color: "bg-pink-500",
                     },
                     {
                       name: "Unilever Ltd",
