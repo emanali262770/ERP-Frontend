@@ -1,40 +1,58 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 import {
-  FaExclamationCircle,
   FaUserCheck,
   FaCheckCircle,
   FaClock,
-  FaUserShield,
   FaFileContract,
-  FaClipboardList,
   FaChartLine,
   FaCogs,
   FaChevronRight,
-  FaChartBar,
-  FaUsers,
-  FaList
+
+  FaFileAlt,
+  FaCheckDouble
 } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
 
 /* ================= FUNCTIONALITY ================= */
 const functionalityChildren = [
-  { to: "/admin/launch-complaint", label: "Launch New Complaint", icon: <FaExclamationCircle size={30} /> },
-  { to: "/admin/assign-complaint", label: "Assigned Complaint to Staff", icon: <FaUserCheck size={30} /> },
-  { to: "/admin/resolve-complaint", label: "Complaint Resolved", icon: <FaCheckCircle size={30} /> },
+  {
+    to: "/admin/assign-complaint",
+    label: "Complaint Assigned to Employee",
+    icon: <FaUserCheck size={30} />,
+  },
+  {
+    to: "/admin/attended-complaint",
+    label: "Complaint Attended",
+    icon: <FaCheckCircle size={30} />,
+  },
 ];
+
 
 /* ================= REPORTS ================= */
 const reportChildren = [
-  { to: "/admin/pending-complaints", label: "Pending Complaints", icon: <FaClock size={30} /> },
-  { to: "/admin/customer-complaints", label: "Complaints against Customer", icon: <FaUserShield size={30} /> },
+  {
+    to: "/admin/pending-complaints",
+    label: "Pending Complaints",
+    icon: <FaClock size={30} />,
+  },
+  {
+    to: "/admin/resolved-complaints",
+    label: "Resolved Complaints",
+    icon: <FaCheckDouble size={30} />,
+  },
 ];
+
 
 /* ================= SETUP ================= */
 const setupChildren = [
-  { to: "/admin/maintenance-contract-types", label: "Maintenance Contract Types", icon: <FaFileContract size={30} /> },
-  { to: "/admin/complaint-status", label: "Complaints Status", icon: <FaClipboardList size={30} /> },
+  {
+    to: "/admin/complaint-from",
+    label: "Complaint From",
+    icon: <FaFileAlt size={30} />,
+  },
 ];
+
 
 const ComplaintPage = () => {
   return (
