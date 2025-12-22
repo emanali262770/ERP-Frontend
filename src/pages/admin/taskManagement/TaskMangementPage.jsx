@@ -8,7 +8,7 @@ import {
   FaChartLine,
   FaCogs,
   FaFileContract,
-
+FaTasks,
   FaUsersCog,
   FaUserPlus,
   FaSpinner,
@@ -25,7 +25,11 @@ const functionalityChildren = [
     label: "Assign Task To Staff",
     icon: <FaUserPlus size={30} />,
   },
-
+  {
+    to: "/admin/task-daily-base",
+    label: "Task Daily Base",
+    icon: <FaTasks size={30} />,
+  },
 ];
 
 
@@ -56,11 +60,11 @@ const definitionChildren = [
     label: "Create Task List",
     icon: <FaClipboardList size={30} />,
   },
-  {
-    to: "/admin/create-employee-list",
-    label: "Create Employee List",
-    icon: <FaUsersCog size={30} />,
-  },
+  // {
+  //   to: "/admin/create-employee-list",
+  //   label: "Create Employee List",
+  //   icon: <FaUsersCog size={30} />,
+  // },
 ];
 
 

@@ -132,6 +132,7 @@ import AssignTaskToStaff from "./pages/admin/taskManagement/AssignTaskToStaff.js
 import MonthlyWorkingSheet from "./pages/admin/taskManagement/MontlyWorkingSheet.jsx";
 import TaskProgress from "./pages/admin/taskManagement/TaskProgress.jsx";
 import TaskCompleted from "./pages/admin/taskManagement/TaskCompleted.jsx";
+import TaskDailyBase from "./pages/admin/taskManagement/TaskDailyBase.jsx"
 
 function AppContent() {
   return (
@@ -299,6 +300,7 @@ function AppContent() {
             <Route path="monthly-working-sheet" element={<MonthlyWorkingSheet />} />
             <Route path="task-progress" element={<TaskProgress />} />
             <Route path="task-completed" element={<TaskCompleted />} />
+            <Route path="task-daily-base" element={<TaskDailyBase />} />
 
             {/* payrole */}
             <Route path="payrole" element={<PayrolePage />} />
