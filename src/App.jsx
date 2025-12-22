@@ -133,6 +133,11 @@ import MonthlyWorkingSheet from "./pages/admin/taskManagement/MontlyWorkingSheet
 import TaskProgress from "./pages/admin/taskManagement/TaskProgress.jsx";
 import TaskCompleted from "./pages/admin/taskManagement/TaskCompleted.jsx";
 import TaskDailyBase from "./pages/admin/taskManagement/TaskDailyBase.jsx"
+import ComplaintFrom from "./pages/admin/complaintManagement/ComplaintFrom.jsx";
+import ComplaintAttended from "./pages/admin/complaintManagement/ComplaintAttended.jsx";
+import ComplientAssignedToEmployee from "./pages/admin/complaintManagement/ComplientAssignedToEmployee.jsx";
+import PendingComplaints from "./pages/admin/complaintManagement/PendingComplaints.jsx";
+import ResolvedComplaints from "./pages/admin/complaintManagement/ResolvedComplaints.jsx";
 
 function AppContent() {
   return (
@@ -292,6 +297,7 @@ function AppContent() {
               element={<StoreTransferFromUnits />}
             />
             <Route path="items-issue" element={<StoreItemsIssue />} />
+            
             {/* Task managment */}
             <Route path="task-management" element={<TaskMangementPage />} />
             <Route path="create-employee-list" element={<EmployeList />} />
@@ -335,6 +341,12 @@ function AppContent() {
 
             {/* Complaint Management */}
             <Route path="complaint-management" element={<ComplainMangementPage />} />
+            <Route path="complaint-from" element={<ComplaintFrom />} />
+            <Route path="attended-complaint" element={<ComplaintAttended />} />
+            <Route path="assign-complaint" element={<ComplientAssignedToEmployee />} />
+            <Route path="pending-complaints" element={<PendingComplaints/>} />
+            <Route path="resolved-complaints" element={<ResolvedComplaints/>} />
+
           </Route>
         </Routes>
       </main>

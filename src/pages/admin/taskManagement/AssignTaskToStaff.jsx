@@ -734,7 +734,7 @@ const AssignTaskToStaff = () => {
                                 <div className="grid grid-cols-2 gap-6">
                                     {/* Start Date */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                        <label className=" text-sm font-medium text-gray-700 flex items-center gap-1">
                                             Start Date <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
@@ -753,7 +753,7 @@ const AssignTaskToStaff = () => {
 
                                     {/* End Date */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                        <label className=" text-sm font-medium text-gray-700 flex items-center gap-1">
                                             End Date <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">

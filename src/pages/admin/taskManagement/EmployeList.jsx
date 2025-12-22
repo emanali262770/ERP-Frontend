@@ -716,7 +716,7 @@ const EmployeList = () => {
                                 <div className="grid grid-cols-2 gap-6">
                                     {/* Employee Code */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                        <label className=" text-sm font-medium text-gray-700 flex items-center gap-1">
                                             Employee Code <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
@@ -735,7 +735,7 @@ const EmployeList = () => {
 
                                     {/* Employee Name */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                        <label className=" text-sm font-medium text-gray-700 flex items-center gap-1">
                                             Employee Name <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
@@ -757,7 +757,7 @@ const EmployeList = () => {
 
                                     {/* Email */}
                                     <div className="space-y-2">
-                                        <label className="block text-sm font-medium text-gray-700 flex items-center gap-1">
+                                        <label className=" text-sm font-medium text-gray-700 flex items-center gap-1">
                                             Email Address <span className="text-red-500">*</span>
                                         </label>
                                         <div className="relative">
