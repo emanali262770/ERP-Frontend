@@ -61,7 +61,7 @@ const links = [
 
   // { to: "/admin/store", label: "Store", icon: <FaStore />, key: "isStore" },
   { to: "/admin/task-management", label: "Task Management", icon: <FaTasks />, key: "isTaskMangement" },
-  { to: "/admin/payroll", label: "PayRole", icon: <FaCalculator />, key: "isPayrole" },
+  { to: "/admin/payrole", label: "PayRoll", icon: <FaCalculator />, key: "isPayrole" },
   { to: "/admin/financial", label: "Financial", icon: <FaMoneyBillWave/>, key: "isPayrole" },
   {
     label: "Setup",
