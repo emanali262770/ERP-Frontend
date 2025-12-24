@@ -4,18 +4,18 @@ import gsap from "gsap";
 import { toast } from "react-toastify";
 import Swal from "sweetalert2";
 import axios from "axios";
-import { 
-  FiEdit3, 
-  FiTrash2, 
-  FiCalendar, 
-  FiUsers,
-  FiFileText,
-  FiClock,
-  FiCheckCircle,
-  FiHash,
-  FiUser,
-  FiPackage,
-  FiMessageSquare
+import {
+    FiEdit3,
+    FiTrash2,
+    FiCalendar,
+    FiUsers,
+    FiFileText,
+    FiClock,
+    FiCheckCircle,
+    FiHash,
+    FiUser,
+    FiPackage,
+    FiMessageSquare
 } from "react-icons/fi";
 import { FaCalendarAlt, FaUserFriends } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
@@ -27,7 +27,7 @@ const ComplaintFrom = () => {
     const [complaintId, setComplaintId] = useState("");
     const [selectedCustomer, setSelectedCustomer] = useState("");
     const [selectedProducts, setSelectedProducts] = useState([]);
-    const [complaintText, setComplaintText] = useState("");
+    const [productComplaints, setProductComplaints] = useState({});
     const [isEdit, setIsEdit] = useState(false);
     const [editId, setEditId] = useState(null);
     const sliderRef = useRef(null);
@@ -155,7 +155,7 @@ const ComplaintFrom = () => {
         setIsSliderOpen(true);
         setIsEdit(false);
         setEditId(null);
-        
+
         // Reset form
         const today = new Date().toISOString().split('T')[0];
         setComplaintDate(today);
@@ -166,15 +166,18 @@ const ComplaintFrom = () => {
     };
 
     // Handle product selection
+    // Handle product selection
     const handleProductSelect = (productId) => {
-        setSelectedProducts(prev => {
-            if (prev.includes(productId)) {
-                return prev.filter(id => id !== productId);
-            } else {
-                return [...prev, productId];
-            }
-        });
+        // Toggle selection - if already selected, deselect it, otherwise select only this one
+        if (selectedProducts.includes(productId)) {
+            // If clicking an already selected checkbox, deselect it
+            setSelectedProducts([]);
+        } else {
+            // If selecting a new checkbox, select only this one (clear others)
+            setSelectedProducts([productId]);
+        }
     };
+
 
     // Get selected products names
     const getSelectedProductNames = () => {
@@ -185,15 +188,34 @@ const ComplaintFrom = () => {
     };
 
     // Save or Update Complaint
+  
     const handleSave = async () => {
-        if (!selectedCustomer || selectedProducts.length === 0 || !complaintText) {
-            toast.error("Please select customer, products, and enter complaint text");
+        if (!selectedCustomer || selectedProducts.length === 0) {
+            toast.error("Please select customer and at least one product");
+            return;
+        }
+
+        // Check if all SELECTED products have complaint text
+        const missingComplaints = selectedProducts.filter(
+            productId => !productComplaints[productId]?.trim()  // Fixed: should be productId not product.id
+        );
+
+        if (missingComplaints.length > 0) {
+            toast.error("Please enter complaint text for all selected products");
             return;
         }
 
         try {
             const selectedCustomerData = dummyCustomers.find(c => c.id === parseInt(selectedCustomer));
             const productNames = getSelectedProductNames();
+
+            // Combine all product complaints into one text
+            const combinedComplaint = selectedProducts
+                .map(productId => {
+                    const product = dummyProducts[selectedCustomer].find(p => p.id === productId);
+                    return `${product.name}: ${productComplaints[productId]}`;
+                })
+                .join('\n');
 
             if (isEdit && editId) {
                 // Update complaint
@@ -202,7 +224,7 @@ const ComplaintFrom = () => {
                     complaintId: complaintId,
                     customer: selectedCustomerData.name,
                     products: productNames,
-                    complaint: complaintText,
+                    complaint: combinedComplaint,
                     date: complaintDate
                 };
 
@@ -217,7 +239,7 @@ const ComplaintFrom = () => {
                     complaintId: complaintId,
                     customer: selectedCustomerData.name,
                     products: productNames,
-                    complaint: complaintText,
+                    complaint: combinedComplaint,
                     date: complaintDate
                 };
 
@@ -225,36 +247,63 @@ const ComplaintFrom = () => {
                 toast.success("Complaint added successfully");
             }
 
+            // Clear all selected products after saving
+            setSelectedProducts([]); // Add this line
+
             reState();
         } catch (error) {
             console.error(error);
             toast.error(`❌ ${isEdit ? "Update" : "Add"} Complaint failed`);
         }
     };
-
     // Reset state
+    // In the reState function, add:
     const reState = () => {
         setIsSliderOpen(false);
         setIsEdit(false);
         setEditId(null);
         setSelectedCustomer("");
         setSelectedProducts([]);
-        setComplaintText("");
-    };
 
+        setProductComplaints({}); // Add this line
+    };
     // Edit Complaint
+    // In handleEdit function (around line 230-250), you'll need to parse the combined complaint back:
     const handleEdit = (complaint) => {
         setIsEdit(true);
         setEditId(complaint._id);
         setComplaintId(complaint.complaintId);
         setComplaintDate(complaint.date);
-        
+
         // Find customer by name
         const customer = dummyCustomers.find(c => c.name === complaint.customer);
         setSelectedCustomer(customer ? customer.id.toString() : "");
-        
-        // Set complaint text
-        setComplaintText(complaint.complaint);
+
+        // Parse the combined complaint text back to product complaints
+        // This assumes format: "Product Name: complaint text"
+        const complaintsObj = {};
+        if (customer && dummyProducts[customer.id]) {
+            dummyProducts[customer.id].forEach(product => {
+                if (complaint.products.includes(product.name)) {
+                    // Find this product's complaint in the combined text
+                    const lines = complaint.complaint.split('\n');
+                    const productLine = lines.find(line => line.startsWith(product.name + ':'));
+                    if (productLine) {
+                        complaintsObj[product.id] = productLine.replace(`${product.name}: `, '');
+                    }
+                }
+            });
+        }
+        setProductComplaints(complaintsObj);
+
+        // Set selected products based on product names
+        if (customer && dummyProducts[customer.id]) {
+            const selectedIds = dummyProducts[customer.id]
+                .filter(product => complaint.products.includes(product.name))
+                .map(product => product.id);
+            setSelectedProducts(selectedIds);
+        }
+
         setIsSliderOpen(true);
     };
 
@@ -338,7 +387,7 @@ const ComplaintFrom = () => {
 
     return (
         <div className="p-6 bg-gray-50 min-h-screen">
-            <CommanHeader/>
+            <CommanHeader />
             <div className="flex justify-between items-center mb-6">
                 <div className="flex items-center gap-3">
                     <FiFileText className="text-newPrimary w-8 h-8" />
@@ -377,9 +426,8 @@ const ComplaintFrom = () => {
                             {currentItems.map((complaint, index) => (
                                 <div
                                     key={complaint._id}
-                                    className={`grid grid-cols-[0.5fr_1fr_1fr_1fr_3fr_1fr] items-center gap-4 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-all duration-200 ${
-                                        index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
-                                    }`}
+                                    className={`grid grid-cols-[0.5fr_1fr_1fr_1fr_3fr_1fr] items-center gap-4 px-6 py-4 border-b border-gray-100 hover:bg-gray-50 transition-all duration-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                                        }`}
                                 >
                                     {/* Serial Number */}
                                     <div className="text-sm font-medium text-gray-900">
@@ -443,29 +491,26 @@ const ComplaintFrom = () => {
                     </div>
                 </div>
 
-             
+
             </div>
 
             {/* Slider/Modal for Complaint Form */}
             <div
-                className={`fixed inset-0 flex items-center justify-center z-50 transition-all duration-300 ${
-                    isSliderOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
-                }`}
+                className={`fixed inset-0 flex items-center justify-center z-50 transition-all duration-300 ${isSliderOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+                    }`}
             >
                 {/* Backdrop */}
                 <div
-                    className={`absolute inset-0 bg-gray-600/70 backdrop-blur-0 transition-opacity duration-300 ${
-                        isSliderOpen ? "opacity-100" : "opacity-0"
-                    }`}
+                    className={`absolute inset-0 bg-gray-600/70 backdrop-blur-0 transition-opacity duration-300 ${isSliderOpen ? "opacity-100" : "opacity-0"
+                        }`}
                     onClick={reState}
                 />
 
                 {/* Slider Content */}
                 <div
                     ref={sliderRef}
-                    className={`relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl transform transition-all duration-500 ease-out ${
-                        isSliderOpen ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
-                    }`}
+                    className={`relative bg-white w-full max-w-3xl rounded-3xl shadow-2xl transform transition-all duration-500 ease-out ${isSliderOpen ? "translate-y-0 scale-100" : "translate-y-8 scale-95"
+                        }`}
                 >
                     {/* Header with gradient */}
                     <div className="sticky top-0 z-10 bg-gray-200 px-8 py-4 rounded-t-3xl">
@@ -573,25 +618,25 @@ const ComplaintFrom = () => {
                                 </div>
 
                                 {/* Products Table - Only show when customer is selected */}
+                                {/* Products Table - Only show when customer is selected */}
                                 {selectedCustomer && dummyProducts[selectedCustomer] && (
                                     <div className="mt-6">
                                         <label className="block text-sm font-medium text-gray-700 mb-3">
                                             Select Products for Complaint <span className="text-red-500">*</span>
                                         </label>
                                         <div className="rounded-lg border border-gray-300 overflow-hidden">
-                                            <div className="grid grid-cols-[0.2fr_0.5fr_2fr] gap-4 bg-gray-100 py-3 px-4 text-sm font-medium text-gray-700">
+                                            <div className="grid grid-cols-[0.2fr_0.5fr_2fr_3fr] gap-4 bg-gray-100 py-3 px-4 text-sm font-medium text-gray-700">
                                                 <div>Select</div>
                                                 <div>Sr#</div>
                                                 <div>Product</div>
-                                                
+                                                <div>Complaint</div>
                                             </div>
                                             <div className="max-h-60 overflow-y-auto">
                                                 {dummyProducts[selectedCustomer].map((product, index) => (
                                                     <div
                                                         key={product.id}
-                                                        className={`grid grid-cols-[0.2fr_0.5fr_2fr] gap-4 items-center py-3 px-4 border-b border-gray-200 hover:bg-gray-50 ${
-                                                            index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
-                                                        }`}
+                                                        className={`grid grid-cols-[0.2fr_0.5fr_2fr_3fr] gap-4 items-center py-3 px-4 border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                                                            }`}
                                                     >
                                                         <div className="flex items-center">
                                                             <input
@@ -599,17 +644,39 @@ const ComplaintFrom = () => {
                                                                 checked={selectedProducts.includes(product.id)}
                                                                 onChange={() => handleProductSelect(product.id)}
                                                                 className="w-4 h-4 text-newPrimary rounded focus:ring-newPrimary border-gray-300"
+                                                                id={`product-${product.id}`}
                                                             />
                                                         </div>
-                                                         <div className="text-sm text-gray-500">
+                                                        <div className="text-sm text-gray-500">
                                                             {index + 1}
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <FiPackage className="w-4 h-4 text-gray-400" />
                                                             {product.name}
                                                         </div>
-                                                       
-                                                       
+                                                        <div>
+                                                            <div className="relative">
+                                                                <input
+                                                                    type="text"
+                                                                    value={productComplaints[product.id] || ""}
+                                                                    onChange={(e) => {
+                                                                        // Only allow editing if product is selected
+                                                                        if (selectedProducts.includes(product.id)) {
+                                                                            setProductComplaints(prev => ({
+                                                                                ...prev,
+                                                                                [product.id]: e.target.value
+                                                                            }));
+                                                                        }
+                                                                    }}
+                                                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-newPrimary bg-white transition-all duration-200 text-sm ${selectedProducts.includes(product.id)
+                                                                        ? "border-gray-300 focus:ring-newPrimary/30"
+                                                                        : "border-gray-200 bg-gray-50 text-gray-500 cursor-not-allowed"
+                                                                        }`}
+                                                                    placeholder="Enter complaint for this product..."
+                                                                    readOnly={!selectedProducts.includes(product.id)}
+                                                                />
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -620,24 +687,8 @@ const ComplaintFrom = () => {
                                     </div>
                                 )}
 
-                                {/* Complaint Text Area */}
-                                <div className="space-y-2">
-                                    <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
-                                        Complaint Description <span className="text-red-500">*</span>
-                                    </label>
-                                    <div className="relative">
-                                        <div className="absolute top-3 left-3 pointer-events-none">
-                                            <FiMessageSquare className="w-5 h-5 text-gray-400" />
-                                        </div>
-                                        <textarea
-                                            value={complaintText}
-                                            onChange={(e) => setComplaintText(e.target.value)}
-                                            rows="4"
-                                            className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-newPrimary/30 focus:border-newPrimary bg-white transition-all duration-200 hover:border-gray-400 resize-none"
-                                            placeholder="Enter detailed complaint description..."
-                                        />
-                                    </div>
-                                </div>
+
+
                             </div>
 
                             {/* Save Button */}
