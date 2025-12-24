@@ -13,6 +13,7 @@ import {
   FaCheckDouble
 } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
+import { AiOutlineProduct } from "react-icons/ai";
 
 /* ================= FUNCTIONALITY ================= */
 const functionalityChildren = [
@@ -50,6 +51,11 @@ const setupChildren = [
     to: "/admin/complaint-from",
     label: "Complaint From",
     icon: <FaFileAlt size={30} />,
+  },
+  {
+    to: "/admin/product-installed",
+    label: "Product Installed",
+    icon: <AiOutlineProduct size={30} />,
   },
 ];
 
