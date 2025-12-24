@@ -15,7 +15,8 @@ import {
     FiHash,
     FiUser,
     FiPackage,
-    FiMessageSquare
+    FiMessageSquare,
+    FiClipboard
 } from "react-icons/fi";
 import { FaCalendarAlt, FaUserFriends } from "react-icons/fa";
 import CommanHeader from "../../../components/CommanHeader";
@@ -29,6 +30,7 @@ const ComplaintFrom = () => {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [productComplaints, setProductComplaints] = useState({});
     const [isEdit, setIsEdit] = useState(false);
+    const [remarks, setRemarks] = useState("");
     const [editId, setEditId] = useState(null);
     const sliderRef = useRef(null);
     const [loading, setLoading] = useState(true);
@@ -46,27 +48,27 @@ const ComplaintFrom = () => {
 
     const dummyProducts = {
         1: [
-            { id: 1, name: "Laptop Pro", serial: "LP001" },
-            { id: 2, name: "Monitor 27inch", serial: "MN001" },
-            { id: 3, name: "Keyboard Wireless", serial: "KB001" }
+            { id: 1, name: "Laptop Pro", serial: "LP001",slatype: "Annual" },
+            { id: 2, name: "Monitor 27inch", serial: "MN001",slatype: "Per Visit" },
+            { id: 3, name: "Keyboard Wireless", serial: "KB001",slatype: "Annual" }
         ],
         2: [
-            { id: 4, name: "Smartphone X", serial: "SP001" },
-            { id: 5, name: "Tablet Pro", serial: "TB001" },
-            { id: 6, name: "Smart Watch", serial: "SW001" }
+            { id: 4, name: "Smartphone X", serial: "SP001",slatype: "Per Visit" },
+            { id: 5, name: "Tablet Pro", serial: "TB001",slatype: "Per Visit" },
+            { id: 6, name: "Smart Watch", serial: "SW001",slatype: "Per Visit" }
         ],
         3: [
-            { id: 7, name: "Server Rack", serial: "SR001" },
-            { id: 8, name: "Network Switch", serial: "NS001" },
-            { id: 9, name: "Router Advanced", serial: "RT001" }
+            { id: 7, name: "Server Rack", serial: "SR001",slatype: "Annual" },
+            { id: 8, name: "Network Switch", serial: "NS001",slatype: "Per Visit" },
+            { id: 9, name: "Router Advanced", serial: "RT001",slatype: "Annual" }
         ],
         4: [
-            { id: 10, name: "Software License", serial: "SL001" },
-            { id: 11, name: "Antivirus Pro", serial: "AV001" }
+            { id: 10, name: "Software License", serial: "SL001" ,slatype: "Annual"},
+            { id: 11, name: "Antivirus Pro", serial: "AV001",slatype: "Per Visit" }
         ],
         5: [
-            { id: 12, name: "Printer Laser", serial: "PR001" },
-            { id: 13, name: "Scanner HD", serial: "SC001" }
+            { id: 12, name: "Printer Laser", serial: "PR001",slatype: "Per Visit" },
+            { id: 13, name: "Scanner HD", serial: "SC001" ,slatype: "Annual"}
         ]
     };
 
@@ -188,7 +190,7 @@ const ComplaintFrom = () => {
     };
 
     // Save or Update Complaint
-  
+
     const handleSave = async () => {
         if (!selectedCustomer || selectedProducts.length === 0) {
             toast.error("Please select customer and at least one product");
@@ -625,9 +627,9 @@ const ComplaintFrom = () => {
                                             Select Products for Complaint <span className="text-red-500">*</span>
                                         </label>
                                         <div className="rounded-lg border border-gray-300 overflow-hidden">
-                                            <div className="grid grid-cols-[0.2fr_0.5fr_2fr_3fr] gap-4 bg-gray-100 py-3 px-4 text-sm font-medium text-gray-700">
+                                            <div className="grid grid-cols-[0.2fr_1fr_2fr_3fr] whitespace-nowrap gap-4 bg-gray-100 py-3 px-4 text-sm font-medium text-gray-700">
                                                 <div>Select</div>
-                                                <div>Sr#</div>
+                                                <div>SLA Type</div>
                                                 <div>Product</div>
                                                 <div>Complaint</div>
                                             </div>
@@ -635,7 +637,7 @@ const ComplaintFrom = () => {
                                                 {dummyProducts[selectedCustomer].map((product, index) => (
                                                     <div
                                                         key={product.id}
-                                                        className={`grid grid-cols-[0.2fr_0.5fr_2fr_3fr] gap-4 items-center py-3 px-4 border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                                                        className={`grid grid-cols-[0.2fr_1fr_2fr_3fr] gap-4 items-center py-3 px-4 border-b border-gray-200 hover:bg-gray-50 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
                                                             }`}
                                                     >
                                                         <div className="flex items-center">
@@ -647,8 +649,8 @@ const ComplaintFrom = () => {
                                                                 id={`product-${product.id}`}
                                                             />
                                                         </div>
-                                                        <div className="text-sm text-gray-500">
-                                                            {index + 1}
+                                                        <div className="text-sm inline-flex justify-center gap-2  text-gray-500">
+                                                            {product.slatype }
                                                         </div>
                                                         <div className="flex items-center gap-2">
                                                             <FiPackage className="w-4 h-4 text-gray-400" />
@@ -689,6 +691,25 @@ const ComplaintFrom = () => {
 
 
 
+                            </div>
+
+                            {/* Remarks Text Area */}
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium text-gray-700 flex items-center gap-1">
+                                    Remarks <span className="text-red-500">*</span>
+                                </label>
+                                <div className="relative">
+                                    <div className="absolute top-3 left-3 pointer-events-none">
+                                        <FiClipboard className="w-5 h-5 text-gray-400" />
+                                    </div>
+                                    <textarea
+                                        value={remarks}
+                                        onChange={(e) => setRemarks(e.target.value)}
+                                        rows="3"
+                                        className="w-full pl-12 pr-4 py-3.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-newPrimary/30 focus:border-newPrimary bg-white transition-all duration-200 hover:border-gray-400 resize-none"
+                                        placeholder="Enter remarks and resolution details..."
+                                    />
+                                </div>
                             </div>
 
                             {/* Save Button */}

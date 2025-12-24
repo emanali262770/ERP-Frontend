@@ -138,6 +138,7 @@ import ComplaintAttended from "./pages/admin/complaintManagement/ComplaintAttend
 import ComplientAssignedToEmployee from "./pages/admin/complaintManagement/ComplientAssignedToEmployee.jsx";
 import PendingComplaints from "./pages/admin/complaintManagement/PendingComplaints.jsx";
 import ResolvedComplaints from "./pages/admin/complaintManagement/ResolvedComplaints.jsx";
+import ProductInstalled from "./pages/admin/complaintManagement/ProductInstalled.jsx";
 
 function AppContent() {
   return (
@@ -346,6 +347,7 @@ function AppContent() {
             <Route path="assign-complaint" element={<ComplientAssignedToEmployee />} />
             <Route path="pending-complaints" element={<PendingComplaints/>} />
             <Route path="resolved-complaints" element={<ResolvedComplaints/>} />
+            <Route path="product-installed" element={<ProductInstalled/>} />
 
           </Route>
         </Routes>
