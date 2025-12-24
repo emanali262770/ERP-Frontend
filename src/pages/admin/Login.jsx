@@ -19,7 +19,7 @@ const Login = () => {
   const dispatch = useDispatch();
   const fillDemoCredentials = () => {
     setEmail("admin@gmail.com");
-    setPassword("admin123");
+    setPassword("admin1122");
   };
 
 
