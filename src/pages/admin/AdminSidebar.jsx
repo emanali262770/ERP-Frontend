@@ -38,6 +38,11 @@ const links = [
     icon: <FaWarehouse />,
   },
   {
+    to: "/admin/store",
+    label: "Store",
+    icon: <FaShoppingCart />,
+  },
+  {
     to: "/admin/purchase",
     label: "Purchase",
     icon: <FaShoppingCart />,
